@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/models/wanderer_model.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"wanderer"
+display_name = "ENEMY_WANDERER"
+base_health = 100
+health_per_wave = 15
+speed = 2.5
+damage = 20
+attack_range = 1.4
+attack_windup = 0.45
+attack_cooldown = 1.1
+climb_time = 1.1
+model = ExtResource("2")

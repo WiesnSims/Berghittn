@@ -6,9 +6,21 @@ messages = {
 [&"", &"UI_TITLE"]: [&"Berghittn"],
 [&"", &"UI_TAGLINE"]: [&"Snowstorm. Undead. One hut."],
 [&"", &"UI_CLICK_TO_PLAY"]: [&"Click to play"],
-[&"", &"UI_CONTROLS"]: [&"WASD move  ·  Mouse look  ·  Space jump  ·  Shift sprint  ·  C crouch  ·  Esc pause  ·  F3 debug"],
+[&"", &"UI_CONTROLS"]: [&"WASD move  ·  Mouse look  ·  LMB shoot  ·  R reload  ·  Space jump  ·  Shift sprint  ·  C crouch  ·  Esc pause  ·  F3 debug"],
 [&"", &"UI_PAUSE_TITLE"]: [&"Paused"],
 [&"", &"UI_PAUSE_HINT"]: [&"A quick Jause, then back to it."],
 [&"", &"UI_RESUME"]: [&"Resume"],
-[&"", &"UI_DEBUG_OVERLAY"]: [&"%d FPS   pos %.1f / %.1f / %.1f"]
+[&"", &"UI_DEBUG_OVERLAY"]: [&"%d FPS   pos %.1f / %.1f / %.1f"],
+[&"", &"UI_AMMO"]: [&"%d / %d"],
+[&"", &"UI_RELOADING"]: [&"Reloading…"],
+[&"", &"UI_RELOAD_HINT"]: [&"R to reload"],
+[&"", &"UI_NO_AMMO"]: [&"Out of ammo"],
+[&"", &"UI_DEATH_TITLE"]: [&"Game over"],
+[&"", &"UI_DEATH_QUIP_1"]: [&"\"Geh, des gibt's jo ned!\"  (No way, that can't be!)"],
+[&"", &"UI_DEATH_QUIP_2"]: [&"\"Na, des is ka Wanderweg mehr.\"  (Well, that's no hiking trail anymore.)"],
+[&"", &"UI_DEATH_QUIP_3"]: [&"\"Jetzt brauch i an Schnaps.\"  (Now I need a schnaps.)"],
+[&"", &"UI_DEATH_QUIP_4"]: [&"The hiker reached the summit. Unfortunately, you were the summit."],
+[&"", &"UI_RESTART"]: [&"Try again"],
+[&"", &"WEAPON_PISTOLE"]: [&"Service pistol"],
+[&"", &"ENEMY_WANDERER"]: [&"Hiker"]
 }

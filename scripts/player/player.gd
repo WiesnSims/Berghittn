@@ -1,7 +1,11 @@
 class_name Player
 extends CharacterBody3D
-## First-person controller: walk, sprint, jump, crouch and mouse look.
+## First-person controller: walk, sprint, jump, crouch and mouse look. Health and weapons live in child nodes.
 
+signal died
+
+@onready var health: PlayerHealth = $Health
+@onready var weapons: WeaponHolder = $Head/Camera3D/WeaponHolder
 @onready var _head: Node3D = $Head
 @onready var _collision: CollisionShape3D = $CollisionShape3D
 @onready var _capsule: CapsuleShape3D = _collision.shape as CapsuleShape3D
@@ -16,6 +20,8 @@ var _spawn_transform: Transform3D
 func _ready() -> void:
 	_spawn_transform = global_transform
 	_apply_height(Constants.PLAYER_STAND_HEIGHT)
+	weapons.set_owner_body(self)
+	health.died.connect(_on_died)
 
 
 func spawn_at(spawn: Transform3D) -> void:
@@ -23,12 +29,24 @@ func spawn_at(spawn: Transform3D) -> void:
 	_respawn()
 
 
+func is_targetable() -> bool:
+	return not health.is_dead()
+
+
+func take_damage(amount: int) -> void:
+	health.take_damage(amount)
+
+
 func _unhandled_input(event: InputEvent) -> void:
+	if health.is_dead():
+		return
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		_look((event as InputEventMouseMotion).screen_relative)
 
 
 func _physics_process(delta: float) -> void:
+	if health.is_dead():
+		return
 	_update_crouch(delta)
 	if not is_on_floor():
 		velocity.y -= _gravity * delta
@@ -89,3 +107,14 @@ func _apply_height(height: float) -> void:
 func _respawn() -> void:
 	global_transform = _spawn_transform
 	velocity = Vector3.ZERO
+
+
+func _on_died() -> void:
+	weapons.process_mode = Node.PROCESS_MODE_DISABLED
+	weapons.visible = false
+	# Drop to the floor and roll onto one side, so the death reads before the screen appears.
+	var tween: Tween = create_tween().set_parallel().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(_head, "position:y", Constants.PLAYER_CROUCH_HEIGHT * 0.3, Constants.PLAYER_DEATH_FALL_TIME)
+	tween.tween_property(_head, "rotation:z", deg_to_rad(70.0), Constants.PLAYER_DEATH_FALL_TIME)
+	died.emit()
+	Events.player_died.emit(self)

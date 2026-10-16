@@ -28,7 +28,7 @@ Needs `DecompressionStream` (Chrome 80+, Firefox 113+, Safari 16.4+).
 
 ## Controls
 
-WASD / arrows move, mouse look, Space jump, Shift sprint (forward only), C crouch
+WASD / arrows move, mouse look, left click shoot, R reload, Space jump, Shift sprint (forward only), C crouch
 (not Ctrl: Ctrl+W closes the browser tab), E interact, Esc or P pause, F3 debug overlay
 (FPS and position).
 
@@ -39,7 +39,25 @@ immediate re-lock.
 ## Physics layers
 
 1 `world`, 2 `player`, 3 `enemy`, 4 `player_blocker` (window openings: blocks players,
-lets enemies through later).
+lets enemies through), 5 `hitbox` (enemy body/head hurtboxes; hitscan rays test `world` + `hitbox`).
+
+## Navigation
+
+Each zone has a `NavigationRegion3D` with `scripts/zones/navmesh_baker.gd`, which bakes at load
+from the zone's colliding CSG shapes (~12 ms for the Stube). Windows are one-way
+`NavigationLink3D`s; enemies hop through them when the agent reaches a link.
+`navigation/world/region_use_async_iterations` is off: with it on, Godot 4.7 never pushes
+the runtime-baked mesh to the navigation server (paths come back empty).
+
+## Tests
+
+```
+godot --headless --fixed-fps 60 res://tests/m2_smoke.tscn
+```
+
+Drives the real main scene: navmesh bake, an enemy pathing in through a window and hitting the
+player, killing it with the pistol, regeneration, player death and the death screen.
+`tests/` is excluded from the web export.
 
 ## Deploy
 
