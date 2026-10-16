@@ -26,26 +26,26 @@ shape = SubResource("Body")
 
 [node name="Visual" type="Node3D" parent="."]
 
-[node name="BodyHurtbox" type="Area3D" parent="." node_paths=PackedStringArray("receiver")]
+[node name="BodyHurtbox" type="Area3D" parent="Visual" node_paths=PackedStringArray("receiver")]
 collision_layer = 16
 collision_mask = 0
 monitoring = false
 script = ExtResource("2")
-receiver = NodePath("..")
+receiver = NodePath("../..")
 
-[node name="Shape" type="CollisionShape3D" parent="BodyHurtbox"]
+[node name="Shape" type="CollisionShape3D" parent="Visual/BodyHurtbox"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.725, 0)
 shape = SubResource("BodyHit")
 
-[node name="HeadHurtbox" type="Area3D" parent="." node_paths=PackedStringArray("receiver")]
+[node name="HeadHurtbox" type="Area3D" parent="Visual" node_paths=PackedStringArray("receiver")]
 collision_layer = 16
 collision_mask = 0
 monitoring = false
 script = ExtResource("2")
 is_head = true
-receiver = NodePath("..")
+receiver = NodePath("../..")
 
-[node name="Shape" type="CollisionShape3D" parent="HeadHurtbox"]
+[node name="Shape" type="CollisionShape3D" parent="Visual/HeadHurtbox"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.64, -0.02)
 shape = SubResource("HeadHit")
 

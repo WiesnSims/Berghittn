@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/weapons/viewmodel.gd" id="1"]
 
@@ -18,6 +18,10 @@ size = Vector3(0.034, 0.042, 0.17)
 [sub_resource type="BoxMesh" id="GripMesh"]
 material = SubResource("Grip")
 size = Vector3(0.032, 0.11, 0.05)
+
+[sub_resource type="BoxMesh" id="MagMesh"]
+material = SubResource("Metal")
+size = Vector3(0.026, 0.1, 0.04)
 
 [sub_resource type="StandardMaterial3D" id="Flash"]
 transparency = 1
@@ -43,6 +47,11 @@ mesh = SubResource("Slide")
 transform = Transform3D(1, 0, 0, 0, 0.966, 0.259, 0, -0.259, 0.966, 0, -0.065, 0.055)
 cast_shadow = 0
 mesh = SubResource("GripMesh")
+
+[node name="Magazine" type="MeshInstance3D" parent="Model/Grip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.012, 0)
+cast_shadow = 0
+mesh = SubResource("MagMesh")
 
 [node name="MuzzleFlash" type="Node3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, -0.11)

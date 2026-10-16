@@ -48,8 +48,12 @@ const ENEMY_REPATH_INTERVAL: float = 0.25
 const ENEMY_TURN_SPEED: float = 8.0
 const ENEMY_CORPSE_TIME: float = 5.0
 const ENEMY_DEATH_FALL_TIME: float = 0.6
-# Peak height of the hop through a window, above the straight line between both sides.
-const ENEMY_CLIMB_ARC: float = 0.7
+# Window entry: height of the window centre above the inside floor (sill 0.9 m + half of the 1.2 m
+# opening), how far from the wall centre the enemy stands to start its dive and lands inside,
+# and the root height that puts a body lying face down on the floor.
+const ENEMY_WINDOW_DIVE_HEIGHT: float = 1.5
+const ENEMY_WINDOW_STAND_OFF: float = 0.75
+const ENEMY_LYING_HEIGHT: float = 0.2
 # Vertical distance beyond which a melee swing cannot reach (player on a table, enemy below).
 const ENEMY_ATTACK_MAX_HEIGHT: float = 1.4
 

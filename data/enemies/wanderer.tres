@@ -14,5 +14,5 @@ damage = 20
 attack_range = 1.4
 attack_windup = 0.45
 attack_cooldown = 1.1
-climb_time = 1.1
+climb_time = 2.2
 model = ExtResource("2")

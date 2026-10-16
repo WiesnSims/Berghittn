@@ -62,6 +62,13 @@ Drives the real main scene: navmesh bake, an enemy pathing in through a window a
 player, killing it with the pistol, regeneration, player death and the death screen.
 `tests/` is excluded from the web export.
 
+```
+godot res://tests/climb_view.tscn -- <out_dir> inside|outside|reload
+```
+
+Needs a real window (not `--headless`): saves PNG frames of an enemy's window entry, seen from
+inside or outside, or of the pistol reload, for checking animations without playing.
+
 ## Deploy
 
 Cloudflare Pages project `berghittn` -> https://berghittn.pages.dev
