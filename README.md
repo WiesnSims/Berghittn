@@ -61,6 +61,12 @@ keeps players in and lets enemies through. Wall-buys (`WallBuy`, a chalk outline
 Jagdflinte (Stube) and the Stutzen (Skiraum), and once you carry the gun, ammo at `ammo_cost` (half price).
 Two gun slots: a new gun goes in the free slot, otherwise it replaces the gun in hand.
 
+Outside (`scenes/zones/exterior.tscn`) the hut stands on an Alm: the walkable snow is a flat CSG
+disc (radius 37 m around the hut), and `AlmTerrain` generates the mountain beyond it at load
+(flat-shaded, rock on steep faces, pines below the tree line and rocks above as two MultiMeshes,
+no collision since nobody can get there). `MountainBackdrop` draws two rings of far peaks that
+ignore fog and fade into the fog color at their foot, so the summits show through the storm.
+
 ## Navigation
 
 One `NavigationRegion3D` (`World/Navigation` in main) with `scripts/zones/navmesh_baker.gd` bakes

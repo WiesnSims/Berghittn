@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Material" path="res://assets/materials/greybox_wood_floor.tres" id="1"]
 [ext_resource type="Material" path="res://assets/materials/greybox_wood_wall.tres" id="2"]
@@ -10,7 +10,8 @@
 [ext_resource type="PackedScene" path="res://scenes/props/table_set.tscn" id="8"]
 [ext_resource type="Material" path="res://assets/materials/greybox_lamp.tres" id="9"]
 [ext_resource type="PackedScene" path="res://scenes/zones/wallbuy_jagdflinte.tscn" id="10"]
-[ext_resource type="Script" path="res://scripts/zones/spawn_point.gd" id="11"]
+[ext_resource type="Material" path="res://assets/materials/greybox_snow.tres" id="11"]
+[ext_resource type="Script" path="res://scripts/zones/spawn_point.gd" id="12"]
 
 [node name="Stube" type="Node3D"]
 
@@ -205,6 +206,35 @@ omni_range = 8
 [node name="WallBuyJagdflinte" parent="." instance=ExtResource("10")]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0.8, 1.5, -4.99)
 
+[node name="Roof" type="Node3D" parent="."]
+
+[node name="PlaneA" type="CSGBox3D" parent="Roof"]
+transform = Transform3D(1, 0, 0, 0, 0.866, -0.5, 0, 0.5, 0.866, 0, 4.9768, 2.95)
+size = Vector3(15.8, 0.25, 6.9127)
+material = ExtResource("11")
+
+[node name="PlaneB" type="CSGBox3D" parent="Roof"]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, 0, 4.9768, -2.95)
+size = Vector3(15.8, 0.25, 6.9127)
+material = ExtResource("11")
+
+[node name="GableA" type="CSGPolygon3D" parent="Roof"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -7, 3.5, 0)
+polygon = PackedVector2Array(-5.3, 0, 5.3, 0, 0, 3.06)
+depth = 0.3
+material = ExtResource("2")
+
+[node name="GableB" type="CSGPolygon3D" parent="Roof"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 7.3, 3.5, 0)
+polygon = PackedVector2Array(-5.3, 0, 5.3, 0, 0, 3.06)
+depth = 0.3
+material = ExtResource("2")
+
+[node name="Chimney" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 5.8, 0)
+size = Vector3(0.8, 4.6, 0.8)
+material = ExtResource("5")
+
 [node name="PlayerSpawn" type="Marker3D" parent="." groups=["player_spawn"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 3.8)
 
@@ -212,10 +242,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 3.8)
 
 [node name="WestNorth" type="Marker3D" parent="SpawnPoints"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, -0.3, -2)
-script = ExtResource("11")
+script = ExtResource("12")
 zone = &"stube"
 
 [node name="WestSouth" type="Marker3D" parent="SpawnPoints"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, -0.3, 2.5)
-script = ExtResource("11")
+script = ExtResource("12")
 zone = &"stube"

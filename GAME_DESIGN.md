@@ -335,6 +335,11 @@ fix console errors, commit. Stop and report after each milestone.
 - All six zones greybox-connected, door purchasing, spawn activation rules,
   shotgun and rifle wall-buys, ammo refill.
 - Acceptance: unlock all zones in a test run (debug key may add points).
+- Added by user request (2026-10-16): the surroundings must read as an Alm in the mountains: the
+  hut on a flat pasture plateau, the slope rising to the summit behind it and dropping into a
+  forested valley in front, snowy peaks showing through the storm, pitched snowy roofs, a yellow
+  trail sign, the cable car line, a hay barn, a wayside cross and a crossed-rail fence. Greybox
+  only; the art pass stays in M6.
 
 **M5 — Shrine, chest, more enemies**
 - Perks, Hüttentruhe, `tourist`, `knappe`, `perchte`, `krampus` boss wave.

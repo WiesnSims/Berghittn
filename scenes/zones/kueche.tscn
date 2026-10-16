@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Material" path="res://assets/materials/greybox_tile.tres" id="1"]
 [ext_resource type="Material" path="res://assets/materials/greybox_wood_wall.tres" id="2"]
@@ -7,7 +7,8 @@
 [ext_resource type="Material" path="res://assets/materials/greybox_stone.tres" id="5"]
 [ext_resource type="Material" path="res://assets/materials/greybox_metal.tres" id="6"]
 [ext_resource type="Material" path="res://assets/materials/greybox_lamp.tres" id="7"]
-[ext_resource type="Script" path="res://scripts/zones/spawn_point.gd" id="8"]
+[ext_resource type="Material" path="res://assets/materials/greybox_snow.tres" id="8"]
+[ext_resource type="Script" path="res://scripts/zones/spawn_point.gd" id="9"]
 
 [node name="Kueche" type="Node3D"]
 
@@ -139,19 +140,43 @@ light_color = Color(1, 0.75, 0.45, 1)
 light_energy = 1
 omni_range = 7
 
+[node name="Roof" type="Node3D" parent="."]
+
+[node name="PlaneA" type="CSGBox3D" parent="Roof"]
+transform = Transform3D(1, 0, 0, 0, 0.866, -0.5, 0, 0.5, 0.866, 4, 4.9335, -7.575)
+size = Vector3(15.8, 0.25, 6.7395)
+material = ExtResource("8")
+
+[node name="PlaneB" type="CSGBox3D" parent="Roof"]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, 4, 4.9335, -13.325)
+size = Vector3(15.8, 0.25, 6.7395)
+material = ExtResource("8")
+
+[node name="GableA" type="CSGPolygon3D" parent="Roof"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -3, 3.5, -10.45)
+polygon = PackedVector2Array(-5.15, 0, 5.15, 0, 0, 2.9734)
+depth = 0.3
+material = ExtResource("2")
+
+[node name="GableB" type="CSGPolygon3D" parent="Roof"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 11.3, 3.5, -10.45)
+polygon = PackedVector2Array(-5.15, 0, 5.15, 0, 0, 2.9734)
+depth = 0.3
+material = ExtResource("2")
+
 [node name="SpawnPoints" type="Node3D" parent="."]
 
 [node name="NorthWest" type="Marker3D" parent="SpawnPoints"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, -0.3, -19.5)
-script = ExtResource("8")
+script = ExtResource("9")
 zone = &"kueche"
 
 [node name="NorthEast" type="Marker3D" parent="SpawnPoints"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, -0.3, -19.5)
-script = ExtResource("8")
+script = ExtResource("9")
 zone = &"kueche"
 
 [node name="West" type="Marker3D" parent="SpawnPoints"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, -0.3, -10)
-script = ExtResource("8")
+script = ExtResource("9")
 zone = &"kueche"

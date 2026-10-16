@@ -14,6 +14,11 @@ const VIEWS: Array = [
 	["schuppen", Vector3(8.2, 2.2, 18.4), Vector3(20.0, 0.8, 10.0)],
 	["terrasse", Vector3(-6.2, 2.2, 16.6), Vector3(5.0, 0.5, 6.0)],
 	["outside", Vector3(-16.0, 6.0, 26.0), Vector3(6.0, 0.0, 2.0)],
+	["alm_valley", Vector3(0.0, 1.7, 16.0), Vector3(0.0, -6.0, 70.0)],
+	["alm_summit", Vector3(2.0, 1.7, -20.0), Vector3(2.0, 14.0, -80.0)],
+	["alm_cable", Vector3(23.0, 1.7, 8.0), Vector3(60.0, 14.0, 4.0)],
+	["alm_signpost", Vector3(-6.8, 1.7, 16.4), Vector3(-10.0, 1.7, 19.5)],
+	["alm_aerial", Vector3(-45.0, 28.0, 55.0), Vector3(7.0, 0.0, 0.0)],
 ]
 
 var _out_dir: String

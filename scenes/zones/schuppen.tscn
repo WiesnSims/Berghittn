@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Material" path="res://assets/materials/greybox_wood_floor.tres" id="1"]
 [ext_resource type="Material" path="res://assets/materials/greybox_wood_wall.tres" id="2"]
@@ -6,7 +6,8 @@
 [ext_resource type="PackedScene" path="res://scenes/zones/window.tscn" id="4"]
 [ext_resource type="Material" path="res://assets/materials/greybox_board.tres" id="5"]
 [ext_resource type="Material" path="res://assets/materials/greybox_lamp.tres" id="6"]
-[ext_resource type="Script" path="res://scripts/zones/spawn_point.gd" id="7"]
+[ext_resource type="Material" path="res://assets/materials/greybox_snow.tres" id="7"]
+[ext_resource type="Script" path="res://scripts/zones/spawn_point.gd" id="8"]
 
 [node name="Schuppen" type="Node3D"]
 
@@ -120,19 +121,43 @@ light_color = Color(1, 0.75, 0.45, 1)
 light_energy = 0.9
 omni_range = 9
 
+[node name="Roof" type="Node3D" parent="."]
+
+[node name="PlaneA" type="CSGBox3D" parent="Roof"]
+transform = Transform3D(1, 0, 0, 0, 0.9063, -0.4226, 0, 0.4226, 0.9063, 14.3, 4.6808, 17.325)
+size = Vector3(15.8, 0.25, 6.4444)
+material = ExtResource("7")
+
+[node name="PlaneB" type="CSGBox3D" parent="Roof"]
+transform = Transform3D(1, 0, 0, 0, 0.9063, 0.4226, 0, -0.4226, 0.9063, 14.3, 4.6808, 11.575)
+size = Vector3(15.8, 0.25, 6.4444)
+material = ExtResource("7")
+
+[node name="GableA" type="CSGPolygon3D" parent="Roof"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 7.3, 3.5, 14.45)
+polygon = PackedVector2Array(-5.15, 0, 5.15, 0, 0, 2.4015)
+depth = 0.3
+material = ExtResource("2")
+
+[node name="GableB" type="CSGPolygon3D" parent="Roof"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 21.6, 3.5, 14.45)
+polygon = PackedVector2Array(-5.15, 0, 5.15, 0, 0, 2.4015)
+depth = 0.3
+material = ExtResource("2")
+
 [node name="SpawnPoints" type="Node3D" parent="."]
 
 [node name="SouthWest" type="Marker3D" parent="SpawnPoints"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, -0.3, 23)
-script = ExtResource("7")
+script = ExtResource("8")
 zone = &"schuppen"
 
 [node name="SouthEast" type="Marker3D" parent="SpawnPoints"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, -0.3, 23)
-script = ExtResource("7")
+script = ExtResource("8")
 zone = &"schuppen"
 
 [node name="East" type="Marker3D" parent="SpawnPoints"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, -0.3, 14.5)
-script = ExtResource("7")
+script = ExtResource("8")
 zone = &"schuppen"
