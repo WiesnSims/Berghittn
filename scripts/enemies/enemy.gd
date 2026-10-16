@@ -7,12 +7,15 @@ signal died(enemy: Enemy)
 ## Corpse gone; the enemy can go back to the pool.
 signal despawned(enemy: Enemy)
 
-enum State { INACTIVE, CHASING, CLIMBING, ATTACKING, DEAD }
+## QUEUED: waiting at a window another enemy is working. BREAKING: tearing boards off a barricade.
+enum State { INACTIVE, CHASING, QUEUED, BREAKING, CLIMBING, ATTACKING, DEAD }
 
 @onready var _agent: NavigationAgent3D = $NavigationAgent3D
 @onready var _visual: Node3D = $Visual
 # Under Visual so they follow the climb and bob animations: you hit what you see.
 @onready var _hurtboxes: Array[Hurtbox] = [$Visual/BodyHurtbox as Hurtbox, $Visual/HeadHurtbox as Hurtbox]
+@onready var _head_shape: Node3D = $Visual/HeadHurtbox/Shape
+@onready var _head_pop: EffectPool = $HeadPop
 
 var data: EnemyData
 var health: int = 0
@@ -25,10 +28,24 @@ var _attack_time: float = 0.0
 var _has_swung: bool = false
 var _walk_phase: float = 0.0
 var _tween: Tween
+# Hit reaction runs on the model, not on Visual, so it never fights the climb, attack or death tweens.
+var _flinch_tween: Tween
+var _flash_material: StandardMaterial3D
+var _meshes: Array[MeshInstance3D] = []
+var _head_parts: Array[Node3D] = []
+# The window being entered, from the navigation link: wall centre, inward direction, landing point inside.
+var _window: Barricade
+var _window_wall: Vector3
+var _window_forward: Vector3
+var _window_exit: Vector3
 
 
 func _ready() -> void:
 	_agent.link_reached.connect(_on_link_reached)
+	_flash_material = StandardMaterial3D.new()
+	_flash_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_flash_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_flash_material.albedo_color = Color(1, 1, 1, 0)
 
 
 func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
@@ -37,13 +54,19 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 			_model.queue_free()
 		_model = enemy_data.model.instantiate() as Node3D
 		_visual.add_child(_model)
+		_meshes.assign(_model.find_children("*", "MeshInstance3D", true, false))
+		_head_parts.assign(_model.find_children("*", "Node3D", true, false).filter(func(n: Node) -> bool: return n.is_in_group("head_part")))
 	data = enemy_data
 	health = data.health_for_wave(wave)
 	global_transform = at
 	velocity = Vector3.ZERO
 	_visual.transform = Transform3D.IDENTITY
 	_repath_left = 0.0
+	_window = null
 	_kill_tween()
+	_reset_hit_reaction()
+	for part: Node3D in _head_parts:
+		part.visible = true
 	_set_active(true)
 	_state = State.CHASING
 
@@ -52,21 +75,71 @@ func is_alive() -> bool:
 	return _state != State.INACTIVE and _state != State.DEAD
 
 
-func receive_hit(amount: int, is_headshot: bool) -> Hurtbox.Result:
+func receive_hit(amount: int, is_headshot: bool, is_melee: bool, source: Node3D) -> Hurtbox.Result:
 	if not is_alive():
 		return Hurtbox.Result.IGNORED
 	health -= amount
-	Events.enemy_damaged.emit(self, amount, is_headshot)
+	_hit_flash()
 	if health > 0:
+		_flinch(is_headshot)
+		Events.enemy_damaged.emit(self, amount, is_headshot, source)
 		return Hurtbox.Result.HIT
-	_die(is_headshot)
+	if is_headshot and amount >= data.head_pop_damage:
+		_pop_head()
+	_die(is_headshot, is_melee, source)
 	return Hurtbox.Result.KILLED
+
+
+func _flinch(is_headshot: bool) -> void:
+	if _flinch_tween:
+		_flinch_tween.kill()
+	# Lean back from the hit (the model faces -Z, so +X rotation tips it backwards); headshots snap harder.
+	_model.rotation.x = Constants.ENEMY_FLINCH_HEAD if is_headshot else Constants.ENEMY_FLINCH_BODY
+	_flinch_tween = create_tween()
+	_flinch_tween.tween_property(_model, "rotation:x", 0.0, Constants.ENEMY_FLINCH_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+
+func _hit_flash() -> void:
+	# A white overlay pass, only on while it fades: an idle overlay would cost a draw per mesh.
+	for mesh: MeshInstance3D in _meshes:
+		mesh.material_overlay = _flash_material
+	_flash_material.albedo_color.a = 0.7
+	var tween: Tween = create_tween()
+	tween.tween_property(_flash_material, "albedo_color:a", 0.0, Constants.ENEMY_HIT_FLASH_TIME)
+	tween.tween_callback(_clear_flash)
+
+
+func _clear_flash() -> void:
+	if _flash_material.albedo_color.a > 0.0:
+		return
+	for mesh: MeshInstance3D in _meshes:
+		mesh.material_overlay = null
+
+
+func _reset_hit_reaction() -> void:
+	if _flinch_tween:
+		_flinch_tween.kill()
+	if _model:
+		_model.rotation = Vector3.ZERO
+	_flash_material.albedo_color.a = 0.0
+	_clear_flash()
+
+
+func _pop_head() -> void:
+	# Comic-horror, not gore: the head is gone in a red cloud, nothing anatomical (section 7).
+	for part: Node3D in _head_parts:
+		part.visible = false
+	_head_pop.play(_head_shape.global_position, Vector3.UP)
 
 
 func _physics_process(delta: float) -> void:
 	match _state:
 		State.CHASING:
 			_chase(delta)
+		State.QUEUED:
+			_wait_for_window(delta)
+		State.BREAKING:
+			_break_window(delta)
 		State.ATTACKING:
 			_attack(delta)
 		State.DEAD:
@@ -127,14 +200,76 @@ func _start_attack() -> void:
 func _on_link_reached(details: Dictionary) -> void:
 	if _state != State.CHASING:
 		return
-	# Window links are the only links. The opening is smaller than the body, so the enemy goes
-	# through lying flat, head first, with collision off; every pose keeps the body inside the opening.
-	_state = State.CLIMBING
+	# Window links are the only links.
 	var entry: Vector3 = details.get("link_entry_position", global_position)
-	var exit: Vector3 = details.get("link_exit_position", global_position)
+	_window_exit = details.get("link_exit_position", global_position)
 	# Links are placed symmetrically across the wall, so their midpoint is the window.
-	var forward: Vector3 = _flat(exit - entry).normalized()
-	var wall: Vector3 = _flat((entry + exit) * 0.5)
+	_window_forward = _flat(_window_exit - entry).normalized()
+	_window_wall = _flat((entry + _window_exit) * 0.5)
+	_window = _find_barricade(_window_wall)
+	velocity = Vector3.ZERO
+	if _window and not _window.claim(self):
+		_state = State.QUEUED
+		return
+	_start_window()
+
+
+func _wait_for_window(delta: float) -> void:
+	# Stand behind the one in front; collision keeps the bodies apart.
+	_halt(delta)
+	_face(_window_forward, delta)
+	if _window.claim(self):
+		_start_window()
+
+
+func _start_window() -> void:
+	if _window == null or _window.is_open():
+		_start_climb()
+		return
+	_state = State.BREAKING
+	_kill_tween()
+	_visual.transform = Transform3D.IDENTITY
+	_tween = create_tween()
+	var stand: Vector3 = _window_wall - _window_forward * Constants.ENEMY_WINDOW_STAND_OFF + Vector3.UP * global_position.y
+	_tween.tween_property(self, "global_position", stand, Constants.ENEMY_WINDOW_APPROACH_TIME)
+
+
+func _break_window(delta: float) -> void:
+	_face(_window_forward, delta)
+	if _tween and _tween.is_running():
+		return
+	if _window.is_open():
+		_start_climb()
+		return
+	_pull_board()
+
+
+func _pull_board() -> void:
+	var time: float = data.board_break_time
+	_kill_tween()
+	_tween = create_tween()
+	# Reach in, rip the board out, stagger back with it.
+	_tween.tween_property(_visual, "rotation:x", -0.5, time * 0.55).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_tween.tween_callback(_window.remove_board)
+	_tween.tween_property(_visual, "rotation:x", 0.2, time * 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_tween.tween_property(_visual, "rotation:x", 0.0, time * 0.25)
+
+
+func _find_barricade(wall: Vector3) -> Barricade:
+	for node: Node in get_tree().get_nodes_in_group("barricades"):
+		var barricade := node as Barricade
+		if _flat(barricade.global_position).distance_to(wall) < 1.0:
+			return barricade
+	return null
+
+
+func _start_climb() -> void:
+	# The opening is smaller than the body, so the enemy goes through lying flat, head first,
+	# with collision off; every pose keeps the body inside the opening.
+	_state = State.CLIMBING
+	var forward: Vector3 = _window_forward
+	var wall: Vector3 = _window_wall
+	var exit: Vector3 = _window_exit
 	var outside_y: float = global_position.y
 	var dive_y: float = exit.y + Constants.ENEMY_WINDOW_DIVE_HEIGHT
 	var at := func(along: float, height: float) -> Vector3: return wall + forward * along + Vector3.UP * height
@@ -181,17 +316,26 @@ func _end_climb() -> void:
 	_visual.transform = Transform3D.IDENTITY
 	collision_mask = _movement_mask()
 	_repath_left = 0.0
+	_leave_window()
 	_state = State.CHASING
 
 
-func _die(is_headshot: bool) -> void:
+func _leave_window() -> void:
+	if _window:
+		_window.release(self)
+		_window = null
+
+
+func _die(is_headshot: bool, is_melee: bool, source: Node3D) -> void:
 	_state = State.DEAD
+	_leave_window()
 	collision_layer = 0
 	collision_mask = Constants.LAYER_WORLD
 	for hurtbox: Hurtbox in _hurtboxes:
 		hurtbox.collision_layer = 0
+	# Points first, then the wave manager: the last kill of a wave is paid out before "wave cleared".
+	Events.enemy_killed.emit(self, is_headshot, is_melee, source)
 	died.emit(self)
-	Events.enemy_killed.emit(self, is_headshot)
 	_kill_tween()
 	_visual.rotation.z = 0.0
 	# Fall backwards, unless already lying face down in a window: then just stay down.
@@ -245,7 +389,12 @@ func _nearest_target() -> Player:
 
 func _in_attack_range() -> bool:
 	var offset: Vector3 = _target.global_position - global_position
-	return absf(offset.y) <= Constants.ENEMY_ATTACK_MAX_HEIGHT and _flat(offset).length() <= data.attack_range
+	if absf(offset.y) > Constants.ENEMY_ATTACK_MAX_HEIGHT or _flat(offset).length() > data.attack_range:
+		return false
+	# Only in the same room: walls and window openings (player blockers) both stop the swing.
+	var chest := Vector3.UP * Constants.ENEMY_ATTACK_CHEST_HEIGHT
+	var query := PhysicsRayQueryParameters3D.create(global_position + chest, _target.global_position + chest, Constants.LAYER_WORLD | Constants.LAYER_PLAYER_BLOCKER)
+	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 
 
 func _halt(delta: float) -> void:

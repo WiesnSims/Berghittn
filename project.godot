@@ -60,6 +60,10 @@ reload={
 "deadzone": 0.2,
 "events": [Object(InputEventKey,"physical_keycode":82)]
 }
+melee={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"physical_keycode":86)]
+}
 toggle_debug={
 "deadzone": 0.2,
 "events": [Object(InputEventKey,"physical_keycode":4194334)]

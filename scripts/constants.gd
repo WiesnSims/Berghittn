@@ -56,14 +56,59 @@ const ENEMY_WINDOW_STAND_OFF: float = 0.75
 const ENEMY_LYING_HEIGHT: float = 0.2
 # Vertical distance beyond which a melee swing cannot reach (player on a table, enemy below).
 const ENEMY_ATTACK_MAX_HEIGHT: float = 1.4
+# Height of the line between enemy and player that must be clear for a swing to start and land.
+const ENEMY_ATTACK_CHEST_HEIGHT: float = 1.2
 
-# M2 test spawner: keeps one enemy around until the wave manager (M3) takes over.
-const TEST_SPAWN_DELAY: float = 3.0
-const TEST_SPAWN_WAVE: int = 1
+# Seconds to walk the last bit from the link start to the window.
+const ENEMY_WINDOW_APPROACH_TIME: float = 0.3
+
+# Waves (section 8; the per-wave formula numbers live in data/wave_table.tres).
+# Hard performance cap from section 3, shared by all players in co-op.
+const MAX_ALIVE_ENEMIES: int = 24
+# Countdown before wave 1, so the player can look around first.
+const FIRST_WAVE_DELAY: float = 5.0
+# Enemies spawn scattered around their marker instead of stacked inside each other.
+const SPAWN_SCATTER_RADIUS: float = 1.2
+const WAVE_BANNER_TIME: float = 3.0
+
+# Points (section 8).
+const POINTS_HIT: int = 10
+const POINTS_KILL_BODY: int = 60
+const POINTS_KILL_HEADSHOT: int = 100
+const POINTS_KILL_MELEE: int = 130
+const POINTS_REPAIR_BOARD: int = 10
+const POINTS_POPUP_TIME: float = 0.9
+
+# Barricades (section 4).
+const BARRICADE_MAX_BOARDS: int = 6
+# Seconds per board while E is held.
+const BARRICADE_REPAIR_INTERVAL: float = 0.6
+# Distance from the repair spot inside the window within which E works.
+const INTERACT_RANGE: float = 1.7
 
 # Weapon feedback.
-const MUZZLE_FLASH_TIME: float = 0.05
+const MUZZLE_FLASH_TIME: float = 0.07
+# Camera recoil: how fast the kick snaps in and how fast the view settles back (per second).
+# Ejected casings: how many can be in the air at once, and seconds each one flies.
+const CASING_POOL_SIZE: int = 8
+const CASING_LIFETIME: float = 0.6
+const RECOIL_SNAP_SPEED: float = 30.0
+const RECOIL_RECOVER_SPEED: float = 9.0
+# Enemy hit reaction: lean-back angle (radians) for body and head hits, its recovery time,
+# and how long the white hit flash takes to fade.
+const ENEMY_FLINCH_BODY: float = 0.12
+const ENEMY_FLINCH_HEAD: float = 0.3
+const ENEMY_FLINCH_TIME: float = 0.2
+const ENEMY_HIT_FLASH_TIME: float = 0.12
 const IMPACT_MARK_COUNT: int = 32
 const IMPACT_MARK_LIFETIME: float = 8.0
 const HIT_MARKER_TIME: float = 0.15
 const DAMAGE_FLASH_TIME: float = 0.4
+
+# Quick melee: share of the swing time before the blow lands, the width of the arc in front of the
+# player that it sweeps (degrees), the most enemies it checks, and where on a body box it aims its
+# line-of-sight test (metres above the box origin, which is at the feet; high enough to clear a sill).
+const MELEE_HIT_FRACTION: float = 0.3
+const MELEE_ARC_DEGREES: float = 110.0
+const MELEE_MAX_TARGETS: int = 32
+const MELEE_AIM_HEIGHT: float = 1.3

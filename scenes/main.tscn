@@ -8,9 +8,9 @@
 [ext_resource type="Script" path="res://scripts/ui/debug_overlay.gd" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://scenes/ui/death_screen.tscn" id="8"]
-[ext_resource type="Script" path="res://scripts/enemies/enemy_spawner.gd" id="9"]
+[ext_resource type="Script" path="res://scripts/waves/wave_manager.gd" id="9"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/enemy.tscn" id="10"]
-[ext_resource type="Resource" path="res://data/enemies/wanderer.tres" id="11"]
+[ext_resource type="Resource" path="res://data/wave_table.tres" id="11"]
 
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
@@ -41,11 +41,11 @@ process_mode = 1
 [node name="Player" parent="." instance=ExtResource("3")]
 process_mode = 1
 
-[node name="EnemySpawner" type="Node3D" parent="."]
+[node name="WaveManager" type="Node3D" parent="."]
 process_mode = 1
 script = ExtResource("9")
 enemy_scene = ExtResource("10")
-enemy_data = ExtResource("11")
+wave_table = ExtResource("11")
 
 [node name="UI" type="CanvasLayer" parent="."]
 

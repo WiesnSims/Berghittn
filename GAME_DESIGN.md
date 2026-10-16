@@ -150,6 +150,10 @@ effects, see section 6a).
 
 Rules:
 - Ammo refill from wall-buys costs half the weapon price.
+- Magazine weapons with a chamber hold magazine + 1 (user rule, 2026-10-16): reloading with a
+  round still chambered loads mag + 1, reloading from empty loads mag (the rack chambers one
+  from the new mag). Weapons start fully loaded and chambered. Guns without a chamber
+  (`chamber_time` 0) stay at mag size.
 - Slots: 2 gun slots (wonder weapons and the hand mortar use a gun slot),
   1 melee slot (starts with the shovel, can be replaced), 1 equipment slot
   (stackable throwables, see section 6a).
@@ -224,6 +228,9 @@ attack it; attack in melee range.
 Headshots deal `headshot_multiplier` x damage (default 2.0).
 Death: ragdoll-lite (simple fall animation or particle puff), disappears
 after 5 s. No gore beyond stylized effects. Keep it comic-horror.
+Stylized head pop (user request, 2026-10-16): a headshot kill dealing at least
+`head_pop_damage` (EnemyData) in one hit hides the head and bursts it into a red cloud of
+blocky particles. No anatomy, no lingering remains.
 
 ## 8. Waves and points
 
@@ -320,6 +327,9 @@ fix console errors, commit. Stop and report after each milestone.
 - Wave manager with formulas from section 8, spawn points, windows with
   barricades, points and HUD, break between waves.
 - Acceptance: survive and reach wave 3, points counted correctly.
+- Added by user decision (2026-10-16): the Schneeschaufel as quick melee (V). The 72 starting
+  pistol rounds cannot clear waves 1–3 before M4 brings ammo refills, and it makes the
+  melee-kill points testable.
 
 **M4 — Zones, doors, wall-buys**
 - All six zones greybox-connected, door purchasing, spawn activation rules,

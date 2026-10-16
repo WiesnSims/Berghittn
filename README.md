@@ -28,9 +28,9 @@ Needs `DecompressionStream` (Chrome 80+, Firefox 113+, Safari 16.4+).
 
 ## Controls
 
-WASD / arrows move, mouse look, left click shoot, R reload, Space jump, Shift sprint (forward only), C crouch
-(not Ctrl: Ctrl+W closes the browser tab), E interact, Esc or P pause, F3 debug overlay
-(FPS and position).
+WASD / arrows move, mouse look, left click shoot, V melee (shovel), R reload, Space jump, Shift sprint
+(forward only), C crouch (not Ctrl: Ctrl+W closes the browser tab), E interact (hold at a window to
+board it up), Esc or P pause, F3 debug overlay (FPS and position).
 
 F5, Ctrl/Cmd+R, F11 and F12 go to the browser: `web/browser_shortcuts.js` stops them before
 Godot's web runtime, which otherwise calls `preventDefault()` on every key.
@@ -52,7 +52,40 @@ from the zone's colliding CSG shapes (~12 ms for the Stube). Windows are one-way
 `navigation/world/region_use_async_iterations` is off: with it on, Godot 4.7 never pushes
 the runtime-baked mesh to the navigation server (paths come back empty).
 
+## Waves, barricades, points
+
+`scripts/waves/wave_manager.gd` runs the waves from `data/wave_table.tres` (section 8 formulas and the
+enemy mix). Every window has a `Barricade` (`scripts/zones/barricade.gd`) with 6 boards: an enemy that
+reaches the window's navigation link tears them off (`board_break_time` per board, in `EnemyData`), and
+only climbs in once they are all gone; one enemy works a window at a time, the rest queue. Players hold
+E at the repair spot inside to nail boards back on. Points live per player in `PlayerPoints`, which
+listens to `Events` and credits only its own player (`source` on every hit, kill and repair).
+
 ## Tests
+
+```
+godot --headless --fixed-fps 60 res://tests/m3_smoke.tscn
+```
+
+A bot holds the middle of the Stube and plays to wave 3 (shooting head and body, shovel kills, repairing
+in the break). Checks wave sizes, spawn interval and break length against the formulas, that no enemy
+climbs through a window that still has boards, and that the points (and the HUD) match the bot's own
+hits, kills and repairs. Exits non-zero on failure.
+
+```
+godot --headless --fixed-fps 60 res://tests/melee_arc.tscn
+```
+
+One shovel swing must hit every enemy in the arc in front of the player and none behind.
+
+```
+godot --headless --fixed-fps 60 res://tests/window_attack.tscn
+godot --headless --fixed-fps 60 res://tests/chamber.tscn
+```
+
+`window_attack`: a player pressed against a window takes no hits while the enemy outside tears it
+open, and is hit once it has climbed in. `chamber`: guns with a chamber hold mag + 1 (start, reload
+with a round chambered) and mag after a reload from empty.
 
 ```
 godot --headless --fixed-fps 60 res://tests/m2_smoke.tscn
@@ -63,11 +96,13 @@ player, killing it with the pistol, regeneration, player death and the death scr
 `tests/` is excluded from the web export.
 
 ```
-godot res://tests/climb_view.tscn -- <out_dir> inside|outside|reload
+godot res://tests/climb_view.tscn -- <out_dir> inside|outside|break|reload|melee|hud|shoot
 ```
 
 Needs a real window (not `--headless`): saves PNG frames of an enemy's window entry, seen from
-inside or outside, or of the pistol reload, for checking animations without playing.
+inside or outside, of it tearing the boards off, of the pistol reload or the shovel swing, one
+frame with the HUD, or shooting an enemy (wall puffs, hit flash, casings, head pop), for checking
+visuals without playing.
 
 ## Deploy
 
