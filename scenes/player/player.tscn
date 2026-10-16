@@ -1,6 +1,10 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/player.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/player/player_health.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_holder.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/weapons/impact_marks.gd" id="4"]
+[ext_resource type="Resource" path="res://data/weapons/pistole.tres" id="5"]
 
 [sub_resource type="CapsuleShape3D" id="Capsule"]
 resource_local_to_scene = true
@@ -9,7 +13,7 @@ height = 1.8
 
 [node name="Player" type="CharacterBody3D" groups=["player"]]
 collision_layer = 2
-collision_mask = 9
+collision_mask = 13
 script = ExtResource("1")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
@@ -23,3 +27,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
 current = true
 fov = 75.0
 near = 0.05
+
+[node name="WeaponHolder" type="Node3D" parent="Head/Camera3D"]
+script = ExtResource("3")
+starting_weapon = ExtResource("5")
+
+[node name="ImpactMarks" type="Node3D" parent="Head/Camera3D/WeaponHolder"]
+script = ExtResource("4")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("2")

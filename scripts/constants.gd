@@ -26,3 +26,44 @@ const DEFAULT_LOCALE: String = "en"
 # Chrome refuses a new pointer lock for about a second after the user pressed Esc to exit one.
 const POINTER_RELOCK_DELAY: float = 1.2
 const DEBUG_OVERLAY_REFRESH: float = 0.25
+
+# Physics layer bitmasks (see README "Physics layers").
+const LAYER_WORLD: int = 1
+const LAYER_PLAYER: int = 2
+const LAYER_ENEMY: int = 4
+const LAYER_PLAYER_BLOCKER: int = 8
+const LAYER_HITBOX: int = 16
+
+# Player health.
+const PLAYER_MAX_HEALTH: int = 100
+const PLAYER_REGEN_PER_SECOND: float = 10.0
+const PLAYER_REGEN_DELAY: float = 5.0
+# Time the camera takes to drop to the floor, and the pause before the death screen shows.
+const PLAYER_DEATH_FALL_TIME: float = 0.8
+const DEATH_SCREEN_DELAY: float = 1.6
+
+# Enemy AI.
+# Re-pathing every physics frame is wasted work with 24 enemies; the player does not move that far in 0.25 s.
+const ENEMY_REPATH_INTERVAL: float = 0.25
+const ENEMY_TURN_SPEED: float = 8.0
+const ENEMY_CORPSE_TIME: float = 5.0
+const ENEMY_DEATH_FALL_TIME: float = 0.6
+# Window entry: height of the window centre above the inside floor (sill 0.9 m + half of the 1.2 m
+# opening), how far from the wall centre the enemy stands to start its dive and lands inside,
+# and the root height that puts a body lying face down on the floor.
+const ENEMY_WINDOW_DIVE_HEIGHT: float = 1.5
+const ENEMY_WINDOW_STAND_OFF: float = 0.75
+const ENEMY_LYING_HEIGHT: float = 0.2
+# Vertical distance beyond which a melee swing cannot reach (player on a table, enemy below).
+const ENEMY_ATTACK_MAX_HEIGHT: float = 1.4
+
+# M2 test spawner: keeps one enemy around until the wave manager (M3) takes over.
+const TEST_SPAWN_DELAY: float = 3.0
+const TEST_SPAWN_WAVE: int = 1
+
+# Weapon feedback.
+const MUZZLE_FLASH_TIME: float = 0.05
+const IMPACT_MARK_COUNT: int = 32
+const IMPACT_MARK_LIFETIME: float = 8.0
+const HIT_MARKER_TIME: float = 0.15
+const DAMAGE_FLASH_TIME: float = 0.4

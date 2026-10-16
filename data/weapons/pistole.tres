@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/pistole_viewmodel.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"pistole"
+display_name = "WEAPON_PISTOLE"
+damage = 25
+headshot_multiplier = 2.0
+fire_rate = 4.0
+mag_size = 8
+reserve_ammo = 64
+reload_time = 1.4
+chamber_time = 0.35
+spread = 0.8
+range = 60.0
+is_auto = false
+pellets = 1
+cost = 0
+ammo_cost = 0
+behavior = &""
+viewmodel = ExtResource("2")

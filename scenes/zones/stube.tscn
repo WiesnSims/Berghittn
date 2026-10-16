@@ -11,12 +11,22 @@
 [ext_resource type="Material" path="res://assets/materials/greybox_lamp.tres" id="9"]
 [ext_resource type="PackedScene" path="res://scenes/props/table_set.tscn" id="10"]
 [ext_resource type="Script" path="res://scripts/zones/fire_flicker.gd" id="11"]
+[ext_resource type="Script" path="res://scripts/zones/navmesh_baker.gd" id="12"]
 
 [sub_resource type="BoxShape3D" id="WindowBlockerX"]
 size = Vector3(0.3, 1.2, 1.2)
 
 [sub_resource type="BoxShape3D" id="WindowBlockerZ"]
 size = Vector3(1.2, 1.2, 0.3)
+
+[sub_resource type="NavigationMesh" id="NavMesh"]
+geometry_collision_mask = 1
+cell_size = 0.2
+cell_height = 0.1
+agent_height = 1.8
+agent_radius = 0.4
+agent_max_climb = 0.3
+filter_baking_aabb = AABB(-30, -1.5, -30, 60, 3, 60)
 
 [node name="Stube" type="Node3D"]
 
@@ -340,3 +350,43 @@ height = 5.0
 sides = 7
 cone = true
 material = ExtResource("6")
+
+[node name="Navigation" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavMesh")
+script = ExtResource("12")
+
+[node name="WindowLinks" type="Node3D" parent="."]
+
+[node name="WestNorth" type="NavigationLink3D" parent="WindowLinks"]
+bidirectional = false
+start_position = Vector3(-7.9, -0.3, -2)
+end_position = Vector3(-6.4, 0, -2)
+
+[node name="WestSouth" type="NavigationLink3D" parent="WindowLinks"]
+bidirectional = false
+start_position = Vector3(-7.9, -0.3, 2.5)
+end_position = Vector3(-6.4, 0, 2.5)
+
+[node name="SouthEast" type="NavigationLink3D" parent="WindowLinks"]
+bidirectional = false
+start_position = Vector3(3, -0.3, 5.9)
+end_position = Vector3(3, 0, 4.4)
+
+[node name="SouthWest" type="NavigationLink3D" parent="WindowLinks"]
+bidirectional = false
+start_position = Vector3(-5, -0.3, 5.9)
+end_position = Vector3(-5, 0, 4.4)
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="WestNorth" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, -0.3, -2)
+
+[node name="WestSouth" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, -0.3, 2.5)
+
+[node name="SouthEast" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, -0.3, 9.5)
+
+[node name="SouthWest" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, -0.3, 9.5)
