@@ -44,7 +44,7 @@ func _run() -> void:
 	player = main.get_node("Player")
 	player.died.connect(_on_player_died)
 	await _wait(0.2)
-	var region := main.get_node("Stube/Navigation") as NavigationRegion3D
+	var region := main.get_node("World/Navigation") as NavigationRegion3D
 	print("NAV polygons: ", region.navigation_mesh.get_polygon_count())
 	var start_pos: Vector3 = player.global_position
 	print("PLAYER at ", start_pos)

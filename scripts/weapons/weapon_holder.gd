@@ -1,14 +1,23 @@
 class_name WeaponHolder
 extends Node3D
-## Holds the equipped gun (firing, hitscan, ammo, reload) and the melee weapon for quick melee on V.
-## Sits under the camera so shots follow the view.
+## Holds the guns (two slots, section 6: firing, hitscan, ammo, reload, switching) and the melee weapon
+## for quick melee on V. Sits under the camera so shots follow the view.
 
 signal ammo_changed(mag: int, reserve: int)
 signal reload_started(duration: float)
 signal reload_finished
 signal fired
+## The gun in hand changed (switch, buy, replace).
+signal weapon_changed(data: WeaponData)
 ## Emitted when a shot hit an enemy, for the hit marker.
 signal hit_confirmed(is_headshot: bool, killed: bool)
+
+## One carried gun and the ammo it had when it was put away.
+class GunSlot:
+	var data: WeaponData
+	var mag: int
+	var reserve: int
+	var viewmodel: Viewmodel
 
 @export var starting_weapon: WeaponData
 ## Always carried (section 6: the shovel until the melee slot gets replaced).
@@ -18,13 +27,17 @@ signal hit_confirmed(is_headshot: bool, killed: bool)
 @onready var _impact_puffs: EffectPool = $ImpactPuffs
 @onready var _hit_puffs: EffectPool = $HitPuffs
 
+## The gun in hand and its ammo; written back to its slot when it is put away.
 var weapon: WeaponData
 var mag: int = 0
 var reserve: int = 0
+var _slots: Array[GunSlot] = []
+var _current: int = -1
 var _cooldown: float = 0.0
 var _reload_left: float = 0.0
 # What the running reload fills the gun to.
 var _reload_target: int = 0
+var _switch_left: float = 0.0
 var _viewmodel: Viewmodel
 var _melee_viewmodel: MeleeViewmodel
 # Seconds left of the current swing, and until its blow lands (negative once it has).
@@ -39,7 +52,9 @@ var _shooter: Node3D
 func _ready() -> void:
 	_rng.randomize()
 	if starting_weapon:
-		equip(starting_weapon)
+		give_weapon(starting_weapon)
+		# Already in hand at the start, not drawn.
+		_switch_left = 0.0
 	if melee_weapon and melee_weapon.viewmodel:
 		_melee_viewmodel = melee_weapon.viewmodel.instantiate() as MeleeViewmodel
 		add_child(_melee_viewmodel)
@@ -50,24 +65,75 @@ func set_owner_body(body: CollisionObject3D) -> void:
 	_shooter = body
 
 
-func equip(data: WeaponData) -> void:
-	if _viewmodel:
-		_viewmodel.queue_free()
-		_viewmodel = null
-	weapon = data
-	# Handed over ready to fire: chambered and topped up.
-	mag = data.loaded_capacity(true)
-	reserve = data.reserve_ammo
-	_cooldown = 0.0
-	_reload_left = 0.0
+## Puts a gun in hand: into a free slot if there is one, otherwise in place of the gun in hand.
+## Handed over ready to fire, chambered and with full reserve.
+func give_weapon(data: WeaponData) -> void:
+	var owned: int = _slot_of(data)
+	if owned >= 0:
+		_select(owned)
+		return
+	var slot := GunSlot.new()
+	slot.data = data
+	slot.mag = data.loaded_capacity(true)
+	slot.reserve = data.reserve_ammo
 	if data.viewmodel:
-		_viewmodel = data.viewmodel.instantiate() as Viewmodel
-		add_child(_viewmodel)
-	ammo_changed.emit(mag, reserve)
+		# Built once per gun and kept: instancing on every switch would hitch in the middle of a fight.
+		slot.viewmodel = data.viewmodel.instantiate() as Viewmodel
+		slot.viewmodel.visible = false
+		add_child(slot.viewmodel)
+	if _slots.size() < Constants.GUN_SLOTS:
+		_slots.append(slot)
+		_select(_slots.size() - 1)
+		return
+	var old: GunSlot = _slots[_current]
+	if old.viewmodel:
+		old.viewmodel.queue_free()
+	_slots[_current] = slot
+	_current = -1
+	_select(_slots.find(slot))
+
+
+func has_weapon(data: WeaponData) -> bool:
+	return _slot_of(data) >= 0
+
+
+## True when the gun is carried and its reserve is not full, so buying ammo would do something.
+func needs_ammo(data: WeaponData) -> bool:
+	var index: int = _slot_of(data)
+	if index < 0:
+		return false
+	var spare: int = reserve if index == _current else _slots[index].reserve
+	return spare < data.reserve_ammo
+
+
+func refill_ammo(data: WeaponData) -> void:
+	var index: int = _slot_of(data)
+	if index < 0:
+		return
+	_slots[index].reserve = data.reserve_ammo
+	if index == _current:
+		reserve = data.reserve_ammo
+		ammo_changed.emit(mag, reserve)
+
+
+func gun_count() -> int:
+	return _slots.size()
 
 
 func is_reloading() -> bool:
 	return _reload_left > 0.0
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	# Here and not in _physics_process: wheel "presses" are released in the same frame and would be missed.
+	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED or _melee_left > 0.0 or _slots.size() < 2:
+		return
+	if event.is_action_pressed("weapon_next") or event.is_action_pressed("weapon_previous"):
+		_select((_current + 1) % _slots.size())
+	elif event.is_action_pressed("weapon_slot_1"):
+		_select(0)
+	elif event.is_action_pressed("weapon_slot_2"):
+		_select(1)
 
 
 func _physics_process(delta: float) -> void:
@@ -79,6 +145,9 @@ func _physics_process(delta: float) -> void:
 		return
 	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Input.is_action_just_pressed("melee") and melee_weapon:
 		_start_melee()
+		return
+	if _switch_left > 0.0:
+		_switch_left -= delta
 		return
 	if is_reloading():
 		_reload_left -= delta
@@ -121,11 +190,59 @@ func _finish_reload() -> void:
 	ammo_changed.emit(mag, reserve)
 
 
+func _cancel_reload() -> void:
+	if is_reloading():
+		_reload_left = 0.0
+		reload_finished.emit()
+
+
+func _slot_of(data: WeaponData) -> int:
+	for i: int in _slots.size():
+		if _slots[i].data.id == data.id:
+			return i
+	return -1
+
+
+func _select(index: int) -> void:
+	if index == _current or index < 0 or index >= _slots.size():
+		return
+	# A switch drops a running reload, like in every shooter: the mag swap starts over next time.
+	_cancel_reload()
+	if _current >= 0 and _current < _slots.size():
+		var old: GunSlot = _slots[_current]
+		old.mag = mag
+		old.reserve = reserve
+		if old.viewmodel:
+			old.viewmodel.visible = false
+	_current = index
+	var slot: GunSlot = _slots[index]
+	weapon = slot.data
+	mag = slot.mag
+	reserve = slot.reserve
+	_viewmodel = slot.viewmodel
+	_cooldown = 0.0
+	_switch_left = Constants.WEAPON_SWITCH_TIME
+	if _viewmodel:
+		_viewmodel.visible = true
+		_viewmodel.play_raise(Constants.WEAPON_SWITCH_TIME)
+	weapon_changed.emit(weapon)
+	ammo_changed.emit(mag, reserve)
+
+
 func _fire() -> void:
 	mag -= 1
 	_cooldown = 1.0 / weapon.fire_rate
+	# Pellets that hit the same enemy land as one hit: one flinch, one hit marker and one set of
+	# points per shot, not one per pellet.
+	var hits: Dictionary = {}
 	for i: int in weapon.pellets:
-		_fire_ray()
+		_fire_ray(hits)
+	for receiver: Node in hits:
+		var hit: Dictionary = hits[receiver]
+		var result: Hurtbox.Result = receiver.receive_hit(hit.amount, hit.head, false, _shooter)
+		if result != Hurtbox.Result.IGNORED:
+			_hit_puffs.play(hit.position, hit.normal)
+			hit_confirmed.emit(hit.head, result == Hurtbox.Result.KILLED)
 	fired.emit()
 	ammo_changed.emit(mag, reserve)
 	if _viewmodel:
@@ -134,9 +251,7 @@ func _fire() -> void:
 
 func _start_melee() -> void:
 	# A swing cancels a running reload: in a panic the shovel must always come out.
-	if is_reloading():
-		_reload_left = 0.0
-		reload_finished.emit()
+	_cancel_reload()
 	_melee_left = 1.0 / melee_weapon.fire_rate
 	_melee_hit_in = _melee_left * Constants.MELEE_HIT_FRACTION
 	if _viewmodel:
@@ -196,19 +311,22 @@ func _cast(offset: Vector3, mask: int = Constants.LAYER_WORLD | Constants.LAYER_
 	return hit if not hit.is_empty() else {"collider": null}
 
 
-func _fire_ray() -> void:
+func _fire_ray(hits: Dictionary) -> void:
 	var hit: Dictionary = _cast(_spread_direction() * weapon.range)
 	if hit.collider == null:
 		return
 	var hurtbox := hit.collider as Hurtbox
-	if hurtbox:
-		var result: Hurtbox.Result = hurtbox.take_hit(weapon.damage, weapon.headshot_multiplier, false, _shooter)
-		if result != Hurtbox.Result.IGNORED:
-			_hit_puffs.play(hit.position, hit.normal)
-			hit_confirmed.emit(hurtbox.is_head, result == Hurtbox.Result.KILLED)
-	else:
+	if hurtbox == null:
 		_impact_marks.place(hit.position, hit.normal)
 		_impact_puffs.play(hit.position, hit.normal)
+		return
+	var amount: int = hurtbox.damage_for(weapon.damage, weapon.headshot_multiplier)
+	var total: Dictionary = hits.get(hurtbox.receiver, {"amount": 0, "head": false})
+	total.amount += amount
+	total.head = total.head or hurtbox.is_head
+	total.position = hit.position
+	total.normal = hit.normal
+	hits[hurtbox.receiver] = total
 
 
 func _spread_direction() -> Vector3:

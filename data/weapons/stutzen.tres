@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/stutzen_viewmodel.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"stutzen"
+display_name = "WEAPON_STUTZEN"
+damage = 120
+headshot_multiplier = 2.0
+fire_rate = 0.8
+mag_size = 5
+reserve_ammo = 40
+reload_time = 2.4
+chamber_time = 0.4
+recoil_pitch = 5.0
+recoil_yaw = 0.8
+spread = 0.1
+range = 120.0
+is_auto = false
+pellets = 1
+cost = 750
+ammo_cost = 375
+behavior = &""
+viewmodel = ExtResource("2")

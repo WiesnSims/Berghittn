@@ -6,7 +6,7 @@ messages = {
 [&"", &"UI_TITLE"]: [&"Berghittn"],
 [&"", &"UI_TAGLINE"]: [&"Snowstorm. Undead. One hut."],
 [&"", &"UI_CLICK_TO_PLAY"]: [&"Click to play"],
-[&"", &"UI_CONTROLS"]: [&"WASD move  ·  Mouse look  ·  LMB shoot  ·  V melee  ·  R reload  ·  E repair  ·  Space jump  ·  Shift sprint  ·  C crouch  ·  Esc pause  ·  F3 debug"],
+[&"", &"UI_CONTROLS"]: [&"WASD move  ·  Mouse look  ·  LMB shoot  ·  V melee  ·  R reload  ·  1 / 2 / wheel switch gun  ·  E use  ·  Space jump  ·  Shift sprint  ·  C crouch  ·  Esc pause  ·  F3 debug"],
 [&"", &"UI_PAUSE_TITLE"]: [&"Paused"],
 [&"", &"UI_PAUSE_HINT"]: [&"A quick Jause, then back to it."],
 [&"", &"UI_RESUME"]: [&"Resume"],
@@ -29,5 +29,14 @@ messages = {
 [&"", &"UI_NEXT_WAVE"]: [&"Next wave in %d"],
 [&"", &"UI_POINTS_GAIN"]: [&"+%d"],
 [&"", &"UI_REPAIR_HINT"]: [&"Hold E to board up the window"],
-[&"", &"UI_DEATH_STATS"]: [&"Reached wave %d  ·  %d points"]
+[&"", &"UI_DEATH_STATS"]: [&"Reached wave %d  ·  %d points"],
+[&"", &"UI_DOOR_OPEN"]: [&"Press E to open the door – %s (%d)"],
+[&"", &"UI_DOOR_NEED"]: [&"%s: %d points needed"],
+[&"", &"UI_BUY_WEAPON"]: [&"Press E to buy the %s (%d)"],
+[&"", &"UI_BUY_NEED"]: [&"%s: %d points needed"],
+[&"", &"UI_BUY_AMMO"]: [&"Press E to buy %s ammo (%d)"],
+[&"", &"UI_BUY_AMMO_NEED"]: [&"%s ammo: %d points needed"],
+[&"", &"UI_POINTS_SPENT"]: [&"-%d"],
+[&"", &"WEAPON_JAGDFLINTE"]: [&"Jagdflinte"],
+[&"", &"WEAPON_STUTZEN"]: [&"Stutzen"]
 }

@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="ZoneTable" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/zones/zone_table.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/zones/zone_data.gd" id="2"]
+
+[sub_resource type="Resource" id="Zone0"]
+script = ExtResource("2")
+id = &"stube"
+display_name = "Gaststube"
+cost = 0
+starts_unlocked = true
+
+[sub_resource type="Resource" id="Zone1"]
+script = ExtResource("2")
+id = &"kueche"
+display_name = "Küche"
+cost = 500
+starts_unlocked = false
+
+[sub_resource type="Resource" id="Zone2"]
+script = ExtResource("2")
+id = &"terrasse"
+display_name = "Terrasse"
+cost = 750
+starts_unlocked = false
+
+[sub_resource type="Resource" id="Zone3"]
+script = ExtResource("2")
+id = &"skiraum"
+display_name = "Skiraum"
+cost = 1000
+starts_unlocked = false
+
+[sub_resource type="Resource" id="Zone4"]
+script = ExtResource("2")
+id = &"schuppen"
+display_name = "Holzschuppen"
+cost = 1250
+starts_unlocked = false
+
+[sub_resource type="Resource" id="Zone5"]
+script = ExtResource("2")
+id = &"seilbahn"
+display_name = "Seilbahn-Station"
+cost = 1500
+starts_unlocked = false
+
+[resource]
+script = ExtResource("1")
+zones = Array[ExtResource("2")]([SubResource("Zone0"), SubResource("Zone1"), SubResource("Zone2"), SubResource("Zone3"), SubResource("Zone4"), SubResource("Zone5")])

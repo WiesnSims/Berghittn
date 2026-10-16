@@ -1,7 +1,7 @@
 class_name PlayerPoints
 extends Node
 ## This player's points (section 8). Listens to the event bus and only counts what its own player caused,
-## so every player in co-op earns separately.
+## so every player in co-op earns (and spends) separately.
 
 signal changed(total: int, gained: int)
 
@@ -18,6 +18,19 @@ func _ready() -> void:
 func add(amount: int) -> void:
 	total += amount
 	changed.emit(total, amount)
+
+
+func can_afford(cost: int) -> bool:
+	return total >= cost
+
+
+## Takes the points if there are enough; false (and nothing taken) otherwise.
+func spend(cost: int) -> bool:
+	if not can_afford(cost):
+		return false
+	total -= cost
+	changed.emit(total, -cost)
+	return true
 
 
 func _on_enemy_damaged(_enemy: Node3D, _amount: int, _is_headshot: bool, source: Node3D) -> void:

@@ -1,0 +1,157 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Material" path="res://assets/materials/greybox_tile.tres" id="1"]
+[ext_resource type="Material" path="res://assets/materials/greybox_wood_wall.tres" id="2"]
+[ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/zones/window.tscn" id="4"]
+[ext_resource type="Material" path="res://assets/materials/greybox_stone.tres" id="5"]
+[ext_resource type="Material" path="res://assets/materials/greybox_metal.tres" id="6"]
+[ext_resource type="Material" path="res://assets/materials/greybox_lamp.tres" id="7"]
+[ext_resource type="Script" path="res://scripts/zones/spawn_point.gd" id="8"]
+
+[node name="Kueche" type="Node3D"]
+
+[node name="Floor" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -0.15, -10.3)
+use_collision = true
+size = Vector3(14, 0.3, 10)
+material = ExtResource("1")
+
+[node name="Ceiling" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3.35, -10.45)
+use_collision = true
+size = Vector3(14.6, 0.3, 10.3)
+material = ExtResource("2")
+
+[node name="Walls" type="CSGCombiner3D" parent="."]
+use_collision = true
+
+[node name="North" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1.45, -15.45)
+size = Vector3(14.6, 3.5, 0.3)
+material = ExtResource("2")
+
+[node name="West" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.15, 1.45, -10.3)
+size = Vector3(0.3, 3.5, 10)
+material = ExtResource("2")
+
+[node name="East" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.15, 1.45, -10.15)
+size = Vector3(0.3, 3.5, 10.3)
+material = ExtResource("2")
+
+[node name="SouthEast" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.15, 1.45, -5.15)
+size = Vector3(3.7, 3.5, 0.3)
+material = ExtResource("2")
+
+[node name="DoorSkiraumHole" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.15, 1.1, -8)
+operation = 2
+size = Vector3(0.6, 2.2, 1.4)
+material = ExtResource("3")
+
+[node name="WindowNorthWestHole" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.5, -15.45)
+operation = 2
+size = Vector3(1.2, 1.2, 0.6)
+material = ExtResource("3")
+
+[node name="WindowNorthEastHole" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1.5, -15.45)
+operation = 2
+size = Vector3(1.2, 1.2, 0.6)
+material = ExtResource("3")
+
+[node name="WindowWestHole" type="CSGBox3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.15, 1.5, -10)
+operation = 2
+size = Vector3(0.6, 1.2, 1.2)
+material = ExtResource("3")
+
+[node name="WindowNorthWest" parent="." instance=ExtResource("4")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 1, 1.5, -15.45)
+
+[node name="WindowNorthEast" parent="." instance=ExtResource("4")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 7, 1.5, -15.45)
+
+[node name="WindowWest" parent="." instance=ExtResource("4")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -3.15, 1.5, -10)
+
+[node name="Furniture" type="CSGCombiner3D" parent="."]
+use_collision = true
+
+[node name="Counter" type="CSGBox3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0.45, -5.65)
+size = Vector3(5, 0.9, 0.7)
+material = ExtResource("3")
+
+[node name="CounterTop" type="CSGBox3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0.92, -5.65)
+size = Vector3(5.1, 0.05, 0.75)
+material = ExtResource("5")
+
+[node name="Stove" type="CSGBox3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.6, 0.45, -14.6)
+size = Vector3(2.2, 0.9, 1.2)
+material = ExtResource("6")
+
+[node name="StovePipe" type="CSGBox3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.4, 2.1, -15)
+size = Vector3(0.3, 2.4, 0.3)
+material = ExtResource("6")
+
+[node name="Worktable" type="CSGBox3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.45, -10.5)
+size = Vector3(3, 0.9, 1.4)
+material = ExtResource("2")
+
+[node name="Cupboard" type="CSGBox3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.6, 1, -11.5)
+size = Vector3(0.7, 2, 2)
+material = ExtResource("3")
+
+[node name="Pots" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 1.02, -10.6)
+size = Vector3(0.5, 0.25, 0.5)
+material = ExtResource("6")
+
+[node name="LampCenter" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2.95, -10.3)
+size = Vector3(0.5, 0.2, 0.5)
+material = ExtResource("7")
+
+[node name="LampCenterLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2.6, -10.3)
+light_color = Color(1, 0.75, 0.45, 1)
+light_energy = 1.1
+omni_range = 9
+
+[node name="LampWest" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.95, -12.5)
+size = Vector3(0.5, 0.2, 0.5)
+material = ExtResource("7")
+
+[node name="LampWestLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, -12.5)
+light_color = Color(1, 0.75, 0.45, 1)
+light_energy = 1
+omni_range = 7
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="NorthWest" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, -0.3, -19.5)
+script = ExtResource("8")
+zone = &"kueche"
+
+[node name="NorthEast" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, -0.3, -19.5)
+script = ExtResource("8")
+zone = &"kueche"
+
+[node name="West" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, -0.3, -10)
+script = ExtResource("8")
+zone = &"kueche"

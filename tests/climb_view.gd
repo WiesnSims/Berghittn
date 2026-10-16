@@ -97,7 +97,7 @@ func _capture_hud(main: Node) -> void:
 		(main.get_node(screen) as Control).hide()
 	var player := main.get_node("Player") as Player
 	# Face the west-south window from the repair spot, so the boards and the prompt are in view.
-	var barricade := main.get_node("Stube/Barricades/WestSouth") as Barricade
+	var barricade := main.get_node("World/Stube/WindowWestSouth") as Barricade
 	barricade.remove_board()
 	barricade.remove_board()
 	var spot: Vector3 = barricade.get_interact_position()

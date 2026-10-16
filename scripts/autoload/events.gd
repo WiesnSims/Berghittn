@@ -17,3 +17,6 @@ signal wave_break_started(next_wave: int, duration: float)
 signal wave_started(wave: int)
 @warning_ignore("unused_signal")
 signal wave_cleared(wave: int)
+## A door was bought and its zone is open (section 4). `source` is the player who paid.
+@warning_ignore("unused_signal")
+signal zone_unlocked(zone: StringName, source: Node3D)

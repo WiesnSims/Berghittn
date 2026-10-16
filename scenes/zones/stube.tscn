@@ -1,34 +1,16 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Material" path="res://assets/materials/greybox_wood_floor.tres" id="1"]
 [ext_resource type="Material" path="res://assets/materials/greybox_wood_wall.tres" id="2"]
 [ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="3"]
-[ext_resource type="Material" path="res://assets/materials/greybox_stone.tres" id="4"]
-[ext_resource type="Material" path="res://assets/materials/greybox_snow.tres" id="5"]
-[ext_resource type="Material" path="res://assets/materials/greybox_pine.tres" id="6"]
-[ext_resource type="Material" path="res://assets/materials/greybox_door_locked.tres" id="7"]
-[ext_resource type="Material" path="res://assets/materials/greybox_fire.tres" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/zones/window.tscn" id="4"]
+[ext_resource type="Material" path="res://assets/materials/greybox_stone.tres" id="5"]
+[ext_resource type="Material" path="res://assets/materials/greybox_fire.tres" id="6"]
+[ext_resource type="Script" path="res://scripts/zones/fire_flicker.gd" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/props/table_set.tscn" id="8"]
 [ext_resource type="Material" path="res://assets/materials/greybox_lamp.tres" id="9"]
-[ext_resource type="PackedScene" path="res://scenes/props/table_set.tscn" id="10"]
-[ext_resource type="Script" path="res://scripts/zones/fire_flicker.gd" id="11"]
-[ext_resource type="Script" path="res://scripts/zones/navmesh_baker.gd" id="12"]
-[ext_resource type="Script" path="res://scripts/zones/barricade.gd" id="13"]
-[ext_resource type="Material" path="res://assets/materials/greybox_board.tres" id="14"]
-
-[sub_resource type="BoxShape3D" id="WindowBlockerX"]
-size = Vector3(0.3, 1.2, 1.2)
-
-[sub_resource type="BoxShape3D" id="WindowBlockerZ"]
-size = Vector3(1.2, 1.2, 0.3)
-
-[sub_resource type="NavigationMesh" id="NavMesh"]
-geometry_collision_mask = 1
-cell_size = 0.2
-cell_height = 0.1
-agent_height = 1.8
-agent_radius = 0.4
-agent_max_climb = 0.3
-filter_baking_aabb = AABB(-30, -1.5, -30, 60, 3, 60)
+[ext_resource type="PackedScene" path="res://scenes/zones/wallbuy_jagdflinte.tscn" id="10"]
+[ext_resource type="Script" path="res://scripts/zones/spawn_point.gd" id="11"]
 
 [node name="Stube" type="Node3D"]
 
@@ -43,21 +25,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.35, 0)
 use_collision = true
 size = Vector3(14.6, 0.3, 10.6)
 material = ExtResource("2")
-
-[node name="BeamWest" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 3.075, 0)
-size = Vector3(0.25, 0.25, 10)
-material = ExtResource("3")
-
-[node name="BeamCenter" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.075, 0)
-size = Vector3(0.25, 0.25, 10)
-material = ExtResource("3")
-
-[node name="BeamEast" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3.075, 0)
-size = Vector3(0.25, 0.25, 10)
-material = ExtResource("3")
 
 [node name="Walls" type="CSGCombiner3D" parent="."]
 use_collision = true
@@ -85,13 +52,13 @@ material = ExtResource("2")
 [node name="DoorKuecheHole" type="CSGBox3D" parent="Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1.1, -5.15)
 operation = 2
-size = Vector3(1.2, 2.2, 0.6)
+size = Vector3(1.4, 2.2, 0.6)
 material = ExtResource("3")
 
 [node name="DoorTerrasseHole" type="CSGBox3D" parent="Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.1, 5.15)
 operation = 2
-size = Vector3(1.2, 2.2, 0.6)
+size = Vector3(1.4, 2.2, 0.6)
 material = ExtResource("3")
 
 [node name="WindowWestNorthHole" type="CSGBox3D" parent="Walls"]
@@ -118,115 +85,32 @@ operation = 2
 size = Vector3(1.2, 1.2, 0.6)
 material = ExtResource("3")
 
-[node name="DoorKueche" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1.1, -5.06)
-use_collision = true
-size = Vector3(1.2, 2.2, 0.12)
-material = ExtResource("7")
+[node name="BeamWest" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 3.075, 0)
+size = Vector3(0.25, 0.25, 10)
+material = ExtResource("3")
 
-[node name="DoorTerrasse" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.1, 5.06)
-use_collision = true
-size = Vector3(1.2, 2.2, 0.12)
-material = ExtResource("7")
+[node name="BeamCenter" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.075, 0)
+size = Vector3(0.25, 0.25, 10)
+material = ExtResource("3")
 
-[node name="WindowBlockers" type="Node3D" parent="."]
+[node name="BeamEast" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3.075, 0)
+size = Vector3(0.25, 0.25, 10)
+material = ExtResource("3")
 
-[node name="WestNorth" type="StaticBody3D" parent="WindowBlockers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.15, 1.5, -2)
-collision_layer = 8
-collision_mask = 0
-
-[node name="Shape" type="CollisionShape3D" parent="WindowBlockers/WestNorth"]
-shape = SubResource("WindowBlockerX")
-
-[node name="WestSouth" type="StaticBody3D" parent="WindowBlockers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.15, 1.5, 2.5)
-collision_layer = 8
-collision_mask = 0
-
-[node name="Shape" type="CollisionShape3D" parent="WindowBlockers/WestSouth"]
-shape = SubResource("WindowBlockerX")
-
-[node name="SouthEast" type="StaticBody3D" parent="WindowBlockers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, 5.15)
-collision_layer = 8
-collision_mask = 0
-
-[node name="Shape" type="CollisionShape3D" parent="WindowBlockers/SouthEast"]
-shape = SubResource("WindowBlockerZ")
-
-[node name="SouthWest" type="StaticBody3D" parent="WindowBlockers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1.5, 5.15)
-collision_layer = 8
-collision_mask = 0
-
-[node name="Shape" type="CollisionShape3D" parent="WindowBlockers/SouthWest"]
-shape = SubResource("WindowBlockerZ")
-
-[node name="Barricades" type="Node3D" parent="."]
-
-[node name="WestNorth" type="Node3D" parent="Barricades"]
+[node name="WindowWestNorth" parent="." instance=ExtResource("4")]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -7.15, 1.5, -2)
-script = ExtResource("13")
-board_material = ExtResource("14")
 
-[node name="WestSouth" type="Node3D" parent="Barricades"]
+[node name="WindowWestSouth" parent="." instance=ExtResource("4")]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -7.15, 1.5, 2.5)
-script = ExtResource("13")
-board_material = ExtResource("14")
 
-[node name="SouthEast" type="Node3D" parent="Barricades"]
+[node name="WindowSouthEast" parent="." instance=ExtResource("4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, 5.15)
-script = ExtResource("13")
-board_material = ExtResource("14")
 
-[node name="SouthWest" type="Node3D" parent="Barricades"]
+[node name="WindowSouthWest" parent="." instance=ExtResource("4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1.5, 5.15)
-script = ExtResource("13")
-board_material = ExtResource("14")
-
-[node name="WindowBars" type="Node3D" parent="."]
-
-[node name="WestNorthV" type="CSGBox3D" parent="WindowBars"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.15, 1.5, -2)
-size = Vector3(0.06, 1.2, 0.06)
-material = ExtResource("3")
-
-[node name="WestNorthH" type="CSGBox3D" parent="WindowBars"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.15, 1.5, -2)
-size = Vector3(0.06, 0.06, 1.2)
-material = ExtResource("3")
-
-[node name="WestSouthV" type="CSGBox3D" parent="WindowBars"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.15, 1.5, 2.5)
-size = Vector3(0.06, 1.2, 0.06)
-material = ExtResource("3")
-
-[node name="WestSouthH" type="CSGBox3D" parent="WindowBars"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.15, 1.5, 2.5)
-size = Vector3(0.06, 0.06, 1.2)
-material = ExtResource("3")
-
-[node name="SouthEastV" type="CSGBox3D" parent="WindowBars"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, 5.15)
-size = Vector3(0.06, 1.2, 0.06)
-material = ExtResource("3")
-
-[node name="SouthEastH" type="CSGBox3D" parent="WindowBars"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, 5.15)
-size = Vector3(1.2, 0.06, 0.06)
-material = ExtResource("3")
-
-[node name="SouthWestV" type="CSGBox3D" parent="WindowBars"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1.5, 5.15)
-size = Vector3(0.06, 1.2, 0.06)
-material = ExtResource("3")
-
-[node name="SouthWestH" type="CSGBox3D" parent="WindowBars"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1.5, 5.15)
-size = Vector3(1.2, 0.06, 0.06)
-material = ExtResource("3")
 
 [node name="Fireplace" type="CSGCombiner3D" parent="."]
 use_collision = true
@@ -234,12 +118,12 @@ use_collision = true
 [node name="Body" type="CSGBox3D" parent="Fireplace"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 0.75, 0)
 size = Vector3(1, 1.5, 2.4)
-material = ExtResource("4")
+material = ExtResource("5")
 
 [node name="Chimney" type="CSGBox3D" parent="Fireplace"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.65, 2.35, 0)
 size = Vector3(0.7, 1.7, 1.6)
-material = ExtResource("4")
+material = ExtResource("5")
 
 [node name="Firebox" type="CSGBox3D" parent="Fireplace"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.2, 0.55, 0)
@@ -250,7 +134,7 @@ material = ExtResource("3")
 [node name="Hearth" type="CSGBox3D" parent="Fireplace"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.9, 0.05, 0)
 size = Vector3(1.6, 0.1, 2.8)
-material = ExtResource("4")
+material = ExtResource("5")
 
 [node name="Mantel" type="CSGBox3D" parent="Fireplace"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.9, 1.54, 0)
@@ -260,14 +144,14 @@ material = ExtResource("3")
 [node name="FireLogs" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3, 0.2, 0)
 size = Vector3(0.45, 0.2, 0.9)
-material = ExtResource("8")
+material = ExtResource("6")
 
 [node name="FireLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0.8, 0)
 light_color = Color(1, 0.55, 0.25, 1)
 light_energy = 2.0
 omni_range = 9.0
-script = ExtResource("11")
+script = ExtResource("7")
 
 [node name="Bar" type="CSGCombiner3D" parent="."]
 use_collision = true
@@ -287,13 +171,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 1.8, -4.85)
 size = Vector3(4, 0.05, 0.3)
 material = ExtResource("3")
 
-[node name="TableWest" parent="." instance=ExtResource("10")]
+[node name="TableWest" parent="." instance=ExtResource("8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0, 1.2)
 
-[node name="TableSouth" parent="." instance=ExtResource("10")]
+[node name="TableSouth" parent="." instance=ExtResource("8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0, 2.6)
 
-[node name="TableNorth" parent="." instance=ExtResource("10")]
+[node name="TableNorth" parent="." instance=ExtResource("8")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, -2)
 
 [node name="LampWest" type="CSGBox3D" parent="."]
@@ -304,7 +188,8 @@ material = ExtResource("9")
 [node name="LampWestLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 2.6, 0.8)
 light_color = Color(1, 0.75, 0.45, 1)
-omni_range = 8.0
+light_energy = 1
+omni_range = 8
 
 [node name="LampEast" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 2.95, 0)
@@ -314,103 +199,23 @@ material = ExtResource("9")
 [node name="LampEastLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 2.6, 0)
 light_color = Color(1, 0.75, 0.45, 1)
-omni_range = 8.0
+light_energy = 1
+omni_range = 8
+
+[node name="WallBuyJagdflinte" parent="." instance=ExtResource("10")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0.8, 1.5, -4.99)
 
 [node name="PlayerSpawn" type="Marker3D" parent="." groups=["player_spawn"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 3.8)
 
-[node name="Exterior" type="Node3D" parent="."]
-
-[node name="Ground" type="CSGBox3D" parent="Exterior"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
-use_collision = true
-size = Vector3(120, 0.4, 120)
-material = ExtResource("5")
-
-[node name="Pine1" type="CSGCylinder3D" parent="Exterior"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 2.2, -4)
-radius = 1.4
-height = 5.0
-sides = 7
-cone = true
-material = ExtResource("6")
-
-[node name="Pine2" type="CSGCylinder3D" parent="Exterior"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 2.2, 5)
-radius = 1.4
-height = 5.0
-sides = 7
-cone = true
-material = ExtResource("6")
-
-[node name="Pine3" type="CSGCylinder3D" parent="Exterior"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 2.2, 12)
-radius = 1.4
-height = 5.0
-sides = 7
-cone = true
-material = ExtResource("6")
-
-[node name="Pine4" type="CSGCylinder3D" parent="Exterior"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2.2, 14)
-radius = 1.4
-height = 5.0
-sides = 7
-cone = true
-material = ExtResource("6")
-
-[node name="Pine5" type="CSGCylinder3D" parent="Exterior"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.2, 11)
-radius = 1.4
-height = 5.0
-sides = 7
-cone = true
-material = ExtResource("6")
-
-[node name="Pine6" type="CSGCylinder3D" parent="Exterior"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 2.2, -12)
-radius = 1.4
-height = 5.0
-sides = 7
-cone = true
-material = ExtResource("6")
-
-[node name="Navigation" type="NavigationRegion3D" parent="."]
-navigation_mesh = SubResource("NavMesh")
-script = ExtResource("12")
-
-[node name="WindowLinks" type="Node3D" parent="."]
-
-[node name="WestNorth" type="NavigationLink3D" parent="WindowLinks"]
-bidirectional = false
-start_position = Vector3(-7.9, -0.3, -2)
-end_position = Vector3(-6.4, 0, -2)
-
-[node name="WestSouth" type="NavigationLink3D" parent="WindowLinks"]
-bidirectional = false
-start_position = Vector3(-7.9, -0.3, 2.5)
-end_position = Vector3(-6.4, 0, 2.5)
-
-[node name="SouthEast" type="NavigationLink3D" parent="WindowLinks"]
-bidirectional = false
-start_position = Vector3(3, -0.3, 5.9)
-end_position = Vector3(3, 0, 4.4)
-
-[node name="SouthWest" type="NavigationLink3D" parent="WindowLinks"]
-bidirectional = false
-start_position = Vector3(-5, -0.3, 5.9)
-end_position = Vector3(-5, 0, 4.4)
-
 [node name="SpawnPoints" type="Node3D" parent="."]
 
-[node name="WestNorth" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+[node name="WestNorth" type="Marker3D" parent="SpawnPoints"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, -0.3, -2)
+script = ExtResource("11")
+zone = &"stube"
 
-[node name="WestSouth" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
+[node name="WestSouth" type="Marker3D" parent="SpawnPoints"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, -0.3, 2.5)
-
-[node name="SouthEast" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, -0.3, 9.5)
-
-[node name="SouthWest" type="Marker3D" parent="SpawnPoints" groups=["spawn_points"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, -0.3, 9.5)
+script = ExtResource("11")
+zone = &"stube"

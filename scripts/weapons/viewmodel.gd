@@ -1,6 +1,8 @@
 class_name Viewmodel
 extends Node3D
-## First-person gun model: recoil kick, slide blowback, ejected casings, reload and muzzle flash. Purely visual.
+## First-person gun model: recoil kick, slide blowback, ejected casings, reload, draw and muzzle flash. Purely visual.
+## This base is the pistol (slide and magazine); guns that work differently extend it and override
+## play_fire and play_reload.
 
 ## Kick per shot: metres back and degrees of muzzle climb.
 @export var kick_distance: float = 0.05
@@ -23,19 +25,22 @@ extends Node3D
 @export var ejection_port: Vector3 = Vector3(0.02, 0.02, -0.02)
 @export var ejection_velocity: Vector3 = Vector3(1.8, 1.4, 0.4)
 @export var casing_color: Color = Color(0.8, 0.62, 0.25, 1)
+@export var casing_size: Vector3 = Vector3(0.009, 0.009, 0.022)
 
 @onready var _model: Node3D = $Model
-@onready var _slide: Node3D = $Model/Slide
-@onready var _slide_rest: Vector3 = _slide.position
+# Pistol parts; other guns do not have them.
+@onready var _slide: Node3D = get_node_or_null("Model/Slide")
+@onready var _slide_rest: Vector3 = _slide.position if _slide else Vector3.ZERO
 @onready var _flash: Node3D = $Model/MuzzleFlash
 @onready var _flash_light: OmniLight3D = $Model/MuzzleFlash/Light
 @onready var _flash_energy: float = _flash_light.light_energy
-@onready var _mag: Node3D = $Model/Grip/Magazine
-@onready var _mag_rest: Vector3 = _mag.position
+@onready var _mag: Node3D = get_node_or_null("Model/Grip/Magazine")
+@onready var _mag_rest: Vector3 = _mag.position if _mag else Vector3.ZERO
 
 var _rest: Transform3D
 var _tween: Tween
-var _slide_tween: Tween
+# Moving parts (slide, bolt, barrels) animate on their own tween, alongside the kick.
+var _parts_tween: Tween
 var _flash_left: float = 0.0
 # Pooled casings, flown by hand: a physics body per shot would be wasted on something gone in half a second.
 var _casings: Array[MeshInstance3D] = []
@@ -50,7 +55,7 @@ func _ready() -> void:
 	_rest = _model.transform
 	_flash.visible = false
 	var mesh := BoxMesh.new()
-	mesh.size = Vector3(0.009, 0.009, 0.022)
+	mesh.size = casing_size
 	var material := StandardMaterial3D.new()
 	material.albedo_color = casing_color
 	material.metallic = 0.7
@@ -86,6 +91,15 @@ func _process(delta: float) -> void:
 
 
 func play_fire() -> void:
+	_flash_and_kick()
+	# Blowback: the slide slams back and returns, the casing flies out of the port as it does.
+	_parts_tween = create_tween()
+	_parts_tween.tween_property(_slide, "position", _slide_rest + Vector3(0, 0, slide_travel * 0.7), kick_time * 0.2)
+	_parts_tween.tween_property(_slide, "position", _slide_rest, kick_time * 0.6).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_eject_casing()
+
+
+func _flash_and_kick() -> void:
 	_flash_left = Constants.MUZZLE_FLASH_TIME
 	_flash.visible = true
 	_flash.rotation.z = randf() * TAU
@@ -94,11 +108,6 @@ func play_fire() -> void:
 	var kicked: Transform3D = _rest.translated_local(Vector3(0, 0, kick_distance)).rotated_local(Vector3.RIGHT, deg_to_rad(kick_angle))
 	_model.transform = kicked
 	_tween.tween_property(_model, "transform", _rest, kick_time).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	# Blowback: the slide slams back and returns, the casing flies out of the port as it does.
-	_slide_tween = create_tween()
-	_slide_tween.tween_property(_slide, "position", _slide_rest + Vector3(0, 0, slide_travel * 0.7), kick_time * 0.2)
-	_slide_tween.tween_property(_slide, "position", _slide_rest, kick_time * 0.6).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	_eject_casing()
 
 
 func _eject_casing() -> void:
@@ -137,6 +146,13 @@ func play_reload(duration: float, chamber_time: float = 0.0) -> void:
 	_tween.tween_property(_model, "transform", _rest, d * 0.35).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 
 
+func play_raise(duration: float) -> void:
+	# Drawn: comes up from below the view, settling with a little tilt.
+	_restart_tween()
+	_model.transform = _rest.translated(Vector3(0.05, -lower_drop, 0.0)).rotated_local(Vector3.RIGHT, deg_to_rad(-30.0))
+	_tween.tween_property(_model, "transform", _rest, duration).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
 func play_lower(duration: float) -> void:
 	# Out of the way while the melee weapon swings, then back up.
 	_restart_tween()
@@ -149,8 +165,15 @@ func play_lower(duration: float) -> void:
 func _restart_tween() -> void:
 	if _tween:
 		_tween.kill()
-	if _slide_tween:
-		_slide_tween.kill()
-	_mag.position = _mag_rest
-	_slide.position = _slide_rest
+	if _parts_tween:
+		_parts_tween.kill()
+	_reset_parts()
 	_tween = create_tween()
+
+
+## Puts every moving part back where it rests; extended by guns with other parts.
+func _reset_parts() -> void:
+	if _mag:
+		_mag.position = _mag_rest
+	if _slide:
+		_slide.position = _slide_rest
