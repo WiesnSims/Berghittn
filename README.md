@@ -32,6 +32,9 @@ WASD / arrows move, mouse look, left click shoot, R reload, Space jump, Shift sp
 (not Ctrl: Ctrl+W closes the browser tab), E interact, Esc or P pause, F3 debug overlay
 (FPS and position).
 
+F5, Ctrl/Cmd+R, F11 and F12 go to the browser: `web/browser_shortcuts.js` stops them before
+Godot's web runtime, which otherwise calls `preventDefault()` on every key.
+
 In browsers Esc never reaches the game; it releases pointer lock and the game pauses
 because the lock is gone. Resume stays disabled for ~1 s since Chrome refuses an
 immediate re-lock.
