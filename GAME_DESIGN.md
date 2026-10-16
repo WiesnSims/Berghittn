@@ -257,6 +257,7 @@ Alpine folk culture.
 |---|---|---|---|---|---|
 | `kuhglocke` | Kuhglocke | Thrown decoy cowbell; rings for 10 s and attracts all enemies within 20 m | 300 | 2 | wall-buy, Stube |
 | `kuhfladen` | Kuhfladen-Mine | Placed on the floor; enemies stepping in it are slowed 60% for 5 s and take 40 damage | 250 | 3 | wall-buy, Schuppen |
+| `eisstock` | Eisstock | Thrown low, slides along the floor like a curling stone, bounces off walls up to 3 times and damages every enemy it slides through (user request, 2026-10-17) | 400 | 2 | wall-buy, Terrasse (proposed) |
 
 Balance notes: wonder weapons must feel exciting but not make the game trivial.
 Tune damage numbers by playtesting, and keep every number in the data
@@ -423,7 +424,7 @@ fix console errors, commit. Stop and report after each milestone.
 **M5 — Shrine, chest, more enemies**
 - Perks, Hüttentruhe, `tourist`, `knappe`, `perchte`, `krampus` boss wave.
 - Special weapons from section 6a, one at a time in this order: alphorn,
-  Schmarrnpfanne, Knödelwerfer, Kuhglocke, Kuhfladen-Mine, then the rest.
+  Schmarrnpfanne, Knödelwerfer, Kuhglocke, Kuhfladen-Mine, Eisstock, then the rest.
   Report after each one; the user may stop adding weapons at any point.
 - Acceptance: all items purchasable, wave 10 reachable.
 
