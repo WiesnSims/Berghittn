@@ -23,6 +23,9 @@ const REPAIR_SPOT: Vector3 = Vector3(0.0, -1.5, -0.7)
 const ANIM_TIME: float = 0.25
 
 @export var board_material: Material
+## Height of the ground outside below the window centre (metres, negative). The navigation link that
+## enemies climb in by starts there: snow is 1.8 m below, a terrace deck at floor height 1.5 m.
+@export var outside_floor: float = -1.8
 
 ## Seconds between boards while interact is held (read by the player's Interactor).
 var interact_repeat: float = Constants.BARRICADE_REPAIR_INTERVAL
@@ -36,6 +39,9 @@ var _tweens: Array[Tween] = []
 func _ready() -> void:
 	add_to_group("barricades")
 	add_to_group("interactables")
+	var link := get_node_or_null("Link") as NavigationLink3D
+	if link:
+		link.start_position.y = outside_floor
 	for layout: Vector3 in BOARD_LAYOUT:
 		var board := MeshInstance3D.new()
 		var mesh := BoxMesh.new()

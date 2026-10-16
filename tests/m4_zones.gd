@@ -1,11 +1,11 @@
 extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/m4_zones.tscn
-## Headless M4 check on the real main scene: unlock all six zones through their doors (points from the
+## Headless M4 check on the real main scene: unlock all seven zones through their doors (points from the
 ## debug key), spawn activation after every purchase, navmesh paths through opened doors, the shotgun and
 ## rifle wall-buys, ammo refills at half price, gun slots and switching, one set of points per shotgun blast,
 ## and the right-click modes: pistol sights, Stutzen scope, both barrels of the Jagdflinte.
 
-const ALL_ZONES: Array[StringName] = [&"stube", &"kueche", &"terrasse", &"skiraum", &"schuppen", &"seilbahn"]
+const ALL_ZONES: Array[StringName] = [&"stube", &"kueche", &"lager", &"terrasse", &"skiraum", &"schuppen", &"seilbahn"]
 
 var main: Node
 var player: Player
@@ -47,11 +47,17 @@ func _stand_at(target: Node3D) -> void:
 func _expected_active() -> Array[StringName]:
 	# Section 4 by hand, from the table of doors: unlocked zones plus their neighbours.
 	var adjacent := {
-		&"stube": [&"kueche", &"terrasse"], &"kueche": [&"stube", &"skiraum"], &"terrasse": [&"stube", &"schuppen"],
+		&"stube": [&"kueche", &"terrasse", &"lager"], &"kueche": [&"stube", &"skiraum"], &"lager": [&"stube"], &"terrasse": [&"stube", &"schuppen"],
 		&"skiraum": [&"kueche", &"seilbahn"], &"seilbahn": [&"skiraum", &"schuppen"], &"schuppen": [&"seilbahn", &"terrasse"],
 	}
 	var active: Array[StringName] = []
+	# Zones without spawn points of their own (the Lager upstairs: enemies come up the stairs) never show up.
+	var with_spawns: Dictionary = {}
+	for node: Node in get_tree().get_nodes_in_group("spawn_points"):
+		with_spawns[(node as SpawnPoint).zone] = true
 	for zone: StringName in ALL_ZONES:
+		if not with_spawns.has(zone):
+			continue
 		if zones.is_unlocked(zone):
 			active.append(zone)
 			continue
@@ -116,7 +122,7 @@ func _run() -> void:
 	await _frames(5)
 
 	_check(zones.unlocked_count() == 1 and zones.is_unlocked(&"stube"), "only the Stube starts open")
-	_check(get_tree().get_nodes_in_group("zone_doors").size() == 6, "six doors")
+	_check(get_tree().get_nodes_in_group("zone_doors").size() == 7, "seven doors")
 	_check_spawns("start")
 	var stube_spot := Vector3(-1, 0, 2)
 	var schuppen_spot := Vector3(14.3, 0, 13)
@@ -142,6 +148,11 @@ func _run() -> void:
 	await _buy_door(&"stube", &"kueche", &"kueche")
 	await _frames(3)
 	_check(_reachable(stube_spot, Vector3(1, 0, -8)), "Kueche reachable through its door after the rebake")
+	# Upstairs: the Lager door on the gallery sits right above the Kueche door; E must pick the one at your level.
+	_check(not _reachable(stube_spot, Vector3(-2, 3.5, -8)), "Lager not reachable while locked")
+	await _buy_door(&"stube", &"lager", &"lager")
+	await _frames(3)
+	_check(_reachable(stube_spot, Vector3(-2, 3.5, -8)), "Lager reachable up the stairs and over the gallery")
 	await _buy_door(&"kueche", &"skiraum", &"skiraum")
 	await _buy_door(&"skiraum", &"seilbahn", &"seilbahn")
 	await _buy_door(&"seilbahn", &"schuppen", &"schuppen")
@@ -149,10 +160,10 @@ func _run() -> void:
 	_check(not terrasse_schuppen.is_open() and terrasse_schuppen.get_interact_prompt(player) != "", "Terrasse door from the Schuppen side is for sale")
 	await _buy_door(&"stube", &"terrasse", &"terrasse")
 	_check(terrasse_schuppen.is_open(), "door between two open zones opened by itself")
-	_check(zones.unlocked_count() == 6, "all six zones unlocked")
+	_check(zones.unlocked_count() == 7, "all seven zones unlocked")
 	await _frames(3)
 	_check(_reachable(stube_spot, schuppen_spot), "Schuppen reachable from the Stube")
-	var spent: int = 500 + 1000 + 1500 + 1250 + 750
+	var spent: int = 500 + 1250 + 1000 + 1500 + 1250 + 750
 	_check(player.points.total == 7 * Constants.DEBUG_POINTS - spent, "spent exactly %d" % spent)
 	for node: Node in get_tree().get_nodes_in_group("zone_doors"):
 		_check((node as ZoneDoor).get_interact_prompt(player) == "", "%s: no prompt once open" % node.name)

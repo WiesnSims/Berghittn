@@ -1,0 +1,267 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Material" path="res://assets/materials/greybox_wood_wall.tres" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/zones/window_upper.tscn" id="2"]
+[ext_resource type="Material" path="res://assets/materials/greybox_board.tres" id="3"]
+[ext_resource type="Material" path="res://assets/materials/greybox_snow.tres" id="4"]
+[ext_resource type="Material" path="res://assets/materials/greybox_pine.tres" id="5"]
+[ext_resource type="Material" path="res://assets/materials/greybox_door_locked.tres" id="6"]
+[ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="7"]
+[ext_resource type="Material" path="res://assets/materials/greybox_lamp.tres" id="8"]
+
+[node name="Lager" type="Node3D"]
+
+[node name="Ceiling" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 6.85, -11.45)
+use_collision = true
+size = Vector3(18.6, 0.3, 10.3)
+material = ExtResource("1")
+
+[node name="WindowNorthWest" parent="." instance=ExtResource("2")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -6, 5, -16.45)
+
+[node name="WindowNorth" parent="." instance=ExtResource("2")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 5, -16.45)
+
+[node name="WindowNorthEast" parent="." instance=ExtResource("2")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 5, 5, -16.45)
+
+[node name="WindowWest" parent="." instance=ExtResource("2")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -11.15, 5, -11)
+
+[node name="Bunks" type="CSGCombiner3D" parent="."]
+use_collision = true
+
+[node name="NorthPlatform" type="CSGBox3D" parent="Bunks"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 3.72, -15.3)
+size = Vector3(17, 0.45, 2)
+material = ExtResource("3")
+
+[node name="MiddlePlatform" type="CSGBox3D" parent="Bunks"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 3.72, -10.8)
+size = Vector3(12, 0.45, 2.6)
+material = ExtResource("3")
+
+[node name="Mattresses" type="CSGCombiner3D" parent="."]
+
+[node name="North0" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 4, -15.3)
+size = Vector3(1.5, 0.12, 1.9)
+material = ExtResource("4")
+
+[node name="Blanket0" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 4.07, -15)
+size = Vector3(1.4, 0.04, 1)
+material = ExtResource("5")
+
+[node name="North1" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.3, 4, -15.3)
+size = Vector3(1.5, 0.12, 1.9)
+material = ExtResource("4")
+
+[node name="Blanket1" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.3, 4.07, -15)
+size = Vector3(1.4, 0.04, 1)
+material = ExtResource("6")
+
+[node name="North2" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.6, 4, -15.3)
+size = Vector3(1.5, 0.12, 1.9)
+material = ExtResource("4")
+
+[node name="Blanket2" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.6, 4.07, -15)
+size = Vector3(1.4, 0.04, 1)
+material = ExtResource("5")
+
+[node name="North3" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.9, 4, -15.3)
+size = Vector3(1.5, 0.12, 1.9)
+material = ExtResource("4")
+
+[node name="Blanket3" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.9, 4.07, -15)
+size = Vector3(1.4, 0.04, 1)
+material = ExtResource("6")
+
+[node name="North4" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 4, -15.3)
+size = Vector3(1.5, 0.12, 1.9)
+material = ExtResource("4")
+
+[node name="Blanket4" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 4.07, -15)
+size = Vector3(1.4, 0.04, 1)
+material = ExtResource("5")
+
+[node name="North5" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 4, -15.3)
+size = Vector3(1.5, 0.12, 1.9)
+material = ExtResource("4")
+
+[node name="Blanket5" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 4.07, -15)
+size = Vector3(1.4, 0.04, 1)
+material = ExtResource("6")
+
+[node name="North6" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 4, -15.3)
+size = Vector3(1.5, 0.12, 1.9)
+material = ExtResource("4")
+
+[node name="Blanket6" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 4.07, -15)
+size = Vector3(1.4, 0.04, 1)
+material = ExtResource("5")
+
+[node name="North7" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 4, -15.3)
+size = Vector3(1.5, 0.12, 1.9)
+material = ExtResource("4")
+
+[node name="Blanket7" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 4.07, -15)
+size = Vector3(1.4, 0.04, 1)
+material = ExtResource("6")
+
+[node name="North8" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 4, -15.3)
+size = Vector3(1.5, 0.12, 1.9)
+material = ExtResource("4")
+
+[node name="Blanket8" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 4.07, -15)
+size = Vector3(1.4, 0.04, 1)
+material = ExtResource("5")
+
+[node name="North9" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.3, 4, -15.3)
+size = Vector3(1.5, 0.12, 1.9)
+material = ExtResource("4")
+
+[node name="Blanket9" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.3, 4.07, -15)
+size = Vector3(1.4, 0.04, 1)
+material = ExtResource("6")
+
+[node name="MiddleA0" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.4, 4, -11.45)
+size = Vector3(1.5, 0.12, 1.2)
+material = ExtResource("4")
+
+[node name="MiddleB0" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.4, 4, -10.15)
+size = Vector3(1.5, 0.12, 1.2)
+material = ExtResource("4")
+
+[node name="MiddleA1" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.7, 4, -11.45)
+size = Vector3(1.5, 0.12, 1.2)
+material = ExtResource("4")
+
+[node name="MiddleB1" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.7, 4, -10.15)
+size = Vector3(1.5, 0.12, 1.2)
+material = ExtResource("4")
+
+[node name="MiddleA2" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 4, -11.45)
+size = Vector3(1.5, 0.12, 1.2)
+material = ExtResource("4")
+
+[node name="MiddleB2" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 4, -10.15)
+size = Vector3(1.5, 0.12, 1.2)
+material = ExtResource("4")
+
+[node name="MiddleA3" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3, 4, -11.45)
+size = Vector3(1.5, 0.12, 1.2)
+material = ExtResource("4")
+
+[node name="MiddleB3" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3, 4, -10.15)
+size = Vector3(1.5, 0.12, 1.2)
+material = ExtResource("4")
+
+[node name="MiddleA4" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 4, -11.45)
+size = Vector3(1.5, 0.12, 1.2)
+material = ExtResource("4")
+
+[node name="MiddleB4" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 4, -10.15)
+size = Vector3(1.5, 0.12, 1.2)
+material = ExtResource("4")
+
+[node name="MiddleA5" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 4, -11.45)
+size = Vector3(1.5, 0.12, 1.2)
+material = ExtResource("4")
+
+[node name="MiddleB5" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 4, -10.15)
+size = Vector3(1.5, 0.12, 1.2)
+material = ExtResource("4")
+
+[node name="MiddleA6" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 4, -11.45)
+size = Vector3(1.5, 0.12, 1.2)
+material = ExtResource("4")
+
+[node name="MiddleB6" type="CSGBox3D" parent="Mattresses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 4, -10.15)
+size = Vector3(1.5, 0.12, 1.2)
+material = ExtResource("4")
+
+[node name="Locker" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 4.5, -12)
+use_collision = true
+size = Vector3(0.7, 2, 2.4)
+material = ExtResource("7")
+
+[node name="LampWest" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 6.75, -11)
+size = Vector3(0.5, 0.2, 0.5)
+material = ExtResource("8")
+
+[node name="LampWestLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 6.4, -11)
+light_color = Color(1, 0.75, 0.45, 1)
+light_energy = 0.8
+omni_range = 8
+
+[node name="LampEast" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 6.75, -11)
+size = Vector3(0.5, 0.2, 0.5)
+material = ExtResource("8")
+
+[node name="LampEastLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 6.4, -11)
+light_color = Color(1, 0.75, 0.45, 1)
+light_energy = 0.8
+omni_range = 8
+
+[node name="Roof" type="Node3D" parent="."]
+
+[node name="PlaneA" type="CSGBox3D" parent="Roof"]
+transform = Transform3D(1, 0, 0, 0, 0.866, -0.5, 0, 0.5, 0.866, -2, 9.0867, -8.875)
+size = Vector3(19.8, 0.25, 6.0467)
+material = ExtResource("4")
+
+[node name="PlaneB" type="CSGBox3D" parent="Roof"]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, -2, 8.9135, -14.325)
+size = Vector3(19.8, 0.25, 6.7395)
+material = ExtResource("4")
+
+[node name="GableA" type="CSGPolygon3D" parent="Roof"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -11, 7.3, -11.45)
+polygon = PackedVector2Array(-5.15, 0, 5.15, 0, 0, 2.9734)
+depth = 0.3
+material = ExtResource("1")
+
+[node name="GableB" type="CSGPolygon3D" parent="Roof"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 7.3, 7.3, -11.45)
+polygon = PackedVector2Array(-5.15, 0, 5.15, 0, 0, 2.9734)
+depth = 0.3
+material = ExtResource("1")

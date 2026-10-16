@@ -85,6 +85,8 @@ const BARRICADE_MAX_BOARDS: int = 6
 const BARRICADE_REPAIR_INTERVAL: float = 0.6
 # Distance from the repair spot inside the window within which E works.
 const INTERACT_RANGE: float = 1.7
+# Height difference beyond which E does not reach (the gallery's Lager door is right above the Kueche door).
+const INTERACT_MAX_HEIGHT: float = 1.2
 
 # Zones (section 4; door costs live in data/zone_table.tres).
 const DOOR_OPEN_TIME: float = 0.7
