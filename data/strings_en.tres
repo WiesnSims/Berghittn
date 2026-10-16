@@ -16,11 +16,11 @@ messages = {
 [&"", &"UI_RELOAD_HINT"]: [&"R to reload"],
 [&"", &"UI_NO_AMMO"]: [&"Out of ammo"],
 [&"", &"UI_DEATH_TITLE"]: [&"Game over"],
-[&"", &"UI_DEATH_QUIP_1"]: [&"\"Geh, des gibt's jo ned!\"  (No way, that can't be!)"],
-[&"", &"UI_DEATH_QUIP_2"]: [&"\"Na, des is ka Wanderweg mehr.\"  (Well, that's no hiking trail anymore.)"],
-[&"", &"UI_DEATH_QUIP_3"]: [&"\"Jetzt brauch i an Schnaps.\"  (Now I need a schnaps.)"],
-[&"", &"UI_DEATH_QUIP_4"]: [&"The hiker reached the summit. Unfortunately, you were the summit."],
+[&"", &"UI_DEATH_QUIP_1"]: [&"\"Geh, des gibt's jo ned!\""],
+[&"", &"UI_DEATH_QUIP_2"]: [&"\"Na, des is ka Wanderweg mehr.\""],
+[&"", &"UI_DEATH_QUIP_3"]: [&"\"Jetzt brauch i an Schnaps.\""],
+[&"", &"UI_DEATH_QUIP_4"]: [&"Da Wanderer hat an Gipfel erreicht. Leider warst du da Gipfel."],
 [&"", &"UI_RESTART"]: [&"Try again"],
-[&"", &"WEAPON_PISTOLE"]: [&"Service pistol"],
-[&"", &"ENEMY_WANDERER"]: [&"Hiker"]
+[&"", &"WEAPON_PISTOLE"]: [&"Dienstpistole"],
+[&"", &"ENEMY_WANDERER"]: [&"Wanderer"]
 }
