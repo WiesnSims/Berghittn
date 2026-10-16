@@ -33,8 +33,6 @@ var _flinch_tween: Tween
 var _flash_material: StandardMaterial3D
 var _meshes: Array[MeshInstance3D] = []
 var _head_parts: Array[Node3D] = []
-# State to go back to once a swing is over: attacks also happen through a window while breaking it.
-var _resume_state: State = State.CHASING
 # The window being entered, from the navigation link: wall centre, inward direction, landing point inside.
 var _window: Barricade
 var _window_wall: Vector3
@@ -71,7 +69,6 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 		part.visible = true
 	_set_active(true)
 	_state = State.CHASING
-	_resume_state = State.CHASING
 
 
 func is_alive() -> bool:
@@ -186,11 +183,10 @@ func _attack(delta: float) -> void:
 		if _target and _target.is_targetable() and _in_attack_range():
 			_target.take_damage(data.damage)
 	if _attack_time >= data.attack_windup + data.attack_cooldown:
-		_state = _resume_state
+		_state = State.CHASING
 
 
 func _start_attack() -> void:
-	_resume_state = State.BREAKING if _state == State.BREAKING else State.CHASING
 	_state = State.ATTACKING
 	_attack_time = 0.0
 	_has_swung = false
@@ -244,11 +240,6 @@ func _break_window(delta: float) -> void:
 		return
 	if _window.is_open():
 		_start_climb()
-		return
-	# Whoever stands right at the window gets swiped through it, repairing is not free.
-	_target = _nearest_target()
-	if _target and _in_attack_range():
-		_start_attack()
 		return
 	_pull_board()
 
@@ -398,7 +389,12 @@ func _nearest_target() -> Player:
 
 func _in_attack_range() -> bool:
 	var offset: Vector3 = _target.global_position - global_position
-	return absf(offset.y) <= Constants.ENEMY_ATTACK_MAX_HEIGHT and _flat(offset).length() <= data.attack_range
+	if absf(offset.y) > Constants.ENEMY_ATTACK_MAX_HEIGHT or _flat(offset).length() > data.attack_range:
+		return false
+	# Only in the same room: walls and window openings (player blockers) both stop the swing.
+	var chest := Vector3.UP * Constants.ENEMY_ATTACK_CHEST_HEIGHT
+	var query := PhysicsRayQueryParameters3D.create(global_position + chest, _target.global_position + chest, Constants.LAYER_WORLD | Constants.LAYER_PLAYER_BLOCKER)
+	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 
 
 func _halt(delta: float) -> void:

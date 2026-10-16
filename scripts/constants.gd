@@ -56,6 +56,8 @@ const ENEMY_WINDOW_STAND_OFF: float = 0.75
 const ENEMY_LYING_HEIGHT: float = 0.2
 # Vertical distance beyond which a melee swing cannot reach (player on a table, enemy below).
 const ENEMY_ATTACK_MAX_HEIGHT: float = 1.4
+# Height of the line between enemy and player that must be clear for a swing to start and land.
+const ENEMY_ATTACK_CHEST_HEIGHT: float = 1.2
 
 # Seconds to walk the last bit from the link start to the window.
 const ENEMY_WINDOW_APPROACH_TIME: float = 0.3

@@ -79,6 +79,15 @@ godot --headless --fixed-fps 60 res://tests/melee_arc.tscn
 One shovel swing must hit every enemy in the arc in front of the player and none behind.
 
 ```
+godot --headless --fixed-fps 60 res://tests/window_attack.tscn
+godot --headless --fixed-fps 60 res://tests/chamber.tscn
+```
+
+`window_attack`: a player pressed against a window takes no hits while the enemy outside tears it
+open, and is hit once it has climbed in. `chamber`: guns with a chamber hold mag + 1 (start, reload
+with a round chambered) and mag after a reload from empty.
+
+```
 godot --headless --fixed-fps 60 res://tests/m2_smoke.tscn
 ```
 

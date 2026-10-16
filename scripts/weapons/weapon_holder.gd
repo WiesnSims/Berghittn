@@ -23,6 +23,8 @@ var mag: int = 0
 var reserve: int = 0
 var _cooldown: float = 0.0
 var _reload_left: float = 0.0
+# What the running reload fills the gun to.
+var _reload_target: int = 0
 var _viewmodel: Viewmodel
 var _melee_viewmodel: MeleeViewmodel
 # Seconds left of the current swing, and until its blow lands (negative once it has).
@@ -53,7 +55,8 @@ func equip(data: WeaponData) -> void:
 		_viewmodel.queue_free()
 		_viewmodel = null
 	weapon = data
-	mag = data.mag_size
+	# Handed over ready to fire: chambered and topped up.
+	mag = data.loaded_capacity(true)
 	reserve = data.reserve_ammo
 	_cooldown = 0.0
 	_reload_left = 0.0
@@ -96,8 +99,11 @@ func _physics_process(delta: float) -> void:
 
 
 func start_reload() -> void:
-	if is_reloading() or mag >= weapon.mag_size or reserve <= 0:
+	# With rounds left, one stays in the chamber on top of the new mag.
+	var target: int = weapon.loaded_capacity(mag > 0)
+	if is_reloading() or mag >= target or reserve <= 0:
 		return
+	_reload_target = target
 	# Empty mag means the slide is locked back: chamber a round after the new mag is in.
 	var chamber: float = weapon.chamber_time if mag == 0 else 0.0
 	_reload_left = weapon.reload_time + chamber
@@ -108,7 +114,7 @@ func start_reload() -> void:
 
 func _finish_reload() -> void:
 	_reload_left = 0.0
-	var moved: int = mini(weapon.mag_size - mag, reserve)
+	var moved: int = mini(_reload_target - mag, reserve)
 	mag += moved
 	reserve -= moved
 	reload_finished.emit()

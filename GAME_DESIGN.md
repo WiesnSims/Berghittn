@@ -150,6 +150,10 @@ effects, see section 6a).
 
 Rules:
 - Ammo refill from wall-buys costs half the weapon price.
+- Magazine weapons with a chamber hold magazine + 1 (user rule, 2026-10-16): reloading with a
+  round still chambered loads mag + 1, reloading from empty loads mag (the rack chambers one
+  from the new mag). Weapons start fully loaded and chambered. Guns without a chamber
+  (`chamber_time` 0) stay at mag size.
 - Slots: 2 gun slots (wonder weapons and the hand mortar use a gun slot),
   1 melee slot (starts with the shovel, can be replaced), 1 equipment slot
   (stackable throwables, see section 6a).
