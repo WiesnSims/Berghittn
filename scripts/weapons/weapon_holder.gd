@@ -469,6 +469,8 @@ func _fire_ray(hits: Dictionary) -> void:
 		pierced += 1
 		if pierced > weapon.penetration:
 			return
+		if weapon.penetration_range > 0.0 and global_position.distance_to(hit.position) > weapon.penetration_range:
+			return
 		share *= weapon.penetration_falloff
 
 

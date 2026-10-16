@@ -40,6 +40,9 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN }
 ## can still hit, and the share of damage left after each body it passes (0.5 = half, then a quarter...).
 @export var penetration: int = 0
 @export var penetration_falloff: float = 0.5
+## Metres from the muzzle within which a shot still goes through (0 = any distance). Buckshot only
+## punches through up close (play-test, 2026-10-17).
+@export var penetration_range: float = 0.0
 @export var cost: int = 0
 @export var ammo_cost: int = 0
 ## Optional id of a behavior script for special weapons (section 6a). Empty = plain hitscan.

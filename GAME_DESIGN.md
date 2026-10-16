@@ -101,7 +101,7 @@ Zones (each is a separate area scene joined at doors). Costs are in points.
 | `stube` | Gaststube (main room) | yes | – | Spawn point, first wall-buy, fireplace; two-storey hall with gallery, Erker and balcony |
 | `kueche` | Küche | no | 500 | Kitchen with a Speis (pantry); Schnaps shrine (perk machine) |
 | `lager` | Matratzenlager | no | 1250 | Upstairs dorm over the Küche, door on the Stube gallery; no windows enemies can climb (they come up the stairs); Munitionskiste |
-| `terrasse` | Terrasse | no | 750 | Open snowy terrace, long sight lines; Schneekanone trap over the beer garden |
+| `terrasse` | Terrasse | no | 750 | Open snowy terrace, long sight lines over the beer garden |
 | `skiraum` | Skiraum | no | 1000 | Narrow room, good chokepoint, wall-buy |
 | `schuppen` | Holzschuppen | no | 1250 | Woodshed, the mystery chest spawns here at fixed spot |
 | `seilbahn` | Seilbahn-Station | no | 1500 | Cable car station, the alphorn weapon location in later waves |
@@ -121,7 +121,7 @@ Every room has a purpose (user request, 2026-10-17), something worth going there
 | `stube` | Start, Jagdflinte wall-buy, later the Kuhglocke wall-buy |
 | `kueche` | Schnaps shrine (perks, section 9), later the Schmarrnpfanne wall-buy |
 | `lager` | **Munitionskiste** (1000): refills the reserve of every carried gun at once; the only refill for chest guns. The safe-ish room: no climbable windows |
-| `terrasse` | **Schneekanone** trap (1000): blows snow over the sunken beer garden for 15 s, enemies there are slowed to 50 % and take 40 damage per second; 45 s to build pressure again. Trap damage and kills earn no points |
+| `terrasse` | Long sight lines over the sunken beer garden. Purpose still open: the Schneekanone trap was cut after play-testing (2026-10-17, "unfun and useless"). Buyable traps or obstacles stay an idea for later |
 | `skiraum` | Chokepoint, Stutzen wall-buy |
 | `schuppen` | Hüttentruhe (mystery chest), later the Kuhfladen-Mine wall-buy |
 | `seilbahn` | Handböller wall-buy and the Alphorn in later waves; arrive with the special weapons (section 6a) |
@@ -193,11 +193,15 @@ Rules:
   moment and fires as soon as the gun is ready, so fast clicking is never swallowed.
 - Penetration (user request, 2026-10-17): big calibres go through bodies. `penetration` is how many
   enemies behind the first one a shot can still hit; each body passed halves the damage
-  (`penetration_falloff` 0.5: 100 %, 50 %, 25 %, …). Stutzen: 3 more, Repetierer: 1 more. Pistol,
-  shotgun pellets: none.
+  (`penetration_falloff` 0.5: 100 %, 50 %, 25 %, …). Stutzen: 3 more, Repetierer: 1 more, pistol:
+  none. Jagdflinte pellets go through 2 more, but only within 6 m of the muzzle
+  (`penetration_range`, play-test 2026-10-17): up close a blast hits the whole front of a crowd.
 - Bloom (user request, 2026-10-16): each shot widens the spread a little (`bloom_per_shot`, capped
   at `bloom_max`), and it settles back; the crosshair arms move apart by the same amount, so it stays
   honest about where shots can go. Kept small: rapid fire loosens the aim, it does not ruin it.
+  Exception, the pistol (play-test 2026-10-17): spam-clicking must cost accuracy, so each shot adds
+  1.5° (up to 6°) and it settles at 4°/s. Clicking about twice a second stays precise, ten a
+  second sprays.
 - Slots: 2 gun slots (wonder weapons and the hand mortar use a gun slot),
   1 melee slot (starts with the shovel, can be replaced), 1 equipment slot
   (stackable throwables, see section 6a).
@@ -263,7 +267,9 @@ resources so changes never require code edits.
 All enemies share a base `Enemy` scene and are configured by `EnemyData`
 resources. Navigation uses `NavigationAgent3D` with a baked navmesh per zone.
 Enemy AI is simple: move to nearest player; if a barricade is in the way,
-attack it; attack in melee range.
+attack it; attack in melee range. An enemy that stops making headway while chasing (pressed into a
+door edge or a corner, or blocked by other bodies) sidesteps and repaths after 0.8 s, and an enemy
+never rides on top of another one (play-test bug, 2026-10-17).
 
 | Id | Name | HP formula | Speed | Damage | Notes |
 |---|---|---|---|---|---|

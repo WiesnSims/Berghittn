@@ -42,17 +42,27 @@ var _window_wall: Vector3
 var _window_forward: Vector3
 var _window_exit: Vector3
 var _lunge_cooldown_left: float = 0.0
-# Slowed (snow cannon; later dumplings and cow pats): speed factor and seconds left.
+# Slowed (later dumplings and cow pats): speed factor and seconds left.
 var _slow_factor: float = 1.0
 var _slow_left: float = 0.0
 # Seconds into the current lunge (windup first, then the leap), its direction, and whether it struck.
 var _lunge_time: float = 0.0
 var _lunge_direction: Vector3
 var _lunge_struck: bool = false
+# Unsticking: where the enemy was when the stuck timer last restarted, how long it has been there,
+# and the sidestep it is taking (direction, seconds left, and which side to try next time).
+var _stuck_anchor: Vector3
+var _stuck_time: float = 0.0
+var _sidestep: Vector3
+var _sidestep_left: float = 0.0
+var _sidestep_side: float = 1.0
 
 
 func _ready() -> void:
 	_agent.link_reached.connect(_on_link_reached)
+	# Another enemy is never a moving platform: two bodies stacked in a crowd fed each other's
+	# velocity and shot into the sky (stuck_hunt test).
+	platform_floor_layers = Constants.LAYER_WORLD
 	_flash_material = StandardMaterial3D.new()
 	_flash_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_flash_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -80,6 +90,7 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 	velocity = Vector3.ZERO
 	_visual.transform = Transform3D.IDENTITY
 	_repath_left = 0.0
+	_reset_stuck()
 	_window = null
 	_kill_tween()
 	_reset_hit_reaction()
@@ -202,13 +213,74 @@ func _chase(delta: float) -> void:
 	var direction: Vector3 = _flat(next - global_position)
 	if direction.length_squared() < 0.0001:
 		direction = _flat(_target.global_position - global_position)
-	direction = direction.normalized()
+	direction = _unstick(direction.normalized(), delta)
 	velocity.x = direction.x * data.speed * _slow_factor
 	velocity.z = direction.z * data.speed * _slow_factor
 	_apply_gravity(delta)
 	_face(direction, delta)
 	move_and_slide()
 	_animate_walk(delta)
+
+
+## Steering while chasing: the path direction, or a sidestep when the body has stopped making headway.
+func _unstick(direction: Vector3, delta: float) -> Vector3:
+	# Pushed up onto another enemy in a crowd: get off it first.
+	var off: Vector3 = _off_enemy()
+	if off != Vector3.ZERO:
+		return off
+	if _flat(global_position - _stuck_anchor).length() > Constants.ENEMY_STUCK_MOVE:
+		_stuck_anchor = global_position
+		_stuck_time = 0.0
+	else:
+		_stuck_time += delta
+		if _stuck_time > Constants.ENEMY_STUCK_TIME:
+			_start_sidestep(direction)
+	if _sidestep_left <= 0.0:
+		return direction
+	_sidestep_left -= delta
+	return _sidestep
+
+
+func _start_sidestep(direction: Vector3) -> void:
+	_stuck_time = 0.0
+	_stuck_anchor = global_position
+	_repath_left = 0.0
+	# Along the wall it is pressed against, on the side nearer its way; if it is blocked by another
+	# body (or nothing), step off at right angles, swapping sides each try.
+	var side := Vector3(-direction.z, 0.0, direction.x) * _sidestep_side
+	_sidestep_side = -_sidestep_side
+	for i: int in get_slide_collision_count():
+		var hit: KinematicCollision3D = get_slide_collision(i)
+		var normal: Vector3 = _flat(hit.get_normal())
+		if hit.get_collider() is Enemy or normal.length_squared() < 0.25:
+			continue
+		normal = normal.normalized()
+		var along := Vector3(-normal.z, 0.0, normal.x)
+		if along.dot(direction) < 0.0:
+			along = -along
+		side = (along + normal * 0.5).normalized()
+		break
+	_sidestep = (side + direction * 0.2).normalized()
+	_sidestep_left = Constants.ENEMY_SIDESTEP_TIME
+
+
+func _off_enemy() -> Vector3:
+	for i: int in get_slide_collision_count():
+		var hit: KinematicCollision3D = get_slide_collision(i)
+		var below := hit.get_collider() as Enemy
+		if below == null or hit.get_normal().y < 0.5:
+			continue
+		var away: Vector3 = _flat(global_position - below.global_position)
+		if away.length_squared() < 0.0001:
+			away = -global_basis.z
+		return away.normalized()
+	return Vector3.ZERO
+
+
+func _reset_stuck() -> void:
+	_stuck_anchor = global_position
+	_stuck_time = 0.0
+	_sidestep_left = 0.0
 
 
 func _attack(delta: float) -> void:
@@ -426,6 +498,7 @@ func _end_climb() -> void:
 	_visual.transform = Transform3D.IDENTITY
 	collision_mask = _movement_mask()
 	_repath_left = 0.0
+	_reset_stuck()
 	_leave_window()
 	_state = State.CHASING
 

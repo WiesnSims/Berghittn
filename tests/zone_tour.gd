@@ -7,7 +7,7 @@ extends Node
 ## aim: the crosshair opening up under rapid fire, then the right-click modes: pistol down the sights,
 ## both barrels of the Jagdflinte, the Stutzen scope.
 ## m5: the enemy line-up, the Schnaps shrine, the Hüttentruhe closed and offering, the ammo crate,
-## the snow cannon blowing, the boss bar, and the Repetierer firing, fanning and reloading.
+## the boss bar, and the Repetierer firing, fanning and reloading.
 
 const VIEWS: Array = [
 	["stube_hall", Vector3(5.5, 1.7, 4.5), Vector3(-9.0, 3.5, -4.0)],
@@ -218,11 +218,6 @@ func _m5(main: Node) -> void:
 	var crate := main.find_children("*", "AmmoCrate", true, false)[0] as AmmoCrate
 	camera.look_at_from_position(crate.to_global(Vector3(0.5, 1.6, -2.2)), crate.to_global(Vector3(0, 0.4, -0.4)))
 	await _save("m5_crate")
-	var cannon := main.find_children("*", "SnowCannon", true, false)[0] as SnowCannon
-	cannon.interact(player)
-	camera.look_at_from_position(Vector3(-4.0, 2.2, 8.0), Vector3(2.0, -0.5, 15.0))
-	await get_tree().create_timer(1.2).timeout
-	await _save("m5_cannon")
 	# In-hand Repetierer.
 	camera.current = false
 	(main.get_node("UI") as CanvasLayer).show()

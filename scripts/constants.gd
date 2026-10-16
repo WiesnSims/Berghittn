@@ -64,6 +64,12 @@ const ENEMY_WINDOW_APPROACH_TIME: float = 0.3
 # Horizontal distance (m) from a window link's outside end at which an enemy starts its way in,
 # even if the crowd keeps it from reaching the exact point.
 const ENEMY_LINK_REACH: float = 1.0
+# Unsticking (play-test bug: bodies hung in doorways and at corners, blocked by a wall edge the path
+# cuts or by other enemies standing in the way): a chaser that has moved less than ENEMY_STUCK_MOVE
+# in ENEMY_STUCK_TIME seconds sidesteps for ENEMY_SIDESTEP_TIME and asks for a fresh path.
+const ENEMY_STUCK_TIME: float = 0.8
+const ENEMY_STUCK_MOVE: float = 0.3
+const ENEMY_SIDESTEP_TIME: float = 0.5
 
 # Waves (section 8; the per-wave formula numbers live in data/wave_table.tres).
 # Hard performance cap from section 3, shared by all players in co-op.

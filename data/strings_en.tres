@@ -60,8 +60,5 @@ messages = {
 [&"", &"UI_CHEST_SWAP"]: [&"Press E to swap your gun for the %s"],
 [&"", &"UI_BOSS_WAVE"]: [&"Da Krampus kummt!"],
 [&"", &"UI_AMMO_CRATE"]: [&"Press E to restock all guns (%d)"],
-[&"", &"UI_AMMO_CRATE_NEED"]: [&"Munitionskiste: %d points needed"],
-[&"", &"UI_TRAP_BUY"]: [&"Press E to fire up the Schneekanone (%d)"],
-[&"", &"UI_TRAP_NEED"]: [&"Schneekanone: %d points needed"],
-[&"", &"UI_TRAP_WAIT"]: [&"Schneekanone building pressure… %d"]
+[&"", &"UI_AMMO_CRATE_NEED"]: [&"Munitionskiste: %d points needed"]
 }

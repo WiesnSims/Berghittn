@@ -2,7 +2,7 @@ extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/m5_core.tscn
 ## Headless M5 check on the real main scene: the enemy mix per wave, boss waves, the Perchte lunge,
 ## bullet penetration, the four Schnaps and their effects, the Hüttentruhe (take, let sink, swap),
-## the Repetierer's fanning, the Lager's ammo crate and the Terrasse's snow cannon.
+## the Repetierer's fanning and the Lager's ammo crate.
 
 # Open pasture in front of the hut, clear of furniture.
 const FIELD: Vector3 = Vector3(-12.0, -0.3, 22.0)
@@ -84,7 +84,6 @@ func _run() -> void:
 	await _chest()
 	await _fanning()
 	await _ammo_crate()
-	await _snow_cannon()
 	await _boss_wave()
 
 	print("RESULT: %s" % ("PASS" if failures.is_empty() else "%d FAILED" % failures.size()))
@@ -164,6 +163,54 @@ func _penetration() -> void:
 		if e.is_alive():
 			e.receive_hit(10000, false, false, null)
 	await _seconds(0.2)
+	# Spam-clicking sprays, a steady rhythm stays precise.
+	_look_at(FIELD + Vector3(30.0, 1.0, 0.0))
+	player.weapons.aim_amount = 0.0
+	for rhythm: int in [6, 30]:
+		player.weapons.bloom = 0.0
+		for i: int in 5:
+			player.weapons.mag = 8
+			player.weapons._fire()
+			await _frames(rhythm)
+		var spam: bool = rhythm == 6
+		_check((player.weapons.bloom >= 4.0) if spam else (player.weapons.bloom < 0.5),
+			"pistol at %d clicks/s: bloom %.1f°" % [60 / rhythm, player.weapons.bloom])
+	await _shotgun_close()
+
+
+func _shotgun_close() -> void:
+	# Buckshot goes through bodies only up close: three in a row at 2 m, then three at 10 m. Spread off,
+	# so every pellet flies down the line.
+	var wanderer: EnemyData = load("res://data/enemies/wanderer.tres")
+	var flinte: WeaponData = load("res://data/weapons/jagdflinte.tres")
+	var spread: float = flinte.spread
+	flinte.spread = 0.0
+	player.weapons.give_weapon(flinte)
+	await _seconds(0.6)
+	for distance: float in [2.0, 10.0]:
+		var row: Array[Enemy] = []
+		for i: int in 3:
+			row.append(_spawn(wanderer, FIELD + Vector3(distance - 3.0 + i * 1.0, 0.0, 0.0), FIELD + Vector3(-3.0, 0.0, 0.0)))
+		await _frames(2)
+		for i: int in 3:
+			row[i].global_position = FIELD + Vector3(distance - 3.0 + i * 1.0, 0.0, 0.0)
+		await _frames(1)
+		_look_at(FIELD + Vector3(12.0, 1.0, 0.0))
+		player.weapons.bloom = 0.0
+		var before: Array[int] = []
+		for e: Enemy in row:
+			before.append(e.health)
+		player.weapons.mag = 2
+		player.weapons._fire()
+		var after: Array = row.map(func(e: Enemy) -> int: return maxi(e.health, 0) if e.is_alive() else 0)
+		var through: bool = after[1] < before[1]
+		_check(through if distance < flinte.penetration_range else not through,
+			"Jagdflinte at %.0f m %s: health %s -> %s" % [distance, "goes through" if distance < flinte.penetration_range else "stops in the first", before, after])
+		for e: Enemy in row:
+			if e.is_alive():
+				e.receive_hit(10000, false, false, null)
+		await _seconds(0.2)
+	flinte.spread = spread
 
 
 func _lunge() -> void:
@@ -305,29 +352,6 @@ func _ammo_crate() -> void:
 			full = full and holder._slots[i].reserve == holder._slots[i].data.reserve_ammo
 	_check(full and player.points.total == before - crate.cost, "ammo crate refilled every gun for %d" % crate.cost)
 	_check(crate.get_interact_prompt(player) == "", "nothing to buy once full")
-
-
-func _snow_cannon() -> void:
-	var cannon := _find(SnowCannon)[0] as SnowCannon
-	var wanderer: EnemyData = load("res://data/enemies/wanderer.tres")
-	_place(cannon.get_interact_position())
-	_look_at(cannon.global_position + Vector3(0, 1.0, 0))
-	await _frames(2)
-	_check(player.interactor._find_target() == cannon, "snow cannon in reach (prompt: %s)" % cannon.get_interact_prompt(player))
-	var victim: Enemy = _spawn(wanderer, Vector3(-6.0, -1.5, 15.5))
-	await _frames(5)
-	var health: int = victim.health
-	var points: int = player.points.total
-	cannon.interact(player)
-	_check(cannon.is_blowing() and player.points.total == points - cannon.cost, "snow cannon fired up for %d" % cannon.cost)
-	await _seconds(2.1)
-	_check(victim.health <= health - 2 * cannon.damage_per_second and victim._slow_factor == cannon.slow_factor, "garden enemy frozen: %d -> %d, speed x%.1f" % [health, victim.health, victim._slow_factor])
-	_check(player.points.total == points - cannon.cost, "trap damage earns no points")
-	await _seconds(cannon.blow_time)
-	_check(not cannon.is_blowing() and cannon.get_interact_prompt(player).contains(str(ceili(cannon._cooldown_left))), "then it builds pressure: %s" % cannon.get_interact_prompt(player))
-	if victim.is_alive():
-		victim.receive_hit(10000, false, false, null)
-	await _seconds(0.2)
 
 
 func _boss_wave() -> void:
