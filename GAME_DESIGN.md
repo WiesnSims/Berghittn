@@ -98,12 +98,21 @@ Zones (each is a separate area scene joined at doors). Costs are in points.
 
 | Zone id | Name | Starts unlocked | Door cost | Notes |
 |---|---|---|---|---|
-| `stube` | Gaststube (main room) | yes | – | Spawn point, first wall-buy, fireplace |
-| `kueche` | Küche | no | 500 | Kitchen; Schnaps shrine (perk machine) |
+| `stube` | Gaststube (main room) | yes | – | Spawn point, first wall-buy, fireplace; two-storey hall with gallery, Erker and balcony |
+| `kueche` | Küche | no | 500 | Kitchen with a Speis (pantry); Schnaps shrine (perk machine) |
+| `lager` | Matratzenlager | no | 1250 | Upstairs dorm over the Küche, door on the Stube gallery; no windows enemies can climb (they come up the stairs) |
 | `terrasse` | Terrasse | no | 750 | Open snowy terrace, long sight lines |
 | `skiraum` | Skiraum | no | 1000 | Narrow room, good chokepoint, wall-buy |
 | `schuppen` | Holzschuppen | no | 1250 | Woodshed, the mystery chest spawns here at fixed spot |
 | `seilbahn` | Seilbahn-Station | no | 1500 | Cable car station, the alphorn weapon location in later waves |
+
+Layout (user request, 2026-10-16, before M5): rooms are bigger than the Stube's original 14x10 and
+not plain boxes. The Stube is a two-storey hall (7 m) with a gallery along two walls reached by stairs,
+an Erker (bay) with the Herrgottswinkel, and a balcony over the Terrasse off the gallery. The Küche
+has a pantry, the Skiraum a boot corridor behind a partition (the chokepoint), the Seilbahn-Station a
+raised boarding platform with the gondola alongside, the Holzschuppen a hay loft up a ramp, and the
+Terrasse two levels: a deck along the hut and a lower beer garden dug into the slope. Every change of
+level is a ramp (stairs are a ramp with steps on top) with curbs, since enemies cannot climb steps.
 
 Enemy spawn points ("Fenster" and "Türen") are placed per zone as `Marker3D`
 nodes in group `spawn_points`. A spawn point is **active** only if its zone
@@ -159,7 +168,8 @@ Rules:
   Every new weapon, including the wonder weapons and melee weapons of section 6a, must get its own
   fitting secondary mode when it is added.
   - `pistole`: aim down the sights (hold): slight zoom, much tighter spread, slower walking,
-    no sprinting, weapon bob mostly gone.
+    no sprinting, weapon bob mostly gone, mouse sensitivity lowered (user request, 2026-10-16;
+    applies to every aimed mode, the scope too), muzzle flash shrunk so it does not cover the target.
   - `stutzen`: hunting scope (Zielfernrohr, hold): strong zoom, scope overlay with crosshair,
     almost no spread, a slow sway of the aim while scoped.
   - `jagdflinte`: fire both barrels at once (press): all loaded shells in one blast, recoil per

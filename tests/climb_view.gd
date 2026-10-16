@@ -8,9 +8,9 @@ extends Node
 const SPAWN_NAME: String = "WestSouth"
 const FRAME_INTERVAL: float = 0.12
 const VIEWS: Dictionary = {
-	"inside": [Vector3(-4.2, 1.7, 4.4), Vector3(-7.0, 1.0, 2.5)],
-	"outside": [Vector3(-10.0, 1.6, 4.8), Vector3(-7.15, 1.0, 2.5)],
-	"break": [Vector3(-4.6, 1.6, 3.6), Vector3(-7.15, 1.3, 2.5)],
+	"inside": [Vector3(-8.2, 1.7, 4.9), Vector3(-11.0, 1.0, 3.0)],
+	"outside": [Vector3(-14.0, 1.6, 5.3), Vector3(-11.15, 1.0, 3.0)],
+	"break": [Vector3(-8.6, 1.6, 4.1), Vector3(-11.15, 1.3, 3.0)],
 }
 
 var _out_dir: String

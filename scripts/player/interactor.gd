@@ -44,6 +44,8 @@ func _find_target() -> Node3D:
 		if candidate.get_interact_prompt(_player) == "":
 			continue
 		var offset: Vector3 = candidate.get_interact_position() - _player.global_position
+		if absf(offset.y) > Constants.INTERACT_MAX_HEIGHT:
+			continue
 		var distance: float = Vector2(offset.x, offset.z).length()
 		if distance < best_distance:
 			best = candidate

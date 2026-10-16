@@ -49,9 +49,13 @@ lets enemies through), 5 `hitbox` (enemy body/head hurtboxes; hitscan rays test 
 
 ## Map and zones
 
-"Die Hütte" (section 4) is six zone scenes in `scenes/zones/`, joined in a loop by buyable doors
-(`ZoneDoor`, `scenes/zones/door.tscn`, placed in `main.tscn` under `World/Doors`):
-Stube – Küche – Skiraum – Seilbahn – Schuppen – Terrasse – Stube. Zone names and door costs are in
+"Die Hütte" (section 4) is seven zone scenes in `scenes/zones/`, joined by buyable doors
+(`ZoneDoor`, `scenes/zones/door.tscn`, placed in `main.tscn` under `World/Doors`): a loop
+Stube – Küche – Skiraum – Seilbahn – Schuppen – Terrasse – Stube, plus the Matratzenlager upstairs off
+the Stube gallery. The Küche scene owns the outer walls of the Küche + Lager wing (two storeys);
+`lager.tscn` holds what is inside the Lager. Upper-floor windows are `window_upper.tscn` (bars and a
+player blocker, no barricade). Windows facing the terrace deck set `outside_floor` so their navigation
+link starts on the deck. Zone names and door costs are in
 `data/zone_table.tres`; `ZoneMap` (node `Zones` in main) tracks which are open. Adjacency comes from
 the doors, so a door's `zone_a` / `zone_b` is the only layout setting. A door costs what the zone behind
 it costs, and opens by itself once both its zones are open (the loop's last door). Each window is a
@@ -77,9 +81,11 @@ ignore fog and fade into the fog color at their foot, so the summits show throug
 ## Navigation
 
 One `NavigationRegion3D` (`World/Navigation` in main) with `scripts/zones/navmesh_baker.gd` bakes
-the whole map at load from the colliding CSG shapes (~16 ms on desktop), and rebakes from cached faces
+the whole map, both floors, at load from the colliding CSG shapes (~25 ms on desktop), and rebakes from cached faces
 whenever a door opens. Windows are one-way `NavigationLink3D`s; enemies hop through them when the
-agent reaches a link.
+agent reaches a link. Enemies have no step climbing, so every level change is a ramp with side curbs,
+`agent_max_climb` is 0.2 (two cells: a 35° ramp rises 0.14 per cell) and agents follow waypoints
+within 0.3 m; looser, they cut corners onto ramps and get stuck.
 `navigation/world/region_use_async_iterations` is off: with it on, Godot 4.7 never pushes
 the runtime-baked mesh to the navigation server (paths come back empty).
 
@@ -102,6 +108,16 @@ Unlocks all six zones on the real main scene with points from the debug key: pro
 every door, spawn activation after each purchase against section 4, navmesh paths through opened
 doors, the self-opening last door, both wall-buys, ammo refills at half price, gun slots and switching,
 the chamber rule for the new guns, and one payout per shotgun blast (not per pellet).
+
+```
+godot --headless --fixed-fps 60 res://tests/upstairs.tscn
+godot --headless --fixed-fps 60 res://tests/spawn_paths.tscn
+```
+
+`upstairs`: the player walks up the hall stairs, and an enemy follows a player up every level change
+(gallery stairs, garden steps, hay-loft ramp, gondola platform). `spawn_paths`: from every spawn point
+active at the start, an enemy makes it into the Stube. Both catch spots where bodies get stuck that the
+navmesh thinks are fine.
 
 ```
 godot --headless --fixed-fps 60 res://tests/m3_smoke.tscn

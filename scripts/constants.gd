@@ -85,6 +85,8 @@ const BARRICADE_MAX_BOARDS: int = 6
 const BARRICADE_REPAIR_INTERVAL: float = 0.6
 # Distance from the repair spot inside the window within which E works.
 const INTERACT_RANGE: float = 1.7
+# Height difference beyond which E does not reach (the gallery's Lager door is right above the Kueche door).
+const INTERACT_MAX_HEIGHT: float = 1.2
 
 # Zones (section 4; door costs live in data/zone_table.tres).
 const DOOR_OPEN_TIME: float = 0.7
@@ -103,6 +105,13 @@ const SPRINT_TO_FIRE_TIME: float = 0.2
 const SCOPE_SHOW_AT: float = 0.95
 const SCOPE_SWAY_DEGREES: float = 0.35
 const SCOPE_SWAY_SPEED: float = 0.35
+# Aiming (any aimed secondary) multiplies the mouse sensitivity by this, on top of the zoom scaling
+# (play-test #17). Becomes a player setting with the M6 settings menu.
+const DEFAULT_AIM_SENSITIVITY: float = 0.6
+# Fully aimed, the muzzle flash shrinks to this size and its light to this share, so it does not
+# cover the target in front of the sights (play-test #16).
+const AIM_FLASH_SCALE: float = 0.35
+const AIM_FLASH_LIGHT: float = 0.5
 
 # Weapon feedback.
 const MUZZLE_FLASH_TIME: float = 0.07

@@ -10,6 +10,10 @@ extends Node3D
 @export var plateau_radius: float = 38.0
 ## Just below the walkable ground, so the two never flicker against each other.
 @export var plateau_height: float = -0.32
+## Well inside the walkable disc the terrain sinks out of sight, so dug-out areas (the Terrasse's lower
+## garden) show their own floor, not a sheet of terrain. Triangles from here outwards stay under the disc.
+@export var hidden_radius: float = 29.0
+@export var hidden_height: float = -3.0
 ## Side length of the generated square and of one grid cell. Metres.
 @export var size: float = 300.0
 @export var cell: float = 5.0
@@ -52,6 +56,8 @@ func _ready() -> void:
 func height_at(x: float, z: float) -> float:
 	var offset: Vector2 = Vector2(x, z) - center
 	var distance: float = offset.length()
+	if distance < hidden_radius:
+		return hidden_height
 	var beyond: float = distance - plateau_radius
 	if beyond <= 0.0:
 		return plateau_height

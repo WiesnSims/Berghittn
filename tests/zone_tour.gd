@@ -8,16 +8,24 @@ extends Node
 ## both barrels of the Jagdflinte, the Stutzen scope.
 
 const VIEWS: Array = [
-	["stube", Vector3(-6.0, 2.2, 4.2), Vector3(3.0, 1.0, -4.0)],
-	["stube_wallbuy", Vector3(0.8, 1.6, -2.4), Vector3(0.8, 1.5, -5.0)],
-	["kueche", Vector3(-2.2, 2.2, -6.0), Vector3(9.0, 0.8, -14.0)],
-	["skiraum", Vector3(12.2, 2.0, -2.2), Vector3(17.0, 0.8, -14.0)],
-	["skiraum_wallbuy", Vector3(13.6, 1.6, -12.0), Vector3(11.3, 1.5, -12.0)],
-	["seilbahn", Vector3(8.2, 2.3, 8.2), Vector3(20.0, 1.0, 0.0)],
-	["schuppen", Vector3(8.2, 2.2, 18.4), Vector3(20.0, 0.8, 10.0)],
-	["terrasse", Vector3(-6.2, 2.2, 16.6), Vector3(5.0, 0.5, 6.0)],
-	["outside", Vector3(-16.0, 6.0, 26.0), Vector3(6.0, 0.0, 2.0)],
-	["alm_valley", Vector3(0.0, 1.7, 16.0), Vector3(0.0, -6.0, 70.0)],
+	["stube_hall", Vector3(5.5, 1.7, 4.5), Vector3(-9.0, 3.5, -4.0)],
+	["stube_gallery", Vector3(-9.8, 5.2, 4.8), Vector3(4.0, 1.0, -3.0)],
+	["stube_stairs", Vector3(3.5, 1.7, 0.5), Vector3(4.0, 1.4, -5.3)],
+	["stube_wallbuy", Vector3(-0.8, 1.6, -3.4), Vector3(-0.8, 1.5, -6.0)],
+	["erker", Vector3(3.0, 1.7, 3.5), Vector3(3.5, 1.2, 8.0)],
+	["balcony", Vector3(-8.0, 5.2, 6.8), Vector3(0.0, -1.0, 16.0)],
+	["kueche", Vector3(5.5, 1.8, -7.0), Vector3(-8.0, 0.8, -15.0)],
+	["lager", Vector3(5.5, 5.2, -7.0), Vector3(-9.0, 3.8, -14.0)],
+	["skiraum", Vector3(8.5, 1.8, -2.5), Vector3(14.0, 0.8, -15.0)],
+	["skiraum_wallbuy", Vector3(9.5, 1.6, -8.0), Vector3(7.3, 1.5, -8.0)],
+	["bootroom", Vector3(19.4, 1.7, -2.3), Vector3(19.4, 1.0, -15.0)],
+	["seilbahn", Vector3(8.5, 3.0, -0.3), Vector3(20.0, 1.5, 7.0)],
+	["schuppen", Vector3(8.0, 1.8, 10.3), Vector3(20.0, 2.0, 17.0)],
+	["schuppen_loft", Vector3(16.0, 5.2, 10.0), Vector3(9.0, 1.0, 18.0)],
+	["terrasse", Vector3(-10.0, 1.7, 7.0), Vector3(6.0, -1.0, 17.0)],
+	["terrasse_garden", Vector3(5.5, 0.2, 17.5), Vector3(-6.0, 0.5, 8.0)],
+	["outside", Vector3(-16.0, 9.0, 30.0), Vector3(6.0, 2.0, 2.0)],
+	["alm_valley", Vector3(0.0, 1.7, 10.0), Vector3(0.0, -6.0, 70.0)],
 	["alm_summit", Vector3(2.0, 1.7, -20.0), Vector3(2.0, 14.0, -80.0)],
 	["alm_cable", Vector3(23.0, 1.7, 8.0), Vector3(60.0, 14.0, 4.0)],
 	["alm_signpost", Vector3(-6.8, 1.7, 16.4), Vector3(-10.0, 1.7, 19.5)],
@@ -58,12 +66,12 @@ func _zones(main: Node) -> void:
 	var zones := main.get_node("Zones") as ZoneMap
 	var player := main.get_node("Player") as Player
 	# A door mid-swing first, then everything open.
-	camera.look_at_from_position(Vector3(1.5, 1.7, -2.0), Vector3(4.0, 1.1, -5.15))
+	camera.look_at_from_position(Vector3(-2.0, 1.7, -2.5), Vector3(-4.0, 1.1, -6.15))
 	zones.unlock(&"kueche", player)
 	for i: int in 12:
 		await get_tree().process_frame
 	await _save("door_swing")
-	for id: StringName in [&"terrasse", &"skiraum", &"seilbahn", &"schuppen"]:
+	for id: StringName in [&"lager", &"terrasse", &"skiraum", &"seilbahn", &"schuppen"]:
 		zones.unlock(id, player)
 	await get_tree().create_timer(1.0).timeout
 	for view: Array in VIEWS:

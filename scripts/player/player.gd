@@ -86,8 +86,10 @@ func _physics_process(delta: float) -> void:
 
 func _look(relative: Vector2) -> void:
 	# Yaw turns the body so movement follows the view; pitch only tilts the head.
-	# Zoomed in, the same mouse movement turns the view less, so the aim stays as steady on screen.
-	var sensitivity: float = Settings.mouse_sensitivity * tan(deg_to_rad(_camera.fov) * 0.5) / tan(deg_to_rad(_base_fov) * 0.5)
+	# Zoomed in, the same mouse movement turns the view less, so the aim stays as steady on screen;
+	# aiming slows it further for fine adjustments.
+	var aim: float = weapons.aim_eased() if weapons.weapon else 0.0
+	var sensitivity: float = Settings.mouse_sensitivity * lerpf(1.0, Settings.aim_sensitivity, aim) 			* tan(deg_to_rad(_camera.fov) * 0.5) / tan(deg_to_rad(_base_fov) * 0.5)
 	rotate_y(-relative.x * sensitivity)
 	_head.rotation.x = clampf(_head.rotation.x - relative.y * sensitivity, -_max_pitch, _max_pitch)
 

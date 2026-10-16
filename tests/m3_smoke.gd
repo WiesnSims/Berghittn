@@ -5,9 +5,9 @@ extends Node
 ## Checks wave sizes, spawn interval, break length, that nobody climbs through a boarded window,
 ## and that the points shown equal what the bot's own hits, kills and repairs are worth.
 
-const STAND: Vector3 = Vector3(-1.0, 0.0, 1.0)
-const ROOM_MIN: Vector3 = Vector3(-6.9, -0.5, -4.9)
-const ROOM_MAX: Vector3 = Vector3(6.9, 3.0, 4.9)
+const STAND: Vector3 = Vector3(-2.0, 0.0, 3.5)
+const ROOM_MIN: Vector3 = Vector3(-10.9, -0.5, -5.9)
+const ROOM_MAX: Vector3 = Vector3(6.9, 3.0, 5.9)
 const MELEE_REACH: float = 1.7
 
 var main: Node
