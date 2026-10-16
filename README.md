@@ -73,6 +73,12 @@ climbs through a window that still has boards, and that the points (and the HUD)
 hits, kills and repairs. Exits non-zero on failure.
 
 ```
+godot --headless --fixed-fps 60 res://tests/melee_arc.tscn
+```
+
+One shovel swing must hit every enemy in the arc in front of the player and none behind.
+
+```
 godot --headless --fixed-fps 60 res://tests/m2_smoke.tscn
 ```
 
@@ -81,12 +87,13 @@ player, killing it with the pistol, regeneration, player death and the death scr
 `tests/` is excluded from the web export.
 
 ```
-godot res://tests/climb_view.tscn -- <out_dir> inside|outside|break|reload|melee|hud
+godot res://tests/climb_view.tscn -- <out_dir> inside|outside|break|reload|melee|hud|shoot
 ```
 
 Needs a real window (not `--headless`): saves PNG frames of an enemy's window entry, seen from
-inside or outside, of it tearing the boards off, of the pistol reload or the shovel swing, or one
-frame with the HUD, for checking visuals without playing.
+inside or outside, of it tearing the boards off, of the pistol reload or the shovel swing, one
+frame with the HUD, or shooting an enemy (wall puffs, hit flash, casings, head pop), for checking
+visuals without playing.
 
 ## Deploy
 

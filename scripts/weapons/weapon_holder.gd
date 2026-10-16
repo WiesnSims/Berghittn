@@ -15,6 +15,8 @@ signal hit_confirmed(is_headshot: bool, killed: bool)
 @export var melee_weapon: WeaponData
 
 @onready var _impact_marks: ImpactMarks = $ImpactMarks
+@onready var _impact_puffs: EffectPool = $ImpactPuffs
+@onready var _hit_puffs: EffectPool = $HitPuffs
 
 var weapon: WeaponData
 var mag: int = 0
@@ -146,27 +148,43 @@ func _update_melee(delta: float) -> void:
 
 
 func _melee_hit() -> void:
-	# A small fan of short rays, so a swing does not need pistol precision.
-	var best: Dictionary = {}
-	var best_distance: float = INF
-	for offset: Vector2 in Constants.MELEE_RAY_OFFSETS:
-		var direction: Vector3 = (-global_basis.z).rotated(global_basis.x, deg_to_rad(offset.y)).rotated(global_basis.y, deg_to_rad(offset.x))
-		var hit: Dictionary = _cast(direction * melee_weapon.range)
-		if hit.collider is Hurtbox:
-			var distance: float = global_position.distance_to(hit.position)
-			if distance < best_distance:
-				best = hit
-				best_distance = distance
-	if best.is_empty():
-		return
-	var hurtbox := best.collider as Hurtbox
-	var result: Hurtbox.Result = hurtbox.take_hit(melee_weapon.damage, melee_weapon.headshot_multiplier, true, _shooter)
-	if result != Hurtbox.Result.IGNORED:
-		hit_confirmed.emit(hurtbox.is_head, result == Hurtbox.Result.KILLED)
+	# The swing sweeps an arc in front of the player and hits every enemy in it, once each.
+	var sphere := SphereShape3D.new()
+	sphere.radius = melee_weapon.range
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = sphere
+	query.transform = Transform3D(Basis.IDENTITY, global_position)
+	query.collision_mask = Constants.LAYER_HITBOX
+	query.collide_with_areas = true
+	query.collide_with_bodies = false
+	var forward: Vector3 = -global_basis.z
+	var min_dot: float = cos(deg_to_rad(Constants.MELEE_ARC_DEGREES * 0.5))
+	var struck: Dictionary = {}
+	for found: Dictionary in get_world_3d().direct_space_state.intersect_shape(query, Constants.MELEE_MAX_TARGETS):
+		var hurtbox := found.collider as Hurtbox
+		# Body boxes only: one blow per enemy, and a shovel does not do headshots.
+		if hurtbox == null or hurtbox.is_head or struck.has(hurtbox.receiver):
+			continue
+		var target: Vector3 = hurtbox.global_position + Vector3.UP * Constants.MELEE_AIM_HEIGHT
+		var to_target: Vector3 = target - global_position
+		# Flattened, so an enemy right in front still counts when the player looks down at it.
+		var flat := Vector3(to_target.x, 0.0, to_target.z)
+		var flat_forward := Vector3(forward.x, 0.0, forward.z)
+		if flat.length() > 0.2 and flat.normalized().dot(flat_forward.normalized()) < min_dot:
+			continue
+		# No hitting through walls; the window openings themselves are fine.
+		var line: Dictionary = _cast(to_target, Constants.LAYER_WORLD)
+		if line.collider != null:
+			continue
+		struck[hurtbox.receiver] = true
+		var result: Hurtbox.Result = hurtbox.take_hit(melee_weapon.damage, melee_weapon.headshot_multiplier, true, _shooter)
+		if result != Hurtbox.Result.IGNORED:
+			_hit_puffs.play(target, -to_target.normalized())
+			hit_confirmed.emit(false, result == Hurtbox.Result.KILLED)
 
 
-func _cast(offset: Vector3) -> Dictionary:
-	var query := PhysicsRayQueryParameters3D.create(global_position, global_position + offset, Constants.LAYER_WORLD | Constants.LAYER_HITBOX, _exclude)
+func _cast(offset: Vector3, mask: int = Constants.LAYER_WORLD | Constants.LAYER_HITBOX) -> Dictionary:
+	var query := PhysicsRayQueryParameters3D.create(global_position, global_position + offset, mask, _exclude)
 	query.collide_with_areas = true
 	var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
 	return hit if not hit.is_empty() else {"collider": null}
@@ -180,9 +198,11 @@ func _fire_ray() -> void:
 	if hurtbox:
 		var result: Hurtbox.Result = hurtbox.take_hit(weapon.damage, weapon.headshot_multiplier, false, _shooter)
 		if result != Hurtbox.Result.IGNORED:
+			_hit_puffs.play(hit.position, hit.normal)
 			hit_confirmed.emit(hurtbox.is_head, result == Hurtbox.Result.KILLED)
 	else:
 		_impact_marks.place(hit.position, hit.normal)
+		_impact_puffs.play(hit.position, hit.normal)
 
 
 func _spread_direction() -> Vector3:

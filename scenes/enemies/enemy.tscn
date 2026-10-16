@@ -1,7 +1,9 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/enemy.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/enemies/hurtbox.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/effects/effect_pool.gd" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/effects/head_pop.tscn" id="4"]
 
 [sub_resource type="CapsuleShape3D" id="Body"]
 radius = 0.35
@@ -55,3 +57,8 @@ target_desired_distance = 1.0
 path_max_distance = 3.0
 height = 1.8
 radius = 0.4
+
+[node name="HeadPop" type="Node3D" parent="."]
+script = ExtResource("3")
+effect = ExtResource("4")
+size = 1

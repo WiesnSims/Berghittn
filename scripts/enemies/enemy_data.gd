@@ -21,6 +21,8 @@ extends Resource
 @export var climb_time: float = 1.1
 ## Seconds to rip one board off a barricade (6 boards ≈ 3 s, section 4).
 @export var board_break_time: float = 0.5
+## A headshot kill dealing at least this much damage in one hit pops the head (stylized, section 7).
+@export var head_pop_damage: int = 50
 @export var model: PackedScene
 
 

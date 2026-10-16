@@ -10,6 +10,7 @@ signal died
 @onready var interactor: Interactor = $Interactor
 @onready var weapons: WeaponHolder = $Head/Camera3D/WeaponHolder
 @onready var _head: Node3D = $Head
+@onready var _camera: CameraRecoil = $Head/Camera3D
 @onready var _collision: CollisionShape3D = $CollisionShape3D
 @onready var _capsule: CapsuleShape3D = _collision.shape as CapsuleShape3D
 
@@ -24,6 +25,7 @@ func _ready() -> void:
 	_spawn_transform = global_transform
 	_apply_height(Constants.PLAYER_STAND_HEIGHT)
 	weapons.set_owner_body(self)
+	weapons.fired.connect(_on_fired)
 	health.died.connect(_on_died)
 
 
@@ -105,6 +107,10 @@ func _apply_height(height: float) -> void:
 	_capsule.height = height
 	_collision.position.y = height * 0.5
 	_head.position.y = height - Constants.PLAYER_EYE_BELOW_TOP
+
+
+func _on_fired() -> void:
+	_camera.kick(weapons.weapon.recoil_pitch, weapons.weapon.recoil_yaw)
 
 
 func _respawn() -> void:

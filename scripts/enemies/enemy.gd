@@ -14,6 +14,8 @@ enum State { INACTIVE, CHASING, QUEUED, BREAKING, CLIMBING, ATTACKING, DEAD }
 @onready var _visual: Node3D = $Visual
 # Under Visual so they follow the climb and bob animations: you hit what you see.
 @onready var _hurtboxes: Array[Hurtbox] = [$Visual/BodyHurtbox as Hurtbox, $Visual/HeadHurtbox as Hurtbox]
+@onready var _head_shape: Node3D = $Visual/HeadHurtbox/Shape
+@onready var _head_pop: EffectPool = $HeadPop
 
 var data: EnemyData
 var health: int = 0
@@ -26,6 +28,11 @@ var _attack_time: float = 0.0
 var _has_swung: bool = false
 var _walk_phase: float = 0.0
 var _tween: Tween
+# Hit reaction runs on the model, not on Visual, so it never fights the climb, attack or death tweens.
+var _flinch_tween: Tween
+var _flash_material: StandardMaterial3D
+var _meshes: Array[MeshInstance3D] = []
+var _head_parts: Array[Node3D] = []
 # State to go back to once a swing is over: attacks also happen through a window while breaking it.
 var _resume_state: State = State.CHASING
 # The window being entered, from the navigation link: wall centre, inward direction, landing point inside.
@@ -37,6 +44,10 @@ var _window_exit: Vector3
 
 func _ready() -> void:
 	_agent.link_reached.connect(_on_link_reached)
+	_flash_material = StandardMaterial3D.new()
+	_flash_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_flash_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_flash_material.albedo_color = Color(1, 1, 1, 0)
 
 
 func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
@@ -45,6 +56,8 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 			_model.queue_free()
 		_model = enemy_data.model.instantiate() as Node3D
 		_visual.add_child(_model)
+		_meshes.assign(_model.find_children("*", "MeshInstance3D", true, false))
+		_head_parts.assign(_model.find_children("*", "Node3D", true, false).filter(func(n: Node) -> bool: return n.is_in_group("head_part")))
 	data = enemy_data
 	health = data.health_for_wave(wave)
 	global_transform = at
@@ -53,6 +66,9 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 	_repath_left = 0.0
 	_window = null
 	_kill_tween()
+	_reset_hit_reaction()
+	for part: Node3D in _head_parts:
+		part.visible = true
 	_set_active(true)
 	_state = State.CHASING
 	_resume_state = State.CHASING
@@ -66,11 +82,57 @@ func receive_hit(amount: int, is_headshot: bool, is_melee: bool, source: Node3D)
 	if not is_alive():
 		return Hurtbox.Result.IGNORED
 	health -= amount
+	_hit_flash()
 	if health > 0:
+		_flinch(is_headshot)
 		Events.enemy_damaged.emit(self, amount, is_headshot, source)
 		return Hurtbox.Result.HIT
+	if is_headshot and amount >= data.head_pop_damage:
+		_pop_head()
 	_die(is_headshot, is_melee, source)
 	return Hurtbox.Result.KILLED
+
+
+func _flinch(is_headshot: bool) -> void:
+	if _flinch_tween:
+		_flinch_tween.kill()
+	# Lean back from the hit (the model faces -Z, so +X rotation tips it backwards); headshots snap harder.
+	_model.rotation.x = Constants.ENEMY_FLINCH_HEAD if is_headshot else Constants.ENEMY_FLINCH_BODY
+	_flinch_tween = create_tween()
+	_flinch_tween.tween_property(_model, "rotation:x", 0.0, Constants.ENEMY_FLINCH_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+
+func _hit_flash() -> void:
+	# A white overlay pass, only on while it fades: an idle overlay would cost a draw per mesh.
+	for mesh: MeshInstance3D in _meshes:
+		mesh.material_overlay = _flash_material
+	_flash_material.albedo_color.a = 0.7
+	var tween: Tween = create_tween()
+	tween.tween_property(_flash_material, "albedo_color:a", 0.0, Constants.ENEMY_HIT_FLASH_TIME)
+	tween.tween_callback(_clear_flash)
+
+
+func _clear_flash() -> void:
+	if _flash_material.albedo_color.a > 0.0:
+		return
+	for mesh: MeshInstance3D in _meshes:
+		mesh.material_overlay = null
+
+
+func _reset_hit_reaction() -> void:
+	if _flinch_tween:
+		_flinch_tween.kill()
+	if _model:
+		_model.rotation = Vector3.ZERO
+	_flash_material.albedo_color.a = 0.0
+	_clear_flash()
+
+
+func _pop_head() -> void:
+	# Comic-horror, not gore: the head is gone in a red cloud, nothing anatomical (section 7).
+	for part: Node3D in _head_parts:
+		part.visible = false
+	_head_pop.play(_head_shape.global_position, Vector3.UP)
 
 
 func _physics_process(delta: float) -> void:

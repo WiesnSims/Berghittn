@@ -15,6 +15,9 @@ extends Resource
 @export var reload_time: float = 1.0
 ## Extra seconds to chamber a round when reloading from an empty mag. 0 = this weapon never chambers.
 @export var chamber_time: float = 0.0
+## View kick per shot in degrees: straight up, and the most it may also wander left or right.
+@export var recoil_pitch: float = 0.0
+@export var recoil_yaw: float = 0.0
 ## Cone half-angle in degrees.
 @export var spread: float = 0.0
 ## Metres.

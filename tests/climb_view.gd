@@ -1,8 +1,9 @@
 extends Node
 ## Visual check of the window entry. Needs a real window (not --headless):
-##   godot res://tests/climb_view.tscn -- <out_dir> [inside|outside|break|reload|melee|hud]
+##   godot res://tests/climb_view.tscn -- <out_dir> [inside|outside|break|reload|melee|hud|shoot]
 ## Forces the spawn at the west-south window and saves frames while the enemy climbs
-## (break: while it tears the boards off; reload/melee: first-person weapon; hud: one frame with the UI).
+## (break: while it tears the boards off; reload/melee: first-person weapon; hud: one frame with the UI;
+## shoot: wall shots, body hits and a headshot kill on an enemy in front of the player).
 
 const SPAWN_NAME: String = "WestSouth"
 const FRAME_INTERVAL: float = 0.12
@@ -38,6 +39,10 @@ func _ready() -> void:
 		return
 	if mode == "melee":
 		await _capture_melee(main.get_node("Player") as Player)
+		get_tree().quit()
+		return
+	if mode == "shoot":
+		await _capture_shoot(main)
 		get_tree().quit()
 		return
 	if mode == "hud":
@@ -103,3 +108,36 @@ func _capture_hud(main: Node) -> void:
 	await get_tree().create_timer(5.6).timeout
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png("%s/hud.png" % _out_dir)
+
+
+func _capture_shoot(main: Node) -> void:
+	var waves := main.get_node("WaveManager") as WaveManager
+	waves._break_left = 1.0e6
+	var player := main.get_node("Player") as Player
+	player.global_position = Vector3(-1, 0, 1)
+	player.rotation = Vector3.ZERO
+	var enemy: Enemy = waves._create_enemy()
+	enemy.activate(waves.wave_table.entries[0].enemy, 1, Transform3D(Basis.IDENTITY, Vector3(-1, 0, -2.5)))
+	await get_tree().create_timer(0.3).timeout
+	var head := player.get_node("Head") as Node3D
+	# Two wall shots off to the side, two body hits, then headshots until it dies.
+	var shots: Array = [[0.35, 0.0], [0.3, 0.05], [0.0, 1.0], [0.0, 1.0], [0.0, 1.64], [0.0, 1.64], [0.0, 1.64]]
+	for shot: Array in shots:
+		var aim: Vector3 = enemy.global_position + Vector3(0, shot[1], 0) if shot[1] > 0.0 else Vector3(-4, 1.4, -5)
+		player.look_at(Vector3(aim.x, player.global_position.y, aim.z), Vector3.UP)
+		var d: Vector3 = aim - (player.get_node("Head/Camera3D") as Node3D).global_position
+		head.rotation.x = atan2(d.y, Vector2(d.x, d.z).length())
+		player.weapons._cooldown = 0.0
+		player.weapons._fire()
+		for i: int in 3:
+			await RenderingServer.frame_post_draw
+			get_viewport().get_texture().get_image().save_png("%s/frame_%02d.png" % [_out_dir, _frame])
+			_frame += 1
+			await get_tree().create_timer(0.04).timeout
+		if not enemy.is_alive():
+			break
+	for i: int in 6:
+		await get_tree().create_timer(0.08).timeout
+		await RenderingServer.frame_post_draw
+		get_viewport().get_texture().get_image().save_png("%s/frame_%02d.png" % [_out_dir, _frame])
+		_frame += 1

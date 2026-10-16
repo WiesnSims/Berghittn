@@ -1,0 +1,64 @@
+[gd_scene format=3]
+
+[sub_resource type="Curve" id="Shrink"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="StandardMaterial3D" id="Red"]
+shading_mode = 0
+albedo_color = Color(0.62, 0.04, 0.04, 1)
+
+[sub_resource type="StandardMaterial3D" id="Cloud"]
+shading_mode = 0
+albedo_color = Color(0.42, 0.02, 0.03, 1)
+
+[sub_resource type="BoxMesh" id="Chunk"]
+material = SubResource("Red")
+size = Vector3(0.06, 0.06, 0.06)
+
+[sub_resource type="BoxMesh" id="Puff"]
+material = SubResource("Cloud")
+size = Vector3(0.13, 0.13, 0.13)
+
+[node name="HeadPop" type="CPUParticles3D"]
+emitting = false
+amount = 16
+lifetime = 0.8
+one_shot = true
+explosiveness = 1.0
+local_coords = false
+mesh = SubResource("Chunk")
+direction = Vector3(0, 0, 1)
+spread = 180.0
+gravity = Vector3(0, -6.0, 0)
+initial_velocity_min = 1.5
+initial_velocity_max = 3.5
+angular_velocity_min = -360.0
+angular_velocity_max = 360.0
+damping_min = 0.0
+damping_max = 0.0
+scale_amount_min = 0.6
+scale_amount_max = 1.4
+scale_amount_curve = SubResource("Shrink")
+
+[node name="Cloud" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 14
+lifetime = 1.1
+one_shot = true
+explosiveness = 1.0
+local_coords = false
+mesh = SubResource("Puff")
+direction = Vector3(0, 0, 1)
+spread = 180.0
+gravity = Vector3(0, 0.3, 0)
+initial_velocity_min = 0.8
+initial_velocity_max = 2.0
+angular_velocity_min = -360.0
+angular_velocity_max = 360.0
+damping_min = 1.5
+damping_max = 1.5
+scale_amount_min = 0.7
+scale_amount_max = 1.5
+scale_amount_curve = SubResource("Shrink")
+

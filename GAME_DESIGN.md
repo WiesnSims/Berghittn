@@ -224,6 +224,9 @@ attack it; attack in melee range.
 Headshots deal `headshot_multiplier` x damage (default 2.0).
 Death: ragdoll-lite (simple fall animation or particle puff), disappears
 after 5 s. No gore beyond stylized effects. Keep it comic-horror.
+Stylized head pop (user request, 2026-10-16): a headshot kill dealing at least
+`head_pop_damage` (EnemyData) in one hit hides the head and bursts it into a red cloud of
+blocky particles. No anatomy, no lingering remains.
 
 ## 8. Waves and points
 

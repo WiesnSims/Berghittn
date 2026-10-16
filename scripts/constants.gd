@@ -85,13 +85,28 @@ const BARRICADE_REPAIR_INTERVAL: float = 0.6
 const INTERACT_RANGE: float = 1.7
 
 # Weapon feedback.
-const MUZZLE_FLASH_TIME: float = 0.05
+const MUZZLE_FLASH_TIME: float = 0.07
+# Camera recoil: how fast the kick snaps in and how fast the view settles back (per second).
+# Ejected casings: how many can be in the air at once, and seconds each one flies.
+const CASING_POOL_SIZE: int = 8
+const CASING_LIFETIME: float = 0.6
+const RECOIL_SNAP_SPEED: float = 30.0
+const RECOIL_RECOVER_SPEED: float = 9.0
+# Enemy hit reaction: lean-back angle (radians) for body and head hits, its recovery time,
+# and how long the white hit flash takes to fade.
+const ENEMY_FLINCH_BODY: float = 0.12
+const ENEMY_FLINCH_HEAD: float = 0.3
+const ENEMY_FLINCH_TIME: float = 0.2
+const ENEMY_HIT_FLASH_TIME: float = 0.12
 const IMPACT_MARK_COUNT: int = 32
 const IMPACT_MARK_LIFETIME: float = 8.0
 const HIT_MARKER_TIME: float = 0.15
 const DAMAGE_FLASH_TIME: float = 0.4
 
-# Quick melee: share of the swing time before the blow lands, and the fan of rays it checks
-# (degrees: x = yaw, y = pitch, from the centre of the view).
+# Quick melee: share of the swing time before the blow lands, the width of the arc in front of the
+# player that it sweeps (degrees), the most enemies it checks, and where on a body box it aims its
+# line-of-sight test (metres above the box origin, which is at the feet; high enough to clear a sill).
 const MELEE_HIT_FRACTION: float = 0.3
-const MELEE_RAY_OFFSETS: Array[Vector2] = [Vector2(0, 0), Vector2(-12, 0), Vector2(12, 0), Vector2(0, -10), Vector2(0, 8)]
+const MELEE_ARC_DEGREES: float = 110.0
+const MELEE_MAX_TARGETS: int = 32
+const MELEE_AIM_HEIGHT: float = 1.3

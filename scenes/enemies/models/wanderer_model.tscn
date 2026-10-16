@@ -123,26 +123,26 @@ mesh = SubResource("Hand")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 1.38, -0.57)
 mesh = SubResource("Hand")
 
-[node name="Head" type="MeshInstance3D" parent="."]
+[node name="Head" type="MeshInstance3D" parent="." groups=["head_part"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.62, -0.02)
 mesh = SubResource("Head")
 
-[node name="EyeL" type="MeshInstance3D" parent="."]
+[node name="EyeL" type="MeshInstance3D" parent="." groups=["head_part"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, 1.65, -0.17)
 mesh = SubResource("Eye")
 
-[node name="EyeR" type="MeshInstance3D" parent="."]
+[node name="EyeR" type="MeshInstance3D" parent="." groups=["head_part"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06, 1.64, -0.17)
 mesh = SubResource("Eye")
 
-[node name="HatBrim" type="MeshInstance3D" parent="."]
+[node name="HatBrim" type="MeshInstance3D" parent="." groups=["head_part"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, -0.02)
 mesh = SubResource("Brim")
 
-[node name="HatCrown" type="MeshInstance3D" parent="."]
+[node name="HatCrown" type="MeshInstance3D" parent="." groups=["head_part"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.83, -0.02)
 mesh = SubResource("Crown")
 
-[node name="Feather" type="MeshInstance3D" parent="."]
+[node name="Feather" type="MeshInstance3D" parent="." groups=["head_part"]]
 transform = Transform3D(1, 0, 0, 0, 0.94, -0.342, 0, 0.342, 0.94, 0.12, 1.88, 0.03)
 mesh = SubResource("Feather")
