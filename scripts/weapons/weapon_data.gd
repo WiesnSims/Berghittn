@@ -13,6 +13,8 @@ extends Resource
 @export var reserve_ammo: int = 0
 ## Seconds.
 @export var reload_time: float = 1.0
+## Extra seconds to chamber a round when reloading from an empty mag. 0 = this weapon never chambers.
+@export var chamber_time: float = 0.0
 ## Cone half-angle in degrees.
 @export var spread: float = 0.0
 ## Metres.

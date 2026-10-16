@@ -13,6 +13,7 @@ fire_rate = 4.0
 mag_size = 8
 reserve_ammo = 64
 reload_time = 1.4
+chamber_time = 0.35
 spread = 0.8
 range = 60.0
 is_auto = false

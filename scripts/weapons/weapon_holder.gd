@@ -78,10 +78,12 @@ func _physics_process(delta: float) -> void:
 func start_reload() -> void:
 	if is_reloading() or mag >= weapon.mag_size or reserve <= 0:
 		return
-	_reload_left = weapon.reload_time
-	reload_started.emit(weapon.reload_time)
+	# Empty mag means the slide is locked back: chamber a round after the new mag is in.
+	var chamber: float = weapon.chamber_time if mag == 0 else 0.0
+	_reload_left = weapon.reload_time + chamber
+	reload_started.emit(_reload_left)
 	if _viewmodel:
-		_viewmodel.play_reload(weapon.reload_time)
+		_viewmodel.play_reload(weapon.reload_time, chamber)
 
 
 func _finish_reload() -> void:

@@ -51,9 +51,10 @@ func _ready() -> void:
 
 func _capture_reload(player: Player) -> void:
 	await get_tree().create_timer(0.5).timeout
-	player.weapons.mag = 2
+	# Empty mag, so the chamber rack is in the capture too.
+	player.weapons.mag = 0
 	player.weapons.start_reload()
-	var end: float = Time.get_ticks_msec() / 1000.0 + player.weapons.weapon.reload_time + 0.2
+	var end: float = Time.get_ticks_msec() / 1000.0 + player.weapons.weapon.reload_time + player.weapons.weapon.chamber_time + 0.2
 	while Time.get_ticks_msec() / 1000.0 < end:
 		await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png("%s/frame_%02d.png" % [_out_dir, _frame])
