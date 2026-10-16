@@ -20,7 +20,7 @@ const PLAYER_MAX_PITCH_DEG: float = 89.0
 const PLAYER_FALL_RESPAWN_Y: float = -20.0
 
 # Radians of view rotation per screen pixel of mouse movement.
-const DEFAULT_MOUSE_SENSITIVITY: float = 0.0025
+const DEFAULT_MOUSE_SENSITIVITY: float = 0.002
 const DEFAULT_LOCALE: String = "en"
 
 # Chrome refuses a new pointer lock for about a second after the user pressed Esc to exit one.
