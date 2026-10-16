@@ -19,6 +19,7 @@ var _max_pitch: float = deg_to_rad(Constants.PLAYER_MAX_PITCH_DEG)
 # 0 = standing, 1 = crouched. Blended so the camera glides instead of snapping.
 var _crouch_amount: float = 0.0
 var _spawn_transform: Transform3D
+var _sprinting: bool = false
 
 
 func _ready() -> void:
@@ -32,6 +33,11 @@ func _ready() -> void:
 func spawn_at(spawn: Transform3D) -> void:
 	_spawn_transform = spawn
 	_respawn()
+
+
+## Actually running at sprint speed (not just holding Shift against a wall). Guns cannot fire meanwhile.
+func is_sprinting() -> bool:
+	return _sprinting
 
 
 func is_targetable() -> bool:
@@ -71,11 +77,13 @@ func _look(relative: Vector2) -> void:
 
 func _update_horizontal_velocity(delta: float) -> void:
 	var input: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	var target: Vector3 = global_basis * Vector3(input.x, 0.0, input.y) * _target_speed(input)
+	var speed: float = _target_speed(input)
+	var target: Vector3 = global_basis * Vector3(input.x, 0.0, input.y) * speed
 	var accel: float = Constants.PLAYER_GROUND_ACCEL if is_on_floor() else Constants.PLAYER_AIR_ACCEL
 	var horizontal := Vector2(velocity.x, velocity.z).move_toward(Vector2(target.x, target.z), accel * delta)
 	velocity.x = horizontal.x
 	velocity.z = horizontal.y
+	_sprinting = speed == Constants.PLAYER_SPRINT_SPEED and horizontal.length() > Constants.PLAYER_WALK_SPEED * 0.8
 
 
 func _target_speed(input: Vector2) -> float:

@@ -1,8 +1,9 @@
 extends Node
 ## Visual check of the map and the new guns. Needs a real window (not --headless):
-##   godot res://tests/zone_tour.tscn -- <out_dir> [zones|guns]
+##   godot res://tests/zone_tour.tscn -- <out_dir> [zones|guns|motion]
 ## zones: opens every door and saves one view per zone, plus the wall-buys and a door mid-swing.
 ## guns: buys the Jagdflinte and the Stutzen and saves frames of firing and reloading each.
+## motion: frames of the pistol standing, walking, sprinting, turning, jumping and landing.
 
 const VIEWS: Array = [
 	["stube", Vector3(-6.0, 2.2, 4.2), Vector3(3.0, 1.0, -4.0)],
@@ -37,6 +38,8 @@ func _ready() -> void:
 	(main.get_node("WaveManager") as Node).process_mode = Node.PROCESS_MODE_DISABLED
 	if mode == "guns":
 		await _guns(main)
+	elif mode == "motion":
+		await _motion(main)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -84,6 +87,36 @@ func _guns(main: Node) -> void:
 		weapons.mag = 0
 		weapons.start_reload()
 		await _save_series(data.id + "_reload", 12, (data.reload_time + data.chamber_time) / 12.0)
+
+
+func _motion(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	var player := main.get_node("Player") as Player
+	# Down the long axis of the Stube, towards the fireplace.
+	player.global_position = Vector3(-5.5, 0.0, 0.0)
+	player.rotation.y = -PI * 0.5
+	await _save_series("idle", 2, 0.2)
+	Input.action_press("move_forward")
+	await get_tree().create_timer(0.4).timeout
+	await _save_series("walk", 6, 0.09)
+	Input.action_press("sprint")
+	await get_tree().create_timer(0.4).timeout
+	await _save_series("sprint", 6, 0.07)
+	_check_print("sprinting: %s" % player.is_sprinting())
+	Input.action_release("sprint")
+	Input.action_release("move_forward")
+	player.global_position = Vector3(-5.5, 0.0, 0.0)
+	await get_tree().create_timer(0.5).timeout
+	# A fast turn to the right, as if from the mouse.
+	var motion := player.get_node("Head/Camera3D/WeaponHolder/Motion") as WeaponMotion
+	motion._look_lag = Vector2(motion.look_lag_max, 0.0)
+	await _save_series("turn", 3, 0.05)
+	player.velocity.y = Constants.PLAYER_JUMP_VELOCITY
+	await _save_series("jump", 10, 0.08)
+
+
+func _check_print(text: String) -> void:
+	print(text)
 
 
 func _save_series(prefix: String, count: int, interval: float) -> void:

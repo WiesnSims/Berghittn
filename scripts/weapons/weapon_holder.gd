@@ -26,6 +26,8 @@ class GunSlot:
 @onready var _impact_marks: ImpactMarks = $ImpactMarks
 @onready var _impact_puffs: EffectPool = $ImpactPuffs
 @onready var _hit_puffs: EffectPool = $HitPuffs
+# Every viewmodel hangs under this, so walking, sprinting and looking move them all.
+@onready var _motion: WeaponMotion = $Motion
 
 ## The gun in hand and its ammo; written back to its slot when it is put away.
 var weapon: WeaponData
@@ -38,6 +40,8 @@ var _reload_left: float = 0.0
 # What the running reload fills the gun to.
 var _reload_target: int = 0
 var _switch_left: float = 0.0
+# Seconds until the gun is back up after a sprint and may fire.
+var _sprint_left: float = 0.0
 var _viewmodel: Viewmodel
 var _melee_viewmodel: MeleeViewmodel
 # Seconds left of the current swing, and until its blow lands (negative once it has).
@@ -57,7 +61,7 @@ func _ready() -> void:
 		_switch_left = 0.0
 	if melee_weapon and melee_weapon.viewmodel:
 		_melee_viewmodel = melee_weapon.viewmodel.instantiate() as MeleeViewmodel
-		add_child(_melee_viewmodel)
+		_motion.add_child(_melee_viewmodel)
 
 
 func set_owner_body(body: CollisionObject3D) -> void:
@@ -80,7 +84,7 @@ func give_weapon(data: WeaponData) -> void:
 		# Built once per gun and kept: instancing on every switch would hitch in the middle of a fight.
 		slot.viewmodel = data.viewmodel.instantiate() as Viewmodel
 		slot.viewmodel.visible = false
-		add_child(slot.viewmodel)
+		_motion.add_child(slot.viewmodel)
 	if _slots.size() < Constants.GUN_SLOTS:
 		_slots.append(slot)
 		_select(_slots.size() - 1)
@@ -140,6 +144,12 @@ func _physics_process(delta: float) -> void:
 	if weapon == null:
 		return
 	_cooldown = maxf(_cooldown - delta, 0.0)
+	# Reloading on the run is fine, shooting is not: the gun is lowered until the sprint ends.
+	var player := _shooter as Player
+	if player and player.is_sprinting():
+		_sprint_left = Constants.SPRINT_TO_FIRE_TIME
+	else:
+		_sprint_left = maxf(_sprint_left - delta, 0.0)
 	if _melee_left > 0.0:
 		_update_melee(delta)
 		return
@@ -156,10 +166,13 @@ func _physics_process(delta: float) -> void:
 		return
 	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		return
-	var wants_fire: bool = Input.is_action_pressed("fire") if weapon.is_auto else Input.is_action_just_pressed("fire")
 	if Input.is_action_just_pressed("reload"):
 		start_reload()
-	elif wants_fire and _cooldown <= 0.0:
+		return
+	if _sprint_left > 0.0:
+		return
+	var wants_fire: bool = Input.is_action_pressed("fire") if weapon.is_auto else Input.is_action_just_pressed("fire")
+	if wants_fire and _cooldown <= 0.0:
 		if mag > 0:
 			_fire()
 		else:

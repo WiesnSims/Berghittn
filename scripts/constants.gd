@@ -96,6 +96,8 @@ const DEBUG_POINTS: int = 1000
 # Weapons: carried gun slots (section 6) and the time to draw a gun after switching or buying.
 const GUN_SLOTS: int = 2
 const WEAPON_SWITCH_TIME: float = 0.45
+# Seconds from the end of a sprint until the raised gun can fire again (section 5: slower aiming).
+const SPRINT_TO_FIRE_TIME: float = 0.2
 
 # Weapon feedback.
 const MUZZLE_FLASH_TIME: float = 0.07

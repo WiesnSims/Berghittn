@@ -29,7 +29,7 @@ Needs `DecompressionStream` (Chrome 80+, Firefox 113+, Safari 16.4+).
 ## Controls
 
 WASD / arrows move, mouse look, left click shoot, V melee (shovel), R reload, 1 / 2 / Q / mouse wheel
-switch gun, Space jump, Shift sprint (forward only), C crouch (not Ctrl: Ctrl+W closes the browser tab),
+switch gun, Space jump, Shift sprint (forward only; the gun is lowered and cannot fire until 0.2 s after), C crouch (not Ctrl: Ctrl+W closes the browser tab),
 E interact (hold at a window to board it up; press at a door or wall-buy to buy), Esc or P pause,
 F3 debug overlay (FPS and position). While the overlay is on, F4 adds 1000 points (testing doors and
 wall-buys).
@@ -60,6 +60,8 @@ only uses those whose zone is open or next to an open one. The Terrasse is open 
 keeps players in and lets enemies through. Wall-buys (`WallBuy`, a chalk outline per gun) sell the
 Jagdflinte (Stube) and the Stutzen (Skiraum), and once you carry the gun, ammo at `ammo_cost` (half price).
 Two gun slots: a new gun goes in the free slot, otherwise it replaces the gun in hand.
+All viewmodels hang under `WeaponMotion` (`Motion` under the `WeaponHolder`): walk bob, the sprint pose,
+lag behind mouse turns, strafe lean, and lift/dip on jumps and landings, all turning around the grip.
 
 Outside (`scenes/zones/exterior.tscn`) the hut stands on an Alm: the walkable snow is a flat CSG
 disc (radius 37 m around the hut), and `AlmTerrain` generates the mountain beyond it at load
