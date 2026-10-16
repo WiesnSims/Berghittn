@@ -6,8 +6,8 @@
 script = ExtResource("1")
 id = &"marillenbrand"
 display_name = "PERK_MARILLENBRAND"
+title = "PERK_MARILLENBRAND_TITLE"
 description = "PERK_MARILLENBRAND_DESC"
 cost = 2500
 color = Color(0.98, 0.6, 0.2, 1)
-reload_speed_bonus = 0.25
-revive_speed_bonus = 1.0
+badge = "Ma"

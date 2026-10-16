@@ -53,6 +53,15 @@ func take_damage(amount: int) -> void:
 	health.take_damage(amount)
 
 
+func is_crouching() -> bool:
+	return _is_crouching()
+
+
+## A jolt of the view that is not a shot (the Böllerschuss going off at your feet).
+func kick_view(pitch_degrees: float, yaw_degrees: float) -> void:
+	_camera.kick(pitch_degrees, yaw_degrees)
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if health.is_dead():
 		return
@@ -97,17 +106,13 @@ func _look(relative: Vector2) -> void:
 
 func _update_horizontal_velocity(delta: float) -> void:
 	var input: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	var speed: float = _target_speed(input)
+	var speed: float = _base_speed(input)
 	var target: Vector3 = global_basis * Vector3(input.x, 0.0, input.y) * speed
 	var accel: float = Constants.PLAYER_GROUND_ACCEL if is_on_floor() else Constants.PLAYER_AIR_ACCEL
 	var horizontal := Vector2(velocity.x, velocity.z).move_toward(Vector2(target.x, target.z), accel * delta)
 	velocity.x = horizontal.x
 	velocity.z = horizontal.y
-	_sprinting = speed == Constants.PLAYER_SPRINT_SPEED * perks.move_speed_multiplier() and horizontal.length() > Constants.PLAYER_WALK_SPEED * 0.8 * perks.move_speed_multiplier()
-
-
-func _target_speed(input: Vector2) -> float:
-	return _base_speed(input) * perks.move_speed_multiplier()
+	_sprinting = speed == Constants.PLAYER_SPRINT_SPEED and horizontal.length() > Constants.PLAYER_WALK_SPEED * 0.8
 
 
 func _base_speed(input: Vector2) -> float:

@@ -281,7 +281,7 @@ func _check_secondary_modes() -> void:
 	_check(weapons.is_scoped() and not weapons._viewmodel.visible and (hud.get_node("ScopeOverlay") as Control).visible,
 		"Stutzen scoped: overlay up, gun model hidden")
 	_check(absf(camera.fov - weapons.weapon.aim_fov) < 0.5, "scope zooms to %.0f deg (now %.1f)" % [weapons.weapon.aim_fov, camera.fov])
-	_check(player._target_speed(Vector2(0, -1)) < Constants.PLAYER_WALK_SPEED * 0.5, "walking slowly while scoped, no sprint")
+	_check(player._base_speed(Vector2(0, -1)) < Constants.PLAYER_WALK_SPEED * 0.5, "walking slowly while scoped, no sprint")
 	var widest: float = 0.0
 	for i: int in 200:
 		widest = maxf(widest, rad_to_deg(weapons._spread_direction().angle_to(-weapons.global_basis.z)))

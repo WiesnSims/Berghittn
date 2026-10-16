@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PerkData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/perks/perk_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"obstler"
+display_name = "PERK_OBSTLER"
+title = "PERK_OBSTLER_TITLE"
+description = "PERK_OBSTLER_DESC"
+cost = 2500
+color = Color(0.92, 0.86, 0.55, 1)
+badge = "Ob"

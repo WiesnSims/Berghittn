@@ -1,17 +1,15 @@
 class_name PerkData
 extends Resource
-## One Schnaps from the shrine (section 9). Bought once per life; lost when downed.
+## One Schnaps from the shrine (section 9). Bought once per life; lost when downed. Each one has a
+## signature effect you notice in a fight (play-test, 2026-10-17); its numbers are in constants.gd
+## (PERK_*), the code is in PlayerPerks. Plain stat gains come from the Brettljause (JauseData).
 
 @export var id: StringName
-## Translation keys: the Schnaps' name (stays dialect) and what it does.
+## Translation keys: the Schnaps (stays dialect), the perk it gives, and what that does.
 @export var display_name: String
+@export var title: String
 @export var description: String
 @export var cost: int = 1000
-## Bottle and HUD icon colour.
+## Bottle and HUD icon colour, and the short text on the HUD tile.
 @export var color: Color = Color.WHITE
-## Effects. Bonuses are shares (0.25 = +25 %); a perk only sets the ones it gives.
-@export var max_health_bonus: int = 0
-@export var reload_speed_bonus: float = 0.0
-@export var revive_speed_bonus: float = 0.0
-@export var move_speed_bonus: float = 0.0
-@export var damage_bonus: float = 0.0
+@export var badge: String = ""

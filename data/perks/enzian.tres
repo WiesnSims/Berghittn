@@ -6,7 +6,8 @@
 script = ExtResource("1")
 id = &"enzian"
 display_name = "PERK_ENZIAN"
+title = "PERK_ENZIAN_TITLE"
 description = "PERK_ENZIAN_DESC"
 cost = 2000
 color = Color(0.25, 0.4, 0.95, 1)
-max_health_bonus = 50
+badge = "En"

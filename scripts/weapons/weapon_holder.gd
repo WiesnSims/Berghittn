@@ -269,6 +269,8 @@ func start_reload() -> void:
 	if is_reloading() or mag >= target or reserve <= 0:
 		return
 	_reload_target = target
+	if mag == 0 and _perks():
+		_perks().on_empty_reload()
 	# Empty mag means the slide is locked back: chamber a round after the new mag is in.
 	var speed: float = _perks().reload_time_multiplier() if _perks() else 1.0
 	var chamber: float = weapon.chamber_time * speed if mag == 0 else 0.0
@@ -298,7 +300,7 @@ func _perks() -> PlayerPerks:
 	return player.perks if player else null
 
 
-## Damage after perks (Zirbenschnaps).
+## Damage after perks and the Brettljause.
 func _damage(base: int) -> int:
 	return roundi(base * _perks().damage_multiplier()) if _perks() else base
 
@@ -442,6 +444,7 @@ func _fire_ray(hits: Dictionary) -> void:
 	var exclude: Array[RID] = _exclude.duplicate()
 	var share: float = 1.0
 	var pierced: int = 0
+	var extra_pierce: int = _perks().extra_penetration() if _perks() else 0
 	var last: Node = null
 	for i: int in Constants.MAX_RAY_STEPS:
 		var query := PhysicsRayQueryParameters3D.create(global_position, global_position + offset, Constants.LAYER_WORLD | Constants.LAYER_HITBOX, exclude)
@@ -467,7 +470,7 @@ func _fire_ray(hits: Dictionary) -> void:
 		total.normal = hit.normal
 		hits[hurtbox.receiver] = total
 		pierced += 1
-		if pierced > weapon.penetration:
+		if pierced > weapon.penetration + extra_pierce:
 			return
 		if weapon.penetration_range > 0.0 and global_position.distance_to(hit.position) > weapon.penetration_range:
 			return

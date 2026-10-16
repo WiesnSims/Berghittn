@@ -119,7 +119,7 @@ Every room has a purpose (user request, 2026-10-17), something worth going there
 | Zone | Purpose |
 |---|---|
 | `stube` | Start, Jagdflinte wall-buy, later the Kuhglocke wall-buy |
-| `kueche` | Schnaps shrine (perks, section 9), later the Schmarrnpfanne wall-buy |
+| `kueche` | Schnaps shrine (perks) and the Brettljause in the Speis (stats), section 9; later the Schmarrnpfanne wall-buy |
 | `lager` | **Munitionskiste** (1000): refills the reserve of every carried gun at once; the only refill for chest guns. The safe-ish room: no climbable windows |
 | `terrasse` | Long sight lines over the sunken beer garden. Purpose still open: the Schneekanone trap was cut after play-testing (2026-10-17, "unfun and useless"). Buyable traps or obstacles stay an idea for later |
 | `skiraum` | Chokepoint, Stutzen wall-buy |
@@ -318,21 +318,36 @@ Optional power-ups dropped from enemies (random 3%): **Doppelte Punkte** (30 s),
 **Sofort-Kill** (20 s), **Nachschub** (full ammo). Implement only after
 milestone 5.
 
-## 9. Perks: the Schnaps shrine (Küche)
+## 9. Perks: the Schnaps shrine (Küche) and the Brettljause (Speis)
 
-One shrine in the kitchen sells perks, each once per life. Costs in points.
+One shrine in the kitchen sells perks, each once per life. Costs in points. Every Schnaps gives one
+signature effect you notice in a fight, not a plain stat (play-test, 2026-10-17); plain stats come
+from the Brettljause below. Tuning numbers are `PERK_*` in constants.gd.
 
-| Perk | Cost | Effect |
-|---|---|---|
-| Enzian | 2000 | +50 max health |
-| Marillenbrand | 2500 | Revive speed x2, reload speed +25% |
-| Jagertee | 1500 | Movement speed +15% |
-| Zirbenschnaps | 3000 | Weapon damage +20% |
+| Schnaps | Perk | Cost | Effect |
+|---|---|---|---|
+| Jagertee | **Gmiatlichkeit** | 1500 | Stand still or crouch for 2 s: health regenerates at once (no 5 s wait) and three times as fast; a warm glow shows it |
+| Enzian | **Sturschädl** | 2000 | Once per wave a deadly hit leaves 1 HP and 4 s of invincibility: pulsing gold screen glow, banner "Na, sicher ned!" |
+| Marillenbrand | **Böllerschuss** | 2500 | Starting a reload on an empty magazine sets off a Schützen black-powder Böller at your feet: 150 + 20·wave damage within 4.5 m (half at the edge, walls block it), survivors are thrown back; 6 s to pack the next charge |
+| Obstler | **Grantler** | 2500 | +5 % damage for every enemy within 5 m, up to +30 %; the tile shows the bonus |
+| Zirbenschnaps | **Durchschlag** | 3000 | Every gun goes through one more enemy (on top of section 6's penetration; buckshot still only up close) |
+| Jagamoasta | **56 gsunde Kräuter** | 3500 | Every kill is a herb; at 56 you are fully healed and hit twice as hard for 10 s (the Kräuterrausch, green glow); the tile counts the herbs |
 
 Perks are lost when the player is downed (solo: irrelevant, game over).
-The shrine (M5) is a painted wall cabinet with one bottle per Schnaps; the bottle you look at is the
-one E buys (with several things in reach, the one looked at most directly wins). Owned perks show as
-coloured tiles above the health bar.
+The shrine (M5) is a painted wall cabinet with one bottle per Schnaps, cheapest on the left; the
+bottle you look at is the one E buys (with several things in reach, the one looked at most directly
+wins). Owned perks show as coloured tiles above the health bar with a short badge and what the perk
+is doing (cooldown, bonus, herbs); a spent or idle one is greyed out.
+
+**Brettljause** (play-test, 2026-10-17): a wooden board on a table in the Speis. Each thing on it can
+be bought again and again, five helpings each, every helping costing more; the gains stay for the
+whole run, even when downed.
+
+| Jause | Per helping | First helping | Each further one |
+|---|---|---|---|
+| Speck | +20 max health | 750 | +750 |
+| Germknedl | +10 % reload speed | 750 | +750 |
+| Pinzgauer Kasnockn | +10 % weapon damage | 1000 | +1000 |
 
 ## 10. Co-op (1–4 players) — design only, build late
 

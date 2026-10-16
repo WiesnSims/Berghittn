@@ -56,6 +56,8 @@ var _stuck_time: float = 0.0
 var _sidestep: Vector3
 var _sidestep_left: float = 0.0
 var _sidestep_side: float = 1.0
+# Thrown back (Böllerschuss): the push that is left, flat.
+var _knock: Vector3
 
 
 func _ready() -> void:
@@ -91,6 +93,7 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 	_visual.transform = Transform3D.IDENTITY
 	_repath_left = 0.0
 	_reset_stuck()
+	_knock = Vector3.ZERO
 	_window = null
 	_kill_tween()
 	_reset_hit_reaction()
@@ -176,6 +179,9 @@ func _physics_process(delta: float) -> void:
 		_slow_left -= delta
 		if _slow_left <= 0.0:
 			_slow_factor = 1.0
+	if _knock != Vector3.ZERO and (_state == State.CHASING or _state == State.ATTACKING or _state == State.QUEUED):
+		_knocked(delta)
+		return
 	match _state:
 		State.CHASING:
 			_chase(delta)
@@ -189,6 +195,29 @@ func _physics_process(delta: float) -> void:
 			_lunge(delta)
 		State.DEAD:
 			_fall(delta)
+
+
+## Throws the enemy back along `push` (m/s, flat), with a little hop; it chases again once it lands.
+func apply_knockback(push: Vector3) -> void:
+	if not is_alive():
+		return
+	_knock = _flat(push)
+	if is_on_floor():
+		velocity.y = Constants.ENEMY_KNOCKBACK_HOP
+
+
+func _knocked(delta: float) -> void:
+	_state = State.CHASING
+	velocity.x = _knock.x
+	velocity.z = _knock.z
+	# Not _apply_gravity: that zeroes the hop while the feet still touch the floor.
+	if velocity.y > 0.0 or not is_on_floor():
+		velocity.y -= _gravity * delta
+	else:
+		velocity.y = 0.0
+	move_and_slide()
+	_knock = _knock.move_toward(Vector3.ZERO, Constants.ENEMY_KNOCKBACK_DECAY * delta)
+	_reset_stuck()
 
 
 func _chase(delta: float) -> void:

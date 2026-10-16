@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="JauseData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/perks/jause_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"germknedl"
+display_name = "JAUSE_GERMKNEDL"
+description = "JAUSE_GERMKNEDL_DESC"
+base_cost = 750
+cost_step = 750
+max_level = 5
+reload_speed_bonus = 0.1

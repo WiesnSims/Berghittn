@@ -56,6 +56,8 @@ func _ready() -> void:
 		await _aim(main)
 	elif mode == "m5":
 		await _m5(main)
+	elif mode == "perks":
+		await _perks_tour(main)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -177,6 +179,45 @@ func _save_series(prefix: String, count: int, interval: float) -> void:
 func _save(name: String) -> void:
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(_out_dir.path_join(name + ".png"))
+
+
+## perks: the six-bottle shrine, the Brettljause, a Böllerschuss going off (from outside), and the
+## HUD with every Schnaps while Sturschädl holds.
+func _perks_tour(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	var player := main.get_node("Player") as Player
+	var zones := main.get_node("Zones") as ZoneMap
+	for id: StringName in [&"kueche", &"lager", &"terrasse", &"skiraum", &"seilbahn", &"schuppen"]:
+		zones.unlock(id, player)
+	(main.get_node("WaveManager") as Node).process_mode = Node.PROCESS_MODE_DISABLED
+	await get_tree().create_timer(1.0).timeout
+	var camera := Camera3D.new()
+	camera.fov = 70.0
+	add_child(camera)
+	camera.current = true
+	(main.get_node("UI") as CanvasLayer).hide()
+	camera.look_at_from_position(Vector3(-8.6, 1.6, -10.75), Vector3(-11.0, 1.3, -10.75))
+	await _save("perks_shrine")
+	var jause := main.find_child("Brettljause", true, false) as Node3D
+	camera.look_at_from_position(jause.to_global(Vector3(0.3, 1.5, -1.9)), jause.to_global(Vector3(0, 0.8, -0.3)))
+	await _save("perks_jause")
+	player.points.add(50000)
+	for node: Node in main.find_children("*", "", true, false):
+		if node is PerkBottle:
+			(node as PerkBottle).interact(player)
+	player.global_position = Vector3(-12.0, -0.3, 22.0)
+	await get_tree().create_timer(0.3).timeout
+	camera.look_at_from_position(Vector3(-17.0, 2.5, 27.0), Vector3(-12.0, 0.3, 22.0))
+	player.weapons.mag = 0
+	player.weapons.start_reload()
+	await _save_series("perks_boeller", 4, 0.15)
+	camera.current = false
+	(main.get_node("UI") as CanvasLayer).show()
+	await get_tree().create_timer(2.0).timeout
+	player.health._health = 5.0
+	player.take_damage(100)
+	await get_tree().create_timer(0.3).timeout
+	await _save("perks_hud_sturschaedl")
 
 
 func _m5(main: Node) -> void:

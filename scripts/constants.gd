@@ -70,6 +70,32 @@ const ENEMY_LINK_REACH: float = 1.0
 const ENEMY_STUCK_TIME: float = 0.8
 const ENEMY_STUCK_MOVE: float = 0.3
 const ENEMY_SIDESTEP_TIME: float = 0.5
+# Knockback (Böllerschuss): how fast a thrown-back body loses its push (m/s per second) and its hop.
+const ENEMY_KNOCKBACK_DECAY: float = 24.0
+const ENEMY_KNOCKBACK_HOP: float = 2.5
+
+# Schnaps perks (section 9). Durchschlag: extra bodies per shot.
+const PERK_PIERCE_BONUS: int = 1
+# Böllerschuss: blast radius (m), damage at the centre (half at the edge), push, and the wait between blasts.
+const PERK_BOELLER_RADIUS: float = 4.5
+const PERK_BOELLER_DAMAGE: int = 150
+const PERK_BOELLER_DAMAGE_PER_WAVE: int = 20
+const PERK_BOELLER_KNOCKBACK: float = 9.0
+const PERK_BOELLER_COOLDOWN: float = 6.0
+# Sturschädl: seconds of invincibility after cheating death (once per wave).
+const PERK_STUR_INVINCIBLE_TIME: float = 4.0
+# Gmiatlichkeit: standing still (below this speed) or crouching this long heals this many times faster.
+const PERK_COSY_STILL_SPEED: float = 0.3
+const PERK_COSY_TIME: float = 2.0
+const PERK_COSY_REGEN_MULTIPLIER: float = 3.0
+# Grantler (Obstler): damage share per enemy within the radius, and the most it adds.
+const PERK_GRANT_RADIUS: float = 5.0
+const PERK_GRANT_PER_ENEMY: float = 0.05
+const PERK_GRANT_MAX: float = 0.3
+# Jagamoasta: kills ("Kräuter") for the Kräuterrausch, how long it lasts, and its damage factor.
+const PERK_HERBS: int = 56
+const PERK_RAUSCH_TIME: float = 10.0
+const PERK_RAUSCH_DAMAGE: float = 2.0
 
 # Waves (section 8; the per-wave formula numbers live in data/wave_table.tres).
 # Hard performance cap from section 3, shared by all players in co-op.

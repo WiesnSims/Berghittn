@@ -2,7 +2,7 @@ extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/m5_core.tscn
 ## Headless M5 check on the real main scene: the enemy mix per wave, boss waves, the Perchte lunge,
 ## bullet penetration, the four Schnaps and their effects, the Hüttentruhe (take, let sink, swap),
-## the Repetierer's fanning and the Lager's ammo crate.
+## the Repetierer's fanning, the Lager's ammo crate, every Schnaps perk and the Brettljause.
 
 # Open pasture in front of the hut, clear of furniture.
 const FIELD: Vector3 = Vector3(-12.0, -0.3, 22.0)
@@ -239,12 +239,11 @@ func _lunge() -> void:
 
 func _perks() -> void:
 	var bottles: Array[Node] = _find(PerkBottle)
-	_check(bottles.size() == 4, "four bottles on the shrine")
-	player.points.add(20000)
+	_check(bottles.size() == 6, "six bottles on the shrine")
+	player.points.add(30000)
 	var pistol: WeaponData = load("res://data/weapons/pistole.tres")
 	player.weapons.give_weapon(pistol)
 	await _seconds(0.6)
-	var walk_before: float = player._target_speed(Vector2(0, -1))
 	for node: Node in bottles:
 		var bottle := node as PerkBottle
 		# Stand in front of the shrine's middle and look at this bottle: E must pick it, not a neighbour.
@@ -259,15 +258,154 @@ func _perks() -> void:
 		bottle.interact(player)
 		_check(player.points.total == before - bottle.perk.cost and bottle.get_interact_prompt(player) == "", "%s once per life" % bottle.perk.id)
 	await _frames(2)
-	_check(player.health.max_health == 150 and player.health.current() == 150, "Enzian: max health %d, health %d" % [player.health.max_health, player.health.current()])
-	_check(is_equal_approx(player.perks.damage_multiplier(), 1.2), "Zirbenschnaps: damage x%.2f" % player.perks.damage_multiplier())
-	_check(is_equal_approx(player._target_speed(Vector2(0, -1)), walk_before * 1.15), "Jagertee: walk %.2f -> %.2f m/s" % [walk_before, player._target_speed(Vector2(0, -1))])
-	player.weapons.mag = 3
-	player.weapons.start_reload()
-	_check(is_equal_approx(player.weapons._reload_left, pistol.reload_time * 0.8), "Marillenbrand: reload %.2f s (normally %.2f)" % [player.weapons._reload_left, pistol.reload_time])
-	await _seconds(2.0)
 	var hud := main.get_node("UI/Hud") as Hud
-	_check(hud._perk_icons.get_child_count() == 4, "HUD shows %d perk icons" % hud._perk_icons.get_child_count())
+	_check(hud._perk_icons.get_child_count() == 6, "HUD shows %d perk icons" % hud._perk_icons.get_child_count())
+	_check(player.health.max_health == 100 and is_equal_approx(player.perks.damage_multiplier(), 1.0), "Schnaps give no plain stats any more")
+	await _durchschlag()
+	await _boellerschuss()
+	await _sturschaedl(hud)
+	await _gmiatlichkeit()
+	await _grantler()
+	await _kraeuter()
+	await _brettljause()
+
+
+func _durchschlag() -> void:
+	# The pistol goes through nothing by itself; with the Zirbenschnaps it goes through one.
+	var wanderer: EnemyData = load("res://data/enemies/wanderer.tres")
+	_place(FIELD + Vector3(-3.0, 0.0, 0.0))
+	var pair: Array[Enemy] = [_spawn(wanderer, FIELD, FIELD + Vector3(-3, 0, 0)), _spawn(wanderer, FIELD + Vector3(1.2, 0, 0), FIELD + Vector3(-3, 0, 0))]
+	await _frames(2)
+	pair[0].global_position = FIELD
+	pair[1].global_position = FIELD + Vector3(1.2, 0, 0)
+	await _frames(1)
+	_look_at(FIELD + Vector3(4.0, 1.0, 0.0))
+	player.weapons.aim_amount = 1.0
+	player.weapons.bloom = 0.0
+	var behind: int = pair[1].health
+	player.weapons.mag = 8
+	player.weapons._fire()
+	_check(player.perks.extra_penetration() == 1 and pair[1].health < behind, "Durchschlag: pistol goes through (behind %d -> %d)" % [behind, pair[1].health])
+	await _clear_enemies(pair)
+
+
+func _boellerschuss() -> void:
+	var wanderer: EnemyData = load("res://data/enemies/wanderer.tres")
+	_place(FIELD)
+	var close: Array[Enemy] = [_spawn(wanderer, FIELD + Vector3(2.0, 0, 0), FIELD), _spawn(wanderer, FIELD + Vector3(0, 0, 3.5), FIELD)]
+	await _frames(2)
+	close[0].global_position = FIELD + Vector3(2.0, 0, 0)
+	close[1].global_position = FIELD + Vector3(0, 0, 3.5)
+	await _frames(1)
+	# Tough enough to survive, so the push shows.
+	for e: Enemy in close:
+		e.health = 5000
+	var before: Array[int] = [close[0].health, close[1].health]
+	var start: float = close[0].global_position.distance_to(FIELD)
+	player.weapons.mag = 0
+	player.weapons.reserve = 64
+	player.weapons.start_reload()
+	await _frames(1)
+	var hurt: bool = close[0].health < before[0] and close[1].health < before[1]
+	_check(hurt and close[0].health < close[1].health, "Böllerschuss on an empty reload: %s -> %s (nearer hurts more)" % [before, [close[0].health, close[1].health]])
+	_check(main.find_children("*", "Node3D", true, false).any(func(n: Node) -> bool: return n.get_script() == PlayerPerks.BOELLER_BLAST), "the Böller goes off where you stand")
+	await _seconds(0.5)
+	var now: float = close[0].global_position.distance_to(FIELD)
+	_check(now > start + 1.0, "survivors are thrown back (%.1f m -> %.1f m)" % [start, now])
+	player.weapons._cancel_reload()
+	var after: int = close[0].health
+	player.weapons.mag = 0
+	player.weapons.start_reload()
+	await _frames(1)
+	_check(close[0].health == after, "then it needs %.0f s to pack the next charge" % Constants.PERK_BOELLER_COOLDOWN)
+	await _seconds(player.weapons._reload_left + 0.2)
+	await _clear_enemies(close)
+
+
+func _sturschaedl(hud: Hud) -> void:
+	_place(FIELD)
+	player.health._health = 10.0
+	player.take_damage(500)
+	_check(player.health.current() == 1 and not player.health.is_dead() and player.perks.is_invincible(), "Sturschädl: a deadly hit leaves 1 HP")
+	var held: int = player.health.current()
+	player.take_damage(500)
+	await _frames(1)
+	_check(player.health.current() >= held and not player.health.is_dead(), "and nothing gets through for %.0f s" % Constants.PERK_STUR_INVINCIBLE_TIME)
+	_check(hud._perk_glow.modulate.a > 0.2 and hud._banner.text == tr("PERK_ENZIAN_SHOUT"), "gold glow on screen, banner '%s'" % hud._banner.text)
+	await _seconds(Constants.PERK_STUR_INVINCIBLE_TIME + 0.1)
+	_check(not player.perks.is_invincible() and not player.perks._cheat_death(), "once per wave")
+	Events.wave_started.emit(2, false)
+	_check(player.perks.status(_perk(&"enzian")).dim == false, "ready again next wave")
+	player.health.heal_full()
+
+
+func _gmiatlichkeit() -> void:
+	_place(FIELD)
+	player.health._health = 40.0
+	player.health._since_damage = 0.0
+	player.perks._cosy_time = 0.0
+	await _seconds(Constants.PERK_COSY_TIME + 1.0)
+	# Without it nothing would heal for 5 s; cosy it heals 30/s after 2 s.
+	_check(player.health.current() >= 60, "Gmiatlichkeit: standing still heals at once and fast (40 -> %d in 3 s)" % player.health.current())
+	player.health.heal_full()
+
+
+func _grantler() -> void:
+	var wanderer: EnemyData = load("res://data/enemies/wanderer.tres")
+	_place(FIELD)
+	var crowd: Array[Enemy] = []
+	for i: int in 4:
+		crowd.append(_spawn(wanderer, FIELD + Vector3(cos(i * 1.6) * 3.0, 0, sin(i * 1.6) * 3.0), FIELD))
+	await _frames(3)
+	_check(is_equal_approx(player.perks.grantler_bonus(), 0.2) and is_equal_approx(player.perks.damage_multiplier(), 1.2), "Grantler: 4 close by, damage x%.2f" % player.perks.damage_multiplier())
+	await _clear_enemies(crowd)
+	await _frames(2)
+	_check(is_equal_approx(player.perks.damage_multiplier(), 1.0), "nobody close, no bonus")
+
+
+func _kraeuter() -> void:
+	player.health._health = 30.0
+	for i: int in Constants.PERK_HERBS - 1:
+		Events.enemy_killed.emit(null, false, false, player)
+	_check(player.perks.herbs == Constants.PERK_HERBS - 1 and player.perks.rausch_left() == 0.0, "Jagamoasta: %d herbs gathered" % player.perks.herbs)
+	Events.enemy_killed.emit(null, false, false, player)
+	_check(player.health.current() == player.health.max_health and is_equal_approx(player.perks.damage_multiplier(), 2.0) and player.perks.herbs == 0,
+		"56 gsunde Kräuter: healed to %d, damage x%.1f" % [player.health.current(), player.perks.damage_multiplier()])
+	player.perks._rausch_left = 0.0
+
+
+func _brettljause() -> void:
+	var items: Array[Node] = _find(JauseItem)
+	player.points.add(40000)
+	_check(items.size() == 3, "three things on the Brettljause")
+	for node: Node in items:
+		var item := node as JauseItem
+		_place(item.global_position + Vector3(0.0, -0.84, -1.0))
+		_look_at(item.global_position)
+		await _frames(2)
+		_check(player.interactor._find_target() == item, "looking at the %s targets it (%s)" % [item.jause.id, item.get_interact_prompt(player)])
+		for helping: int in item.jause.max_level + 1:
+			item.interact(player)
+		_check(player.perks.jause_level(item.jause) == item.jause.max_level and item.get_interact_prompt(player) == tr("UI_JAUSE_FULL") % tr(item.jause.display_name),
+			"%s eaten %d times, then enough" % [item.jause.id, item.jause.max_level])
+	_check(player.health.max_health == 200, "Speck x5: max health %d" % player.health.max_health)
+	_check(is_equal_approx(player.perks.damage_multiplier(), 1.5), "Kasnockn x5: damage x%.2f" % player.perks.damage_multiplier())
+	_check(is_equal_approx(player.perks.reload_time_multiplier(), 1.0 / 1.5), "Germknedl x5: reload x%.2f" % player.perks.reload_time_multiplier())
+	player.health.heal_full()
+
+
+func _perk(id: StringName) -> PerkData:
+	for perk: PerkData in player.perks.owned:
+		if perk.id == id:
+			return perk
+	return null
+
+
+func _clear_enemies(list: Array[Enemy]) -> void:
+	for e: Enemy in list:
+		if e.is_alive():
+			e.receive_hit(100000, false, false, null)
+	await _seconds(0.2)
 
 
 func _chest() -> void:
