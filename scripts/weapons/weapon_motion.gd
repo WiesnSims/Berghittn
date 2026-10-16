@@ -8,10 +8,12 @@ extends Node3D
 ## Point the turns happen around (camera space): about where the hand holds the guns. Turning around the
 ## camera instead would swing the gun out of view.
 @export var pivot: Vector3 = Vector3(0.15, -0.16, -0.4)
-## Bob: metres sideways and up at walking speed, and bob cycles per metre walked.
+## Bob: metres sideways and up at walking speed, and bob cycles per second at walking speed (one cycle is
+## two steps). Faster movement raises the cadence only with the square root of the speed, like real
+## strides that get longer rather than quicker, so a sprint bobs a little faster, not frantically.
 @export var bob_side: float = 0.012
 @export var bob_up: float = 0.009
-@export var bob_per_metre: float = 0.9
+@export var bob_frequency: float = 0.95
 ## How fast the bob fades in when starting to walk and out when stopping (per second).
 @export var bob_blend_speed: float = 6.0
 ## Sprint pose: where the gun goes (metres) and how it turns (degrees: pitch down, yaw in, roll).
@@ -66,7 +68,7 @@ func _process(delta: float) -> void:
 
 	var walk_share: float = flat_speed / Constants.PLAYER_WALK_SPEED if on_floor else 0.0
 	_bob_amount = move_toward(_bob_amount, minf(walk_share, 1.6), bob_blend_speed * delta)
-	_bob_phase = fmod(_bob_phase + flat_speed * bob_per_metre * TAU * delta, TAU)
+	_bob_phase = fmod(_bob_phase + sqrt(walk_share) * bob_frequency * TAU * delta, TAU)
 	var sprint_blend: float = 1.0 / Constants.SPRINT_TO_FIRE_TIME
 	_sprint = move_toward(_sprint, 1.0 if _player.is_sprinting() else 0.0, sprint_blend * delta)
 

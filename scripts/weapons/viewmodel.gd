@@ -44,6 +44,7 @@ var _tween: Tween
 # Moving parts (slide, bolt, barrels) animate on their own tween, alongside the kick.
 var _parts_tween: Tween
 var _flash_left: float = 0.0
+var _aim: float = 0.0
 # Pooled casings, flown by hand: a physics body per shot would be wasted on something gone in half a second.
 var _casings: Array[MeshInstance3D] = []
 var _casing_velocity: Array[Vector3] = []
@@ -80,7 +81,7 @@ func _process(delta: float) -> void:
 		_flash_left -= delta
 		_flash.visible = _flash_left > 0.0
 		# The light dies out instead of switching off, so the room visibly flickers with each shot.
-		_flash_light.light_energy = _flash_energy * clampf(_flash_left / Constants.MUZZLE_FLASH_TIME, 0.0, 1.0)
+		_flash_light.light_energy = _flash_energy * lerpf(1.0, Constants.AIM_FLASH_LIGHT, _aim) 				* clampf(_flash_left / Constants.MUZZLE_FLASH_TIME, 0.0, 1.0)
 	for i: int in _casings.size():
 		if _casing_left[i] <= 0.0:
 			continue
@@ -104,13 +105,16 @@ func play_fire(_rounds: int = 1) -> void:
 ## Aim pose blend (0 hip, 1 aimed), set every frame by the WeaponHolder.
 func set_aim(amount: float) -> void:
 	position = aim_offset * amount
+	_aim = amount
 
 
 func _flash_and_kick(strength: float = 1.0) -> void:
 	_flash_left = Constants.MUZZLE_FLASH_TIME
 	_flash.visible = true
 	_flash.rotation.z = randf() * TAU
-	_flash_light.light_energy = _flash_energy
+	# Aimed, the flash sits right in front of the sights: keep it small there.
+	_flash.scale = Vector3.ONE * lerpf(1.0, Constants.AIM_FLASH_SCALE, _aim)
+	_flash_light.light_energy = _flash_energy * lerpf(1.0, Constants.AIM_FLASH_LIGHT, _aim)
 	_restart_tween()
 	var kicked: Transform3D = _rest.translated_local(Vector3(0, 0, kick_distance * strength)).rotated_local(Vector3.RIGHT, deg_to_rad(kick_angle * strength))
 	_model.transform = kicked

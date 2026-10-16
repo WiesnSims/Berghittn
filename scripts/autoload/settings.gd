@@ -6,6 +6,8 @@ extends Node
 const STRING_TABLES: Array[String] = ["res://data/strings_en.tres", "res://data/strings_de.tres"]
 
 var mouse_sensitivity: float = Constants.DEFAULT_MOUSE_SENSITIVITY
+## Share of the sensitivity left while aiming down the sights or through the scope.
+var aim_sensitivity: float = Constants.DEFAULT_AIM_SENSITIVITY
 
 
 func _ready() -> void:

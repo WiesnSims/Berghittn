@@ -168,7 +168,8 @@ Rules:
   Every new weapon, including the wonder weapons and melee weapons of section 6a, must get its own
   fitting secondary mode when it is added.
   - `pistole`: aim down the sights (hold): slight zoom, much tighter spread, slower walking,
-    no sprinting, weapon bob mostly gone.
+    no sprinting, weapon bob mostly gone, mouse sensitivity lowered (user request, 2026-10-16;
+    applies to every aimed mode, the scope too), muzzle flash shrunk so it does not cover the target.
   - `stutzen`: hunting scope (Zielfernrohr, hold): strong zoom, scope overlay with crosshair,
     almost no spread, a slow sway of the aim while scoped.
   - `jagdflinte`: fire both barrels at once (press): all loaded shells in one blast, recoil per
