@@ -1,13 +1,15 @@
 extends Node
 ## Visual check of the window entry. Needs a real window (not --headless):
-##   godot res://tests/climb_view.tscn -- <out_dir> [inside|outside|reload]
-## Forces the spawn at the west-south window and saves frames while the enemy climbs.
+##   godot res://tests/climb_view.tscn -- <out_dir> [inside|outside|break|reload|melee|hud]
+## Forces the spawn at the west-south window and saves frames while the enemy climbs
+## (break: while it tears the boards off; reload/melee: first-person weapon; hud: one frame with the UI).
 
 const SPAWN_NAME: String = "WestSouth"
 const FRAME_INTERVAL: float = 0.12
 const VIEWS: Dictionary = {
 	"inside": [Vector3(-4.2, 1.7, 4.4), Vector3(-7.0, 1.0, 2.5)],
 	"outside": [Vector3(-10.0, 1.6, 4.8), Vector3(-7.15, 1.0, 2.5)],
+	"break": [Vector3(-4.6, 1.6, 3.6), Vector3(-7.15, 1.3, 2.5)],
 }
 
 var _out_dir: String
@@ -18,29 +20,41 @@ func _ready() -> void:
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	_out_dir = args[0] if args.size() > 0 else "user://climb"
 	var view: Array = VIEWS.get(args[1] if args.size() > 1 else "inside", VIEWS["inside"])
+	var mode: String = args[1] if args.size() > 1 else "inside"
 	DirAccess.make_dir_recursive_absolute(_out_dir)
 	get_window().size = Vector2i(960, 540)
 	var main: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
 	add_child(main)
 	await get_tree().process_frame
-	(main.get_node("UI") as CanvasLayer).hide()
+	if mode != "hud":
+		(main.get_node("UI") as CanvasLayer).hide()
 	for marker: Node in get_tree().get_nodes_in_group("spawn_points"):
 		if marker.name != SPAWN_NAME:
 			marker.remove_from_group("spawn_points")
 	get_tree().paused = false
-	if args.size() > 1 and args[1] == "reload":
+	if mode == "reload":
 		await _capture_reload(main.get_node("Player") as Player)
+		get_tree().quit()
+		return
+	if mode == "melee":
+		await _capture_melee(main.get_node("Player") as Player)
+		get_tree().quit()
+		return
+	if mode == "hud":
+		await _capture_hud(main)
 		get_tree().quit()
 		return
 	var camera := Camera3D.new()
 	add_child(camera)
 	camera.look_at_from_position(view[0], view[1])
 	camera.current = true
+	var wanted: Enemy.State = Enemy.State.BREAKING if mode == "break" else Enemy.State.CLIMBING
 	var enemy: Enemy = null
-	while enemy == null or enemy._state != Enemy.State.CLIMBING:
+	while enemy == null or enemy._state != wanted:
 		await get_tree().physics_frame
 		enemy = get_tree().get_first_node_in_group("enemies") as Enemy
-	var end: float = Time.get_ticks_msec() / 1000.0 + enemy.data.climb_time + 0.5
+	var length: float = enemy.data.board_break_time * Constants.BARRICADE_MAX_BOARDS if mode == "break" else enemy.data.climb_time
+	var end: float = Time.get_ticks_msec() / 1000.0 + length + 0.5
 	while Time.get_ticks_msec() / 1000.0 < end:
 		await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png("%s/frame_%02d.png" % [_out_dir, _frame])
@@ -60,3 +74,32 @@ func _capture_reload(player: Player) -> void:
 		get_viewport().get_texture().get_image().save_png("%s/frame_%02d.png" % [_out_dir, _frame])
 		_frame += 1
 		await get_tree().create_timer(0.08).timeout
+
+
+func _capture_melee(player: Player) -> void:
+	await get_tree().create_timer(0.5).timeout
+	player.weapons._start_melee()
+	var end: float = Time.get_ticks_msec() / 1000.0 + 1.0 / player.weapons.melee_weapon.fire_rate + 0.1
+	while Time.get_ticks_msec() / 1000.0 < end:
+		await RenderingServer.frame_post_draw
+		get_viewport().get_texture().get_image().save_png("%s/frame_%02d.png" % [_out_dir, _frame])
+		_frame += 1
+		await get_tree().create_timer(0.05).timeout
+
+
+func _capture_hud(main: Node) -> void:
+	for screen: String in ["UI/StartScreen", "UI/PauseMenu"]:
+		(main.get_node(screen) as Control).hide()
+	var player := main.get_node("Player") as Player
+	# Face the west-south window from the repair spot, so the boards and the prompt are in view.
+	var barricade := main.get_node("Stube/Barricades/WestSouth") as Barricade
+	barricade.remove_board()
+	barricade.remove_board()
+	var spot: Vector3 = barricade.get_interact_position()
+	player.global_position = Vector3(spot.x + 0.3, 0.0, spot.z)
+	player.look_at(Vector3(barricade.global_position.x, 0.0, barricade.global_position.z), Vector3.UP)
+	player.points.add(60)
+	player.points.add(10)
+	await get_tree().create_timer(5.6).timeout
+	await RenderingServer.frame_post_draw
+	get_viewport().get_texture().get_image().save_png("%s/hud.png" % _out_dir)

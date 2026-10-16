@@ -6,7 +6,7 @@ messages = {
 [&"", &"UI_TITLE"]: [&"Berghittn"],
 [&"", &"UI_TAGLINE"]: [&"Snowstorm. Undead. One hut."],
 [&"", &"UI_CLICK_TO_PLAY"]: [&"Click to play"],
-[&"", &"UI_CONTROLS"]: [&"WASD move  ·  Mouse look  ·  LMB shoot  ·  R reload  ·  Space jump  ·  Shift sprint  ·  C crouch  ·  Esc pause  ·  F3 debug"],
+[&"", &"UI_CONTROLS"]: [&"WASD move  ·  Mouse look  ·  LMB shoot  ·  V melee  ·  R reload  ·  E repair  ·  Space jump  ·  Shift sprint  ·  C crouch  ·  Esc pause  ·  F3 debug"],
 [&"", &"UI_PAUSE_TITLE"]: [&"Paused"],
 [&"", &"UI_PAUSE_HINT"]: [&"A quick Jause, then back to it."],
 [&"", &"UI_RESUME"]: [&"Resume"],
@@ -22,5 +22,12 @@ messages = {
 [&"", &"UI_DEATH_QUIP_4"]: [&"Da Wanderer hat an Gipfel erreicht. Leider warst du da Gipfel."],
 [&"", &"UI_RESTART"]: [&"Try again"],
 [&"", &"WEAPON_PISTOLE"]: [&"Dienstpistole"],
-[&"", &"ENEMY_WANDERER"]: [&"Wanderer"]
+[&"", &"ENEMY_WANDERER"]: [&"Wanderer"],
+[&"", &"WEAPON_SCHAUFEL"]: [&"Schneeschaufel"],
+[&"", &"UI_WAVE"]: [&"Welle %d"],
+[&"", &"UI_WAVE_CLEARED"]: [&"Wave %d survived"],
+[&"", &"UI_NEXT_WAVE"]: [&"Next wave in %d"],
+[&"", &"UI_POINTS_GAIN"]: [&"+%d"],
+[&"", &"UI_REPAIR_HINT"]: [&"Hold E to board up the window"],
+[&"", &"UI_DEATH_STATS"]: [&"Reached wave %d  ·  %d points"]
 }

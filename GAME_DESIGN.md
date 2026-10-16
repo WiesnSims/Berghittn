@@ -320,6 +320,9 @@ fix console errors, commit. Stop and report after each milestone.
 - Wave manager with formulas from section 8, spawn points, windows with
   barricades, points and HUD, break between waves.
 - Acceptance: survive and reach wave 3, points counted correctly.
+- Added by user decision (2026-10-16): the Schneeschaufel as quick melee (V). The 72 starting
+  pistol rounds cannot clear waves 1–3 before M4 brings ammo refills, and it makes the
+  melee-kill points testable.
 
 **M4 — Zones, doors, wall-buys**
 - All six zones greybox-connected, door purchasing, spawn activation rules,

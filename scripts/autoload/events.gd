@@ -1,9 +1,19 @@
 extends Node
 ## Global signal bus for events that several unrelated systems care about (points, waves, stats).
+## `source` is whoever caused it (the player who shot, swung or repaired), so co-op can credit the right player.
 
 @warning_ignore("unused_signal")
-signal enemy_damaged(enemy: Node3D, amount: int, is_headshot: bool)
+signal enemy_damaged(enemy: Node3D, amount: int, is_headshot: bool, source: Node3D)
 @warning_ignore("unused_signal")
-signal enemy_killed(enemy: Node3D, is_headshot: bool)
+signal enemy_killed(enemy: Node3D, is_headshot: bool, is_melee: bool, source: Node3D)
 @warning_ignore("unused_signal")
 signal player_died(player: Node3D)
+@warning_ignore("unused_signal")
+signal board_repaired(barricade: Node3D, source: Node3D)
+## Countdown to the next wave started (also before wave 1).
+@warning_ignore("unused_signal")
+signal wave_break_started(next_wave: int, duration: float)
+@warning_ignore("unused_signal")
+signal wave_started(wave: int)
+@warning_ignore("unused_signal")
+signal wave_cleared(wave: int)

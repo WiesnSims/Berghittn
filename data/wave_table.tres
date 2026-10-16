@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WaveTable" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/waves/wave_table.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/waves/wave_entry.gd" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/wanderer.tres" id="3"]
+
+[sub_resource type="Resource" id="Wanderer"]
+script = ExtResource("2")
+enemy = ExtResource("3")
+first_wave = 1
+weight = 1.0
+last_wave = 0
+
+[resource]
+script = ExtResource("1")
+base_enemies = 6
+enemies_per_wave = 2
+coop_extra_per_player = 0.5
+start_spawn_interval = 2.5
+spawn_interval_step = 0.1
+min_spawn_interval = 0.6
+break_time = 10.0
+entries = Array[ExtResource("2")]([SubResource("Wanderer")])

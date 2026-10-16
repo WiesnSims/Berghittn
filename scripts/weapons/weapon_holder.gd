@@ -1,6 +1,7 @@
 class_name WeaponHolder
 extends Node3D
-## Holds the equipped gun: firing, hitscan, ammo and reload. Sits under the camera so shots follow the view.
+## Holds the equipped gun (firing, hitscan, ammo, reload) and the melee weapon for quick melee on V.
+## Sits under the camera so shots follow the view.
 
 signal ammo_changed(mag: int, reserve: int)
 signal reload_started(duration: float)
@@ -10,6 +11,8 @@ signal fired
 signal hit_confirmed(is_headshot: bool, killed: bool)
 
 @export var starting_weapon: WeaponData
+## Always carried (section 6: the shovel until the melee slot gets replaced).
+@export var melee_weapon: WeaponData
 
 @onready var _impact_marks: ImpactMarks = $ImpactMarks
 
@@ -19,19 +22,28 @@ var reserve: int = 0
 var _cooldown: float = 0.0
 var _reload_left: float = 0.0
 var _viewmodel: Viewmodel
+var _melee_viewmodel: MeleeViewmodel
+# Seconds left of the current swing, and until its blow lands (negative once it has).
+var _melee_left: float = 0.0
+var _melee_hit_in: float = -1.0
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
-# The shooter's own body, so rays never hit it.
+# The shooter's own body, so rays never hit it, and who gets the points.
 var _exclude: Array[RID] = []
+var _shooter: Node3D
 
 
 func _ready() -> void:
 	_rng.randomize()
 	if starting_weapon:
 		equip(starting_weapon)
+	if melee_weapon and melee_weapon.viewmodel:
+		_melee_viewmodel = melee_weapon.viewmodel.instantiate() as MeleeViewmodel
+		add_child(_melee_viewmodel)
 
 
 func set_owner_body(body: CollisionObject3D) -> void:
 	_exclude = [body.get_rid()]
+	_shooter = body
 
 
 func equip(data: WeaponData) -> void:
@@ -57,6 +69,12 @@ func _physics_process(delta: float) -> void:
 	if weapon == null:
 		return
 	_cooldown = maxf(_cooldown - delta, 0.0)
+	if _melee_left > 0.0:
+		_update_melee(delta)
+		return
+	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Input.is_action_just_pressed("melee") and melee_weapon:
+		_start_melee()
+		return
 	if is_reloading():
 		_reload_left -= delta
 		if _reload_left <= 0.0:
@@ -106,17 +124,61 @@ func _fire() -> void:
 		_viewmodel.play_fire()
 
 
-func _fire_ray() -> void:
-	var from: Vector3 = global_position
-	var to: Vector3 = from + _spread_direction() * weapon.range
-	var query := PhysicsRayQueryParameters3D.create(from, to, Constants.LAYER_WORLD | Constants.LAYER_HITBOX, _exclude)
+func _start_melee() -> void:
+	# A swing cancels a running reload: in a panic the shovel must always come out.
+	if is_reloading():
+		_reload_left = 0.0
+		reload_finished.emit()
+	_melee_left = 1.0 / melee_weapon.fire_rate
+	_melee_hit_in = _melee_left * Constants.MELEE_HIT_FRACTION
+	if _viewmodel:
+		_viewmodel.play_lower(_melee_left)
+	if _melee_viewmodel:
+		_melee_viewmodel.play_swing(_melee_left, _melee_hit_in)
+
+
+func _update_melee(delta: float) -> void:
+	_melee_left -= delta
+	if _melee_hit_in >= 0.0:
+		_melee_hit_in -= delta
+		if _melee_hit_in < 0.0:
+			_melee_hit()
+
+
+func _melee_hit() -> void:
+	# A small fan of short rays, so a swing does not need pistol precision.
+	var best: Dictionary = {}
+	var best_distance: float = INF
+	for offset: Vector2 in Constants.MELEE_RAY_OFFSETS:
+		var direction: Vector3 = (-global_basis.z).rotated(global_basis.x, deg_to_rad(offset.y)).rotated(global_basis.y, deg_to_rad(offset.x))
+		var hit: Dictionary = _cast(direction * melee_weapon.range)
+		if hit.collider is Hurtbox:
+			var distance: float = global_position.distance_to(hit.position)
+			if distance < best_distance:
+				best = hit
+				best_distance = distance
+	if best.is_empty():
+		return
+	var hurtbox := best.collider as Hurtbox
+	var result: Hurtbox.Result = hurtbox.take_hit(melee_weapon.damage, melee_weapon.headshot_multiplier, true, _shooter)
+	if result != Hurtbox.Result.IGNORED:
+		hit_confirmed.emit(hurtbox.is_head, result == Hurtbox.Result.KILLED)
+
+
+func _cast(offset: Vector3) -> Dictionary:
+	var query := PhysicsRayQueryParameters3D.create(global_position, global_position + offset, Constants.LAYER_WORLD | Constants.LAYER_HITBOX, _exclude)
 	query.collide_with_areas = true
 	var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
-	if hit.is_empty():
+	return hit if not hit.is_empty() else {"collider": null}
+
+
+func _fire_ray() -> void:
+	var hit: Dictionary = _cast(_spread_direction() * weapon.range)
+	if hit.collider == null:
 		return
 	var hurtbox := hit.collider as Hurtbox
 	if hurtbox:
-		var result: Hurtbox.Result = hurtbox.take_hit(weapon.damage, weapon.headshot_multiplier)
+		var result: Hurtbox.Result = hurtbox.take_hit(weapon.damage, weapon.headshot_multiplier, false, _shooter)
 		if result != Hurtbox.Result.IGNORED:
 			hit_confirmed.emit(hurtbox.is_head, result == Hurtbox.Result.KILLED)
 	else:

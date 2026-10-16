@@ -13,10 +13,14 @@ var player_died: bool = false
 func _ready() -> void:
 	main = (load("res://scenes/main.tscn") as PackedScene).instantiate()
 	add_child(main)
-	Events.enemy_killed.connect(func(_e: Node3D, head: bool) -> void:
+	Events.enemy_killed.connect(func(_e: Node3D, head: bool, _melee: bool, _source: Node3D) -> void:
 		kills += 1
 		if head: headshots += 1)
 	_run()
+
+
+func _on_player_died() -> void:
+	player_died = true
 
 
 func _wait(seconds: float) -> void:
@@ -38,6 +42,7 @@ func _run() -> void:
 	await get_tree().process_frame
 	get_tree().paused = false
 	player = main.get_node("Player")
+	player.died.connect(_on_player_died)
 	await _wait(0.2)
 	var region := main.get_node("Stube/Navigation") as NavigationRegion3D
 	print("NAV polygons: ", region.navigation_mesh.get_polygon_count())
@@ -111,7 +116,6 @@ func _run() -> void:
 	var hp_now: int = player.health.current()
 	await _wait(6.5)
 	print("REGEN: hp %d -> %d" % [hp_now, player.health.current()])
-	player.died.connect(func() -> void: player_died = true)
 	while t < 120.0 and not player_died:
 		await _wait(0.1)
 		player.global_position = start_pos

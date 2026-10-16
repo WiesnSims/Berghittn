@@ -19,6 +19,8 @@ extends Resource
 @export var attack_cooldown: float = 1.1
 ## Seconds to climb through a window opening.
 @export var climb_time: float = 1.1
+## Seconds to rip one board off a barricade (6 boards ≈ 3 s, section 4).
+@export var board_break_time: float = 0.5
 @export var model: PackedScene
 
 

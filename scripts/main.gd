@@ -9,6 +9,7 @@ enum State { MENU, CAPTURING, PLAYING, DEAD }
 @onready var _start_screen: StartScreen = $UI/StartScreen
 @onready var _pause_menu: PauseMenu = $UI/PauseMenu
 @onready var _death_screen: DeathScreen = $UI/DeathScreen
+@onready var _waves: WaveManager = $WaveManager
 
 var _state: State = State.MENU
 
@@ -68,7 +69,7 @@ func _on_player_died() -> void:
 	await get_tree().create_timer(Constants.DEATH_SCREEN_DELAY).timeout
 	get_tree().paused = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	_death_screen.present()
+	_death_screen.present(_waves.wave, _player.points.total)
 
 
 func _restart() -> void:

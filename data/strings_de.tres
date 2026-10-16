@@ -6,7 +6,7 @@ messages = {
 [&"", &"UI_TITLE"]: [&"Berghittn"],
 [&"", &"UI_TAGLINE"]: [&"Schneesturm. Untote. Oane Hüttn."],
 [&"", &"UI_CLICK_TO_PLAY"]: [&"Klick zum Spielen"],
-[&"", &"UI_CONTROLS"]: [&"WASD gehen  ·  Maus schauen  ·  LMT schießen  ·  R nachladen  ·  Leertaste springen  ·  Shift sprinten  ·  C ducken  ·  Esc Pause  ·  F3 Debug"],
+[&"", &"UI_CONTROLS"]: [&"WASD gehen  ·  Maus schauen  ·  LMT schießen  ·  V Nahkampf  ·  R nachladen  ·  E reparieren  ·  Leertaste springen  ·  Shift sprinten  ·  C ducken  ·  Esc Pause  ·  F3 Debug"],
 [&"", &"UI_PAUSE_TITLE"]: [&"Pause"],
 [&"", &"UI_PAUSE_HINT"]: [&"A kurze Jausn, dann geht's weida."],
 [&"", &"UI_RESUME"]: [&"Weiter"],
@@ -22,5 +22,12 @@ messages = {
 [&"", &"UI_DEATH_QUIP_4"]: [&"Da Wanderer hat an Gipfel erreicht. Leider warst du da Gipfel."],
 [&"", &"UI_RESTART"]: [&"No amoi"],
 [&"", &"WEAPON_PISTOLE"]: [&"Dienstpistole"],
-[&"", &"ENEMY_WANDERER"]: [&"Wanderer"]
+[&"", &"ENEMY_WANDERER"]: [&"Wanderer"],
+[&"", &"WEAPON_SCHAUFEL"]: [&"Schneeschaufel"],
+[&"", &"UI_WAVE"]: [&"Welle %d"],
+[&"", &"UI_WAVE_CLEARED"]: [&"Welle %d überstanden"],
+[&"", &"UI_NEXT_WAVE"]: [&"Nächste Welle in %d"],
+[&"", &"UI_POINTS_GAIN"]: [&"+%d"],
+[&"", &"UI_REPAIR_HINT"]: [&"E halten zum Vernageln"],
+[&"", &"UI_DEATH_STATS"]: [&"Welle %d erreicht  ·  %d Punkte"]
 }

@@ -17,6 +17,8 @@ extends Node3D
 @export var slide_travel: float = 0.06
 ## Degrees the gun turns to show its side while racking.
 @export var chamber_turn: float = 50.0
+## How far the gun drops out of view during a melee swing. Metres.
+@export var lower_drop: float = 0.3
 
 @onready var _model: Node3D = $Model
 @onready var _slide: Node3D = $Model/Slide
@@ -72,6 +74,15 @@ func play_reload(duration: float, chamber_time: float = 0.0) -> void:
 		_tween.parallel().tween_property(_model, "transform", side_on.rotated_local(Vector3.RIGHT, deg_to_rad(kick_angle)), chamber_time * 0.15)
 		_tween.tween_interval(chamber_time * 0.25)
 	_tween.tween_property(_model, "transform", _rest, d * 0.35).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+
+
+func play_lower(duration: float) -> void:
+	# Out of the way while the melee weapon swings, then back up.
+	_restart_tween()
+	var lowered: Transform3D = _rest.translated(Vector3(0.05, -lower_drop, 0.0)).rotated_local(Vector3.RIGHT, deg_to_rad(-30.0))
+	_tween.tween_property(_model, "transform", lowered, duration * 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_tween.tween_interval(duration * 0.45)
+	_tween.tween_property(_model, "transform", _rest, duration * 0.35).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 
 
 func _restart_tween() -> void:

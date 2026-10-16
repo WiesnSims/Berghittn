@@ -57,9 +57,32 @@ const ENEMY_LYING_HEIGHT: float = 0.2
 # Vertical distance beyond which a melee swing cannot reach (player on a table, enemy below).
 const ENEMY_ATTACK_MAX_HEIGHT: float = 1.4
 
-# M2 test spawner: keeps one enemy around until the wave manager (M3) takes over.
-const TEST_SPAWN_DELAY: float = 3.0
-const TEST_SPAWN_WAVE: int = 1
+# Seconds to walk the last bit from the link start to the window.
+const ENEMY_WINDOW_APPROACH_TIME: float = 0.3
+
+# Waves (section 8; the per-wave formula numbers live in data/wave_table.tres).
+# Hard performance cap from section 3, shared by all players in co-op.
+const MAX_ALIVE_ENEMIES: int = 24
+# Countdown before wave 1, so the player can look around first.
+const FIRST_WAVE_DELAY: float = 5.0
+# Enemies spawn scattered around their marker instead of stacked inside each other.
+const SPAWN_SCATTER_RADIUS: float = 1.2
+const WAVE_BANNER_TIME: float = 3.0
+
+# Points (section 8).
+const POINTS_HIT: int = 10
+const POINTS_KILL_BODY: int = 60
+const POINTS_KILL_HEADSHOT: int = 100
+const POINTS_KILL_MELEE: int = 130
+const POINTS_REPAIR_BOARD: int = 10
+const POINTS_POPUP_TIME: float = 0.9
+
+# Barricades (section 4).
+const BARRICADE_MAX_BOARDS: int = 6
+# Seconds per board while E is held.
+const BARRICADE_REPAIR_INTERVAL: float = 0.6
+# Distance from the repair spot inside the window within which E works.
+const INTERACT_RANGE: float = 1.7
 
 # Weapon feedback.
 const MUZZLE_FLASH_TIME: float = 0.05
@@ -67,3 +90,8 @@ const IMPACT_MARK_COUNT: int = 32
 const IMPACT_MARK_LIFETIME: float = 8.0
 const HIT_MARKER_TIME: float = 0.15
 const DAMAGE_FLASH_TIME: float = 0.4
+
+# Quick melee: share of the swing time before the blow lands, and the fan of rays it checks
+# (degrees: x = yaw, y = pitch, from the centre of the view).
+const MELEE_HIT_FRACTION: float = 0.3
+const MELEE_RAY_OFFSETS: Array[Vector2] = [Vector2(0, 0), Vector2(-12, 0), Vector2(12, 0), Vector2(0, -10), Vector2(0, 8)]

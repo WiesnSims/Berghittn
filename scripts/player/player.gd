@@ -1,10 +1,13 @@
 class_name Player
 extends CharacterBody3D
-## First-person controller: walk, sprint, jump, crouch and mouse look. Health and weapons live in child nodes.
+## First-person controller: walk, sprint, jump, crouch and mouse look. Health, points, weapons and
+## interaction live in child nodes.
 
 signal died
 
 @onready var health: PlayerHealth = $Health
+@onready var points: PlayerPoints = $Points
+@onready var interactor: Interactor = $Interactor
 @onready var weapons: WeaponHolder = $Head/Camera3D/WeaponHolder
 @onready var _head: Node3D = $Head
 @onready var _collision: CollisionShape3D = $CollisionShape3D
