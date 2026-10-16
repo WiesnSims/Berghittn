@@ -402,6 +402,9 @@ more than one map, more than four players, procedural levels.
 
 ## 16. Open questions for the user
 
-- Exact name of the Cloudflare project and whether a custom domain is wanted.
-- Preferred language for the default UI (German or English).
+- ~~Exact name of the Cloudflare project and whether a custom domain is wanted.~~
+  Answered: classic Pages project `berghittn` at https://berghittn.pages.dev, no
+  `workers.dev` URL. Co-op relay must be reachable through this domain.
+- ~~Preferred language for the default UI (German or English).~~ Answered: English
+  is the default; German stays available via `strings_de.tres`.
 - Whether co-op should use a lobby with room codes or direct invite links.
