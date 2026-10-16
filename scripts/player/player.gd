@@ -20,11 +20,15 @@ var _max_pitch: float = deg_to_rad(Constants.PLAYER_MAX_PITCH_DEG)
 var _crouch_amount: float = 0.0
 var _spawn_transform: Transform3D
 var _sprinting: bool = false
+# Field of view without aiming; aiming zooms from here to the gun's aim_fov.
+var _base_fov: float = 75.0
+var _time: float = 0.0
 
 
 func _ready() -> void:
 	_spawn_transform = global_transform
 	_apply_height(Constants.PLAYER_STAND_HEIGHT)
+	_base_fov = _camera.fov
 	weapons.set_owner_body(self)
 	weapons.fired.connect(_on_fired)
 	health.died.connect(_on_died)
@@ -55,6 +59,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		_look((event as InputEventMouseMotion).screen_relative)
 
 
+func _process(delta: float) -> void:
+	_time += delta
+	var aim: float = weapons.aim_eased() if weapons.weapon else 0.0
+	var aim_fov: float = weapons.weapon.aim_fov if weapons.weapon else _base_fov
+	_camera.fov = lerpf(_base_fov, aim_fov, aim)
+	# Holding a scope steady is hard: the aim drifts in a slow figure 8, less when crouched.
+	var sway: float = Constants.SCOPE_SWAY_DEGREES * (0.5 if _is_crouching() else 1.0) if weapons.is_scoped() else 0.0
+	var phase: float = _time * Constants.SCOPE_SWAY_SPEED * TAU
+	_camera.sway = Vector2(sin(phase * 2.0) * 0.5, sin(phase)) * deg_to_rad(sway)
+
+
 func _physics_process(delta: float) -> void:
 	if health.is_dead():
 		return
@@ -71,8 +86,10 @@ func _physics_process(delta: float) -> void:
 
 func _look(relative: Vector2) -> void:
 	# Yaw turns the body so movement follows the view; pitch only tilts the head.
-	rotate_y(-relative.x * Settings.mouse_sensitivity)
-	_head.rotation.x = clampf(_head.rotation.x - relative.y * Settings.mouse_sensitivity, -_max_pitch, _max_pitch)
+	# Zoomed in, the same mouse movement turns the view less, so the aim stays as steady on screen.
+	var sensitivity: float = Settings.mouse_sensitivity * tan(deg_to_rad(_camera.fov) * 0.5) / tan(deg_to_rad(_base_fov) * 0.5)
+	rotate_y(-relative.x * sensitivity)
+	_head.rotation.x = clampf(_head.rotation.x - relative.y * sensitivity, -_max_pitch, _max_pitch)
 
 
 func _update_horizontal_velocity(delta: float) -> void:
@@ -89,6 +106,8 @@ func _update_horizontal_velocity(delta: float) -> void:
 func _target_speed(input: Vector2) -> float:
 	if _is_crouching():
 		return Constants.PLAYER_CROUCH_SPEED
+	if weapons.is_aiming():
+		return Constants.PLAYER_WALK_SPEED * weapons.weapon.aim_move_multiplier
 	# Sprinting only counts while moving forward, so you cannot sprint backwards or sideways.
 	if Input.is_action_pressed("sprint") and input.y < 0.0:
 		return Constants.PLAYER_SPRINT_SPEED
@@ -117,8 +136,8 @@ func _apply_height(height: float) -> void:
 	_head.position.y = height - Constants.PLAYER_EYE_BELOW_TOP
 
 
-func _on_fired() -> void:
-	_camera.kick(weapons.weapon.recoil_pitch, weapons.weapon.recoil_yaw)
+func _on_fired(rounds: int) -> void:
+	_camera.kick(weapons.weapon.recoil_pitch * rounds, weapons.weapon.recoil_yaw * rounds)
 
 
 func _respawn() -> void:

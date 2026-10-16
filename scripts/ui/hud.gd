@@ -10,6 +10,7 @@ const SPENT_COLOR: Color = Color(0.9, 0.3, 0.25, 1)
 @onready var _health_bar: ProgressBar = %HealthBar
 @onready var _damage_vignette: TextureRect = %DamageVignette
 @onready var _crosshair: Crosshair = %Crosshair
+@onready var _scope: ScopeOverlay = %ScopeOverlay
 @onready var _points_label: Label = %PointsLabel
 @onready var _points_popups: Control = %PointsPopups
 @onready var _wave_label: Label = %WaveLabel
@@ -18,6 +19,7 @@ const SPENT_COLOR: Color = Color(0.9, 0.3, 0.25, 1)
 @onready var _prompt_label: Label = %PromptLabel
 
 var _weapons: WeaponHolder
+var _dead: bool = false
 var _vignette_tween: Tween
 # Vignette strength that stays on screen while hurt, so low health is visible without looking at the bar.
 var _hurt_level: float = 0.0
@@ -33,6 +35,14 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if _weapons and not _dead:
+		# Down the sights the gun's own sights are the crosshair; through the scope the reticle is.
+		_scope.visible = _weapons.is_scoped()
+		_crosshair.visible = _weapons.aim_amount < 0.5
+		var camera: Camera3D = get_viewport().get_camera_3d()
+		if camera:
+			var half_fov: float = deg_to_rad(camera.fov) * 0.5
+			_crosshair.set_spread(tan(deg_to_rad(_weapons.current_bloom())) / tan(half_fov) * size.y * 0.5)
 	# The UI keeps running under the pause menu; the countdown must not.
 	if _countdown_left < 0.0 or get_tree().paused:
 		return
@@ -147,6 +157,8 @@ func _show_banner(text: String) -> void:
 
 
 func _on_player_died() -> void:
+	_dead = true
+	_scope.hide()
 	_crosshair.hide()
 	_status_label.text = ""
 	_prompt_label.text = ""

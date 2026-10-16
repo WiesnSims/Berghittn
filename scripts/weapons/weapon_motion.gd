@@ -34,6 +34,7 @@ extends Node3D
 @export var smoothing: float = 12.0
 
 var _player: Player
+@onready var _holder: WeaponHolder = get_parent()
 var _bob_phase: float = 0.0
 var _bob_amount: float = 0.0
 var _sprint: float = 0.0
@@ -76,16 +77,18 @@ func _process(delta: float) -> void:
 	_land_dip = lerpf(_land_dip, 0.0, minf(land_recover * delta, 1.0))
 	_look_lag = _look_lag.lerp(Vector2.ZERO, minf(look_lag_recover * delta, 1.0))
 
+	# Aimed, the gun is held tight to the eye: barely any bob, lag or lean.
+	var loose: float = 1.0 - 0.85 * _holder.aim_eased()
 	# Figure 8: side to side once per two steps, up and down once per step.
-	var bob := Vector3(sin(_bob_phase) * bob_side, -absf(cos(_bob_phase)) * bob_up, 0.0) * _bob_amount
+	var bob := Vector3(sin(_bob_phase) * bob_side, -absf(cos(_bob_phase)) * bob_up, 0.0) * _bob_amount * loose
 	var air: float = 0.0 if on_floor else clampf(-velocity.y * air_lag_per_speed, -air_lag_max, air_lag_max)
 	var eased_sprint: float = smoothstep(0.0, 1.0, _sprint)
 	var target_position: Vector3 = bob + sprint_offset * eased_sprint + Vector3(0.0, air - _land_dip, 0.0)
 	# The gun trails the view: turning right leaves it a little to the left, looking up leaves it low.
 	var target_rotation := Vector3(
-		deg_to_rad(sprint_rotation.x * eased_sprint + _look_lag.y),
-		deg_to_rad(sprint_rotation.y * eased_sprint + _look_lag.x),
-		deg_to_rad(sprint_rotation.z * eased_sprint - local.x / Constants.PLAYER_WALK_SPEED * strafe_roll))
+		deg_to_rad(sprint_rotation.x * eased_sprint + _look_lag.y * loose),
+		deg_to_rad(sprint_rotation.y * eased_sprint + _look_lag.x * loose),
+		deg_to_rad(sprint_rotation.z * eased_sprint - local.x / Constants.PLAYER_WALK_SPEED * strafe_roll * loose))
 	var weight: float = minf(smoothing * delta, 1.0)
 	_position = _position.lerp(target_position, weight)
 	_rotation = _rotation.lerp(target_rotation, weight)

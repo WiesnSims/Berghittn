@@ -6,7 +6,7 @@ messages = {
 [&"", &"UI_TITLE"]: [&"Berghittn"],
 [&"", &"UI_TAGLINE"]: [&"Schneesturm. Untote. Oane Hüttn."],
 [&"", &"UI_CLICK_TO_PLAY"]: [&"Klick zum Spielen"],
-[&"", &"UI_CONTROLS"]: [&"WASD gehen  ·  Maus schauen  ·  LMT schießen  ·  V Nahkampf  ·  R nachladen  ·  1 / 2 / Mausrad Waffe wechseln  ·  E benutzen  ·  Leertaste springen  ·  Shift sprinten  ·  C ducken  ·  Esc Pause  ·  F3 Debug"],
+[&"", &"UI_CONTROLS"]: [&"WASD gehen  ·  Maus schauen  ·  LMT schießen  ·  RMT zielen / beide Läufe  ·  V Nahkampf  ·  R nachladen  ·  1 / 2 / Mausrad Waffe wechseln  ·  E benutzen  ·  Leertaste springen  ·  Shift sprinten  ·  C ducken  ·  Esc Pause  ·  F3 Debug"],
 [&"", &"UI_PAUSE_TITLE"]: [&"Pause"],
 [&"", &"UI_PAUSE_HINT"]: [&"A kurze Jausn, dann geht's weida."],
 [&"", &"UI_RESUME"]: [&"Weiter"],

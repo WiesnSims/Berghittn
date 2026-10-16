@@ -6,7 +6,8 @@ extends Node3D
 signal ammo_changed(mag: int, reserve: int)
 signal reload_started(duration: float)
 signal reload_finished
-signal fired
+## A shot went off; `rounds` > 1 when several went at once (both barrels).
+signal fired(rounds: int)
 ## The gun in hand changed (switch, buy, replace).
 signal weapon_changed(data: WeaponData)
 ## Emitted when a shot hit an enemy, for the hit marker.
@@ -31,6 +32,12 @@ class GunSlot:
 
 ## The gun in hand and its ammo; written back to its slot when it is put away.
 var weapon: WeaponData
+## Extra spread (degrees) from shots fired in quick succession; see WeaponData bloom_*.
+var bloom: float = 0.0
+## 0 = hip fire, 1 = fully aimed (down the sights or through the scope).
+var aim_amount: float = 0.0
+## Holds right click without a mouse, for tests and capture tools.
+var force_aim: bool = false
 var mag: int = 0
 var reserve: int = 0
 var _slots: Array[GunSlot] = []
@@ -42,6 +49,7 @@ var _reload_target: int = 0
 var _switch_left: float = 0.0
 # Seconds until the gun is back up after a sprint and may fire.
 var _sprint_left: float = 0.0
+var _aiming: bool = false
 var _viewmodel: Viewmodel
 var _melee_viewmodel: MeleeViewmodel
 # Seconds left of the current swing, and until its blow lands (negative once it has).
@@ -128,6 +136,31 @@ func is_reloading() -> bool:
 	return _reload_left > 0.0
 
 
+## Aiming right now (right click held on a gun that aims). Movement slows down and sprint is off.
+func is_aiming() -> bool:
+	return _aiming
+
+
+## Looking through the scope: the overlay is up and the gun model is out of the way.
+func is_scoped() -> bool:
+	return weapon != null and weapon.secondary == WeaponData.Secondary.SCOPE and aim_amount >= Constants.SCOPE_SHOW_AT
+
+
+## Cone half-angle in degrees the next shot can stray: base spread plus bloom, tightened by aiming.
+func current_spread() -> float:
+	return (weapon.spread + bloom) * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
+
+
+## Bloom as it would widen the next shot (aiming tightens it like the base spread), for the crosshair.
+func current_bloom() -> float:
+	return bloom * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
+
+
+## Aim blend eased, for the camera zoom and the gun pose.
+func aim_eased() -> float:
+	return smoothstep(0.0, 1.0, aim_amount)
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	# Here and not in _physics_process: wheel "presses" are released in the same frame and would be missed.
 	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED or _melee_left > 0.0 or _slots.size() < 2:
@@ -144,12 +177,15 @@ func _physics_process(delta: float) -> void:
 	if weapon == null:
 		return
 	_cooldown = maxf(_cooldown - delta, 0.0)
+	bloom = move_toward(bloom, 0.0, weapon.bloom_recover * delta)
 	# Reloading on the run is fine, shooting is not: the gun is lowered until the sprint ends.
 	var player := _shooter as Player
 	if player and player.is_sprinting():
 		_sprint_left = Constants.SPRINT_TO_FIRE_TIME
 	else:
 		_sprint_left = maxf(_sprint_left - delta, 0.0)
+	var captured: bool = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+	_update_aim(delta, force_aim or (captured and Input.is_action_pressed("secondary")))
 	if _melee_left > 0.0:
 		_update_melee(delta)
 		return
@@ -170,6 +206,12 @@ func _physics_process(delta: float) -> void:
 		start_reload()
 		return
 	if _sprint_left > 0.0:
+		return
+	if weapon.secondary == WeaponData.Secondary.ALL_BARRELS and Input.is_action_just_pressed("secondary") and _cooldown <= 0.0:
+		if mag > 0:
+			fire_all()
+		else:
+			start_reload()
 		return
 	var wants_fire: bool = Input.is_action_pressed("fire") if weapon.is_auto else Input.is_action_just_pressed("fire")
 	if wants_fire and _cooldown <= 0.0:
@@ -230,6 +272,7 @@ func _select(index: int) -> void:
 	_current = index
 	var slot: GunSlot = _slots[index]
 	weapon = slot.data
+	bloom = 0.0
 	mag = slot.mag
 	reserve = slot.reserve
 	_viewmodel = slot.viewmodel
@@ -242,13 +285,30 @@ func _select(index: int) -> void:
 	ammo_changed.emit(mag, reserve)
 
 
-func _fire() -> void:
-	mag -= 1
+## Both barrels (ALL_BARRELS secondary): every loaded round in one blast.
+func fire_all() -> void:
+	_fire(mag)
+
+
+func _update_aim(delta: float, held: bool) -> void:
+	# Reloading, switching or swinging the shovel drops the aim; it comes back once the hands are free.
+	_aiming = held and weapon != null and weapon.can_aim() and not is_reloading() and _switch_left <= 0.0 and _melee_left <= 0.0
+	var speed: float = 1.0 / weapon.aim_time if weapon and weapon.aim_time > 0.0 else 1.0 / Constants.WEAPON_SWITCH_TIME
+	aim_amount = move_toward(aim_amount, 1.0 if _aiming else 0.0, speed * delta)
+	if _viewmodel:
+		_viewmodel.set_aim(aim_eased())
+		_viewmodel.visible = not is_scoped()
+
+
+func _fire(rounds: int = 1) -> void:
+	rounds = mini(rounds, mag)
+	mag -= rounds
+	bloom = minf(bloom + weapon.bloom_per_shot * rounds, weapon.bloom_max)
 	_cooldown = 1.0 / weapon.fire_rate
 	# Pellets that hit the same enemy land as one hit: one flinch, one hit marker and one set of
 	# points per shot, not one per pellet.
 	var hits: Dictionary = {}
-	for i: int in weapon.pellets:
+	for i: int in weapon.pellets * rounds:
 		_fire_ray(hits)
 	for receiver: Node in hits:
 		var hit: Dictionary = hits[receiver]
@@ -256,10 +316,10 @@ func _fire() -> void:
 		if result != Hurtbox.Result.IGNORED:
 			_hit_puffs.play(hit.position, hit.normal)
 			hit_confirmed.emit(hit.head, result == Hurtbox.Result.KILLED)
-	fired.emit()
+	fired.emit(rounds)
 	ammo_changed.emit(mag, reserve)
 	if _viewmodel:
-		_viewmodel.play_fire()
+		_viewmodel.play_fire(rounds)
 
 
 func _start_melee() -> void:
@@ -345,9 +405,10 @@ func _fire_ray(hits: Dictionary) -> void:
 func _spread_direction() -> Vector3:
 	var basis: Basis = global_basis
 	var forward: Vector3 = -basis.z
-	if weapon.spread <= 0.0:
+	var spread: float = current_spread()
+	if spread <= 0.0:
 		return forward
 	# Uniform over the cone's disc, so shots do not cluster in the middle.
-	var radius: float = tan(deg_to_rad(weapon.spread)) * sqrt(_rng.randf())
+	var radius: float = tan(deg_to_rad(spread)) * sqrt(_rng.randf())
 	var angle: float = _rng.randf() * TAU
 	return (forward + basis.x * cos(angle) * radius + basis.y * sin(angle) * radius).normalized()

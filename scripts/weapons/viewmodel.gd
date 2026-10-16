@@ -19,6 +19,8 @@ extends Node3D
 @export var slide_travel: float = 0.06
 ## Degrees the gun turns to show its side while racking.
 @export var chamber_turn: float = 50.0
+## Where the whole gun moves when fully aimed, so its sights sit on the middle of the screen. Metres.
+@export var aim_offset: Vector3 = Vector3.ZERO
 ## How far the gun drops out of view during a melee swing. Metres.
 @export var lower_drop: float = 0.3
 ## Where casings leave the gun (model space) and how they fly (camera space: right, up, back; m/s).
@@ -90,7 +92,7 @@ func _process(delta: float) -> void:
 		casing.visible = _casing_left[i] > 0.0
 
 
-func play_fire() -> void:
+func play_fire(_rounds: int = 1) -> void:
 	_flash_and_kick()
 	# Blowback: the slide slams back and returns, the casing flies out of the port as it does.
 	_parts_tween = create_tween()
@@ -99,13 +101,18 @@ func play_fire() -> void:
 	_eject_casing()
 
 
-func _flash_and_kick() -> void:
+## Aim pose blend (0 hip, 1 aimed), set every frame by the WeaponHolder.
+func set_aim(amount: float) -> void:
+	position = aim_offset * amount
+
+
+func _flash_and_kick(strength: float = 1.0) -> void:
 	_flash_left = Constants.MUZZLE_FLASH_TIME
 	_flash.visible = true
 	_flash.rotation.z = randf() * TAU
 	_flash_light.light_energy = _flash_energy
 	_restart_tween()
-	var kicked: Transform3D = _rest.translated_local(Vector3(0, 0, kick_distance)).rotated_local(Vector3.RIGHT, deg_to_rad(kick_angle))
+	var kicked: Transform3D = _rest.translated_local(Vector3(0, 0, kick_distance * strength)).rotated_local(Vector3.RIGHT, deg_to_rad(kick_angle * strength))
 	_model.transform = kicked
 	_tween.tween_property(_model, "transform", _rest, kick_time).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 

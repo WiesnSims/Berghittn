@@ -98,6 +98,11 @@ const GUN_SLOTS: int = 2
 const WEAPON_SWITCH_TIME: float = 0.45
 # Seconds from the end of a sprint until the raised gun can fire again (section 5: slower aiming).
 const SPRINT_TO_FIRE_TIME: float = 0.2
+# Scope (section 6): aim blend at which the overlay replaces the gun model, and the slow drift of the
+# aim while scoped (degrees and cycles per second; halved while crouched).
+const SCOPE_SHOW_AT: float = 0.95
+const SCOPE_SWAY_DEGREES: float = 0.35
+const SCOPE_SWAY_SPEED: float = 0.35
 
 # Weapon feedback.
 const MUZZLE_FLASH_TIME: float = 0.07

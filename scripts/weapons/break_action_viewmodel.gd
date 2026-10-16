@@ -19,8 +19,9 @@ func _ready() -> void:
 	_shells.visible = false
 
 
-func play_fire() -> void:
-	_flash_and_kick()
+func play_fire(rounds: int = 1) -> void:
+	# Both barrels at once kick a lot harder than one.
+	_flash_and_kick(1.0 + 0.6 * (rounds - 1))
 
 
 func play_reload(duration: float, _chamber_time: float = 0.0) -> void:

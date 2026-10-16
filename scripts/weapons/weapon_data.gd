@@ -2,6 +2,11 @@ class_name WeaponData
 extends Resource
 ## Every weapon is one of these. Tune numbers in the .tres files, never in code.
 
+## What right click does (section 6): every weapon gets a mode that suits it.
+## AIM: down the sights (hold). SCOPE: through a scope with an overlay (hold).
+## ALL_BARRELS: every loaded round in one blast (press).
+enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS }
+
 @export var id: StringName
 ## Translation key, not display text.
 @export var display_name: String
@@ -21,6 +26,11 @@ extends Resource
 @export var recoil_yaw: float = 0.0
 ## Cone half-angle in degrees.
 @export var spread: float = 0.0
+## Bloom: degrees each shot adds to the spread, the most it can add, and how fast it settles (deg/s).
+## The crosshair opens up by the same amount.
+@export var bloom_per_shot: float = 0.0
+@export var bloom_max: float = 0.0
+@export var bloom_recover: float = 4.0
 ## Metres.
 @export var range: float = 50.0
 @export var is_auto: bool = false
@@ -30,6 +40,17 @@ extends Resource
 ## Optional id of a behavior script for special weapons (section 6a). Empty = plain hitscan.
 @export var behavior: StringName
 @export var viewmodel: PackedScene
+@export var secondary: Secondary = Secondary.NONE
+## Aiming (AIM and SCOPE): field of view when fully aimed (degrees), seconds to get there, and the
+## spread and walking speed as a share of hip fire.
+@export var aim_fov: float = 60.0
+@export var aim_time: float = 0.18
+@export var aim_spread_multiplier: float = 0.3
+@export var aim_move_multiplier: float = 0.6
+
+
+func can_aim() -> bool:
+	return secondary == Secondary.AIM or secondary == Secondary.SCOPE
 
 
 func has_chamber() -> bool:

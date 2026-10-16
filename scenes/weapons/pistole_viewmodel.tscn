@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/weapons/viewmodel.gd" id="1"]
 
@@ -23,6 +23,14 @@ size = Vector3(0.032, 0.11, 0.05)
 material = SubResource("Metal")
 size = Vector3(0.026, 0.1, 0.04)
 
+[sub_resource type="BoxMesh" id="FrontSightMesh"]
+material = SubResource("Metal")
+size = Vector3(0.006, 0.013, 0.008)
+
+[sub_resource type="BoxMesh" id="RearSightMesh"]
+material = SubResource("Metal")
+size = Vector3(0.008, 0.012, 0.008)
+
 [sub_resource type="StandardMaterial3D" id="Flash"]
 transparency = 1
 blend_mode = 1
@@ -35,6 +43,7 @@ size = Vector2(0.12, 0.12)
 
 [node name="PistoleViewmodel" type="Node3D"]
 script = ExtResource("1")
+aim_offset = Vector3(-0.15, 0.106, -0.02)
 
 [node name="Model" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, -0.14, -0.42)
@@ -42,6 +51,21 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, -0.14, -0.42)
 [node name="Slide" type="MeshInstance3D" parent="Model"]
 cast_shadow = 0
 mesh = SubResource("Slide")
+
+[node name="FrontSight" type="MeshInstance3D" parent="Model/Slide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.027, -0.078)
+cast_shadow = 0
+mesh = SubResource("FrontSightMesh")
+
+[node name="RearSightLeft" type="MeshInstance3D" parent="Model/Slide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.009, 0.026, 0.075)
+cast_shadow = 0
+mesh = SubResource("RearSightMesh")
+
+[node name="RearSightRight" type="MeshInstance3D" parent="Model/Slide"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009, 0.026, 0.075)
+cast_shadow = 0
+mesh = SubResource("RearSightMesh")
 
 [node name="Grip" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 0.966, 0.259, 0, -0.259, 0.966, 0, -0.065, 0.055)

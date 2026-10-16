@@ -1,9 +1,11 @@
 extends Node
 ## Visual check of the map and the new guns. Needs a real window (not --headless):
-##   godot res://tests/zone_tour.tscn -- <out_dir> [zones|guns|motion]
+##   godot res://tests/zone_tour.tscn -- <out_dir> [zones|guns|motion|aim]
 ## zones: opens every door and saves one view per zone, plus the wall-buys and a door mid-swing.
 ## guns: buys the Jagdflinte and the Stutzen and saves frames of firing and reloading each.
 ## motion: frames of the pistol standing, walking, sprinting, turning, jumping and landing.
+## aim: the crosshair opening up under rapid fire, then the right-click modes: pistol down the sights,
+## both barrels of the Jagdflinte, the Stutzen scope.
 
 const VIEWS: Array = [
 	["stube", Vector3(-6.0, 2.2, 4.2), Vector3(3.0, 1.0, -4.0)],
@@ -40,6 +42,8 @@ func _ready() -> void:
 		await _guns(main)
 	elif mode == "motion":
 		await _motion(main)
+	elif mode == "aim":
+		await _aim(main)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -113,6 +117,39 @@ func _motion(main: Node) -> void:
 	await _save_series("turn", 3, 0.05)
 	player.velocity.y = Constants.PLAYER_JUMP_VELOCITY
 	await _save_series("jump", 10, 0.08)
+
+
+func _aim(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	var player := main.get_node("Player") as Player
+	var weapons: WeaponHolder = player.weapons
+	# At the far end of the Stube, looking at the west windows.
+	player.global_position = Vector3(5.0, 0.0, 1.0)
+	player.rotation.y = PI * 0.5
+	await get_tree().create_timer(0.3).timeout
+	await _save("crosshair_00")
+	for i: int in 4:
+		weapons._fire()
+		await get_tree().create_timer(0.12).timeout
+	await _save_series("crosshair_bloom", 2, 0.15)
+	await get_tree().create_timer(0.8).timeout
+	weapons.force_aim = true
+	await _save_series("pistol_aim", 4, 0.06)
+	weapons._fire()
+	await _save_series("pistol_aim_fire", 2, 0.05)
+	weapons.force_aim = false
+	await get_tree().create_timer(0.4).timeout
+	weapons.give_weapon(load("res://data/weapons/jagdflinte.tres"))
+	await get_tree().create_timer(0.6).timeout
+	weapons.fire_all()
+	await _save_series("shotgun_both", 4, 0.06)
+	weapons._select(0)
+	weapons.give_weapon(load("res://data/weapons/stutzen.tres"))
+	await get_tree().create_timer(0.6).timeout
+	weapons.force_aim = true
+	await _save_series("stutzen_scope", 6, 0.06)
+	await get_tree().create_timer(0.8).timeout
+	await _save_series("stutzen_sway", 3, 0.6)
 
 
 func _check_print(text: String) -> void:

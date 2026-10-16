@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/ui/crosshair.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/ui/scope_overlay.gd" id="3"]
 
 [sub_resource type="Gradient" id="VignetteGradient"]
 offsets = PackedFloat32Array(0.45, 1)
@@ -48,6 +49,18 @@ grow_vertical = 2
 mouse_filter = 2
 texture = SubResource("Vignette")
 expand_mode = 1
+
+[node name="ScopeOverlay" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("3")
 
 [node name="Crosshair" type="Control" parent="."]
 unique_name_in_owner = true

@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://scripts/weapons/bolt_action_viewmodel.gd" id="1"]
 
@@ -52,21 +52,41 @@ size = Vector3(0.008, 0.03, 0.008)
 
 [sub_resource type="BoxMesh" id="M6"]
 material = SubResource("Metal")
-size = Vector3(0.02, 0.02, 0.1)
+size = Vector3(0.032, 0.032, 0.24)
 
 [sub_resource type="BoxMesh" id="M7"]
 material = SubResource("Metal")
-size = Vector3(0.055, 0.012, 0.012)
+size = Vector3(0.044, 0.044, 0.05)
 
 [sub_resource type="BoxMesh" id="M8"]
-material = SubResource("Wood")
-size = Vector3(0.022, 0.022, 0.022)
+material = SubResource("Metal")
+size = Vector3(0.04, 0.04, 0.04)
 
 [sub_resource type="BoxMesh" id="M9"]
 material = SubResource("Metal")
-size = Vector3(0.022, 0.006, 0.055)
+size = Vector3(0.012, 0.03, 0.012)
 
 [sub_resource type="BoxMesh" id="M10"]
+material = SubResource("Metal")
+size = Vector3(0.012, 0.03, 0.012)
+
+[sub_resource type="BoxMesh" id="M11"]
+material = SubResource("Metal")
+size = Vector3(0.02, 0.02, 0.1)
+
+[sub_resource type="BoxMesh" id="M12"]
+material = SubResource("Metal")
+size = Vector3(0.055, 0.012, 0.012)
+
+[sub_resource type="BoxMesh" id="M13"]
+material = SubResource("Wood")
+size = Vector3(0.022, 0.022, 0.022)
+
+[sub_resource type="BoxMesh" id="M14"]
+material = SubResource("Metal")
+size = Vector3(0.022, 0.006, 0.055)
+
+[sub_resource type="BoxMesh" id="M15"]
 material = SubResource("Accent")
 size = Vector3(0.014, 0.035, 0.05)
 
@@ -82,6 +102,7 @@ lower_drop = 0.35
 ejection_port = Vector3(0.02, 0.035, 0.06)
 ejection_velocity = Vector3(1.8, 1.6, 0.3)
 casing_size = Vector3(0.01, 0.01, 0.045)
+aim_offset = Vector3(-0.14, 0.085, 0.12)
 [node name="Model" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0.14, -0.16, -0.4)
 
@@ -115,23 +136,48 @@ transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, -0.065, 0.05)
 cast_shadow = 0
 mesh = SubResource("M5")
 
+[node name="Scope" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.075, -0.02)
+cast_shadow = 0
+mesh = SubResource("M6")
+
+[node name="ScopeFront" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.075, -0.15)
+cast_shadow = 0
+mesh = SubResource("M7")
+
+[node name="ScopeRear" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.075, 0.12)
+cast_shadow = 0
+mesh = SubResource("M8")
+
+[node name="MountFront" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.05, -0.08)
+cast_shadow = 0
+mesh = SubResource("M9")
+
+[node name="MountRear" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.05, 0.07)
+cast_shadow = 0
+mesh = SubResource("M10")
+
 [node name="Bolt" type="Node3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.024, 0.06)
 
 [node name="Body" type="MeshInstance3D" parent="Model/Bolt"]
 transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0, 0)
 cast_shadow = 0
-mesh = SubResource("M6")
+mesh = SubResource("M11")
 
 [node name="Arm" type="MeshInstance3D" parent="Model/Bolt"]
 transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0.03, 0, 0.03)
 cast_shadow = 0
-mesh = SubResource("M7")
+mesh = SubResource("M12")
 
 [node name="Knob" type="MeshInstance3D" parent="Model/Bolt"]
 transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0.06, 0, 0.03)
 cast_shadow = 0
-mesh = SubResource("M8")
+mesh = SubResource("M13")
 
 [node name="Clip" type="Node3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.05, 0.02)
@@ -139,12 +185,12 @@ transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.05, 0.02)
 [node name="Strip" type="MeshInstance3D" parent="Model/Clip"]
 transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.015, 0)
 cast_shadow = 0
-mesh = SubResource("M9")
+mesh = SubResource("M14")
 
 [node name="Rounds" type="MeshInstance3D" parent="Model/Clip"]
 transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, -0.005, 0)
 cast_shadow = 0
-mesh = SubResource("M10")
+mesh = SubResource("M15")
 
 [node name="MuzzleFlash" type="Node3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.022, -0.67)

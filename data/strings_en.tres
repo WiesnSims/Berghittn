@@ -6,7 +6,7 @@ messages = {
 [&"", &"UI_TITLE"]: [&"Berghittn"],
 [&"", &"UI_TAGLINE"]: [&"Snowstorm. Undead. One hut."],
 [&"", &"UI_CLICK_TO_PLAY"]: [&"Click to play"],
-[&"", &"UI_CONTROLS"]: [&"WASD move  ·  Mouse look  ·  LMB shoot  ·  V melee  ·  R reload  ·  1 / 2 / wheel switch gun  ·  E use  ·  Space jump  ·  Shift sprint  ·  C crouch  ·  Esc pause  ·  F3 debug"],
+[&"", &"UI_CONTROLS"]: [&"WASD move  ·  Mouse look  ·  LMB shoot  ·  RMB aim / both barrels  ·  V melee  ·  R reload  ·  1 / 2 / wheel switch gun  ·  E use  ·  Space jump  ·  Shift sprint  ·  C crouch  ·  Esc pause  ·  F3 debug"],
 [&"", &"UI_PAUSE_TITLE"]: [&"Paused"],
 [&"", &"UI_PAUSE_HINT"]: [&"A quick Jause, then back to it."],
 [&"", &"UI_RESUME"]: [&"Resume"],

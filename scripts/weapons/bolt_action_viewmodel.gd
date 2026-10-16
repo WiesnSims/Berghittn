@@ -25,7 +25,7 @@ func _ready() -> void:
 	_clip.visible = false
 
 
-func play_fire() -> void:
+func play_fire(_rounds: int = 1) -> void:
 	_flash_and_kick()
 	_parts_tween = create_tween()
 	_parts_tween.tween_interval(bolt_delay)

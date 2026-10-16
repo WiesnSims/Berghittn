@@ -2,7 +2,8 @@ extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/m4_zones.tscn
 ## Headless M4 check on the real main scene: unlock all six zones through their doors (points from the
 ## debug key), spawn activation after every purchase, navmesh paths through opened doors, the shotgun and
-## rifle wall-buys, ammo refills at half price, gun slots and switching, and one set of points per shotgun blast.
+## rifle wall-buys, ammo refills at half price, gun slots and switching, one set of points per shotgun blast,
+## and the right-click modes: pistol sights, Stutzen scope, both barrels of the Jagdflinte.
 
 const ALL_ZONES: Array[StringName] = [&"stube", &"kueche", &"terrasse", &"skiraum", &"schuppen", &"seilbahn"]
 
@@ -158,6 +159,7 @@ func _run() -> void:
 
 	await _check_wall_buys()
 	await _check_shotgun_points()
+	await _check_secondary_modes()
 
 	print("RESULT: ", "PASS" if failures.is_empty() else "FAIL (%d)" % failures.size())
 	get_tree().quit(0 if failures.is_empty() else 1)
@@ -236,3 +238,65 @@ func _check_shotgun_points() -> void:
 	var gained: int = player.points.total - before
 	_check(not enemy.is_alive() and kills[0] == 1 and (gained == Constants.POINTS_KILL_BODY or gained == Constants.POINTS_KILL_HEADSHOT),
 		"one shotgun blast: %d kill(s), %d points (not one payout per pellet)" % [kills[0], gained])
+
+
+func _aim_for(weapons: WeaponHolder, seconds: float) -> void:
+	weapons.force_aim = true
+	await _frames(int(seconds * 60.0) + 2)
+
+
+func _check_secondary_modes() -> void:
+	var weapons: WeaponHolder = player.weapons
+	var camera := player.get_node("Head/Camera3D") as Camera3D
+	var hud := main.get_node("UI/Hud") as Hud
+	# Jagdflinte in hand from the shotgun test: right click empties both barrels in one blast.
+	weapons.mag = 2
+	weapons._cooldown = 0.0
+	var cam := camera as CameraRecoil
+	cam._target = Vector2.ZERO
+	weapons.fire_all()
+	_check(weapons.mag == 0 and is_equal_approx(cam._target.x, deg_to_rad(weapons.weapon.recoil_pitch * 2.0)),
+		"both barrels: gun empty, double recoil (%.1f deg)" % rad_to_deg(cam._target.x))
+	await _aim_for(weapons, 0.5)
+	_check(not weapons.is_aiming() and weapons.aim_amount == 0.0, "the Jagdflinte does not aim")
+	weapons.force_aim = false
+
+	# Stutzen: scope.
+	weapons._select(weapons._slot_of(load("res://data/weapons/stutzen.tres")))
+	weapons.mag = 6
+	await _frames(int(Constants.WEAPON_SWITCH_TIME * 60) + 2)
+	await _aim_for(weapons, weapons.weapon.aim_time + 0.2)
+	await _frames(2)
+	_check(weapons.is_scoped() and not weapons._viewmodel.visible and (hud.get_node("ScopeOverlay") as Control).visible,
+		"Stutzen scoped: overlay up, gun model hidden")
+	_check(absf(camera.fov - weapons.weapon.aim_fov) < 0.5, "scope zooms to %.0f deg (now %.1f)" % [weapons.weapon.aim_fov, camera.fov])
+	_check(player._target_speed(Vector2(0, -1)) < Constants.PLAYER_WALK_SPEED * 0.5, "walking slowly while scoped, no sprint")
+	var widest: float = 0.0
+	for i: int in 200:
+		widest = maxf(widest, rad_to_deg(weapons._spread_direction().angle_to(-weapons.global_basis.z)))
+	_check(widest <= weapons.weapon.spread * weapons.weapon.aim_spread_multiplier + 0.01, "scoped spread %.3f deg (hip %.1f)" % [widest, weapons.weapon.spread])
+	weapons._fire()
+	weapons.start_reload()
+	await _frames(3)
+	_check(not weapons.is_aiming() and not weapons.is_scoped(), "reloading drops the scope")
+	weapons._finish_reload()
+	weapons.force_aim = false
+	await _frames(30)
+	_check(absf(camera.fov - player._base_fov) < 0.5, "zoom back to %.0f after letting go" % player._base_fov)
+
+	# Bloom: quick shots open the spread (and the crosshair) up to a limit, then it settles.
+	weapons.bloom = 0.0
+	var hip: float = weapons.current_spread()
+	for i: int in 3:
+		weapons._fire()
+	var bloomed: float = weapons.current_spread()
+	_check(is_equal_approx(weapons.bloom, weapons.weapon.bloom_max) and bloomed > hip,
+		"3 quick shots: spread %.1f -> %.1f deg, capped at +%.1f" % [hip, bloomed, weapons.weapon.bloom_max])
+	await _frames(int(weapons.weapon.bloom_max / weapons.weapon.bloom_recover * 60.0) + 5)
+	_check(weapons.bloom == 0.0, "bloom settles back to 0")
+
+	# Pistol is gone (replaced by the Stutzen); buy it back is not possible, so check its data and a fresh holder pose.
+	var pistol: WeaponData = load("res://data/weapons/pistole.tres")
+	_check(pistol.secondary == WeaponData.Secondary.AIM and pistol.can_aim(), "pistol right click aims down the sights")
+	var shotgun: WeaponData = load("res://data/weapons/jagdflinte.tres")
+	_check(shotgun.secondary == WeaponData.Secondary.ALL_BARRELS, "Jagdflinte right click fires both barrels")

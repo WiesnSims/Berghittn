@@ -6,6 +6,8 @@ extends Camera3D
 # Offset the view is heading for, and where it is now (radians, x = pitch, y = yaw).
 var _target: Vector2 = Vector2.ZERO
 var _current: Vector2 = Vector2.ZERO
+## Extra drift on top (radians, x = pitch, y = yaw), set every frame by the player (scope sway).
+var sway: Vector2 = Vector2.ZERO
 
 
 func kick(pitch_degrees: float, yaw_degrees: float) -> void:
@@ -15,4 +17,4 @@ func kick(pitch_degrees: float, yaw_degrees: float) -> void:
 func _process(delta: float) -> void:
 	_target = _target.lerp(Vector2.ZERO, minf(Constants.RECOIL_RECOVER_SPEED * delta, 1.0))
 	_current = _current.lerp(_target, minf(Constants.RECOIL_SNAP_SPEED * delta, 1.0))
-	rotation = Vector3(_current.x, _current.y, 0.0)
+	rotation = Vector3(_current.x + sway.x, _current.y + sway.y, 0.0)
