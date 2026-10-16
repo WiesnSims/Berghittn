@@ -1,5 +1,6 @@
 extends Label
 ## FPS and position readout for checking performance and movement in browser builds. Toggle with F3.
+## While it is on, F4 adds points, for testing doors and wall-buys without playing for them.
 
 var _since_refresh: float = 0.0
 
@@ -7,6 +8,10 @@ var _since_refresh: float = 0.0
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_debug"):
 		visible = not visible
+	elif visible and event.is_action_pressed("debug_points"):
+		var player := get_tree().get_first_node_in_group("player") as Player
+		if player:
+			player.points.add(Constants.DEBUG_POINTS)
 
 
 func _process(delta: float) -> void:

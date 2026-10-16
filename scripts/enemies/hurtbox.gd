@@ -10,5 +10,8 @@ enum Result { IGNORED, HIT, KILLED }
 
 
 func take_hit(damage: int, headshot_multiplier: float, is_melee: bool, source: Node3D) -> Result:
-	var amount: int = roundi(damage * headshot_multiplier) if is_head else damage
-	return receiver.receive_hit(amount, is_head, is_melee, source)
+	return receiver.receive_hit(damage_for(damage, headshot_multiplier), is_head, is_melee, source)
+
+
+func damage_for(damage: int, headshot_multiplier: float) -> int:
+	return roundi(damage * headshot_multiplier) if is_head else damage

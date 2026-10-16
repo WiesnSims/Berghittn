@@ -1,0 +1,120 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="1"]
+[ext_resource type="Material" path="res://assets/materials/greybox_snow.tres" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/props/table_set.tscn" id="3"]
+[ext_resource type="Material" path="res://assets/materials/greybox_lamp.tres" id="4"]
+[ext_resource type="Script" path="res://scripts/zones/spawn_point.gd" id="5"]
+
+[sub_resource type="BoxShape3D" id="BoxShape1"]
+size = Vector3(14.6, 3, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape2"]
+size = Vector3(0.3, 3, 12.3)
+
+[node name="Terrasse" type="Node3D"]
+
+[node name="Fence" type="CSGCombiner3D" parent="."]
+use_collision = true
+
+[node name="SouthWest" type="CSGBox3D" parent="Fence"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.05, 0.2, 17.3)
+size = Vector3(2.5, 1, 0.15)
+material = ExtResource("1")
+
+[node name="SouthMiddle" type="CSGBox3D" parent="Fence"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0.2, 17.3)
+size = Vector3(4.9, 1, 0.15)
+material = ExtResource("1")
+
+[node name="SouthEast" type="CSGBox3D" parent="Fence"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.15, 0.2, 17.3)
+size = Vector3(3.7, 1, 0.15)
+material = ExtResource("1")
+
+[node name="WestNorth" type="CSGBox3D" parent="Fence"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.15, 0.2, 8)
+size = Vector3(0.15, 1, 5.4)
+material = ExtResource("1")
+
+[node name="WestSouth" type="CSGBox3D" parent="Fence"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.15, 0.2, 14.8)
+size = Vector3(0.15, 1, 5)
+material = ExtResource("1")
+
+[node name="PlayerBlockers" type="Node3D" parent="."]
+
+[node name="South" type="StaticBody3D" parent="PlayerBlockers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 1.2, 17.3)
+collision_layer = 8
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="PlayerBlockers/South"]
+shape = SubResource("BoxShape1")
+
+[node name="West" type="StaticBody3D" parent="PlayerBlockers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.15, 1.2, 11.3)
+collision_layer = 8
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="PlayerBlockers/West"]
+shape = SubResource("BoxShape2")
+
+[node name="RampStube" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9806, -0.1961, 0, 0.1961, 0.9806, -1.5, -0.2971, 6.0206)
+use_collision = true
+size = Vector3(1.6, 0.3, 1.6297)
+material = ExtResource("2")
+
+[node name="RampSchuppen" type="CSGBox3D" parent="."]
+transform = Transform3D(0, -0.1961, -0.9806, 0, 0.9806, -0.1961, 1, 0, 0, 6.2794, -0.2971, 12.5)
+use_collision = true
+size = Vector3(1.6, 0.3, 1.6297)
+material = ExtResource("2")
+
+[node name="TableWest" parent="." instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, -0.3, 11.2)
+
+[node name="TableEast" parent="." instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, -0.3, 15.6)
+
+[node name="SnowPile" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.8, -0.1, 15.8)
+use_collision = true
+size = Vector3(1.6, 0.5, 1.4)
+material = ExtResource("2")
+
+[node name="LanternPost" type="CSGCylinder3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.6, 0.95, 16.8)
+radius = 0.06
+height = 2.5
+sides = 6
+material = ExtResource("1")
+
+[node name="Lantern" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.6, 2.3, 16.8)
+size = Vector3(0.25, 0.3, 0.25)
+material = ExtResource("4")
+
+[node name="LanternLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.6, 2.2, 16.6)
+light_color = Color(1, 0.75, 0.45, 1)
+light_energy = 0.9
+omni_range = 9
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="SouthWest" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -0.3, 21)
+script = ExtResource("5")
+zone = &"terrasse"
+
+[node name="SouthEast" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, -0.3, 21)
+script = ExtResource("5")
+zone = &"terrasse"
+
+[node name="West" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, -0.3, 11.5)
+script = ExtResource("5")
+zone = &"terrasse"

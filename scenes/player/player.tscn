@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/player.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player/player_health.gd" id="2"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" path="res://scripts/effects/effect_pool.gd" id="10"]
 [ext_resource type="PackedScene" path="res://scenes/effects/impact_puff.tscn" id="11"]
 [ext_resource type="PackedScene" path="res://scenes/effects/hit_puff.tscn" id="12"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_motion.gd" id="13"]
 
 [sub_resource type="CapsuleShape3D" id="Capsule"]
 resource_local_to_scene = true
@@ -40,6 +41,9 @@ near = 0.05
 script = ExtResource("3")
 starting_weapon = ExtResource("5")
 melee_weapon = ExtResource("6")
+
+[node name="Motion" type="Node3D" parent="Head/Camera3D/WeaponHolder"]
+script = ExtResource("13")
 
 [node name="ImpactMarks" type="Node3D" parent="Head/Camera3D/WeaponHolder"]
 script = ExtResource("4")

@@ -86,6 +86,24 @@ const BARRICADE_REPAIR_INTERVAL: float = 0.6
 # Distance from the repair spot inside the window within which E works.
 const INTERACT_RANGE: float = 1.7
 
+# Zones (section 4; door costs live in data/zone_table.tres).
+const DOOR_OPEN_TIME: float = 0.7
+# Where a buyer stands in front of a wall-buy: from the outline's centre down to the floor and into the room.
+const WALL_BUY_SPOT: Vector3 = Vector3(0.0, -1.5, -0.7)
+# Debug key (F4 while the F3 overlay is on): points added per press, for testing doors and wall-buys.
+const DEBUG_POINTS: int = 1000
+
+# Weapons: carried gun slots (section 6) and the time to draw a gun after switching or buying.
+const GUN_SLOTS: int = 2
+const WEAPON_SWITCH_TIME: float = 0.45
+# Seconds from the end of a sprint until the raised gun can fire again (section 5: slower aiming).
+const SPRINT_TO_FIRE_TIME: float = 0.2
+# Scope (section 6): aim blend at which the overlay replaces the gun model, and the slow drift of the
+# aim while scoped (degrees and cycles per second; halved while crouched).
+const SCOPE_SHOW_AT: float = 0.95
+const SCOPE_SWAY_DEGREES: float = 0.35
+const SCOPE_SWAY_SPEED: float = 0.35
+
 # Weapon feedback.
 const MUZZLE_FLASH_TIME: float = 0.07
 # Camera recoil: how fast the kick snaps in and how fast the view settles back (per second).

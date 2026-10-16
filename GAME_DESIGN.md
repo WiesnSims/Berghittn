@@ -128,7 +128,7 @@ All weapons are data-driven `Resource` files (`WeaponData`), never hardcoded.
 Fields: `id`, `display_name`, `damage`, `headshot_multiplier`, `fire_rate`,
 `mag_size`, `reserve_ammo`, `reload_time`, `spread`, `range`, `is_auto`,
 `pellets`, `cost`, `ammo_cost`, `behavior` (optional id of a script for special
-effects, see section 6a).
+effects, see section 6a), `secondary` (what right click does, see the rules below).
 
 | Id | Name | Type | Damage | Fire rate (shots/s) | Mag / Reserve | Cost |
 |---|---|---|---|---|---|---|
@@ -154,6 +154,19 @@ Rules:
   round still chambered loads mag + 1, reloading from empty loads mag (the rack chambers one
   from the new mag). Weapons start fully loaded and chambered. Guns without a chamber
   (`chamber_time` 0) stay at mag size.
+- **Right click = the weapon's secondary mode** (user decision, 2026-10-16). Every weapon gets
+  one that suits it, chosen per weapon in `WeaponData.secondary`; not every gun just aims.
+  Every new weapon, including the wonder weapons and melee weapons of section 6a, must get its own
+  fitting secondary mode when it is added.
+  - `pistole`: aim down the sights (hold): slight zoom, much tighter spread, slower walking,
+    no sprinting, weapon bob mostly gone.
+  - `stutzen`: hunting scope (Zielfernrohr, hold): strong zoom, scope overlay with crosshair,
+    almost no spread, a slow sway of the aim while scoped.
+  - `jagdflinte`: fire both barrels at once (press): all loaded shells in one blast, recoil per
+    shell; the gun is then empty.
+- Bloom (user request, 2026-10-16): each shot widens the spread a little (`bloom_per_shot`, capped
+  at `bloom_max`), and it settles back; the crosshair arms move apart by the same amount, so it stays
+  honest about where shots can go. Kept small: rapid fire loosens the aim, it does not ruin it.
 - Slots: 2 gun slots (wonder weapons and the hand mortar use a gun slot),
   1 melee slot (starts with the shovel, can be replaced), 1 equipment slot
   (stackable throwables, see section 6a).
@@ -335,6 +348,11 @@ fix console errors, commit. Stop and report after each milestone.
 - All six zones greybox-connected, door purchasing, spawn activation rules,
   shotgun and rifle wall-buys, ammo refill.
 - Acceptance: unlock all zones in a test run (debug key may add points).
+- Added by user request (2026-10-16): the surroundings must read as an Alm in the mountains: the
+  hut on a flat pasture plateau, the slope rising to the summit behind it and dropping into a
+  forested valley in front, snowy peaks showing through the storm, pitched snowy roofs, a yellow
+  trail sign, the cable car line, a hay barn, a wayside cross and a crossed-rail fence. Greybox
+  only; the art pass stays in M6.
 
 **M5 — Shrine, chest, more enemies**
 - Perks, Hüttentruhe, `tourist`, `knappe`, `perchte`, `krampus` boss wave.

@@ -7,6 +7,7 @@ enum Phase { BREAK, SPAWNING, CLEARING }
 
 @export var enemy_scene: PackedScene
 @export var wave_table: WaveTable
+@export var zones: ZoneMap
 
 ## Current wave number; 0 before wave 1 starts.
 var wave: int = 0
@@ -70,11 +71,15 @@ func _count_spawned() -> void:
 
 
 func _pick_spawn_point() -> Node3D:
-	# Zone activation rules (section 4) come with the zones in M4; until then every point is active.
-	var points: Array[Node] = get_tree().get_nodes_in_group("spawn_points")
+	# Only points of open zones and their neighbours (section 4), so enemies come from near the players.
+	var points: Array[SpawnPoint] = []
+	for node: Node in get_tree().get_nodes_in_group("spawn_points"):
+		var point := node as SpawnPoint
+		if point and zones.is_spawn_active(point.zone):
+			points.append(point)
 	if points.is_empty():
 		return null
-	return points[_rng.randi() % points.size()] as Node3D
+	return points[_rng.randi() % points.size()]
 
 
 func _check_cleared() -> void:

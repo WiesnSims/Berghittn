@@ -64,6 +64,30 @@ melee={
 "deadzone": 0.2,
 "events": [Object(InputEventKey,"physical_keycode":86)]
 }
+secondary={
+"deadzone": 0.2,
+"events": [Object(InputEventMouseButton,"button_index":2)]
+}
+weapon_next={
+"deadzone": 0.2,
+"events": [Object(InputEventMouseButton,"button_index":5), Object(InputEventKey,"physical_keycode":81)]
+}
+weapon_previous={
+"deadzone": 0.2,
+"events": [Object(InputEventMouseButton,"button_index":4)]
+}
+weapon_slot_1={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"physical_keycode":49)]
+}
+weapon_slot_2={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"physical_keycode":50)]
+}
+debug_points={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"physical_keycode":4194335)]
+}
 toggle_debug={
 "deadzone": 0.2,
 "events": [Object(InputEventKey,"physical_keycode":4194334)]

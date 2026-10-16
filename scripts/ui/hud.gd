@@ -2,11 +2,15 @@ class_name Hud
 extends Control
 ## In-game overlay for the local player: health, ammo, points, wave, interact prompt, crosshair and damage feedback.
 
+const SPENT_COLOR: Color = Color(0.9, 0.3, 0.25, 1)
+
 @onready var _ammo_label: Label = %AmmoLabel
+@onready var _weapon_label: Label = %WeaponLabel
 @onready var _status_label: Label = %StatusLabel
 @onready var _health_bar: ProgressBar = %HealthBar
 @onready var _damage_vignette: TextureRect = %DamageVignette
 @onready var _crosshair: Crosshair = %Crosshair
+@onready var _scope: ScopeOverlay = %ScopeOverlay
 @onready var _points_label: Label = %PointsLabel
 @onready var _points_popups: Control = %PointsPopups
 @onready var _wave_label: Label = %WaveLabel
@@ -15,6 +19,7 @@ extends Control
 @onready var _prompt_label: Label = %PromptLabel
 
 var _weapons: WeaponHolder
+var _dead: bool = false
 var _vignette_tween: Tween
 # Vignette strength that stays on screen while hurt, so low health is visible without looking at the bar.
 var _hurt_level: float = 0.0
@@ -30,6 +35,14 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if _weapons and not _dead:
+		# Down the sights the gun's own sights are the crosshair; through the scope the reticle is.
+		_scope.visible = _weapons.is_scoped()
+		_crosshair.visible = _weapons.aim_amount < 0.5
+		var camera: Camera3D = get_viewport().get_camera_3d()
+		if camera:
+			var half_fov: float = deg_to_rad(camera.fov) * 0.5
+			_crosshair.set_spread(tan(deg_to_rad(_weapons.current_bloom())) / tan(half_fov) * size.y * 0.5)
 	# The UI keeps running under the pause menu; the countdown must not.
 	if _countdown_left < 0.0 or get_tree().paused:
 		return
@@ -40,6 +53,7 @@ func _process(delta: float) -> void:
 func bind_player(player: Player) -> void:
 	_weapons = player.weapons
 	_weapons.ammo_changed.connect(_on_ammo_changed)
+	_weapons.weapon_changed.connect(_on_weapon_changed)
 	_weapons.reload_started.connect(_on_reload_changed.unbind(1))
 	_weapons.reload_finished.connect(_on_reload_changed)
 	_weapons.hit_confirmed.connect(_crosshair.show_hit)
@@ -49,6 +63,7 @@ func bind_player(player: Player) -> void:
 	player.points.changed.connect(_on_points_changed)
 	player.interactor.prompt_changed.connect(_on_prompt_changed)
 	_points_label.text = str(player.points.total)
+	_on_weapon_changed(_weapons.weapon)
 	_on_ammo_changed(_weapons.mag, _weapons.reserve)
 	_on_health_changed(player.health.current(), player.health.max_health)
 
@@ -56,6 +71,10 @@ func bind_player(player: Player) -> void:
 func _on_ammo_changed(mag: int, reserve: int) -> void:
 	_ammo_label.text = tr("UI_AMMO") % [mag, reserve]
 	_update_status()
+
+
+func _on_weapon_changed(data: WeaponData) -> void:
+	_weapon_label.text = tr(data.display_name)
 
 
 func _on_reload_changed() -> void:
@@ -91,11 +110,12 @@ func _on_damaged() -> void:
 
 func _on_points_changed(total: int, gained: int) -> void:
 	_points_label.text = str(total)
-	# Each gain floats up next to the total, so hits, kills and repairs are told apart at a glance.
+	# Each gain floats up next to the total, so hits, kills and repairs are told apart at a glance;
+	# purchases show as a red loss.
 	var popup := Label.new()
-	popup.text = tr("UI_POINTS_GAIN") % gained
+	popup.text = tr("UI_POINTS_GAIN") % gained if gained >= 0 else tr("UI_POINTS_SPENT") % -gained
 	popup.add_theme_font_size_override("font_size", 24)
-	popup.add_theme_color_override("font_color", _points_label.get_theme_color("font_color"))
+	popup.add_theme_color_override("font_color", _points_label.get_theme_color("font_color") if gained >= 0 else SPENT_COLOR)
 	popup.add_theme_color_override("font_outline_color", Color.BLACK)
 	popup.add_theme_constant_override("outline_size", 4)
 	popup.position = Vector2(_points_label.get_minimum_size().x + 12.0, 8.0 + randf() * 8.0)
@@ -137,6 +157,8 @@ func _show_banner(text: String) -> void:
 
 
 func _on_player_died() -> void:
+	_dead = true
+	_scope.hide()
 	_crosshair.hide()
 	_status_label.text = ""
 	_prompt_label.text = ""

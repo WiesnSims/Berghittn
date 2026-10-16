@@ -1,0 +1,63 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/zones/wall_buy.gd" id="1"]
+[ext_resource type="Resource" path="res://data/weapons/jagdflinte.tres" id="2"]
+[ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="3"]
+[ext_resource type="Material" path="res://assets/materials/greybox_chalk.tres" id="4"]
+
+[node name="WallBuyJagdflinte" type="Node3D"]
+script = ExtResource("1")
+weapon = ExtResource("2")
+
+[node name="Board" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.015)
+size = Vector3(1.45, 0.45, 0.03)
+material = ExtResource("3")
+
+[node name="Outline" type="Node3D" parent="."]
+
+[node name="Line0" type="CSGBox3D" parent="Outline"]
+transform = Transform3D(0.9923, -0.124, 0, 0.124, 0.9923, 0, 0, 0, 1, -0.36, 0.06, -0.035)
+size = Vector3(0.4977, 0.014, 0.006)
+material = ExtResource("4")
+
+[node name="Line1" type="CSGBox3D" parent="Outline"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, 0.09, -0.035)
+size = Vector3(0.754, 0.014, 0.006)
+material = ExtResource("4")
+
+[node name="Line2" type="CSGBox3D" parent="Outline"]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0.62, 0.065, -0.035)
+size = Vector3(0.064, 0.014, 0.006)
+material = ExtResource("4")
+
+[node name="Line3" type="CSGBox3D" parent="Outline"]
+transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, 0.285, 0.04, -0.035)
+size = Vector3(0.684, 0.014, 0.006)
+material = ExtResource("4")
+
+[node name="Line4" type="CSGBox3D" parent="Outline"]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, -0.05, 0.005, -0.035)
+size = Vector3(0.084, 0.014, 0.006)
+material = ExtResource("4")
+
+[node name="Line5" type="CSGBox3D" parent="Outline"]
+transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, -0.085, -0.03, -0.035)
+size = Vector3(0.084, 0.014, 0.006)
+material = ExtResource("4")
+
+[node name="Line6" type="CSGBox3D" parent="Outline"]
+transform = Transform3D(-0.979, 0.204, 0, -0.204, -0.979, 0, 0, 0, 1, -0.36, -0.08, -0.035)
+size = Vector3(0.5043, 0.014, 0.006)
+material = ExtResource("4")
+
+[node name="Line7" type="CSGBox3D" parent="Outline"]
+transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, -0.6, -0.05, -0.035)
+size = Vector3(0.174, 0.014, 0.006)
+material = ExtResource("4")
+
+[node name="Light" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.5)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 0.6
+omni_range = 2.5

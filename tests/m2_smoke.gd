@@ -44,7 +44,7 @@ func _run() -> void:
 	player = main.get_node("Player")
 	player.died.connect(_on_player_died)
 	await _wait(0.2)
-	var region := main.get_node("Stube/Navigation") as NavigationRegion3D
+	var region := main.get_node("World/Navigation") as NavigationRegion3D
 	print("NAV polygons: ", region.navigation_mesh.get_polygon_count())
 	var start_pos: Vector3 = player.global_position
 	print("PLAYER at ", start_pos)
@@ -95,8 +95,12 @@ func _run() -> void:
 	if enemy:
 		var shots: int = 0
 		while enemy.is_alive() and shots < 30:
-			var head: Vector3 = enemy.global_position + Vector3(0, 1.64, 0)
-			var cam := player.get_node("Head/Camera3D") as Camera3D
+			# The real head box: during an attack lunge the head is well forward of and below standing height.
+			var head: Vector3 = (enemy.get_node("Visual/HeadHurtbox/Shape") as Node3D).global_position
+			var cam := player.get_node("Head/Camera3D") as CameraRecoil
+			cam._target = Vector2.ZERO
+			cam._current = Vector2.ZERO
+			cam.rotation = Vector3.ZERO
 			var flat := Vector3(head.x, player.global_position.y, head.z)
 			player.look_at(flat, Vector3.UP)
 			var head_node := player.get_node("Head") as Node3D
