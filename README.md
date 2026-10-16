@@ -26,6 +26,21 @@ and writes `index.wasm.parts.json`. `web/wasm_parts_loader.js` (injected via the
 Gzip is done by us because Pages serves unknown extensions uncompressed.
 Needs `DecompressionStream` (Chrome 80+, Firefox 113+, Safari 16.4+).
 
+## Controls
+
+WASD / arrows move, mouse look, Space jump, Shift sprint (forward only), C crouch
+(not Ctrl: Ctrl+W closes the browser tab), E interact, Esc or P pause, F3 debug overlay
+(FPS and position).
+
+In browsers Esc never reaches the game; it releases pointer lock and the game pauses
+because the lock is gone. Resume stays disabled for ~1 s since Chrome refuses an
+immediate re-lock.
+
+## Physics layers
+
+1 `world`, 2 `player`, 3 `enemy`, 4 `player_blocker` (window openings: blocks players,
+lets enemies through later).
+
 ## Deploy
 
 Cloudflare Pages project `berghittn` -> https://berghittn.pages.dev

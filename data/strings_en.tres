@@ -1,0 +1,14 @@
+[gd_resource type="Translation" format=3]
+
+[resource]
+locale = "en"
+messages = {
+[&"", &"UI_TITLE"]: [&"Berghittn"],
+[&"", &"UI_TAGLINE"]: [&"Snowstorm. Undead. One hut."],
+[&"", &"UI_CLICK_TO_PLAY"]: [&"Click to play"],
+[&"", &"UI_CONTROLS"]: [&"WASD move  ·  Mouse look  ·  Space jump  ·  Shift sprint  ·  C crouch  ·  Esc pause  ·  F3 debug"],
+[&"", &"UI_PAUSE_TITLE"]: [&"Paused"],
+[&"", &"UI_PAUSE_HINT"]: [&"A quick Jause, then back to it."],
+[&"", &"UI_RESUME"]: [&"Resume"],
+[&"", &"UI_DEBUG_OVERLAY"]: [&"%d FPS   pos %.1f / %.1f / %.1f"]
+}

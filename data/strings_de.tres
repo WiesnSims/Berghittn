@@ -1,0 +1,14 @@
+[gd_resource type="Translation" format=3]
+
+[resource]
+locale = "de"
+messages = {
+[&"", &"UI_TITLE"]: [&"Berghittn"],
+[&"", &"UI_TAGLINE"]: [&"Schneesturm. Untote. Oane Hüttn."],
+[&"", &"UI_CLICK_TO_PLAY"]: [&"Klick zum Spielen"],
+[&"", &"UI_CONTROLS"]: [&"WASD gehen  ·  Maus schauen  ·  Leertaste springen  ·  Shift sprinten  ·  C ducken  ·  Esc Pause  ·  F3 Debug"],
+[&"", &"UI_PAUSE_TITLE"]: [&"Pause"],
+[&"", &"UI_PAUSE_HINT"]: [&"A kurze Jausn, dann geht's weida."],
+[&"", &"UI_RESUME"]: [&"Weiter"],
+[&"", &"UI_DEBUG_OVERLAY"]: [&"%d FPS   Pos %.1f / %.1f / %.1f"]
+}
