@@ -11,8 +11,29 @@ Browser-first wave-survival shooter. Design: see `GAME_DESIGN.md`.
 ## Build
 
 ```
-godot --headless --import                                   # first run only / after new assets
-godot --headless --export-release "Web" export/index.html
+godot --headless --import      # first run only / after adding assets
+node tools/build_web.mjs       # headless export + wasm packing, prints every file size
 ```
 
-Output goes to `export/` (gitignored).
+Output goes to `export/` (gitignored). The script exits non-zero if any file is over 20 MiB.
+
+### Why the wasm is packed
+
+The Godot 4.7 engine wasm is ~37.7 MiB, over Cloudflare Pages' 25 MiB per-file limit.
+`tools/build_web.mjs` gzips it (~9.7 MiB), splits it into parts if still above 16 MiB,
+and writes `index.wasm.parts.json`. `web/wasm_parts_loader.js` (injected via the preset's
+`html/head_include`) wraps `fetch` so Godot's loader receives the original wasm.
+Gzip is done by us because Pages serves unknown extensions uncompressed.
+Needs `DecompressionStream` (Chrome 80+, Firefox 113+, Safari 16.4+).
+
+## Deploy
+
+Cloudflare Pages project `berghittn` -> https://berghittn.pages.dev
+
+```
+npx wrangler@latest pages deploy export --project-name berghittn --branch main --commit-dirty=true
+```
+
+Note: in wrangler 4.15x, `pages project create` delegates to Workers by default; the
+project was created once with `--force` to get a classic Pages project. Do not pass
+`--force` on deploys.

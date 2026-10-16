@@ -1,3 +1,0 @@
-# Wasm parts are raw binary chunks; serving them as wasm lets Cloudflare compress them in transit.
-/*.wasm.part*
-  Content-Type: application/wasm
