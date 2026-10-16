@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PerkData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/perks/perk_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"jagertee"
+display_name = "PERK_JAGERTEE"
+description = "PERK_JAGERTEE_DESC"
+cost = 1500
+color = Color(0.65, 0.22, 0.12, 1)
+move_speed_bonus = 0.15

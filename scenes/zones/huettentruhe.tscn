@@ -1,0 +1,140 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/chest/huettentruhe.gd" id="1"]
+[ext_resource type="Resource" path="res://data/chest_pool.tres" id="2"]
+[ext_resource type="Material" path="res://assets/materials/greybox_metal.tres" id="3"]
+[ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="4"]
+
+[sub_resource type="StandardMaterial3D" id="Paint"]
+albedo_color = Color(0.13, 0.3, 0.22, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Flower"]
+albedo_color = Color(0.75, 0.16, 0.12, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Gold"]
+albedo_color = Color(0.85, 0.66, 0.28, 1)
+metallic = 0.7
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Inside"]
+shading_mode = 0
+albedo_color = Color(1, 0.82, 0.45, 1)
+
+[sub_resource type="BoxMesh" id="LidMesh"]
+material = SubResource("Paint")
+size = Vector3(1.34, 0.12, 0.76)
+
+[sub_resource type="BoxMesh" id="LidBand"]
+material = ExtResource("3")
+size = Vector3(0.06, 0.13, 0.78)
+
+[sub_resource type="BoxMesh" id="GlowMesh"]
+material = SubResource("Inside")
+size = Vector3(1.18, 0.02, 0.6)
+
+[node name="Huettentruhe" type="Node3D"]
+script = ExtResource("1")
+pool = ExtResource("2")
+
+[node name="Body" type="CSGCombiner3D" parent="."]
+use_collision = true
+
+[node name="Bottom" type="CSGBox3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -0.38)
+size = Vector3(1.3, 0.16, 0.72)
+material = SubResource("Paint")
+
+[node name="Front" type="CSGBox3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.31, -0.71)
+size = Vector3(1.3, 0.62, 0.06)
+material = SubResource("Paint")
+
+[node name="Back" type="CSGBox3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.31, -0.05)
+size = Vector3(1.3, 0.62, 0.06)
+material = SubResource("Paint")
+
+[node name="Left" type="CSGBox3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62, 0.31, -0.38)
+size = Vector3(0.06, 0.62, 0.72)
+material = SubResource("Paint")
+
+[node name="Right" type="CSGBox3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, 0.31, -0.38)
+size = Vector3(0.06, 0.62, 0.72)
+material = SubResource("Paint")
+
+[node name="FootL" type="CSGBox3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.55, 0.04, -0.38)
+size = Vector3(0.16, 0.08, 0.76)
+material = ExtResource("4")
+
+[node name="FootR" type="CSGBox3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 0.04, -0.38)
+size = Vector3(0.16, 0.08, 0.76)
+material = ExtResource("4")
+
+[node name="Panel0" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.32, 0.36, -0.745)
+size = Vector3(0.42, 0.32, 0.012)
+material = SubResource("Flower")
+
+[node name="Panel1" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32, 0.36, -0.745)
+size = Vector3(0.42, 0.32, 0.012)
+material = SubResource("Flower")
+
+[node name="Band0" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0.31, -0.748)
+size = Vector3(0.06, 0.62, 0.012)
+material = ExtResource("3")
+
+[node name="Band1" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.31, -0.748)
+size = Vector3(0.06, 0.62, 0.012)
+material = ExtResource("3")
+
+[node name="Lock" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.52, -0.752)
+size = Vector3(0.1, 0.12, 0.02)
+material = SubResource("Gold")
+
+[node name="InsideGlow" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17, -0.38)
+cast_shadow = 0
+mesh = SubResource("GlowMesh")
+
+[node name="LidPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.62, -0.02)
+
+[node name="Lid" type="MeshInstance3D" parent="LidPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, -0.36)
+mesh = SubResource("LidMesh")
+
+[node name="LidBand0" type="MeshInstance3D" parent="LidPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0.06, -0.36)
+mesh = SubResource("LidBand")
+
+[node name="LidBand1" type="MeshInstance3D" parent="LidPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.06, -0.36)
+mesh = SubResource("LidBand")
+
+[node name="Name" type="Label3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.36, -0.753)
+pixel_size = 0.0022
+text = "Hüttentruhe
+950"
+font_size = 48
+outline_size = 0
+modulate = Color(0.98, 0.92, 0.7, 1)
+
+[node name="Display" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, -0.38)
+
+[node name="Glow" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, -0.58)
+light_color = Color(1, 0.8, 0.45, 1)
+light_energy = 1.6
+omni_range = 3.5

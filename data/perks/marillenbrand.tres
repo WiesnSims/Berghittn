@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PerkData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/perks/perk_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"marillenbrand"
+display_name = "PERK_MARILLENBRAND"
+description = "PERK_MARILLENBRAND_DESC"
+cost = 2500
+color = Color(0.98, 0.6, 0.2, 1)
+reload_speed_bonus = 0.25
+revive_speed_bonus = 1.0

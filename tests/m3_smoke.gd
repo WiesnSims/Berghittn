@@ -35,7 +35,7 @@ var _modes: Dictionary = {}
 func _ready() -> void:
 	main = (load("res://scenes/main.tscn") as PackedScene).instantiate()
 	add_child(main)
-	Events.wave_started.connect(func(w: int) -> void:
+	Events.wave_started.connect(func(w: int, _boss: bool) -> void:
 		wave_start_time[w] = t
 		print("t=%.1f WAVE %d started (points %d)" % [t, w, player.points.total]))
 	Events.wave_cleared.connect(func(w: int) -> void:
@@ -222,6 +222,10 @@ func _repair_all() -> void:
 
 func _report() -> void:
 	print("--- report at t=%.1f" % t)
+	for node: Node in get_tree().get_nodes_in_group("enemies"):
+		var e := node as Enemy
+		if e.is_alive():
+			print("  still alive: %s at %s, state %s, mode %s" % [e.data.id, e.global_position, Enemy.State.keys()[e._state], _modes.get(e, -1)])
 	for w: int in [1, 2]:
 		var expected: int = waves.wave_table.enemy_count(w, 1)
 		_check(kills_in_wave.get(w, 0) == expected, "wave %d had %d kills, formula says %d" % [w, kills_in_wave.get(w, 0), expected])

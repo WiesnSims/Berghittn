@@ -8,7 +8,8 @@ signal died(enemy: Enemy)
 signal despawned(enemy: Enemy)
 
 ## QUEUED: waiting at a window another enemy is working. BREAKING: tearing boards off a barricade.
-enum State { INACTIVE, CHASING, QUEUED, BREAKING, CLIMBING, ATTACKING, DEAD }
+## LUNGING: crouching for and then flying through a leap at the player (Perchte).
+enum State { INACTIVE, CHASING, QUEUED, BREAKING, CLIMBING, ATTACKING, LUNGING, DEAD }
 
 @onready var _agent: NavigationAgent3D = $NavigationAgent3D
 @onready var _visual: Node3D = $Visual
@@ -19,6 +20,8 @@ enum State { INACTIVE, CHASING, QUEUED, BREAKING, CLIMBING, ATTACKING, DEAD }
 
 var data: EnemyData
 var health: int = 0
+## Health at spawn, for the boss bar.
+var max_health: int = 0
 var _state: State = State.INACTIVE
 var _target: Player
 var _model: Node3D
@@ -38,6 +41,14 @@ var _window: Barricade
 var _window_wall: Vector3
 var _window_forward: Vector3
 var _window_exit: Vector3
+var _lunge_cooldown_left: float = 0.0
+# Slowed (snow cannon; later dumplings and cow pats): speed factor and seconds left.
+var _slow_factor: float = 1.0
+var _slow_left: float = 0.0
+# Seconds into the current lunge (windup first, then the leap), its direction, and whether it struck.
+var _lunge_time: float = 0.0
+var _lunge_direction: Vector3
+var _lunge_struck: bool = false
 
 
 func _ready() -> void:
@@ -54,10 +65,17 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 			_model.queue_free()
 		_model = enemy_data.model.instantiate() as Node3D
 		_visual.add_child(_model)
+		_model.scale = Vector3.ONE * enemy_data.model_scale
+		for hurtbox: Hurtbox in _hurtboxes:
+			hurtbox.scale = Vector3.ONE * enemy_data.model_scale
 		_meshes.assign(_model.find_children("*", "MeshInstance3D", true, false))
 		_head_parts.assign(_model.find_children("*", "Node3D", true, false).filter(func(n: Node) -> bool: return n.is_in_group("head_part")))
 	data = enemy_data
 	health = data.health_for_wave(wave)
+	max_health = health
+	_lunge_cooldown_left = 0.0
+	_slow_left = 0.0
+	_slow_factor = 1.0
 	global_transform = at
 	velocity = Vector3.ZERO
 	_visual.transform = Transform3D.IDENTITY
@@ -69,6 +87,8 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 		part.visible = true
 	_set_active(true)
 	_state = State.CHASING
+	if data.is_boss:
+		Events.boss_spawned.emit(self)
 
 
 func is_alive() -> bool:
@@ -90,11 +110,18 @@ func receive_hit(amount: int, is_headshot: bool, is_melee: bool, source: Node3D)
 	return Hurtbox.Result.KILLED
 
 
+## Slows the enemy to `factor` of its speed for `duration` seconds; the stronger slow wins.
+func apply_slow(factor: float, duration: float) -> void:
+	if _slow_left <= 0.0 or factor <= _slow_factor:
+		_slow_factor = factor
+	_slow_left = maxf(_slow_left, duration)
+
+
 func _flinch(is_headshot: bool) -> void:
 	if _flinch_tween:
 		_flinch_tween.kill()
 	# Lean back from the hit (the model faces -Z, so +X rotation tips it backwards); headshots snap harder.
-	_model.rotation.x = Constants.ENEMY_FLINCH_HEAD if is_headshot else Constants.ENEMY_FLINCH_BODY
+	_model.rotation.x = (Constants.ENEMY_FLINCH_HEAD if is_headshot else Constants.ENEMY_FLINCH_BODY) * data.flinch_multiplier
 	_flinch_tween = create_tween()
 	_flinch_tween.tween_property(_model, "rotation:x", 0.0, Constants.ENEMY_FLINCH_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
@@ -133,6 +160,11 @@ func _pop_head() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_lunge_cooldown_left -= delta
+	if _slow_left > 0.0:
+		_slow_left -= delta
+		if _slow_left <= 0.0:
+			_slow_factor = 1.0
 	match _state:
 		State.CHASING:
 			_chase(delta)
@@ -142,6 +174,8 @@ func _physics_process(delta: float) -> void:
 			_break_window(delta)
 		State.ATTACKING:
 			_attack(delta)
+		State.LUNGING:
+			_lunge(delta)
 		State.DEAD:
 			_fall(delta)
 
@@ -154,18 +188,23 @@ func _chase(delta: float) -> void:
 	if _in_attack_range():
 		_start_attack()
 		return
+	if _can_lunge():
+		_start_lunge()
+		return
 	_repath_left -= delta
 	if _repath_left <= 0.0:
 		_repath_left = Constants.ENEMY_REPATH_INTERVAL
 		_agent.target_position = _target.global_position
 	# Must be polled every frame: it advances the path and fires link_reached.
 	var next: Vector3 = _agent.get_next_path_position()
+	if _near_window_link():
+		return
 	var direction: Vector3 = _flat(next - global_position)
 	if direction.length_squared() < 0.0001:
 		direction = _flat(_target.global_position - global_position)
 	direction = direction.normalized()
-	velocity.x = direction.x * data.speed
-	velocity.z = direction.z * data.speed
+	velocity.x = direction.x * data.speed * _slow_factor
+	velocity.z = direction.z * data.speed * _slow_factor
 	_apply_gravity(delta)
 	_face(direction, delta)
 	move_and_slide()
@@ -195,6 +234,77 @@ func _start_attack() -> void:
 	# Lean in during the windup, snap back as the hit lands.
 	_tween.tween_property(_visual, "rotation:x", -0.45, data.attack_windup).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	_tween.tween_property(_visual, "rotation:x", 0.0, 0.25)
+
+
+func _can_lunge() -> bool:
+	if data.lunge_range <= 0.0 or _lunge_cooldown_left > 0.0 or not is_on_floor():
+		return false
+	var offset: Vector3 = _target.global_position - global_position
+	return absf(offset.y) <= Constants.ENEMY_ATTACK_MAX_HEIGHT and _flat(offset).length() <= data.lunge_range and _clear_line_to_target()
+
+
+func _start_lunge() -> void:
+	_state = State.LUNGING
+	_lunge_time = 0.0
+	_lunge_struck = false
+	_kill_tween()
+	_visual.transform = Transform3D.IDENTITY
+	_tween = create_tween()
+	# Crouch and rear back, then throw the body forward for the leap.
+	_tween.tween_property(_visual, "position:y", -0.25, data.lunge_windup * 0.8).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_tween.parallel().tween_property(_visual, "rotation:x", 0.3, data.lunge_windup * 0.8)
+	_tween.tween_property(_visual, "position:y", 0.35, data.lunge_time * 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_tween.parallel().tween_property(_visual, "rotation:x", -0.7, data.lunge_time * 0.4)
+	_tween.tween_property(_visual, "position:y", 0.0, data.lunge_time * 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_tween.tween_property(_visual, "rotation:x", 0.0, 0.25)
+
+
+func _lunge(delta: float) -> void:
+	_lunge_time += delta
+	if _lunge_time < data.lunge_windup:
+		# The direction locks at take-off, so side-stepping during the crouch dodges the leap.
+		_halt(delta)
+		if _target:
+			_lunge_direction = _flat(_target.global_position - global_position).normalized()
+			_face(_lunge_direction, delta)
+		return
+	velocity.x = _lunge_direction.x * data.lunge_speed
+	velocity.z = _lunge_direction.z * data.lunge_speed
+	_apply_gravity(delta)
+	move_and_slide()
+	if not _lunge_struck and _target and _target.is_targetable() and _in_attack_range():
+		_lunge_struck = true
+		_target.take_damage(data.damage)
+	if _lunge_struck or _lunge_time >= data.lunge_windup + data.lunge_time:
+		_end_lunge()
+
+
+func _end_lunge() -> void:
+	_lunge_cooldown_left = data.lunge_cooldown
+	# Recover like after a swing: no second hit straight away.
+	_state = State.ATTACKING
+	_attack_time = data.attack_windup
+	_has_swung = true
+
+
+func _near_window_link() -> bool:
+	# A crowd at a window shoves its front man around, so he may never get within the agent's
+	# path_desired_distance of the link and link_reached never fires: the whole crowd stalls.
+	# Close enough to the window the path goes through counts as there.
+	var result: NavigationPathQueryResult3D = _agent.get_current_navigation_result()
+	var path: PackedVector3Array = result.path
+	var start: int = _agent.get_current_navigation_path_index()
+	for i: int in range(start, mini(start + 2, path.size())):
+		if result.path_types[i] != NavigationPathQueryResult3D.PATH_SEGMENT_TYPE_LINK:
+			continue
+		if _flat(path[i] - global_position).length() > Constants.ENEMY_LINK_REACH:
+			return false
+		var link := instance_from_id(result.path_owner_ids[i]) as NavigationLink3D
+		if link == null:
+			return false
+		_on_link_reached({"link_entry_position": link.to_global(link.start_position), "link_exit_position": link.to_global(link.end_position)})
+		return _state != State.CHASING
+	return false
 
 
 func _on_link_reached(details: Dictionary) -> void:
@@ -391,6 +501,10 @@ func _in_attack_range() -> bool:
 	var offset: Vector3 = _target.global_position - global_position
 	if absf(offset.y) > Constants.ENEMY_ATTACK_MAX_HEIGHT or _flat(offset).length() > data.attack_range:
 		return false
+	return _clear_line_to_target()
+
+
+func _clear_line_to_target() -> bool:
 	# Only in the same room: walls and window openings (player blockers) both stop the swing.
 	var chest := Vector3.UP * Constants.ENEMY_ATTACK_CHEST_HEIGHT
 	var query := PhysicsRayQueryParameters3D.create(global_position + chest, _target.global_position + chest, Constants.LAYER_WORLD | Constants.LAYER_PLAYER_BLOCKER)
@@ -419,7 +533,7 @@ func _face(direction: Vector3, delta: float) -> void:
 
 func _animate_walk(delta: float) -> void:
 	# Shambling bob and sway; enough to read as "walking" on a greybox model.
-	_walk_phase += delta * data.speed * 2.2
+	_walk_phase += delta * data.speed * _slow_factor * 2.2
 	_visual.position.y = absf(sin(_walk_phase)) * 0.06
 	_visual.rotation.z = sin(_walk_phase) * 0.06
 

@@ -7,6 +7,7 @@ signal died
 
 @onready var health: PlayerHealth = $Health
 @onready var points: PlayerPoints = $Points
+@onready var perks: PlayerPerks = $Perks
 @onready var interactor: Interactor = $Interactor
 @onready var weapons: WeaponHolder = $Head/Camera3D/WeaponHolder
 @onready var _head: Node3D = $Head
@@ -102,10 +103,14 @@ func _update_horizontal_velocity(delta: float) -> void:
 	var horizontal := Vector2(velocity.x, velocity.z).move_toward(Vector2(target.x, target.z), accel * delta)
 	velocity.x = horizontal.x
 	velocity.z = horizontal.y
-	_sprinting = speed == Constants.PLAYER_SPRINT_SPEED and horizontal.length() > Constants.PLAYER_WALK_SPEED * 0.8
+	_sprinting = speed == Constants.PLAYER_SPRINT_SPEED * perks.move_speed_multiplier() and horizontal.length() > Constants.PLAYER_WALK_SPEED * 0.8 * perks.move_speed_multiplier()
 
 
 func _target_speed(input: Vector2) -> float:
+	return _base_speed(input) * perks.move_speed_multiplier()
+
+
+func _base_speed(input: Vector2) -> float:
 	if _is_crouching():
 		return Constants.PLAYER_CROUCH_SPEED
 	if weapons.is_aiming():
@@ -139,7 +144,8 @@ func _apply_height(height: float) -> void:
 
 
 func _on_fired(rounds: int) -> void:
-	_camera.kick(weapons.weapon.recoil_pitch * rounds, weapons.weapon.recoil_yaw * rounds)
+	var strength: float = rounds * (weapons.weapon.rapid_recoil_multiplier if weapons.is_fanning() else 1.0)
+	_camera.kick(weapons.weapon.recoil_pitch * strength, weapons.weapon.recoil_yaw * strength)
 
 
 func _respawn() -> void:

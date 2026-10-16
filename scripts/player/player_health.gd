@@ -24,6 +24,19 @@ func _physics_process(delta: float) -> void:
 		changed.emit(current(), max_health)
 
 
+## A perk (Enzian) raises the maximum, and the new health comes with it.
+func raise_max(amount: int) -> void:
+	max_health += amount
+	_health += amount
+	changed.emit(current(), max_health)
+
+
+func reset_max() -> void:
+	max_health = Constants.PLAYER_MAX_HEALTH
+	_health = minf(_health, max_health)
+	changed.emit(current(), max_health)
+
+
 func current() -> int:
 	return ceili(_health)
 

@@ -24,6 +24,21 @@ extends Resource
 ## A headshot kill dealing at least this much damage in one hit pops the head (stylized, section 7).
 @export var head_pop_damage: int = 50
 @export var model: PackedScene
+## Size of the model and its hit boxes (the body capsule and navigation stay human-sized, so big
+## enemies still fit every path and window).
+@export var model_scale: float = 1.0
+## How far hits rock the model back (1 = full flinch); heavy enemies barely react.
+@export var flinch_multiplier: float = 1.0
+## Lunge (Perchte, section 7): from up to lunge_range metres away with a clear line, crouch for
+## lunge_windup seconds, then leap at lunge_speed for at most lunge_time, striking for `damage` on
+## contact. 0 range = no lunge. Seconds between lunges: lunge_cooldown.
+@export var lunge_range: float = 0.0
+@export var lunge_windup: float = 0.35
+@export var lunge_speed: float = 11.0
+@export var lunge_time: float = 0.35
+@export var lunge_cooldown: float = 3.0
+## Boss (Krampus): announced, gets a health bar, and is immune to crowd control (section 6a).
+@export var is_boss: bool = false
 
 
 func health_for_wave(wave: int) -> int:

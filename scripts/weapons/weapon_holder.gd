@@ -43,6 +43,9 @@ var reserve: int = 0
 var _slots: Array[GunSlot] = []
 var _current: int = -1
 var _cooldown: float = 0.0
+# A click that came in while the gun was still cycling; it fires as soon as it can, so fast clicking
+# is never swallowed.
+var _fire_buffer_left: float = 0.0
 var _reload_left: float = 0.0
 # What the running reload fills the gun to.
 var _reload_target: int = 0
@@ -50,6 +53,8 @@ var _switch_left: float = 0.0
 # Seconds until the gun is back up after a sprint and may fire.
 var _sprint_left: float = 0.0
 var _aiming: bool = false
+# Right click held on a gun that fans its action (FAN secondary).
+var _fanning: bool = false
 var _viewmodel: Viewmodel
 var _melee_viewmodel: MeleeViewmodel
 # Seconds left of the current swing, and until its blow lands (negative once it has).
@@ -128,6 +133,16 @@ func refill_ammo(data: WeaponData) -> void:
 		ammo_changed.emit(mag, reserve)
 
 
+## True when any carried gun is short of reserve ammo (the Lager's ammo crate).
+func needs_any_ammo() -> bool:
+	return _slots.any(func(slot: GunSlot) -> bool: return needs_ammo(slot.data))
+
+
+func refill_all() -> void:
+	for slot: GunSlot in _slots:
+		refill_ammo(slot.data)
+
+
 func gun_count() -> int:
 	return _slots.size()
 
@@ -146,14 +161,24 @@ func is_scoped() -> bool:
 	return weapon != null and weapon.secondary == WeaponData.Secondary.SCOPE and aim_amount >= Constants.SCOPE_SHOW_AT
 
 
+## Fanning the action right now (FAN secondary): faster, wilder shots that kick harder.
+func is_fanning() -> bool:
+	return _fanning
+
+
 ## Cone half-angle in degrees the next shot can stray: base spread plus bloom, tightened by aiming.
 func current_spread() -> float:
-	return (weapon.spread + bloom) * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
+	return (weapon.spread + bloom + _fan_spread()) * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
 
 
 ## Bloom as it would widen the next shot (aiming tightens it like the base spread), for the crosshair.
+## Fanning counts as bloom, so the crosshair shows how wild it gets.
 func current_bloom() -> float:
-	return bloom * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
+	return (bloom + _fan_spread()) * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
+
+
+func _fan_spread() -> float:
+	return weapon.rapid_spread if _fanning else 0.0
 
 
 ## Aim blend eased, for the camera zoom and the gun pose.
@@ -178,6 +203,8 @@ func _physics_process(delta: float) -> void:
 		return
 	_cooldown = maxf(_cooldown - delta, 0.0)
 	bloom = move_toward(bloom, 0.0, weapon.bloom_recover * delta)
+	# Set again below once the hands are free to work the action.
+	_fanning = false
 	# Reloading on the run is fine, shooting is not: the gun is lowered until the sprint ends.
 	var player := _shooter as Player
 	if player and player.is_sprinting():
@@ -207,14 +234,28 @@ func _physics_process(delta: float) -> void:
 		return
 	if _sprint_left > 0.0:
 		return
+	_fanning = weapon.secondary == WeaponData.Secondary.FAN and (force_aim or Input.is_action_pressed("secondary"))
+	if _fanning:
+		if _cooldown <= 0.0:
+			if mag > 0:
+				_fire()
+			else:
+				start_reload()
+		return
 	if weapon.secondary == WeaponData.Secondary.ALL_BARRELS and Input.is_action_just_pressed("secondary") and _cooldown <= 0.0:
 		if mag > 0:
 			fire_all()
 		else:
 			start_reload()
 		return
-	var wants_fire: bool = Input.is_action_pressed("fire") if weapon.is_auto else Input.is_action_just_pressed("fire")
+	if Input.is_action_just_pressed("fire"):
+		_fire_buffer_left = Constants.FIRE_BUFFER_TIME
+	else:
+		_fire_buffer_left = maxf(_fire_buffer_left - delta, 0.0)
+	# Semi-auto fires once per click, as fast as the clicks come (up to fire_rate).
+	var wants_fire: bool = Input.is_action_pressed("fire") if weapon.is_auto else _fire_buffer_left > 0.0
 	if wants_fire and _cooldown <= 0.0:
+		_fire_buffer_left = 0.0
 		if mag > 0:
 			_fire()
 		else:
@@ -229,11 +270,12 @@ func start_reload() -> void:
 		return
 	_reload_target = target
 	# Empty mag means the slide is locked back: chamber a round after the new mag is in.
-	var chamber: float = weapon.chamber_time if mag == 0 else 0.0
-	_reload_left = weapon.reload_time + chamber
+	var speed: float = _perks().reload_time_multiplier() if _perks() else 1.0
+	var chamber: float = weapon.chamber_time * speed if mag == 0 else 0.0
+	_reload_left = weapon.reload_time * speed + chamber
 	reload_started.emit(_reload_left)
 	if _viewmodel:
-		_viewmodel.play_reload(weapon.reload_time, chamber)
+		_viewmodel.play_reload(weapon.reload_time * speed, chamber)
 
 
 func _finish_reload() -> void:
@@ -249,6 +291,16 @@ func _cancel_reload() -> void:
 	if is_reloading():
 		_reload_left = 0.0
 		reload_finished.emit()
+
+
+func _perks() -> PlayerPerks:
+	var player := _shooter as Player
+	return player.perks if player else null
+
+
+## Damage after perks (Zirbenschnaps).
+func _damage(base: int) -> int:
+	return roundi(base * _perks().damage_multiplier()) if _perks() else base
 
 
 func _slot_of(data: WeaponData) -> int:
@@ -304,7 +356,7 @@ func _fire(rounds: int = 1) -> void:
 	rounds = mini(rounds, mag)
 	mag -= rounds
 	bloom = minf(bloom + weapon.bloom_per_shot * rounds, weapon.bloom_max)
-	_cooldown = 1.0 / weapon.fire_rate
+	_cooldown = 1.0 / (weapon.rapid_fire_rate if _fanning else weapon.fire_rate)
 	# Pellets that hit the same enemy land as one hit: one flinch, one hit marker and one set of
 	# points per shot, not one per pellet.
 	var hits: Dictionary = {}
@@ -371,7 +423,7 @@ func _melee_hit() -> void:
 		if line.collider != null:
 			continue
 		struck[hurtbox.receiver] = true
-		var result: Hurtbox.Result = hurtbox.take_hit(melee_weapon.damage, melee_weapon.headshot_multiplier, true, _shooter)
+		var result: Hurtbox.Result = hurtbox.take_hit(_damage(melee_weapon.damage), melee_weapon.headshot_multiplier, true, _shooter)
 		if result != Hurtbox.Result.IGNORED:
 			_hit_puffs.play(target, -to_target.normalized())
 			hit_confirmed.emit(false, result == Hurtbox.Result.KILLED)
@@ -385,21 +437,39 @@ func _cast(offset: Vector3, mask: int = Constants.LAYER_WORLD | Constants.LAYER_
 
 
 func _fire_ray(hits: Dictionary) -> void:
-	var hit: Dictionary = _cast(_spread_direction() * weapon.range)
-	if hit.collider == null:
-		return
-	var hurtbox := hit.collider as Hurtbox
-	if hurtbox == null:
-		_impact_marks.place(hit.position, hit.normal)
-		_impact_puffs.play(hit.position, hit.normal)
-		return
-	var amount: int = hurtbox.damage_for(weapon.damage, weapon.headshot_multiplier)
-	var total: Dictionary = hits.get(hurtbox.receiver, {"amount": 0, "head": false})
-	total.amount += amount
-	total.head = total.head or hurtbox.is_head
-	total.position = hit.position
-	total.normal = hit.normal
-	hits[hurtbox.receiver] = total
+	# One ray, re-cast past every enemy it goes through (penetration) until it stops in one or a wall.
+	var offset: Vector3 = _spread_direction() * weapon.range
+	var exclude: Array[RID] = _exclude.duplicate()
+	var share: float = 1.0
+	var pierced: int = 0
+	var last: Node = null
+	for i: int in Constants.MAX_RAY_STEPS:
+		var query := PhysicsRayQueryParameters3D.create(global_position, global_position + offset, Constants.LAYER_WORLD | Constants.LAYER_HITBOX, exclude)
+		query.collide_with_areas = true
+		var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
+		if hit.is_empty():
+			return
+		var hurtbox := hit.collider as Hurtbox
+		if hurtbox == null:
+			_impact_marks.place(hit.position, hit.normal)
+			_impact_puffs.play(hit.position, hit.normal)
+			return
+		exclude.append(hurtbox.get_rid())
+		# The ray can cross both boxes (head and body) of one enemy: that is still one body.
+		if hurtbox.receiver == last:
+			continue
+		last = hurtbox.receiver
+		var amount: int = roundi(hurtbox.damage_for(_damage(weapon.damage), weapon.headshot_multiplier) * share)
+		var total: Dictionary = hits.get(hurtbox.receiver, {"amount": 0, "head": false})
+		total.amount += amount
+		total.head = total.head or hurtbox.is_head
+		total.position = hit.position
+		total.normal = hit.normal
+		hits[hurtbox.receiver] = total
+		pierced += 1
+		if pierced > weapon.penetration:
+			return
+		share *= weapon.penetration_falloff
 
 
 func _spread_direction() -> Vector3:

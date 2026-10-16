@@ -16,7 +16,10 @@ var _break_left: float = Constants.FIRST_WAVE_DELAY
 var _to_spawn: int = 0
 var _alive: int = 0
 var _spawn_left: float = 0.0
-var _pool: Array[Enemy] = []
+# Pooled per enemy type: re-dressing a body as another type rebuilds its model, which hitches.
+var _pools: Dictionary = {}
+# Boss wave: the exact enemies still to come, boss first; empty in normal waves.
+var _queue: Array[EnemyData] = []
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 
@@ -41,21 +44,29 @@ func _physics_process(delta: float) -> void:
 
 func _start_wave(number: int) -> void:
 	wave = number
-	_to_spawn = wave_table.enemy_count(wave, get_tree().get_nodes_in_group("player").size())
+	_queue.clear()
+	if wave_table.is_boss_wave(wave):
+		_queue.append(wave_table.boss)
+		for i: int in wave_table.boss_escort_count:
+			_queue.append(wave_table.boss_escort)
+		_to_spawn = _queue.size()
+	else:
+		_to_spawn = wave_table.enemy_count(wave, get_tree().get_nodes_in_group("player").size())
 	# First enemy right away: the countdown already was the wait.
 	_spawn_left = 0.0
 	_phase = Phase.SPAWNING
-	Events.wave_started.emit(wave)
+	Events.wave_started.emit(wave, wave_table.is_boss_wave(wave))
 
 
 func _spawn() -> void:
 	var point: Node3D = _pick_spawn_point()
-	var data: EnemyData = wave_table.pick_enemy(wave, _rng)
+	var data: EnemyData = _queue.pop_front() if not _queue.is_empty() else wave_table.pick_enemy(wave, _rng)
 	if point == null or data == null:
 		push_warning("Wave %d: no spawn point or no enemy type; skipping a spawn." % wave)
 		_count_spawned()
 		return
-	var enemy: Enemy = _pool.pop_back() if not _pool.is_empty() else _create_enemy()
+	var pool: Array = _pools.get(data.id, [])
+	var enemy: Enemy = pool.pop_back() if not pool.is_empty() else _create_enemy()
 	var angle: float = _rng.randf() * TAU
 	var scatter := Vector3(cos(angle), 0.0, sin(angle)) * _rng.randf() * Constants.SPAWN_SCATTER_RADIUS
 	enemy.activate(data, wave, point.global_transform.translated(scatter))
@@ -105,4 +116,6 @@ func _on_enemy_died(_enemy: Enemy) -> void:
 
 
 func _on_enemy_despawned(enemy: Enemy) -> void:
-	_pool.append(enemy)
+	if not _pools.has(enemy.data.id):
+		_pools[enemy.data.id] = []
+	_pools[enemy.data.id].append(enemy)

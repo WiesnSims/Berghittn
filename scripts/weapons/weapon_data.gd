@@ -5,7 +5,8 @@ extends Resource
 ## What right click does (section 6): every weapon gets a mode that suits it.
 ## AIM: down the sights (hold). SCOPE: through a scope with an overlay (hold).
 ## ALL_BARRELS: every loaded round in one blast (press).
-enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS }
+## FAN: work the action as fast as the hand can, firing from the hip (hold); see rapid_*.
+enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN }
 
 @export var id: StringName
 ## Translation key, not display text.
@@ -35,6 +36,10 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS }
 @export var range: float = 50.0
 @export var is_auto: bool = false
 @export var pellets: int = 1
+## Big calibres go through (user request, 2026-10-17): how many enemies behind the first one a shot
+## can still hit, and the share of damage left after each body it passes (0.5 = half, then a quarter...).
+@export var penetration: int = 0
+@export var penetration_falloff: float = 0.5
 @export var cost: int = 0
 @export var ammo_cost: int = 0
 ## Optional id of a behavior script for special weapons (section 6a). Empty = plain hitscan.
@@ -47,6 +52,11 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS }
 @export var aim_time: float = 0.18
 @export var aim_spread_multiplier: float = 0.3
 @export var aim_move_multiplier: float = 0.6
+## Fanning (FAN): shots per second while right click is held, degrees of spread it adds, and how much
+## harder each shot kicks.
+@export var rapid_fire_rate: float = 0.0
+@export var rapid_spread: float = 0.0
+@export var rapid_recoil_multiplier: float = 1.0
 
 
 func can_aim() -> bool:

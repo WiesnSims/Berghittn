@@ -1,0 +1,277 @@
+[gd_scene load_steps=38 format=3]
+
+[sub_resource type="StandardMaterial3D" id="Tunic"]
+albedo_color = Color(0.08, 0.08, 0.09, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Trousers"]
+albedo_color = Color(0.12, 0.12, 0.13, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Leather"]
+albedo_color = Color(0.3, 0.18, 0.09, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Brass"]
+albedo_color = Color(0.85, 0.65, 0.25, 1)
+metallic = 0.8
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Skin"]
+albedo_color = Color(0.5, 0.56, 0.47, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Helmet"]
+albedo_color = Color(0.9, 0.88, 0.8, 1)
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Lamp"]
+albedo_color = Color(1, 0.9, 0.6, 1)
+roughness = 0.2
+emission_enabled = true
+emission = Color(1, 0.85, 0.5, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="StandardMaterial3D" id="Iron"]
+albedo_color = Color(0.3, 0.3, 0.32, 1)
+metallic = 0.6
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Wood"]
+albedo_color = Color(0.42, 0.28, 0.14, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Eyes"]
+shading_mode = 0
+albedo_color = Color(1, 0.55, 0.2, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="M0"]
+material = SubResource("Trousers")
+size = Vector3(0.22, 0.52, 0.24)
+
+[sub_resource type="BoxMesh" id="M1"]
+material = SubResource("Trousers")
+size = Vector3(0.22, 0.52, 0.24)
+
+[sub_resource type="BoxMesh" id="M2"]
+material = SubResource("Tunic")
+size = Vector3(0.2, 0.36, 0.28)
+
+[sub_resource type="BoxMesh" id="M3"]
+material = SubResource("Tunic")
+size = Vector3(0.2, 0.36, 0.28)
+
+[sub_resource type="BoxMesh" id="M4"]
+material = SubResource("Tunic")
+size = Vector3(0.66, 0.68, 0.38)
+
+[sub_resource type="BoxMesh" id="M5"]
+material = SubResource("Tunic")
+size = Vector3(0.5, 0.3, 0.12)
+
+[sub_resource type="BoxMesh" id="M6"]
+material = SubResource("Brass")
+size = Vector3(0.04, 0.04, 0.02)
+
+[sub_resource type="BoxMesh" id="M7"]
+material = SubResource("Brass")
+size = Vector3(0.04, 0.04, 0.02)
+
+[sub_resource type="BoxMesh" id="M8"]
+material = SubResource("Brass")
+size = Vector3(0.04, 0.04, 0.02)
+
+[sub_resource type="BoxMesh" id="M9"]
+material = SubResource("Brass")
+size = Vector3(0.04, 0.04, 0.02)
+
+[sub_resource type="BoxMesh" id="M10"]
+material = SubResource("Leather")
+size = Vector3(0.5, 0.5, 0.04)
+
+[sub_resource type="BoxMesh" id="M11"]
+material = SubResource("Leather")
+size = Vector3(0.68, 0.08, 0.4)
+
+[sub_resource type="BoxMesh" id="M12"]
+material = SubResource("Tunic")
+size = Vector3(0.22, 0.2, 0.3)
+
+[sub_resource type="BoxMesh" id="M13"]
+material = SubResource("Tunic")
+size = Vector3(0.22, 0.2, 0.3)
+
+[sub_resource type="BoxMesh" id="M14"]
+material = SubResource("Tunic")
+size = Vector3(0.17, 0.17, 0.55)
+
+[sub_resource type="BoxMesh" id="M15"]
+material = SubResource("Tunic")
+size = Vector3(0.17, 0.17, 0.55)
+
+[sub_resource type="BoxMesh" id="M16"]
+material = SubResource("Skin")
+size = Vector3(0.15, 0.14, 0.15)
+
+[sub_resource type="BoxMesh" id="M17"]
+material = SubResource("Skin")
+size = Vector3(0.15, 0.14, 0.15)
+
+[sub_resource type="BoxMesh" id="M18"]
+material = SubResource("Wood")
+size = Vector3(0.05, 0.05, 0.9)
+
+[sub_resource type="BoxMesh" id="M19"]
+material = SubResource("Iron")
+size = Vector3(0.05, 0.5, 0.06)
+
+[sub_resource type="SphereMesh" id="M20"]
+material = SubResource("Skin")
+radius = 0.16
+height = 0.34
+radial_segments = 10
+rings = 6
+
+[sub_resource type="BoxMesh" id="M21"]
+material = SubResource("Eyes")
+size = Vector3(0.05, 0.025, 0.02)
+
+[sub_resource type="BoxMesh" id="M22"]
+material = SubResource("Eyes")
+size = Vector3(0.05, 0.025, 0.02)
+
+[sub_resource type="BoxMesh" id="M23"]
+material = SubResource("Trousers")
+size = Vector3(0.22, 0.12, 0.08)
+
+[sub_resource type="SphereMesh" id="M24"]
+material = SubResource("Helmet")
+radius = 0.2
+height = 0.26
+radial_segments = 10
+rings = 6
+
+[sub_resource type="CylinderMesh" id="M25"]
+material = SubResource("Helmet")
+top_radius = 0.23
+bottom_radius = 0.23
+height = 0.03
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M26"]
+material = SubResource("Lamp")
+top_radius = 0.05
+bottom_radius = 0.05
+height = 0.05
+radial_segments = 10
+
+[node name="KnappeModel" type="Node3D"]
+
+[node name="ThighL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.6, 0)
+mesh = SubResource("M0")
+
+[node name="ThighR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.6, 0)
+mesh = SubResource("M1")
+
+[node name="BootL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.18, -0.02)
+mesh = SubResource("M2")
+
+[node name="BootR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.18, -0.02)
+mesh = SubResource("M3")
+
+[node name="Torso" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.18, 0)
+mesh = SubResource("M4")
+
+[node name="Belly" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -0.2)
+mesh = SubResource("M5")
+
+[node name="Button0" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, 1.38, -0.2)
+mesh = SubResource("M6")
+
+[node name="Button1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, 1.24, -0.2)
+mesh = SubResource("M7")
+
+[node name="Button2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, 1.1, -0.2)
+mesh = SubResource("M8")
+
+[node name="Button3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, 0.96, -0.2)
+mesh = SubResource("M9")
+
+[node name="Apron" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9903, 0.1392, 0, -0.1392, 0.9903, 0, 0.8, 0.21)
+mesh = SubResource("M10")
+
+[node name="Belt" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("M11")
+
+[node name="ShoulderL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.42, 1.44, 0)
+mesh = SubResource("M12")
+
+[node name="ShoulderR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.42, 1.44, 0)
+mesh = SubResource("M13")
+
+[node name="ArmL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9659, -0.2588, 0, 0.2588, 0.9659, -0.43, 1.26, -0.18)
+mesh = SubResource("M14")
+
+[node name="ArmR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9659, -0.2588, 0, 0.2588, 0.9659, 0.43, 1.26, -0.18)
+mesh = SubResource("M15")
+
+[node name="FistL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.43, 1.14, -0.46)
+mesh = SubResource("M16")
+
+[node name="FistR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.43, 1.14, -0.46)
+mesh = SubResource("M17")
+
+[node name="PickHandle" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866, 0, -0.866, 0.5, 0.43, 1.2, -0.2)
+mesh = SubResource("M18")
+
+[node name="PickHead" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866, 0, -0.866, 0.5, 0.43, 1.57, 0.12)
+mesh = SubResource("M19")
+
+[node name="Head" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.62, -0.02)
+mesh = SubResource("M20")
+
+[node name="EyeL" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, 1.645, -0.17)
+mesh = SubResource("M21")
+
+[node name="EyeR" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06, 1.645, -0.17)
+mesh = SubResource("M22")
+
+[node name="Beard" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -0.15)
+mesh = SubResource("M23")
+
+[node name="Helmet" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, -0.02)
+mesh = SubResource("M24")
+
+[node name="HelmetBrim" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, -0.02)
+mesh = SubResource("M25")
+
+[node name="Lamp" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 1.76, -0.22)
+mesh = SubResource("M26")
