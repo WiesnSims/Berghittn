@@ -328,6 +328,12 @@ const FLEE_LOOKAHEAD: float = 5.0
 const GOASSL_STUN_TIME: float = 1.5
 const GOASSL_HOLD_MAX: float = 3.0
 const GOASSL_PULL_STOP: float = 1.6
+# Mistgabel: bodies one thrust goes through, the longest one can be held up on the fork, and where it
+# is carried (metres ahead of the eye, and of its feet above it).
+const MISTGABEL_PIERCE: int = 2
+const MISTGABEL_HOLD_MAX: float = 3.0
+const MISTGABEL_CARRY_AHEAD: float = 1.5
+const MISTGABEL_CARRY_UP: float = 0.15
 # Screen shake from blasts: seconds it lasts and how fast it trembles (cycles per second).
 const SHAKE_TIME: float = 0.45
 const SHAKE_FREQUENCY: float = 18.0

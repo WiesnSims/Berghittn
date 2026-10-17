@@ -220,6 +220,15 @@ climbs through a window that still has boards, and that the points (and the HUD)
 hits, kills and repairs. Exits non-zero on failure.
 
 ```
+godot --headless --fixed-fps 60 res://tests/m5_mistgabel.tscn
+```
+
+The Mistgabel: the thrust through the first two in a line (100 each), not a third, not one 40° aside,
+not 4 m out; V held lifts the skewered one over the player's head, letting go hurls it (more than 5 m)
+and it and the crowd where it lands take 80, the others nothing; the Krampus too heavy to lift; held
+3 s, the fork throws by itself.
+
+```
 godot --headless --fixed-fps 60 res://tests/melee_arc.tscn
 ```
 

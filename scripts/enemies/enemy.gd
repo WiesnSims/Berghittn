@@ -261,6 +261,7 @@ func lift() -> bool:
 	if not is_alive() or data.is_boss or _lifted or _hurled or not _can_dance():
 		return false
 	_lifted = true
+	_knock = Vector3.ZERO
 	_drop_swing()
 	_body_layer = collision_layer
 	_body_mask = collision_mask
@@ -479,7 +480,8 @@ func _dancing(delta: float) -> void:
 
 ## Throws the enemy back along `push` (m/s, flat), with a little hop; it chases again once it lands.
 func apply_knockback(push: Vector3) -> void:
-	if not is_alive():
+	# On the fork or flying off it, the Mistgabel moves it.
+	if not is_alive() or _lifted or _hurled:
 		return
 	_knock = _flat(push)
 	if is_on_floor():

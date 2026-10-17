@@ -848,6 +848,11 @@ func _melee_tour(main: Node, mode: String) -> void:
 	weapons._start_melee()
 	await _save_series("%s_blow" % mode, 10, 0.07)
 	await get_tree().create_timer(1.2).timeout
+	if mode == "mistgabel":
+		# One straight in front to lift, and the view tipped up to see it on the fork.
+		crowd[0].global_position = center + Vector3(1.4, 0.0, 0.0)
+		(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(18.0)
+		await get_tree().create_timer(0.1).timeout
 	weapons.force_melee_hold = true
 	weapons._start_melee()
 	await _save_series("%s_hold" % mode, 12, 0.15)

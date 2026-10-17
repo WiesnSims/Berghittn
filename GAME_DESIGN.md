@@ -226,6 +226,10 @@ Rules:
     drags it to the player (5 m/s, stopping 1.6 m short) for as long as V is held, 3 s at most,
     dazed all the while; let go, it stays stunned for 1.5 s. Pulls a Perchte out of a crowd or one
     off a window. Bosses are too heavy; with nothing in reach the whip just drops.
+  - `mistgabel`: Aufgabeln (hold V): the first body the thrust skewered is lifted up on the fork and
+    carried over the player's head (3 s at most; the player walks slowly); let go and it is hurled
+    where the player looks (11 m/s, a little up). Where it comes down it bowls over everything within
+    2 m, itself included: 80 and thrown back, "PLUMPS!". Bosses are too heavy to lift.
   - `schmarrnpfanne`: the pan as a shield (hold V): hits from the front (60° each side) are caught and
     the attacker is bonked back; you walk at 60 % and cannot shoot until you let go. Hits from the side
     or behind still land, so you keep turning to face them.
@@ -344,6 +348,9 @@ Alpine folk culture.
   attack; bosses take the blow but are not stunned. "SCHNALZ!" at the tip until the M6 crack sound.
 - **Mistgabel:** pitchfork with long reach; pierces and hits two enemies in
   a line.
+  Details (M5): on V in place of the shovel (chest only, weight 1). A thrust, not a swing: 3 m
+  straight along the aim (10° either side, measured on the ground), through the first two bodies,
+  100 each and a small push; once a second. "ZACK!" until the M6 sound.
 - **Krampus-Rute:** birch rod dropped by the Krampus boss. Hits cause enemies
   in a small radius to flee for 3 s.
 
