@@ -89,6 +89,22 @@ const RESI_MILK_TIME: float = 2.5
 const RESI_WALK_SPEED: float = 1.1
 const RESI_BOLT_SPEED: float = 6.0
 
+# Random events: from which wave, the chance per wave, and when in the wave (seconds).
+const RANDOM_EVENT_FIRST_WAVE: int = 2
+const RANDOM_EVENT_CHANCE: float = 0.3
+const RANDOM_EVENT_DELAY_MIN: float = 8.0
+const RANDOM_EVENT_DELAY_MAX: float = 35.0
+# Bierfassl: rolling speed (m/s), how close a player stops it and an enemy gets flattened, what a
+# boss takes instead, seconds of tapping, how long it waits to be tapped, and the points when the
+# tapper already has every Schnaps.
+const FASSL_SPEED: float = 8.0
+const FASSL_STOP_REACH: float = 1.2
+const FASSL_HIT_REACH: float = 1.0
+const FASSL_BOSS_DAMAGE: int = 500
+const FASSL_TAP_TIME: float = 2.0
+const FASSL_REST_TIME: float = 60.0
+const FASSL_POINTS_IF_FULL: int = 2000
+
 # Schnaps perks (section 9). Durchschlag: extra bodies per shot.
 const PERK_PIERCE_BONUS: int = 1
 # Böllerschuss: blast radius (m), damage at the centre (half at the edge), push, and the wait between blasts.

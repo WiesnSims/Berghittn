@@ -2,7 +2,8 @@ extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/m5_events.tscn
 ## Section 8a events on the real main scene. Die Resi: only with the Terrasse open, walks into the
 ## beer garden, is marked map-wide, her bell pulls outside enemies to her (they make her bolt), and
-## milking her heals fully and gives a free Brettljause helping.
+## milking her heals fully and gives a free Brettljause helping. The Bierfassl rolls down off the alm
+## into the garden, flattens what is in its way, stops at a wall or a player, and tapping it gives a Schnaps.
 
 var main: Node
 var player: Player
@@ -55,8 +56,71 @@ func _run() -> void:
 	await _resi_lures()
 	await _resi_milked()
 	await _resi_leaves()
+	_random_events()
+	await _fassl()
+	await _fassl_stopped()
 	print("RESULT: ", "PASS" if failures.is_empty() else "%d FAILED" % failures.size())
 	get_tree().quit(0 if failures.is_empty() else 1)
+
+
+func _random_events() -> void:
+	_check(director.available_random_events() == [&"fassl"], "random events with the Terrasse open: %s" % [director.available_random_events()])
+	# Never on a boss wave: not even Resi, who is due.
+	var due: int = director._next_resi
+	director._next_resi = 5
+	director._on_wave_started(5, true)
+	_check(director._next_resi == 5, "nothing on a boss wave")
+	director._next_resi = due
+
+
+func _fassl() -> void:
+	# An enemy standing in the garden on the barrel's way; the player safe in the Stube.
+	player.global_position = Vector3(-2.0, 0.0, 1.0)
+	var victim := waves._create_enemy()
+	victim.activate(load("res://data/enemies/wanderer.tres"), 1, Transform3D(Basis.IDENTITY, Vector3(-8.0, -0.3, 17.0)))
+	victim.process_mode = Node.PROCESS_MODE_PAUSABLE
+	victim.set_physics_process(false)
+	var fassl: Bierfassl = director.start_event(&"fassl") as Bierfassl
+	_check(fassl != null and _banners.back() == "Bierfassl kert onzapft!", "announced: %s" % _banners.back())
+	var start: Vector3 = fassl.global_position
+	_check(start.y > 3.0, "it breaks loose up on the alm (%s)" % start.snapped(Vector3.ONE * 0.1))
+	for i: int in 60 * 25:
+		await get_tree().physics_frame
+		if fassl.is_resting():
+			break
+	var p: Vector3 = fassl.global_position
+	_check(not victim.is_alive(), "it flattens the enemy in its way")
+	_check(fassl.is_resting() and p.x > 4.0 and p.x < 7.1 and absf(p.z - 17.0) < 1.0 and p.y < 0.5, "and rolls across the garden into the Schuppen wall (%s)" % p.snapped(Vector3.ONE * 0.1))
+	# Tap it.
+	player.global_position = p + Vector3(-1.2, -0.12, 0.0)
+	player.velocity = Vector3.ZERO
+	await _frames(3)
+	_check(fassl.get_interact_prompt(player) == tr("UI_TAP"), "prompt: %s" % fassl.get_interact_prompt(player))
+	var owned: int = player.perks.owned.size()
+	var pulls: int = 0
+	while fassl.is_resting() and pulls < 40:
+		fassl.interact(player)
+		pulls += 1
+		await _seconds(fassl.interact_repeat)
+	_check(player.perks.owned.size() == owned + 1 and _banners.back().begins_with("Freibier!"), "Freibier after %.1f s: %s" % [pulls * fassl.interact_repeat, _banners.back()])
+	await _seconds(5.0)
+	_check(not is_instance_valid(fassl), "then the empty barrel is gone")
+
+
+func _fassl_stopped() -> void:
+	# A player in its way stops it.
+	var spot := Vector3(-6.0, -0.3, 17.0)
+	var fassl: Bierfassl = director.start_event(&"fassl") as Bierfassl
+	for i: int in 60 * 25:
+		player.global_position = spot
+		player.velocity = Vector3.ZERO
+		await get_tree().physics_frame
+		if fassl.is_resting():
+			break
+	var p: Vector3 = fassl.global_position
+	_check(fassl.is_resting() and p.x < spot.x and p.x > spot.x - 2.0, "a player in its way stops it (%s)" % p.snapped(Vector3.ONE * 0.1))
+	fassl.queue_free()
+	await _frames(2)
 
 
 func _schedule() -> void:

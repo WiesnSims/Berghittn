@@ -88,5 +88,11 @@ messages = {
 [&"", &"EVENT_RESI_MILKED"]: [&"Frische Almmilch! Fully healed, and a %s on the house"],
 [&"", &"EVENT_RESI_MILKED_FULL"]: [&"Frische Almmilch! Fully healed"],
 [&"", &"UI_MILK"]: [&"Hold E to milk die Resi"],
-[&"", &"UI_MILKING"]: [&"Milking… %d%%"]
+[&"", &"UI_MILKING"]: [&"Milking… %d%%"],
+[&"", &"EVENT_FASSL_LOOSE"]: [&"Bierfassl kert onzapft!"],
+[&"", &"MARKER_FASSL"]: [&"Bierfassl"],
+[&"", &"EVENT_FASSL_FREIBIER"]: [&"Freibier! %s: %s, on the house"],
+[&"", &"EVENT_FASSL_POINTS"]: [&"Freibier! +%d"],
+[&"", &"UI_TAP"]: [&"Hold E to tap the Fassl"],
+[&"", &"UI_TAPPING"]: [&"Tapping… %d%%"]
 }

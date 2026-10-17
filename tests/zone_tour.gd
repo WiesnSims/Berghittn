@@ -60,6 +60,8 @@ func _ready() -> void:
 		await _perks_tour(main)
 	elif mode == "resi":
 		await _resi_tour(main)
+	elif mode == "fassl":
+		await _fassl_tour(main)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -252,6 +254,40 @@ func _resi_tour(main: Node) -> void:
 	player.rotation.y = 0.0
 	await get_tree().create_timer(0.3).timeout
 	await _save("resi_arrow")
+
+
+## fassl: the Bierfassl rolling down the alm, coming in at the garden gate, resting, and being tapped.
+func _fassl_tour(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	var player := main.get_node("Player") as Player
+	var zones := main.get_node("Zones") as ZoneMap
+	for id: StringName in [&"kueche", &"lager", &"terrasse", &"skiraum", &"seilbahn", &"schuppen"]:
+		zones.unlock(id, player)
+	(main.get_node("WaveManager") as Node).process_mode = Node.PROCESS_MODE_DISABLED
+	await get_tree().create_timer(1.0).timeout
+	var fassl: Bierfassl = (main.get_node("EventDirector") as EventDirector).send_fassl()
+	var camera := Camera3D.new()
+	camera.fov = 60.0
+	add_child(camera)
+	camera.current = true
+	(main.get_node("UI") as CanvasLayer).hide()
+	await get_tree().create_timer(2.5).timeout
+	camera.look_at_from_position(fassl.global_position + Vector3(4.0, 1.5, 4.0), fassl.global_position)
+	await _save("fassl_slope")
+	camera.look_at_from_position(Vector3(-12.0, 1.6, 14.0), Vector3(-17.0, 0.3, 17.0))
+	while fassl.global_position.x < -18.5:
+		await get_tree().physics_frame
+	await _save("fassl_gate")
+	while not fassl.is_resting():
+		await get_tree().physics_frame
+	camera.look_at_from_position(fassl.global_position + Vector3(-2.2, 1.3, 1.4), fassl.global_position)
+	await _save("fassl_rest")
+	player.global_position = fassl.global_position + Vector3(-1.2, -0.12, 0.0)
+	while fassl.is_resting():
+		fassl.interact(player)
+		await get_tree().create_timer(fassl.interact_repeat).timeout
+	await get_tree().create_timer(0.4).timeout
+	await _save("fassl_foam")
 
 
 func _m5(main: Node) -> void:

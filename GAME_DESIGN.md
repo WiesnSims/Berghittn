@@ -113,7 +113,7 @@ has a pantry, the Skiraum a boot corridor behind a partition (the chokepoint), t
 raised boarding platform with the gondola alongside, the Holzschuppen a hay loft up a ramp, and the
 Terrasse a deck along the hut that runs out over a full-width gentle ramp onto a big, open beer
 garden at the level of the alm (play-test 2026-10-17: the sunken garden, down and up again, looked
-odd and was crowded), fenced with three gates enemies come in by, with few objects in it. Every change of
+odd and was crowded), fenced with three 3.5 m gates enemies come in by, with few objects in it. Every change of
 level is a ramp (stairs are a ramp with steps on top) with curbs, since enemies cannot climb steps.
 
 Every room has a purpose (user request, 2026-10-17), something worth going there for:
@@ -338,11 +338,15 @@ and stays 45 s.
 - Her bell draws every enemy within 20 m to her, so getting the milk is a fight.
 - If enemies reach her, she bolts off mooing and the milk is gone.
 
-**Random events.** At most one per wave, with a chance each wave from wave 2 (not every wave, and
-never on a boss wave); the same one does not come twice in a row.
-- **"Bierfassl kert onzapft!"** A beer barrel breaks loose up on the alm and rolls down the slope
-  across the beer garden, bouncing, flattening every enemy in its way. Whoever stops it (walks into
-  it) and taps it (hold E) gets Freibier: a random Schnaps they do not own yet, for free.
+**Random events.** At most one per wave, a 30 % chance each wave from wave 2, 8 to 35 s into it (not
+every wave, never on a boss wave or a wave Resi comes); the same one does not come twice in a row
+when another one could come.
+- **"Bierfassl kert onzapft!"** A beer barrel breaks loose up on the alm to the north-west and rolls
+  down the slope, in at the beer garden's west gate and across the garden (8 m/s), bouncing,
+  flattening every enemy in its way (a boss takes 500 and is shoved). It stops at the first wall,
+  fence or table, or when a player steps in its way. Tap it (hold E for 2 s) for Freibier: a random
+  Schnaps the tapper does not own yet, for free (2000 points if they have them all). Only while the
+  Terrasse is open; an untapped barrel is gone after 60 s.
 - **The Murmeltier.** A marmot pops out of the floor somewhere on the open part of the map, indoors
   too, screams the meme scream and ducks away again, a few times in different spots close by. Hit it
   (shot or melee) before it is gone for points and a full refill of the gun in hand.
