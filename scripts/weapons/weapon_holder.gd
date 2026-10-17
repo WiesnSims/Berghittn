@@ -330,7 +330,7 @@ func _physics_process(delta: float) -> void:
 			start_reload()
 		return
 	if weapon.secondary == WeaponData.Secondary.BEHAVIOR and Input.is_action_just_pressed("secondary") and _cooldown <= 0.0:
-		if mag >= weapon.secondary_rounds:
+		if _can_fire_secondary():
 			fire_secondary()
 		else:
 			start_reload()
@@ -436,15 +436,25 @@ func fire_all() -> void:
 ## A special weapon's own second shot (BEHAVIOR secondary), using secondary_rounds at once.
 func fire_secondary() -> void:
 	var rounds: int = weapon.secondary_rounds
-	if _behavior == null or mag < rounds:
+	if _behavior == null or not _can_fire_secondary():
 		return
-	mag -= rounds
+	# What the magazine lacks comes from the reserve, where the weapon allows it.
+	var from_reserve: int = maxi(rounds - mag, 0)
+	mag -= rounds - from_reserve
+	reserve -= from_reserve
 	_set_cooldown(1.0 / weapon.fire_rate)
 	_behavior.fire_secondary()
 	fired.emit(rounds)
 	ammo_changed.emit(mag, reserve)
 	if _viewmodel:
 		_viewmodel.play_secondary(rounds)
+
+
+func _can_fire_secondary() -> bool:
+	var rounds: int = weapon.secondary_rounds
+	if weapon.secondary_from_reserve:
+		return mag > 0 and mag + reserve >= rounds
+	return mag >= rounds
 
 
 ## Area hit from the muzzle along the aim (the Alphorn); see area_hit.
@@ -511,6 +521,11 @@ func shake_view(degrees: float) -> void:
 ## Where thrown things and effects live: the world the shooter stands in.
 func world_root() -> Node:
 	return _shooter.get_parent()
+
+
+## Who holds the guns (the Player), for behaviors that move or affect them.
+func shooter() -> Node3D:
+	return _shooter
 
 
 ## The shooter's own body, so its projectiles never hit it.

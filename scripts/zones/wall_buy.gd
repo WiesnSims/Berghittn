@@ -7,13 +7,30 @@ extends Node3D
 @export var weapon: WeaponData
 ## Set instead of weapon for an equipment wall-buy.
 @export var equipment: EquipmentData
+## Hidden until this wave starts (the Alphorn in the Seilbahn, from a later wave), then announced
+## with arrival_text (translation key). 0 = there from the start.
+@export var from_wave: int = 0
+@export var arrival_text: String = ""
 
 ## Bought with one press, not held.
 var interact_repeat: float = 0.0
 
 
 func _ready() -> void:
+	if from_wave > 0:
+		visible = false
+		Events.wave_started.connect(_on_wave_started)
+		return
 	add_to_group("interactables")
+
+
+func _on_wave_started(wave: int, _is_boss_wave: bool) -> void:
+	if wave < from_wave or visible:
+		return
+	visible = true
+	add_to_group("interactables")
+	if arrival_text != "":
+		Events.event_announced.emit(tr(arrival_text))
 
 
 # Interactable interface (see Interactor).

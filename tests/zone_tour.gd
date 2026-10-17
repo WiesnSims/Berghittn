@@ -8,6 +8,8 @@ extends Node
 ## both barrels of the Jagdflinte, the Stutzen scope.
 ## m5: the enemy line-up, the Schnaps shrine, the Hüttentruhe closed and offering, the ammo crate,
 ## the boss bar, and the Repetierer firing, fanning and reloading.
+## boeller: the Seilbahn wall-buys (Handböller, Alphorn from wave 10), the Handböller in hand, a shell
+## into a crowd, the Doppelladung, the reload.
 ## fladen: the Kuhfladen wall-buy in the Schuppen, one placed in the doorway, a wanderer stepping in.
 ## glocke: the Kuhglocke wall-buy in the Stube, then one thrown onto the pasture, ringing, with
 ## wanderers gathering round it.
@@ -86,6 +88,8 @@ func _ready() -> void:
 		await _glocke_tour(main)
 	elif mode == "fladen":
 		await _fladen_tour(main)
+	elif mode == "boeller":
+		await _boeller_tour(main)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -622,3 +626,44 @@ func _fladen_tour(main: Node) -> void:
 	enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
 	await get_tree().create_timer(0.9).timeout
 	await _save_series("fladen_step", 6, 0.12)
+
+
+func _boeller_tour(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	var player := main.get_node("Player") as Player
+	var waves := main.get_node("WaveManager") as WaveManager
+	var zones := main.get_node("Zones") as ZoneMap
+	for id: StringName in [&"skiraum", &"seilbahn"]:
+		zones.unlock(id, player)
+	var gun: WeaponData = load("res://data/weapons/handboeller.tres")
+	var horn: WeaponData = load("res://data/weapons/alphorn.tres")
+	var buys: Array = main.find_children("*", "WallBuy", true, false)
+	var boeller_buy: WallBuy = buys.filter(func(w: WallBuy) -> bool: return w.weapon == gun)[0]
+	var horn_buy: WallBuy = buys.filter(func(w: WallBuy) -> bool: return w.weapon == horn)[0]
+	Events.wave_started.emit(10, false)
+	for buy: WallBuy in [boeller_buy, horn_buy]:
+		player.global_position = buy.to_global(Vector3(0.4, -1.5, -2.6))
+		player.look_at(Vector3(buy.global_position.x, player.global_position.y, buy.global_position.z), Vector3.UP)
+		await get_tree().create_timer(0.8).timeout
+		await _save("boeller_wallbuy_" + buy.weapon.id)
+	var weapons: WeaponHolder = player.weapons
+	weapons.give_weapon(gun)
+	player.global_position = Vector3(10.0, -0.3, 31.0)
+	player.rotation.y = -PI * 0.5
+	(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(2.0)
+	for i: int in 6:
+		var enemy: Enemy = waves._create_enemy()
+		var spot := Vector3(18.0 + (i % 3) * 1.4, -0.3, 30.0 + (i / 3) * 1.4)
+		enemy.activate(load("res://data/enemies/wanderer.tres"), 12, Transform3D(Basis.IDENTITY, spot).looking_at(Vector3(10.0, -0.3, 31.0), Vector3.UP))
+		enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
+		enemy.set_physics_process(false)
+	await get_tree().create_timer(0.6).timeout
+	await _save("boeller_idle")
+	weapons._fire()
+	await _save_series("boeller_shot", 12, 0.07)
+	weapons.start_reload()
+	await _save_series("boeller_reload", 10, gun.reload_time / 10.0)
+	await get_tree().create_timer(0.5).timeout
+	weapons._cooldown = 0.0
+	weapons.fire_secondary()
+	await _save_series("boeller_double", 10, 0.08)

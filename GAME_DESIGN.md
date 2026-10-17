@@ -127,7 +127,7 @@ Every room has a purpose (user request, 2026-10-17), something worth going there
 | `terrasse` | Long sight lines over the open beer garden, and **die Resi**, the lost Almkuh (section 8a) who turns up in the garden. The Schneekanone trap was cut after play-testing (2026-10-17, "unfun and useless"); buyable traps or obstacles stay an idea for later |
 | `skiraum` | Chokepoint, Stutzen wall-buy |
 | `schuppen` | Hüttentruhe (mystery chest), later the Kuhfladen-Mine wall-buy |
-| `seilbahn` | Handböller wall-buy and the Alphorn in later waves; arrive with the special weapons (section 6a) |
+| `seilbahn` | Handböller wall-buy, and from wave 10 the Alphorn wall-buy (announced when it appears). The gondola portal stays barred: every neighbour is already a door away, so a way out there would only be a new entrance (2026-10-17) |
 
 Enemy spawn points ("Fenster" and "Türen") are placed per zone as `Marker3D`
 nodes in group `spawn_points`. A spawn point is **active** only if its zone
@@ -161,7 +161,7 @@ effects, see section 6a), `secondary` (what right click does, see the rules belo
 | `stutzen` | Stutzen | bolt-action rifle | 120 | 1.33 (the bolt is worked in 0.75 s) | 5 / 40 | 750 (wall-buy, Skiraum) |
 | `repetierer` | Repetierer | lever/repeater rifle | 90 (two shots for small enemies, play-test 2026-10-17) | 3 (5.5 fanned) | 10 / 80 | 1000 (chest only) |
 | `schaufel` | Schneeschaufel | melee | 70 | 1.2 | – | 0 (always equipped) |
-| `alphorn` | Alphorn | wonder weapon | 200 area | 0.5 | 6 / 18 | chest only, rare |
+| `alphorn` | Alphorn | wonder weapon | 200 area | 0.5 | 6 / 18 | chest (rare); from wave 10 also 4000 at the Seilbahn wall (user decision, 2026-10-17) |
 | `knoedelwerfer` | Knödelwerfer | wonder weapon | 180 area | 1.0 | 12 / 36 | chest only, rare |
 | `rodelkanone` | Rodelkanone | wonder weapon | 300 line | 0.4 | 4 / 12 | chest only, rare |
 | `brennkessel` | Brennkessel-Werfer | wonder weapon | 15 per tick | 8 ticks/s | 100 fuel / 200 | chest only, rare |
@@ -196,6 +196,9 @@ Rules:
     panic button when surrounded.
   - `knoedelwerfer`: the Knödeltris (press): three smaller dumplings in a fan (9° apart) for three
     rounds, each bursting for 100 within 2 m with a smaller pile; covers a doorway or a crowd's width.
+  - `handboeller`: the Doppelladung (press): a second measure of powder poured in, the loaded round
+    plus one from the reserve; the shell flies 1.5 times as fast and flatter, bursts for 260 within
+    4.5 m, and the kick shoves the shooter back.
   - Melee weapons live on V, not in hand, so their mode is **holding V past the blow** (M5): tap V
     swings as before, keep it held and the weapon stays up.
   - `schmarrnpfanne`: the pan as a shield (hold V): hits from the front (60° each side) are caught and
@@ -271,6 +274,10 @@ Alpine folk culture.
 
 - **Handböller:** a hand-held black-powder mortar like the ones used at
   Schützen celebrations. One loud shot, 3 m explosion, very long reload.
+  Details (M5): 1500 at the Seilbahn's north wall (ammo 750). The iron shell is lobbed at 22 m/s and
+  bursts like the Böllerschuss (the same smoke, sparks and shock ring) for 150 within 3 m, shoving
+  survivors; "BUMM!" until the M6 sound. 1 / 10, a 4.5 s reload: muzzle up, the ball dropped in, two
+  strokes of the ramrod. No self-damage.
 - **Schmarrnpfanne:** a heavy frying pan. Satisfying "bonk" sound, small
   knockback, fastest strong melee.
   Details (M5): bought at the Küche east wall for 400; it replaces the shovel in the melee slot. 90 per

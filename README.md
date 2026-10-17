@@ -152,6 +152,14 @@ wanderer coming through (40 and slowed, once), the Krampus (hurt, not slowed), t
 four, at most six lying about.
 
 ```
+godot --headless --fixed-fps 60 res://tests/m5_handboeller.tscn
+```
+
+The Seilbahn wall-buys: the Handböller (1500, ammo 750, the shell's burst radius, the 4.5 s reload,
+the Doppelladung from the reserve and its kick) and the Alphorn, hidden until wave 10, then
+announced and on sale for 4000. Lobbed shots share `LobbedShot` (Knödel, Böller shell).
+
+```
 godot --headless --fixed-fps 60 res://tests/upstairs.tscn
 godot --headless --fixed-fps 60 res://tests/spawn_paths.tscn
 ```
@@ -203,7 +211,7 @@ frame with the HUD, or shooting an enemy (wall puffs, hit flash, casings, head p
 visuals without playing.
 
 ```
-godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne|knoedel|glocke|fladen
+godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne|knoedel|glocke|fladen|boeller
 ```
 
 Also needs a window: one frame per zone (all doors open), the wall-buys and a door mid-swing; or

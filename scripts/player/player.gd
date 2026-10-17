@@ -66,6 +66,11 @@ func kick_view(pitch_degrees: float, yaw_degrees: float) -> void:
 	_camera.kick(pitch_degrees, yaw_degrees)
 
 
+## A shove that is not the player's own doing (the Handböller's double charge kicking back).
+func push(velocity_change: Vector3) -> void:
+	velocity += velocity_change
+
+
 ## The view trembles for a moment (the Alphorn's blast).
 func shake_view(degrees: float) -> void:
 	_camera.shake(degrees)
