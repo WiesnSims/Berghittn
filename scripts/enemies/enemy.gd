@@ -59,6 +59,14 @@ var _sidestep_left: float = 0.0
 var _sidestep_side: float = 1.0
 # Thrown back (Böllerschuss): the push that is left, flat.
 var _knock: Vector3
+# Dancing to the Harmonika: seconds left, and the polka's own damage (it hurts bosses too, who do
+# not dance), paid once a second to whoever played it.
+var _dance_left: float = 0.0
+var _dance_phase: float = 0.0
+var _polka_left: float = 0.0
+var _polka_dps: int = 0
+var _polka_tick: float = 0.0
+var _polka_source: Node3D
 # Came in through a window: lures outside (die Resi) no longer pull it back out.
 var _inside: bool = false
 var _lure: Node3D
@@ -90,6 +98,9 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 	health = data.health_for_wave(wave)
 	max_health = health
 	_lunge_cooldown_left = 0.0
+	_dance_left = 0.0
+	_polka_left = 0.0
+	_polka_source = null
 	_slow_left = 0.0
 	_slow_factor = 1.0
 	global_transform = at
@@ -116,6 +127,13 @@ func is_alive() -> bool:
 
 
 func receive_hit(amount: int, is_headshot: bool, is_melee: bool, source: Node3D) -> Hurtbox.Result:
+	# A dancer has its guard down: every other hit lands harder.
+	if is_dancing():
+		amount *= Constants.DANCE_DAMAGE_MULTIPLIER
+	return _take_hit(amount, is_headshot, is_melee, source)
+
+
+func _take_hit(amount: int, is_headshot: bool, is_melee: bool, source: Node3D) -> Hurtbox.Result:
 	if not is_alive():
 		return Hurtbox.Result.IGNORED
 	health -= amount
@@ -138,6 +156,36 @@ func apply_slow(factor: float, duration: float) -> void:
 	if _slow_left <= 0.0 or factor <= _slow_factor:
 		_slow_factor = factor
 	_slow_left = maxf(_slow_left, duration)
+
+
+## The Harmonika's polka: for `duration` seconds the enemy dances on the spot (no walking, no
+## attacks; a swing in progress is dropped) and takes `dps` a second from `source`. Bosses take the
+## damage but do not dance (immune to crowd control, section 6a).
+func dance(duration: float, dps: int, source: Node3D) -> void:
+	if not is_alive():
+		return
+	if _polka_left <= 0.0:
+		_polka_tick = 0.0
+	_polka_left = maxf(_polka_left, duration)
+	_polka_dps = dps
+	_polka_source = source
+	if data.is_boss:
+		return
+	if _dance_left <= 0.0:
+		_dance_phase = 0.0
+	_dance_left = maxf(_dance_left, duration)
+	if _state == State.ATTACKING:
+		_kill_tween()
+		_visual.rotation.x = 0.0
+		_state = State.CHASING
+
+
+func is_dancing() -> bool:
+	return _dance_left > 0.0 and is_alive() and _can_dance()
+
+
+func _can_dance() -> bool:
+	return _state == State.CHASING or _state == State.ATTACKING or _state == State.QUEUED
 
 
 func _flinch(is_headshot: bool) -> void:
@@ -188,9 +236,19 @@ func _physics_process(delta: float) -> void:
 		_slow_left -= delta
 		if _slow_left <= 0.0:
 			_slow_factor = 1.0
+	if _polka_left > 0.0 and is_alive():
+		_polka(delta)
 	if _knock != Vector3.ZERO and (_state == State.CHASING or _state == State.ATTACKING or _state == State.QUEUED):
 		_knocked(delta)
 		return
+	if _dance_left > 0.0:
+		_dance_left -= delta
+		if _can_dance() and is_alive():
+			_dancing(delta)
+			if _dance_left <= 0.0:
+				_visual.rotation.z = 0.0
+				_visual.position.y = 0.0
+			return
 	match _state:
 		State.CHASING:
 			_chase(delta)
@@ -204,6 +262,24 @@ func _physics_process(delta: float) -> void:
 			_lunge(delta)
 		State.DEAD:
 			_fall(delta)
+
+
+func _polka(delta: float) -> void:
+	_polka_left -= delta
+	_polka_tick += delta
+	# A second of dancing is paid as one hit (one flash, one set of points), not one per frame.
+	if _polka_tick >= 1.0:
+		_polka_tick -= 1.0
+		_take_hit(_polka_dps, false, false, _polka_source)
+
+
+func _dancing(delta: float) -> void:
+	_halt(delta)
+	_dance_phase += delta
+	rotation.y += Constants.DANCE_SPIN * delta
+	var hop: float = absf(sin(_dance_phase * PI * Constants.DANCE_HOP_RATE))
+	_visual.position.y = hop * Constants.DANCE_HOP
+	_visual.rotation.z = sin(_dance_phase * PI * Constants.DANCE_HOP_RATE * 0.5) * 0.25
 
 
 ## Throws the enemy back along `push` (m/s, flat), with a little hop; it chases again once it lands.

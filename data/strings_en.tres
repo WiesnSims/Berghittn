@@ -53,6 +53,8 @@ messages = {
 [&"", &"WEAPON_RODELKANONE"]: [&"Rodelkanone"],
 [&"", &"HIT_RUMMS"]: [&"RUMMS!"],
 [&"", &"HIT_KRACH"]: [&"KRACH!"],
+[&"", &"WEAPON_HARMONIKA"]: [&"Steirische Harmonika"],
+[&"", &"HIT_JUCHHE"]: [&"JUCHHE!"],
 [&"", &"EVENT_ALPHORN_READY"]: [&"Des Alphorn hängt jetzt in da Seilbahn!"],
 [&"", &"HIT_SPLAT"]: [&"SPLATSCH!"],
 [&"", &"PERK_ENZIAN"]: [&"Enzian"],

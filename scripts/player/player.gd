@@ -136,6 +136,8 @@ func _base_speed(input: Vector2) -> float:
 		return Constants.PLAYER_WALK_SPEED * weapons.weapon.aim_move_multiplier
 	if weapons.is_blocking():
 		return Constants.PLAYER_WALK_SPEED * weapons.melee_weapon.aim_move_multiplier
+	if weapons.is_playing():
+		return Constants.PLAYER_WALK_SPEED * weapons.weapon.aim_move_multiplier
 	# Sprinting only counts while moving forward, so you cannot sprint backwards or sideways.
 	if Input.is_action_pressed("sprint") and input.y < 0.0:
 		return Constants.PLAYER_SPRINT_SPEED

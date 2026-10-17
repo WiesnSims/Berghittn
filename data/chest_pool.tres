@@ -1,10 +1,11 @@
-[gd_resource type="Resource" script_class="ChestPool" load_steps=9 format=3]
+[gd_resource type="Resource" script_class="ChestPool" load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/chest/chest_pool.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/chest/chest_entry.gd" id="2"]
 [ext_resource type="Resource" path="res://data/weapons/alphorn.tres" id="6"]
 [ext_resource type="Resource" path="res://data/weapons/knoedelwerfer.tres" id="7"]
 [ext_resource type="Resource" path="res://data/weapons/rodelkanone.tres" id="8"]
+[ext_resource type="Resource" path="res://data/weapons/harmonika.tres" id="9"]
 
 [sub_resource type="Resource" id="Alphorn"]
 script = ExtResource("2")
@@ -21,9 +22,14 @@ script = ExtResource("2")
 weapon = ExtResource("8")
 weight = 1.0
 
+[sub_resource type="Resource" id="Harmonika"]
+script = ExtResource("2")
+weapon = ExtResource("9")
+weight = 1.0
+
 [resource]
 script = ExtResource("1")
 cost = 1500
 roll_time = 2.5
 offer_time = 4.0
-entries = Array[ExtResource("2")]([SubResource("Alphorn"), SubResource("Knoedelwerfer"), SubResource("Rodelkanone")])
+entries = Array[ExtResource("2")]([SubResource("Alphorn"), SubResource("Knoedelwerfer"), SubResource("Rodelkanone"), SubResource("Harmonika")])

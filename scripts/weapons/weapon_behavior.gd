@@ -33,3 +33,8 @@ func fire(_rounds: int) -> void:
 ## Right click on a BEHAVIOR secondary: data.secondary_rounds went off.
 func fire_secondary() -> void:
 	pass
+
+
+## Every frame right click is held on a PLAY secondary (its rounds are paid by the WeaponHolder).
+func play_secondary(_delta: float) -> void:
+	pass
