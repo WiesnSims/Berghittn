@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/models/perchte_model.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"perchte"
+display_name = "ENEMY_PERCHTE"
+base_health = 250
+health_per_wave = 30
+speed = 4.0
+damage = 30
+attack_range = 1.4
+attack_windup = 0.4
+attack_cooldown = 1.0
+climb_time = 1.8
+board_break_time = 0.45
+head_pop_damage = 100
+model = ExtResource("2")
+model_scale = 1.06
+flinch_multiplier = 0.6
+lunge_range = 4.5
+is_boss = false

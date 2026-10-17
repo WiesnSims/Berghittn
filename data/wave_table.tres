@@ -1,14 +1,39 @@
-[gd_resource type="Resource" script_class="WaveTable" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="WaveTable" load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/waves/wave_table.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/waves/wave_entry.gd" id="2"]
 [ext_resource type="Resource" path="res://data/enemies/wanderer.tres" id="3"]
+[ext_resource type="Resource" path="res://data/enemies/tourist.tres" id="4"]
+[ext_resource type="Resource" path="res://data/enemies/knappe.tres" id="5"]
+[ext_resource type="Resource" path="res://data/enemies/perchte.tres" id="6"]
+[ext_resource type="Resource" path="res://data/enemies/krampus.tres" id="7"]
 
 [sub_resource type="Resource" id="Wanderer"]
 script = ExtResource("2")
 enemy = ExtResource("3")
 first_wave = 1
-weight = 1.0
+weight = 6.0
+last_wave = 0
+
+[sub_resource type="Resource" id="Tourist"]
+script = ExtResource("2")
+enemy = ExtResource("4")
+first_wave = 3
+weight = 2.0
+last_wave = 0
+
+[sub_resource type="Resource" id="Knappe"]
+script = ExtResource("2")
+enemy = ExtResource("5")
+first_wave = 6
+weight = 0.8
+last_wave = 0
+
+[sub_resource type="Resource" id="Perchte"]
+script = ExtResource("2")
+enemy = ExtResource("6")
+first_wave = 8
+weight = 1.2
 last_wave = 0
 
 [resource]
@@ -20,4 +45,9 @@ start_spawn_interval = 2.5
 spawn_interval_step = 0.1
 min_spawn_interval = 0.6
 break_time = 10.0
-entries = Array[ExtResource("2")]([SubResource("Wanderer")])
+entries = Array[ExtResource("2")]([SubResource("Wanderer"), SubResource("Tourist"), SubResource("Knappe"), SubResource("Perchte")])
+boss = ExtResource("7")
+boss_escort = ExtResource("3")
+boss_escort_count = 6
+boss_first_wave = 5
+boss_every = 5

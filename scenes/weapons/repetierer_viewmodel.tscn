@@ -1,0 +1,189 @@
+[gd_scene load_steps=21 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/lever_action_viewmodel.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="Metal"]
+albedo_color = Color(0.16, 0.17, 0.18, 1)
+metallic = 0.6
+roughness = 0.45
+
+[sub_resource type="StandardMaterial3D" id="Wood"]
+albedo_color = Color(0.36, 0.22, 0.12, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Accent"]
+albedo_color = Color(0.78, 0.6, 0.28, 1)
+metallic = 0.75
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Flash"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+albedo_color = Color(1, 0.75, 0.35, 1)
+
+[sub_resource type="QuadMesh" id="FlashQuad"]
+material = SubResource("Flash")
+size = Vector2(0.15, 0.15)
+
+[sub_resource type="BoxMesh" id="M0"]
+material = SubResource("Accent")
+size = Vector3(0.036, 0.06, 0.15)
+
+[sub_resource type="BoxMesh" id="M1"]
+material = SubResource("Wood")
+size = Vector3(0.04, 0.07, 0.27)
+
+[sub_resource type="BoxMesh" id="M2"]
+material = SubResource("Metal")
+size = Vector3(0.02, 0.02, 0.5)
+
+[sub_resource type="BoxMesh" id="M3"]
+material = SubResource("Metal")
+size = Vector3(0.016, 0.016, 0.42)
+
+[sub_resource type="BoxMesh" id="M4"]
+material = SubResource("Metal")
+size = Vector3(0.026, 0.045, 0.012)
+
+[sub_resource type="BoxMesh" id="M5"]
+material = SubResource("Wood")
+size = Vector3(0.042, 0.036, 0.18)
+
+[sub_resource type="BoxMesh" id="M6"]
+material = SubResource("Metal")
+size = Vector3(0.006, 0.016, 0.01)
+
+[sub_resource type="BoxMesh" id="M7"]
+material = SubResource("Metal")
+size = Vector3(0.02, 0.012, 0.01)
+
+[sub_resource type="BoxMesh" id="M8"]
+material = SubResource("Metal")
+size = Vector3(0.004, 0.02, 0.035)
+
+[sub_resource type="BoxMesh" id="M9"]
+material = SubResource("Metal")
+size = Vector3(0.01, 0.03, 0.015)
+
+[sub_resource type="BoxMesh" id="M10"]
+material = SubResource("Metal")
+size = Vector3(0.008, 0.045, 0.008)
+
+[sub_resource type="BoxMesh" id="M11"]
+material = SubResource("Metal")
+size = Vector3(0.008, 0.01, 0.13)
+
+[sub_resource type="BoxMesh" id="M12"]
+material = SubResource("Metal")
+size = Vector3(0.008, 0.045, 0.008)
+
+[sub_resource type="BoxMesh" id="M13"]
+material = SubResource("Accent")
+size = Vector3(0.01, 0.01, 0.04)
+
+[node name="RepetiererViewmodel" type="Node3D"]
+script = ExtResource("1")
+kick_distance = 0.06
+kick_angle = 10.0
+kick_time = 0.16
+reload_offset = Vector3(-0.07, 0.06, 0.02)
+reload_tilt = 38.0
+slap_lift = 0.015
+lower_drop = 0.35
+ejection_port = Vector3(0, 0.045, 0.01)
+ejection_velocity = Vector3(0.4, 2.4, 0.6)
+casing_size = Vector3(0.01, 0.01, 0.035)
+[node name="Model" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0.14, -0.16, -0.4)
+
+[node name="Receiver" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0, 0)
+cast_shadow = 0
+mesh = SubResource("M0")
+
+[node name="Stock" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 0.9902, -0.1395, 0, 0.1395, 0.9902, 0, -0.035, 0.2)
+cast_shadow = 0
+mesh = SubResource("M1")
+
+[node name="Barrel" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.02, -0.32)
+cast_shadow = 0
+mesh = SubResource("M2")
+
+[node name="Tube" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, -0.006, -0.28)
+cast_shadow = 0
+mesh = SubResource("M3")
+
+[node name="Band" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.007, -0.46)
+cast_shadow = 0
+mesh = SubResource("M4")
+
+[node name="Forend" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.002, -0.17)
+cast_shadow = 0
+mesh = SubResource("M5")
+
+[node name="FrontSight" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.038, -0.56)
+cast_shadow = 0
+mesh = SubResource("M6")
+
+[node name="RearSight" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.036, -0.1)
+cast_shadow = 0
+mesh = SubResource("M7")
+
+[node name="Gate" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0.019, -0.008, 0.02)
+cast_shadow = 0
+mesh = SubResource("M8")
+
+[node name="Hammer" type="Node3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.03, 0.07)
+
+[node name="Spur" type="MeshInstance3D" parent="Model/Hammer"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.012, 0)
+cast_shadow = 0
+mesh = SubResource("M9")
+
+[node name="Lever" type="Node3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, -0.032, -0.03)
+
+[node name="LoopFront" type="MeshInstance3D" parent="Model/Lever"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, -0.02, 0)
+cast_shadow = 0
+mesh = SubResource("M10")
+
+[node name="LoopBottom" type="MeshInstance3D" parent="Model/Lever"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, -0.042, 0.065)
+cast_shadow = 0
+mesh = SubResource("M11")
+
+[node name="LoopBack" type="MeshInstance3D" parent="Model/Lever"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, -0.02, 0.13)
+cast_shadow = 0
+mesh = SubResource("M12")
+
+[node name="Round" type="Node3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0.019, -0.008, 0.02)
+
+[node name="Cartridge" type="MeshInstance3D" parent="Model/Round"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0, 0)
+cast_shadow = 0
+mesh = SubResource("M13")
+
+[node name="MuzzleFlash" type="Node3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, -0, 0, 0, 1, 0, 0.02, -0.58)
+
+[node name="Quad" type="MeshInstance3D" parent="Model/MuzzleFlash"]
+cast_shadow = 0
+mesh = SubResource("FlashQuad")
+
+[node name="Light" type="OmniLight3D" parent="Model/MuzzleFlash"]
+light_color = Color(1, 0.7, 0.35, 1)
+light_energy = 5.0
+omni_range = 8.0

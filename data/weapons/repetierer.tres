@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/repetierer_viewmodel.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"repetierer"
+display_name = "WEAPON_REPETIERER"
+damage = 45
+headshot_multiplier = 2.0
+fire_rate = 3.0
+mag_size = 10
+reserve_ammo = 80
+reload_time = 2.6
+chamber_time = 0.35
+recoil_pitch = 2.2
+recoil_yaw = 0.6
+spread = 1.2
+range = 80.0
+is_auto = false
+bloom_per_shot = 0.5
+bloom_max = 2.5
+bloom_recover = 4.0
+pellets = 1
+penetration = 1
+penetration_falloff = 0.5
+cost = 1000
+ammo_cost = 500
+behavior = &""
+viewmodel = ExtResource("2")
+secondary = 4
+rapid_fire_rate = 5.5
+rapid_spread = 4.0
+rapid_recoil_multiplier = 1.6

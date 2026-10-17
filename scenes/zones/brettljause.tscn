@@ -1,0 +1,235 @@
+[gd_scene load_steps=24 format=3]
+
+[ext_resource type="Script" path="res://scripts/perks/jause_item.gd" id="1"]
+[ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="2"]
+[ext_resource type="Material" path="res://assets/materials/greybox_metal.tres" id="3"]
+[ext_resource type="Resource" path="res://data/jause/speck.tres" id="4"]
+[ext_resource type="Resource" path="res://data/jause/germknedl.tres" id="5"]
+[ext_resource type="Resource" path="res://data/jause/kasnockn.tres" id="6"]
+
+[sub_resource type="StandardMaterial3D" id="Board"]
+albedo_color = Color(0.72, 0.52, 0.32, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Meat"]
+albedo_color = Color(0.78, 0.36, 0.34, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Fat"]
+albedo_color = Color(0.95, 0.9, 0.82, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Dough"]
+albedo_color = Color(0.96, 0.93, 0.86, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Poppy"]
+albedo_color = Color(0.18, 0.18, 0.22, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Vanilla"]
+albedo_color = Color(0.98, 0.86, 0.45, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Cheese"]
+albedo_color = Color(0.95, 0.75, 0.3, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Chive"]
+albedo_color = Color(0.3, 0.6, 0.2, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="BoardMesh"]
+material = SubResource("Board")
+size = Vector3(1.05, 0.04, 0.42)
+
+[sub_resource type="BoxMesh" id="SlabMeat"]
+material = SubResource("Meat")
+size = Vector3(0.2, 0.05, 0.1)
+
+[sub_resource type="BoxMesh" id="SlabFat"]
+material = SubResource("Fat")
+size = Vector3(0.2, 0.02, 0.1)
+
+[sub_resource type="SphereMesh" id="Knedl"]
+material = SubResource("Dough")
+radius = 0.09
+height = 0.16
+radial_segments = 12
+rings = 6
+
+[sub_resource type="SphereMesh" id="PoppyCap"]
+material = SubResource("Poppy")
+radius = 0.05
+height = 0.03
+radial_segments = 10
+rings = 3
+
+[sub_resource type="CylinderMesh" id="Sauce"]
+material = SubResource("Vanilla")
+top_radius = 0.13
+bottom_radius = 0.13
+height = 0.012
+radial_segments = 14
+
+[sub_resource type="CylinderMesh" id="Pan"]
+material = ExtResource("3")
+top_radius = 0.14
+bottom_radius = 0.12
+height = 0.05
+radial_segments = 14
+
+[sub_resource type="SphereMesh" id="Nockn"]
+material = SubResource("Cheese")
+radius = 0.12
+height = 0.08
+radial_segments = 12
+rings = 4
+
+[sub_resource type="BoxMesh" id="ChiveBit"]
+material = SubResource("Chive")
+size = Vector3(0.03, 0.01, 0.01)
+
+[node name="Brettljause" type="Node3D"]
+
+[node name="Table" type="CSGCombiner3D" parent="."]
+use_collision = true
+
+[node name="Top" type="CSGBox3D" parent="Table"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.77, -0.32)
+size = Vector3(1.3, 0.06, 0.62)
+material = ExtResource("2")
+
+[node name="Leg0" type="CSGBox3D" parent="Table"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.58, 0.37, -0.08)
+size = Vector3(0.07, 0.74, 0.07)
+material = ExtResource("2")
+
+[node name="Leg1" type="CSGBox3D" parent="Table"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.58, 0.37, -0.08)
+size = Vector3(0.07, 0.74, 0.07)
+material = ExtResource("2")
+
+[node name="Leg2" type="CSGBox3D" parent="Table"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.58, 0.37, -0.56)
+size = Vector3(0.07, 0.74, 0.07)
+material = ExtResource("2")
+
+[node name="Leg3" type="CSGBox3D" parent="Table"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.58, 0.37, -0.56)
+size = Vector3(0.07, 0.74, 0.07)
+material = ExtResource("2")
+
+[node name="Board" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 0, 0.82, -0.32)
+mesh = SubResource("BoardMesh")
+
+[node name="Speck" type="Node3D" parent="." node_paths=PackedStringArray("price_label")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38, 0.84, -0.32)
+script = ExtResource("1")
+jause = ExtResource("4")
+price_label = NodePath("../SpeckPrice")
+
+[node name="Meat0" type="MeshInstance3D" parent="Speck"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 0, 0.025, 0)
+mesh = SubResource("SlabMeat")
+
+[node name="Fat0" type="MeshInstance3D" parent="Speck"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 0, 0.06, 0)
+mesh = SubResource("SlabFat")
+
+[node name="Meat1" type="MeshInstance3D" parent="Speck"]
+transform = Transform3D(0.9659, 0, 0.2588, 0, 1, 0, -0.2588, 0, 0.9659, 0, 0.095, 0)
+mesh = SubResource("SlabMeat")
+
+[node name="Fat1" type="MeshInstance3D" parent="Speck"]
+transform = Transform3D(0.9659, 0, 0.2588, 0, 1, 0, -0.2588, 0, 0.9659, 0, 0.13, 0)
+mesh = SubResource("SlabFat")
+
+[node name="Meat2" type="MeshInstance3D" parent="Speck"]
+transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866, 0, 0.165, 0)
+mesh = SubResource("SlabMeat")
+
+[node name="Fat2" type="MeshInstance3D" parent="Speck"]
+transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866, 0, 0.2, 0)
+mesh = SubResource("SlabFat")
+
+[node name="SpeckPrice" type="Label3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0.38, 0.65, -0.635)
+pixel_size = 0.0018
+text = "Speck"
+font_size = 48
+outline_size = 6
+modulate = Color(0.98, 0.92, 0.75, 1)
+
+[node name="Germknedl" type="Node3D" parent="." node_paths=PackedStringArray("price_label")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.84, -0.32)
+script = ExtResource("1")
+jause = ExtResource("5")
+price_label = NodePath("../GermknedlPrice")
+
+[node name="Sauce" type="MeshInstance3D" parent="Germknedl"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 0, 0.006, 0)
+mesh = SubResource("Sauce")
+
+[node name="Knedl" type="MeshInstance3D" parent="Germknedl"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 0, 0.08, 0)
+mesh = SubResource("Knedl")
+
+[node name="Poppy" type="MeshInstance3D" parent="Germknedl"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 0, 0.155, 0)
+mesh = SubResource("PoppyCap")
+
+[node name="GermknedlPrice" type="Label3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.65, -0.635)
+pixel_size = 0.0018
+text = "Germknedl"
+font_size = 48
+outline_size = 6
+modulate = Color(0.98, 0.92, 0.75, 1)
+
+[node name="Kasnockn" type="Node3D" parent="." node_paths=PackedStringArray("price_label")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.38, 0.84, -0.32)
+script = ExtResource("1")
+jause = ExtResource("6")
+price_label = NodePath("../KasnocknPrice")
+
+[node name="Pan" type="MeshInstance3D" parent="Kasnockn"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 0, 0.025, 0)
+mesh = SubResource("Pan")
+
+[node name="Nockn" type="MeshInstance3D" parent="Kasnockn"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 0, 0.06, 0)
+mesh = SubResource("Nockn")
+
+[node name="Chive0" type="MeshInstance3D" parent="Kasnockn"]
+transform = Transform3D(0.9397, 0, 0.342, 0, 1, 0, -0.342, 0, 0.9397, -0.04, 0.1, 0.02)
+mesh = SubResource("ChiveBit")
+
+[node name="Chive1" type="MeshInstance3D" parent="Kasnockn"]
+transform = Transform3D(0.342, 0, 0.9397, 0, 1, 0, -0.9397, 0, 0.342, 0.03, 0.1, -0.03)
+mesh = SubResource("ChiveBit")
+
+[node name="Chive2" type="MeshInstance3D" parent="Kasnockn"]
+transform = Transform3D(-0.6428, 0, 0.766, 0, 1, 0, -0.766, 0, -0.6428, 0.05, 0.1, 0.04)
+mesh = SubResource("ChiveBit")
+
+[node name="Chive3" type="MeshInstance3D" parent="Kasnockn"]
+transform = Transform3D(-0.9397, 0, 0.342, 0, 1, 0, -0.342, 0, -0.9397, -0.02, 0.1, -0.05)
+mesh = SubResource("ChiveBit")
+
+[node name="KasnocknPrice" type="Label3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -0.38, 0.65, -0.635)
+pixel_size = 0.0018
+text = "Kasnockn"
+font_size = 48
+outline_size = 6
+modulate = Color(0.98, 0.92, 0.75, 1)
+
+[node name="Sign" type="Label3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 1.6, -0.03)
+pixel_size = 0.004
+text = "Brettljause"
+font_size = 72
+outline_size = 0
+modulate = Color(0.95, 0.9, 0.75, 1)

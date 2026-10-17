@@ -61,6 +61,41 @@ const ENEMY_ATTACK_CHEST_HEIGHT: float = 1.2
 
 # Seconds to walk the last bit from the link start to the window.
 const ENEMY_WINDOW_APPROACH_TIME: float = 0.3
+# Horizontal distance (m) from a window link's outside end at which an enemy starts its way in,
+# even if the crowd keeps it from reaching the exact point.
+const ENEMY_LINK_REACH: float = 1.0
+# Unsticking (play-test bug: bodies hung in doorways and at corners, blocked by a wall edge the path
+# cuts or by other enemies standing in the way): a chaser that has moved less than ENEMY_STUCK_MOVE
+# in ENEMY_STUCK_TIME seconds sidesteps for ENEMY_SIDESTEP_TIME and asks for a fresh path.
+const ENEMY_STUCK_TIME: float = 0.8
+const ENEMY_STUCK_MOVE: float = 0.3
+const ENEMY_SIDESTEP_TIME: float = 0.5
+# Knockback (Böllerschuss): how fast a thrown-back body loses its push (m/s per second) and its hop.
+const ENEMY_KNOCKBACK_DECAY: float = 24.0
+const ENEMY_KNOCKBACK_HOP: float = 2.5
+
+# Schnaps perks (section 9). Durchschlag: extra bodies per shot.
+const PERK_PIERCE_BONUS: int = 1
+# Böllerschuss: blast radius (m), damage at the centre (half at the edge), push, and the wait between blasts.
+const PERK_BOELLER_RADIUS: float = 4.5
+const PERK_BOELLER_DAMAGE: int = 150
+const PERK_BOELLER_DAMAGE_PER_WAVE: int = 20
+const PERK_BOELLER_KNOCKBACK: float = 9.0
+const PERK_BOELLER_COOLDOWN: float = 6.0
+# Sturschädl: seconds of invincibility after cheating death (once per wave).
+const PERK_STUR_INVINCIBLE_TIME: float = 4.0
+# Gmiatlichkeit: standing still (below this speed) or crouching this long heals this many times faster.
+const PERK_COSY_STILL_SPEED: float = 0.3
+const PERK_COSY_TIME: float = 2.0
+const PERK_COSY_REGEN_MULTIPLIER: float = 3.0
+# Grantler (Obstler): damage share per enemy within the radius, and the most it adds.
+const PERK_GRANT_RADIUS: float = 5.0
+const PERK_GRANT_PER_ENEMY: float = 0.05
+const PERK_GRANT_MAX: float = 0.3
+# Jagamoasta: kills ("Kräuter") for the Kräuterrausch, how long it lasts, and its damage factor.
+const PERK_HERBS: int = 56
+const PERK_RAUSCH_TIME: float = 10.0
+const PERK_RAUSCH_DAMAGE: float = 2.0
 
 # Waves (section 8; the per-wave formula numbers live in data/wave_table.tres).
 # Hard performance cap from section 3, shared by all players in co-op.
@@ -87,6 +122,8 @@ const BARRICADE_REPAIR_INTERVAL: float = 0.6
 const INTERACT_RANGE: float = 1.7
 # Height difference beyond which E does not reach (the gallery's Lager door is right above the Kueche door).
 const INTERACT_MAX_HEIGHT: float = 1.2
+# Picking between things in reach: metres of distance one radian of looking away is worth.
+const INTERACT_LOOK_WEIGHT: float = 1.0
 
 # Zones (section 4; door costs live in data/zone_table.tres).
 const DOOR_OPEN_TIME: float = 0.7
@@ -112,6 +149,11 @@ const DEFAULT_AIM_SENSITIVITY: float = 0.6
 # cover the target in front of the sights (play-test #16).
 const AIM_FLASH_SCALE: float = 0.35
 const AIM_FLASH_LIGHT: float = 0.5
+
+# Seconds a semi-auto click is remembered while the gun still cycles, so fast clicking always fires.
+const FIRE_BUFFER_TIME: float = 0.12
+# Most bodies plus the wall one shot's ray is traced through (penetration).
+const MAX_RAY_STEPS: int = 12
 
 # Weapon feedback.
 const MUZZLE_FLASH_TIME: float = 0.07

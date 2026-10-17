@@ -7,6 +7,7 @@ signal died
 
 @onready var health: PlayerHealth = $Health
 @onready var points: PlayerPoints = $Points
+@onready var perks: PlayerPerks = $Perks
 @onready var interactor: Interactor = $Interactor
 @onready var weapons: WeaponHolder = $Head/Camera3D/WeaponHolder
 @onready var _head: Node3D = $Head
@@ -50,6 +51,15 @@ func is_targetable() -> bool:
 
 func take_damage(amount: int) -> void:
 	health.take_damage(amount)
+
+
+func is_crouching() -> bool:
+	return _is_crouching()
+
+
+## A jolt of the view that is not a shot (the Böllerschuss going off at your feet).
+func kick_view(pitch_degrees: float, yaw_degrees: float) -> void:
+	_camera.kick(pitch_degrees, yaw_degrees)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -96,7 +106,7 @@ func _look(relative: Vector2) -> void:
 
 func _update_horizontal_velocity(delta: float) -> void:
 	var input: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	var speed: float = _target_speed(input)
+	var speed: float = _base_speed(input)
 	var target: Vector3 = global_basis * Vector3(input.x, 0.0, input.y) * speed
 	var accel: float = Constants.PLAYER_GROUND_ACCEL if is_on_floor() else Constants.PLAYER_AIR_ACCEL
 	var horizontal := Vector2(velocity.x, velocity.z).move_toward(Vector2(target.x, target.z), accel * delta)
@@ -105,7 +115,7 @@ func _update_horizontal_velocity(delta: float) -> void:
 	_sprinting = speed == Constants.PLAYER_SPRINT_SPEED and horizontal.length() > Constants.PLAYER_WALK_SPEED * 0.8
 
 
-func _target_speed(input: Vector2) -> float:
+func _base_speed(input: Vector2) -> float:
 	if _is_crouching():
 		return Constants.PLAYER_CROUCH_SPEED
 	if weapons.is_aiming():
@@ -139,7 +149,8 @@ func _apply_height(height: float) -> void:
 
 
 func _on_fired(rounds: int) -> void:
-	_camera.kick(weapons.weapon.recoil_pitch * rounds, weapons.weapon.recoil_yaw * rounds)
+	var strength: float = rounds * (weapons.weapon.rapid_recoil_multiplier if weapons.is_fanning() else 1.0)
+	_camera.kick(weapons.weapon.recoil_pitch * strength, weapons.weapon.recoil_yaw * strength)
 
 
 func _respawn() -> void:

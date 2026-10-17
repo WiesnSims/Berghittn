@@ -1,0 +1,236 @@
+[gd_scene load_steps=33 format=3]
+
+[sub_resource type="StandardMaterial3D" id="Jacket"]
+albedo_color = Color(0.1, 0.72, 0.78, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Shorts"]
+albedo_color = Color(0.82, 0.72, 0.5, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Skin"]
+albedo_color = Color(0.55, 0.62, 0.5, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Socks"]
+albedo_color = Color(0.95, 0.95, 0.92, 1)
+roughness = 1
+
+[sub_resource type="StandardMaterial3D" id="Sandal"]
+albedo_color = Color(0.3, 0.2, 0.12, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Hat"]
+albedo_color = Color(0.92, 0.85, 0.62, 1)
+roughness = 1
+
+[sub_resource type="StandardMaterial3D" id="Camera"]
+albedo_color = Color(0.08, 0.08, 0.09, 1)
+metallic = 0.3
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Lens"]
+albedo_color = Color(0.25, 0.4, 0.55, 1)
+roughness = 0.1
+emission_enabled = true
+emission = Color(0.15, 0.3, 0.45, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="StandardMaterial3D" id="Eyes"]
+shading_mode = 0
+albedo_color = Color(1, 0.85, 0.35, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Shades"]
+albedo_color = Color(0.05, 0.05, 0.05, 1)
+roughness = 0.2
+
+[sub_resource type="BoxMesh" id="M0"]
+material = SubResource("Shorts")
+size = Vector3(0.16, 0.34, 0.18)
+
+[sub_resource type="BoxMesh" id="M1"]
+material = SubResource("Shorts")
+size = Vector3(0.16, 0.34, 0.18)
+
+[sub_resource type="BoxMesh" id="M2"]
+material = SubResource("Skin")
+size = Vector3(0.12, 0.2, 0.13)
+
+[sub_resource type="BoxMesh" id="M3"]
+material = SubResource("Skin")
+size = Vector3(0.12, 0.2, 0.13)
+
+[sub_resource type="BoxMesh" id="M4"]
+material = SubResource("Socks")
+size = Vector3(0.12, 0.3, 0.13)
+
+[sub_resource type="BoxMesh" id="M5"]
+material = SubResource("Socks")
+size = Vector3(0.12, 0.3, 0.13)
+
+[sub_resource type="BoxMesh" id="M6"]
+material = SubResource("Sandal")
+size = Vector3(0.13, 0.05, 0.24)
+
+[sub_resource type="BoxMesh" id="M7"]
+material = SubResource("Sandal")
+size = Vector3(0.13, 0.05, 0.24)
+
+[sub_resource type="BoxMesh" id="M8"]
+material = SubResource("Jacket")
+size = Vector3(0.44, 0.58, 0.26)
+
+[sub_resource type="BoxMesh" id="M9"]
+material = SubResource("Jacket")
+size = Vector3(0.11, 0.11, 0.5)
+
+[sub_resource type="BoxMesh" id="M10"]
+material = SubResource("Jacket")
+size = Vector3(0.11, 0.11, 0.5)
+
+[sub_resource type="BoxMesh" id="M11"]
+material = SubResource("Skin")
+size = Vector3(0.09, 0.08, 0.11)
+
+[sub_resource type="BoxMesh" id="M12"]
+material = SubResource("Skin")
+size = Vector3(0.09, 0.08, 0.11)
+
+[sub_resource type="BoxMesh" id="M13"]
+material = SubResource("Camera")
+size = Vector3(0.02, 0.5, 0.29)
+
+[sub_resource type="BoxMesh" id="M14"]
+material = SubResource("Camera")
+size = Vector3(0.2, 0.13, 0.08)
+
+[sub_resource type="CylinderMesh" id="M15"]
+material = SubResource("Lens")
+top_radius = 0.04
+bottom_radius = 0.045
+height = 0.08
+radial_segments = 10
+
+[sub_resource type="SphereMesh" id="M16"]
+material = SubResource("Skin")
+radius = 0.16
+height = 0.34
+radial_segments = 10
+rings = 6
+
+[sub_resource type="BoxMesh" id="M17"]
+material = SubResource("Eyes")
+size = Vector3(0.05, 0.025, 0.02)
+
+[sub_resource type="BoxMesh" id="M18"]
+material = SubResource("Eyes")
+size = Vector3(0.05, 0.025, 0.02)
+
+[sub_resource type="BoxMesh" id="M19"]
+material = SubResource("Shades")
+size = Vector3(0.2, 0.05, 0.02)
+
+[sub_resource type="CylinderMesh" id="M20"]
+material = SubResource("Hat")
+top_radius = 0.24
+bottom_radius = 0.26
+height = 0.04
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M21"]
+material = SubResource("Hat")
+top_radius = 0.14
+bottom_radius = 0.15
+height = 0.13
+radial_segments = 10
+
+[node name="TouristModel" type="Node3D"]
+
+[node name="ThighL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.11, 0.72, 0)
+mesh = SubResource("M0")
+
+[node name="ThighR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11, 0.72, 0)
+mesh = SubResource("M1")
+
+[node name="KneeL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.11, 0.47, 0)
+mesh = SubResource("M2")
+
+[node name="KneeR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11, 0.47, 0)
+mesh = SubResource("M3")
+
+[node name="SockL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.11, 0.2, 0)
+mesh = SubResource("M4")
+
+[node name="SockR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11, 0.2, 0)
+mesh = SubResource("M5")
+
+[node name="SandalL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.11, 0.025, -0.04)
+mesh = SubResource("M6")
+
+[node name="SandalR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11, 0.025, -0.04)
+mesh = SubResource("M7")
+
+[node name="Torso" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9903, 0.1392, 0, -0.1392, 0.9903, 0, 1.16, 0)
+mesh = SubResource("M8")
+
+[node name="ArmL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9063, -0.4226, 0, 0.4226, 0.9063, -0.27, 1.3, -0.2)
+mesh = SubResource("M9")
+
+[node name="ArmR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9063, -0.4226, 0, 0.4226, 0.9063, 0.27, 1.3, -0.2)
+mesh = SubResource("M10")
+
+[node name="HandL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.27, 1.12, -0.44)
+mesh = SubResource("M11")
+
+[node name="HandR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.27, 1.12, -0.44)
+mesh = SubResource("M12")
+
+[node name="Strap" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9903, 0.1392, 0, -0.1392, 0.9903, 0, 1.24, -0.02)
+mesh = SubResource("M13")
+
+[node name="Camera" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9903, 0.1392, 0, -0.1392, 0.9903, 0, 1, -0.2)
+mesh = SubResource("M14")
+
+[node name="Lens" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0.04, 1, -0.27)
+mesh = SubResource("M15")
+
+[node name="Head" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -0.02)
+mesh = SubResource("M16")
+
+[node name="EyeL" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, 1.625, -0.17)
+mesh = SubResource("M17")
+
+[node name="EyeR" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06, 1.625, -0.17)
+mesh = SubResource("M18")
+
+[node name="Shades" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.63, -0.175)
+mesh = SubResource("M19")
+
+[node name="HatBrim" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 0.9945, 0.1045, 0, -0.1045, 0.9945, 0, 1.73, -0.02)
+mesh = SubResource("M20")
+
+[node name="HatCrown" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 0.9945, 0.1045, 0, -0.1045, 0.9945, 0, 1.8, -0.02)
+mesh = SubResource("M21")

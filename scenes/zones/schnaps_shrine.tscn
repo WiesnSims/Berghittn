@@ -1,0 +1,362 @@
+[gd_scene load_steps=29 format=3]
+
+[ext_resource type="Script" path="res://scripts/perks/perk_bottle.gd" id="1"]
+[ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="2"]
+[ext_resource type="Material" path="res://assets/materials/greybox_wood_wall.tres" id="3"]
+[ext_resource type="Material" path="res://assets/materials/greybox_chalk.tres" id="4"]
+[ext_resource type="Resource" path="res://data/perks/jagertee.tres" id="5"]
+[ext_resource type="Resource" path="res://data/perks/enzian.tres" id="6"]
+[ext_resource type="Resource" path="res://data/perks/marillenbrand.tres" id="7"]
+[ext_resource type="Resource" path="res://data/perks/obstler.tres" id="8"]
+[ext_resource type="Resource" path="res://data/perks/zirbenschnaps.tres" id="9"]
+[ext_resource type="Resource" path="res://data/perks/jagamoasta.tres" id="10"]
+
+[sub_resource type="StandardMaterial3D" id="Glass5"]
+albedo_color = Color(0.12, 0.28, 0.14, 1)
+metallic = 0.2
+roughness = 0.15
+emission_enabled = true
+emission = Color(0.12, 0.28, 0.14, 1)
+emission_energy_multiplier = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Glass4"]
+albedo_color = Color(0.45, 0.7, 0.3, 1)
+metallic = 0.2
+roughness = 0.15
+emission_enabled = true
+emission = Color(0.45, 0.7, 0.3, 1)
+emission_energy_multiplier = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Glass3"]
+albedo_color = Color(0.92, 0.86, 0.55, 1)
+metallic = 0.2
+roughness = 0.15
+emission_enabled = true
+emission = Color(0.92, 0.86, 0.55, 1)
+emission_energy_multiplier = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Glass2"]
+albedo_color = Color(0.98, 0.6, 0.2, 1)
+metallic = 0.2
+roughness = 0.15
+emission_enabled = true
+emission = Color(0.98, 0.6, 0.2, 1)
+emission_energy_multiplier = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Glass1"]
+albedo_color = Color(0.25, 0.4, 0.95, 1)
+metallic = 0.2
+roughness = 0.15
+emission_enabled = true
+emission = Color(0.25, 0.4, 0.95, 1)
+emission_energy_multiplier = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Glass0"]
+albedo_color = Color(0.65, 0.22, 0.12, 1)
+metallic = 0.2
+roughness = 0.15
+emission_enabled = true
+emission = Color(0.65, 0.22, 0.12, 1)
+emission_energy_multiplier = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Paint"]
+albedo_color = Color(0.55, 0.12, 0.1, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="PaintGreen"]
+albedo_color = Color(0.15, 0.35, 0.2, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Cork"]
+albedo_color = Color(0.6, 0.45, 0.28, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Candle"]
+shading_mode = 0
+albedo_color = Color(1, 0.8, 0.45, 1)
+
+[sub_resource type="CylinderMesh" id="Neck"]
+material = SubResource("Glass0")
+top_radius = 0.02
+bottom_radius = 0.03
+height = 0.09
+radial_segments = 8
+
+[sub_resource type="CylinderMesh" id="CorkMesh"]
+material = SubResource("Cork")
+top_radius = 0.022
+bottom_radius = 0.022
+height = 0.03
+radial_segments = 8
+
+[sub_resource type="CylinderMesh" id="Body0"]
+material = SubResource("Glass0")
+top_radius = 0.065
+bottom_radius = 0.065
+height = 0.24
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="Body1"]
+material = SubResource("Glass1")
+top_radius = 0.065
+bottom_radius = 0.065
+height = 0.24
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="Body2"]
+material = SubResource("Glass2")
+top_radius = 0.065
+bottom_radius = 0.065
+height = 0.24
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="Body3"]
+material = SubResource("Glass3")
+top_radius = 0.065
+bottom_radius = 0.065
+height = 0.24
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="Body4"]
+material = SubResource("Glass4")
+top_radius = 0.065
+bottom_radius = 0.065
+height = 0.24
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="Body5"]
+material = SubResource("Glass5")
+top_radius = 0.065
+bottom_radius = 0.065
+height = 0.24
+radial_segments = 10
+
+[node name="SchnapsShrine" type="Node3D"]
+
+[node name="Body" type="CSGCombiner3D" parent="."]
+use_collision = true
+
+[node name="Cabinet" type="CSGBox3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.475, -0.25)
+size = Vector3(2, 0.95, 0.5)
+material = SubResource("Paint")
+
+[node name="Top" type="CSGBox3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.975, -0.27)
+size = Vector3(2.1, 0.05, 0.56)
+material = ExtResource("2")
+
+[node name="Plinth" type="CSGBox3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -0.26)
+size = Vector3(2.04, 0.1, 0.52)
+material = ExtResource("2")
+
+[node name="Back" type="CSGBox3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, -0.03)
+size = Vector3(2, 1.4, 0.06)
+material = ExtResource("3")
+
+[node name="Shelf" type="CSGBox3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -0.14)
+size = Vector3(2, 0.04, 0.22)
+material = ExtResource("2")
+
+[node name="PostL" type="CSGBox3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.7, -0.14)
+size = Vector3(0.08, 1.45, 0.08)
+material = ExtResource("2")
+
+[node name="PostR" type="CSGBox3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.7, -0.14)
+size = Vector3(0.08, 1.45, 0.08)
+material = ExtResource("2")
+
+[node name="Panel0" type="CSGBox3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.5, -0.505)
+size = Vector3(0.8, 0.6, 0.02)
+material = SubResource("PaintGreen")
+
+[node name="Panel1" type="CSGBox3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.5, -0.505)
+size = Vector3(0.8, 0.6, 0.02)
+material = SubResource("PaintGreen")
+
+[node name="Hood" type="Node3D" parent="."]
+
+[node name="HoodL" type="CSGBox3D" parent="Hood"]
+transform = Transform3D(0.9272, -0.3746, 0, 0.3746, 0.9272, 0, 0, 0, 1, -0.55, 2.55, -0.2)
+size = Vector3(1.2, 0.05, 0.45)
+material = ExtResource("2")
+
+[node name="HoodR" type="CSGBox3D" parent="Hood"]
+transform = Transform3D(0.9272, 0.3746, 0, -0.3746, 0.9272, 0, 0, 0, 1, 0.55, 2.55, -0.2)
+size = Vector3(1.2, 0.05, 0.45)
+material = ExtResource("2")
+
+[node name="Sign" type="Label3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 2.1, -0.065)
+pixel_size = 0.004
+text = "Schnaps"
+font_size = 72
+outline_size = 0
+modulate = Color(0.95, 0.9, 0.75, 1)
+
+[node name="Candle0" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 1.68, -0.14)
+size = Vector3(0.05, 0.12, 0.05)
+material = SubResource("Candle")
+
+[node name="Candle1" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 1.68, -0.14)
+size = Vector3(0.05, 0.12, 0.05)
+material = SubResource("Candle")
+
+[node name="Jagertee" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 1.0, -0.28)
+script = ExtResource("1")
+perk = ExtResource("5")
+
+[node name="Body" type="MeshInstance3D" parent="Jagertee"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
+mesh = SubResource("Body0")
+
+[node name="Neck" type="MeshInstance3D" parent="Jagertee"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.285, 0)
+mesh = SubResource("Neck")
+
+[node name="Cork" type="MeshInstance3D" parent="Jagertee"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.345, 0)
+mesh = SubResource("CorkMesh")
+
+[node name="Price0" type="Label3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0.8, 0.86, -0.52)
+pixel_size = 0.002
+text = "1500"
+font_size = 48
+outline_size = 0
+modulate = Color(0.95, 0.9, 0.75, 1)
+
+[node name="Enzian" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.48, 1.0, -0.28)
+script = ExtResource("1")
+perk = ExtResource("6")
+
+[node name="Body" type="MeshInstance3D" parent="Enzian"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
+mesh = SubResource("Body1")
+
+[node name="Neck" type="MeshInstance3D" parent="Enzian"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.285, 0)
+mesh = SubResource("Neck")
+
+[node name="Cork" type="MeshInstance3D" parent="Enzian"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.345, 0)
+mesh = SubResource("CorkMesh")
+
+[node name="Price1" type="Label3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0.48, 0.86, -0.52)
+pixel_size = 0.002
+text = "2000"
+font_size = 48
+outline_size = 0
+modulate = Color(0.95, 0.9, 0.75, 1)
+
+[node name="Marillenbrand" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.16, 1.0, -0.28)
+script = ExtResource("1")
+perk = ExtResource("7")
+
+[node name="Body" type="MeshInstance3D" parent="Marillenbrand"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
+mesh = SubResource("Body2")
+
+[node name="Neck" type="MeshInstance3D" parent="Marillenbrand"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.285, 0)
+mesh = SubResource("Neck")
+
+[node name="Cork" type="MeshInstance3D" parent="Marillenbrand"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.345, 0)
+mesh = SubResource("CorkMesh")
+
+[node name="Price2" type="Label3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0.16, 0.86, -0.52)
+pixel_size = 0.002
+text = "2500"
+font_size = 48
+outline_size = 0
+modulate = Color(0.95, 0.9, 0.75, 1)
+
+[node name="Obstler" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.16, 1.0, -0.28)
+script = ExtResource("1")
+perk = ExtResource("8")
+
+[node name="Body" type="MeshInstance3D" parent="Obstler"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
+mesh = SubResource("Body3")
+
+[node name="Neck" type="MeshInstance3D" parent="Obstler"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.285, 0)
+mesh = SubResource("Neck")
+
+[node name="Cork" type="MeshInstance3D" parent="Obstler"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.345, 0)
+mesh = SubResource("CorkMesh")
+
+[node name="Price3" type="Label3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -0.16, 0.86, -0.52)
+pixel_size = 0.002
+text = "2500"
+font_size = 48
+outline_size = 0
+modulate = Color(0.95, 0.9, 0.75, 1)
+
+[node name="Zirbenschnaps" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.48, 1.0, -0.28)
+script = ExtResource("1")
+perk = ExtResource("9")
+
+[node name="Body" type="MeshInstance3D" parent="Zirbenschnaps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
+mesh = SubResource("Body4")
+
+[node name="Neck" type="MeshInstance3D" parent="Zirbenschnaps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.285, 0)
+mesh = SubResource("Neck")
+
+[node name="Cork" type="MeshInstance3D" parent="Zirbenschnaps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.345, 0)
+mesh = SubResource("CorkMesh")
+
+[node name="Price4" type="Label3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -0.48, 0.86, -0.52)
+pixel_size = 0.002
+text = "3000"
+font_size = 48
+outline_size = 0
+modulate = Color(0.95, 0.9, 0.75, 1)
+
+[node name="Jagamoasta" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 1.0, -0.28)
+script = ExtResource("1")
+perk = ExtResource("10")
+
+[node name="Body" type="MeshInstance3D" parent="Jagamoasta"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
+mesh = SubResource("Body5")
+
+[node name="Neck" type="MeshInstance3D" parent="Jagamoasta"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.285, 0)
+mesh = SubResource("Neck")
+
+[node name="Cork" type="MeshInstance3D" parent="Jagamoasta"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.345, 0)
+mesh = SubResource("CorkMesh")
+
+[node name="Price5" type="Label3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -0.8, 0.86, -0.52)
+pixel_size = 0.002
+text = "3500"
+font_size = 48
+outline_size = 0
+modulate = Color(0.95, 0.9, 0.75, 1)

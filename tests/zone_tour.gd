@@ -6,6 +6,8 @@ extends Node
 ## motion: frames of the pistol standing, walking, sprinting, turning, jumping and landing.
 ## aim: the crosshair opening up under rapid fire, then the right-click modes: pistol down the sights,
 ## both barrels of the Jagdflinte, the Stutzen scope.
+## m5: the enemy line-up, the Schnaps shrine, the Hüttentruhe closed and offering, the ammo crate,
+## the boss bar, and the Repetierer firing, fanning and reloading.
 
 const VIEWS: Array = [
 	["stube_hall", Vector3(5.5, 1.7, 4.5), Vector3(-9.0, 3.5, -4.0)],
@@ -52,6 +54,10 @@ func _ready() -> void:
 		await _motion(main)
 	elif mode == "aim":
 		await _aim(main)
+	elif mode == "m5":
+		await _m5(main)
+	elif mode == "perks":
+		await _perks_tour(main)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -173,3 +179,103 @@ func _save_series(prefix: String, count: int, interval: float) -> void:
 func _save(name: String) -> void:
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(_out_dir.path_join(name + ".png"))
+
+
+## perks: the six-bottle shrine, the Brettljause, a Böllerschuss going off (from outside), and the
+## HUD with every Schnaps while Sturschädl holds.
+func _perks_tour(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	var player := main.get_node("Player") as Player
+	var zones := main.get_node("Zones") as ZoneMap
+	for id: StringName in [&"kueche", &"lager", &"terrasse", &"skiraum", &"seilbahn", &"schuppen"]:
+		zones.unlock(id, player)
+	(main.get_node("WaveManager") as Node).process_mode = Node.PROCESS_MODE_DISABLED
+	await get_tree().create_timer(1.0).timeout
+	var camera := Camera3D.new()
+	camera.fov = 70.0
+	add_child(camera)
+	camera.current = true
+	(main.get_node("UI") as CanvasLayer).hide()
+	camera.look_at_from_position(Vector3(-8.6, 1.6, -10.75), Vector3(-11.0, 1.3, -10.75))
+	await _save("perks_shrine")
+	var jause := main.find_child("Brettljause", true, false) as Node3D
+	camera.look_at_from_position(jause.to_global(Vector3(0.3, 1.5, -1.9)), jause.to_global(Vector3(0, 0.8, -0.3)))
+	await _save("perks_jause")
+	player.points.add(50000)
+	for node: Node in main.find_children("*", "", true, false):
+		if node is PerkBottle:
+			(node as PerkBottle).interact(player)
+	player.global_position = Vector3(-12.0, -0.3, 22.0)
+	await get_tree().create_timer(0.3).timeout
+	camera.look_at_from_position(Vector3(-17.0, 2.5, 27.0), Vector3(-12.0, 0.3, 22.0))
+	player.weapons.mag = 0
+	player.weapons.start_reload()
+	await _save_series("perks_boeller", 4, 0.15)
+	camera.current = false
+	(main.get_node("UI") as CanvasLayer).show()
+	await get_tree().create_timer(2.0).timeout
+	player.health._health = 5.0
+	player.take_damage(100)
+	await get_tree().create_timer(0.3).timeout
+	await _save("perks_hud_sturschaedl")
+
+
+func _m5(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	var player := main.get_node("Player") as Player
+	var zones := main.get_node("Zones") as ZoneMap
+	var waves := main.get_node("WaveManager") as WaveManager
+	for id: StringName in [&"kueche", &"lager", &"terrasse", &"skiraum", &"seilbahn", &"schuppen"]:
+		zones.unlock(id, player)
+	await get_tree().create_timer(1.0).timeout
+	var camera := Camera3D.new()
+	camera.fov = 70.0
+	add_child(camera)
+	camera.current = true
+	(main.get_node("UI") as CanvasLayer).hide()
+	# Line-up on the pasture, frozen in place.
+	var x: float = -16.0
+	for id: String in ["wanderer", "tourist", "knappe", "perchte", "krampus"]:
+		var enemy: Enemy = waves._create_enemy()
+		enemy.activate(load("res://data/enemies/%s.tres" % id), 1, Transform3D(Basis.IDENTITY, Vector3(x, -0.3, 24.0)).looking_at(Vector3(x, -0.3, 30.0), Vector3.UP))
+		enemy.set_physics_process(false)
+		x += 1.8
+	camera.look_at_from_position(Vector3(-12.4, 1.4, 28.6), Vector3(-12.4, 1.0, 24.0))
+	await get_tree().create_timer(0.3).timeout
+	await _save("m5_enemies")
+	camera.look_at_from_position(Vector3(-13.4, 1.8, 26.0), Vector3(-9.2, 1.4, 24.0))
+	await _save("m5_krampus")
+	camera.look_at_from_position(Vector3(-8.3, 1.6, -10.75), Vector3(-11.0, 1.3, -10.75))
+	await _save("m5_shrine")
+	var chest := main.find_children("*", "Huettentruhe", true, false)[0] as Huettentruhe
+	camera.look_at_from_position(chest.to_global(Vector3(0.6, 1.6, -2.6)), chest.to_global(Vector3(0, 0.5, -0.4)))
+	await _save("m5_chest")
+	player.points.add(5000)
+	chest.interact(player)
+	await get_tree().create_timer(0.8).timeout
+	await _save("m5_chest_roll")
+	await get_tree().create_timer(chest.pool.roll_time).timeout
+	await _save("m5_chest_offer")
+	var crate := main.find_children("*", "AmmoCrate", true, false)[0] as AmmoCrate
+	camera.look_at_from_position(crate.to_global(Vector3(0.5, 1.6, -2.2)), crate.to_global(Vector3(0, 0.4, -0.4)))
+	await _save("m5_crate")
+	# In-hand Repetierer.
+	camera.current = false
+	(main.get_node("UI") as CanvasLayer).show()
+	player.global_position = Vector3(-1.0, 0.0, 1.0)
+	player.rotation.y = -PI * 0.5
+	var weapons: WeaponHolder = player.weapons
+	weapons.give_weapon(load("res://data/weapons/repetierer.tres"))
+	await get_tree().create_timer(0.6).timeout
+	await _save("m5_rep_idle")
+	weapons._fire()
+	await _save_series("m5_rep_fire", 4, 0.05)
+	await get_tree().create_timer(0.4).timeout
+	weapons.force_aim = true
+	await get_tree().create_timer(0.1).timeout
+	await _save("m5_rep_fan")
+	weapons.force_aim = false
+	await get_tree().create_timer(0.4).timeout
+	weapons.mag = 0
+	weapons.start_reload()
+	await _save_series("m5_rep_reload", 8, (weapons.weapon.reload_time + weapons.weapon.chamber_time) / 8.0)

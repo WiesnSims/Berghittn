@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="JauseData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/perks/jause_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"kasnockn"
+display_name = "JAUSE_KASNOCKN"
+description = "JAUSE_KASNOCKN_DESC"
+base_cost = 1000
+cost_step = 1000
+max_level = 5
+damage_bonus = 0.1

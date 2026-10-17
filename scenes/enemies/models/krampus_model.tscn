@@ -1,0 +1,425 @@
+[gd_scene load_steps=55 format=3]
+
+[sub_resource type="StandardMaterial3D" id="Fur"]
+albedo_color = Color(0.08, 0.07, 0.07, 1)
+roughness = 1
+
+[sub_resource type="StandardMaterial3D" id="FurGrey"]
+albedo_color = Color(0.22, 0.2, 0.19, 1)
+roughness = 1
+
+[sub_resource type="StandardMaterial3D" id="Face"]
+albedo_color = Color(0.6, 0.08, 0.06, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="Horn"]
+albedo_color = Color(0.25, 0.2, 0.16, 1)
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Tongue"]
+albedo_color = Color(0.85, 0.2, 0.3, 1)
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Teeth"]
+albedo_color = Color(0.95, 0.92, 0.8, 1)
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Chain"]
+albedo_color = Color(0.35, 0.35, 0.38, 1)
+metallic = 0.8
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Bell"]
+albedo_color = Color(0.7, 0.55, 0.22, 1)
+metallic = 0.8
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="Rute"]
+albedo_color = Color(0.45, 0.3, 0.17, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Eyes"]
+shading_mode = 0
+albedo_color = Color(1, 0.9, 0.2, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="M0"]
+material = SubResource("Fur")
+size = Vector3(0.26, 0.72, 0.3)
+
+[sub_resource type="BoxMesh" id="M1"]
+material = SubResource("Fur")
+size = Vector3(0.26, 0.72, 0.3)
+
+[sub_resource type="BoxMesh" id="M2"]
+material = SubResource("FurGrey")
+size = Vector3(0.22, 0.12, 0.3)
+
+[sub_resource type="BoxMesh" id="M3"]
+material = SubResource("FurGrey")
+size = Vector3(0.22, 0.12, 0.3)
+
+[sub_resource type="BoxMesh" id="M4"]
+material = SubResource("Fur")
+size = Vector3(0.66, 0.7, 0.44)
+
+[sub_resource type="BoxMesh" id="M5"]
+material = SubResource("FurGrey")
+size = Vector3(0.18, 0.28, 0.18)
+
+[sub_resource type="BoxMesh" id="M6"]
+material = SubResource("FurGrey")
+size = Vector3(0.18, 0.28, 0.18)
+
+[sub_resource type="BoxMesh" id="M7"]
+material = SubResource("FurGrey")
+size = Vector3(0.18, 0.28, 0.18)
+
+[sub_resource type="BoxMesh" id="M8"]
+material = SubResource("FurGrey")
+size = Vector3(0.18, 0.28, 0.18)
+
+[sub_resource type="BoxMesh" id="M9"]
+material = SubResource("FurGrey")
+size = Vector3(0.18, 0.28, 0.18)
+
+[sub_resource type="BoxMesh" id="M10"]
+material = SubResource("Fur")
+size = Vector3(0.17, 0.17, 0.62)
+
+[sub_resource type="BoxMesh" id="M11"]
+material = SubResource("Fur")
+size = Vector3(0.17, 0.17, 0.62)
+
+[sub_resource type="BoxMesh" id="M12"]
+material = SubResource("Face")
+size = Vector3(0.13, 0.1, 0.16)
+
+[sub_resource type="BoxMesh" id="M13"]
+material = SubResource("Face")
+size = Vector3(0.13, 0.1, 0.16)
+
+[sub_resource type="BoxMesh" id="M14"]
+material = SubResource("Rute")
+size = Vector3(0.04, 0.04, 0.8)
+
+[sub_resource type="BoxMesh" id="M15"]
+material = SubResource("Rute")
+size = Vector3(0.015, 0.015, 0.45)
+
+[sub_resource type="BoxMesh" id="M16"]
+material = SubResource("Rute")
+size = Vector3(0.015, 0.015, 0.45)
+
+[sub_resource type="BoxMesh" id="M17"]
+material = SubResource("Rute")
+size = Vector3(0.015, 0.015, 0.45)
+
+[sub_resource type="BoxMesh" id="M18"]
+material = SubResource("Rute")
+size = Vector3(0.015, 0.015, 0.45)
+
+[sub_resource type="BoxMesh" id="M19"]
+material = SubResource("Chain")
+size = Vector3(0.07, 0.04, 0.09)
+
+[sub_resource type="BoxMesh" id="M20"]
+material = SubResource("Chain")
+size = Vector3(0.07, 0.04, 0.09)
+
+[sub_resource type="BoxMesh" id="M21"]
+material = SubResource("Chain")
+size = Vector3(0.07, 0.04, 0.09)
+
+[sub_resource type="BoxMesh" id="M22"]
+material = SubResource("Chain")
+size = Vector3(0.07, 0.04, 0.09)
+
+[sub_resource type="BoxMesh" id="M23"]
+material = SubResource("Chain")
+size = Vector3(0.07, 0.04, 0.09)
+
+[sub_resource type="BoxMesh" id="M24"]
+material = SubResource("Chain")
+size = Vector3(0.07, 0.04, 0.09)
+
+[sub_resource type="CylinderMesh" id="M25"]
+material = SubResource("Bell")
+top_radius = 0.13
+bottom_radius = 0.2
+height = 0.3
+radial_segments = 10
+
+[sub_resource type="BoxMesh" id="M26"]
+material = SubResource("Face")
+size = Vector3(0.34, 0.38, 0.28)
+
+[sub_resource type="BoxMesh" id="M27"]
+material = SubResource("Face")
+size = Vector3(0.28, 0.12, 0.2)
+
+[sub_resource type="BoxMesh" id="M28"]
+material = SubResource("Teeth")
+size = Vector3(0.24, 0.04, 0.04)
+
+[sub_resource type="BoxMesh" id="M29"]
+material = SubResource("Tongue")
+size = Vector3(0.08, 0.36, 0.03)
+
+[sub_resource type="BoxMesh" id="M30"]
+material = SubResource("Eyes")
+size = Vector3(0.07, 0.04, 0.02)
+
+[sub_resource type="BoxMesh" id="M31"]
+material = SubResource("Eyes")
+size = Vector3(0.07, 0.04, 0.02)
+
+[sub_resource type="BoxMesh" id="M32"]
+material = SubResource("FurGrey")
+size = Vector3(0.12, 0.3, 0.12)
+
+[sub_resource type="BoxMesh" id="M33"]
+material = SubResource("FurGrey")
+size = Vector3(0.12, 0.3, 0.12)
+
+[sub_resource type="CylinderMesh" id="M34"]
+material = SubResource("Horn")
+top_radius = 0.051
+bottom_radius = 0.085
+height = 0.36
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M35"]
+material = SubResource("Horn")
+top_radius = 0.051
+bottom_radius = 0.085
+height = 0.36
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M36"]
+material = SubResource("Horn")
+top_radius = 0.039
+bottom_radius = 0.065
+height = 0.3
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M37"]
+material = SubResource("Horn")
+top_radius = 0.039
+bottom_radius = 0.065
+height = 0.3
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M38"]
+material = SubResource("Horn")
+top_radius = 0.027
+bottom_radius = 0.045
+height = 0.26
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M39"]
+material = SubResource("Horn")
+top_radius = 0.027
+bottom_radius = 0.045
+height = 0.26
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M40"]
+material = SubResource("Horn")
+top_radius = 0.015
+bottom_radius = 0.025
+height = 0.2
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M41"]
+material = SubResource("Horn")
+top_radius = 0.015
+bottom_radius = 0.025
+height = 0.2
+radial_segments = 10
+
+[sub_resource type="BoxMesh" id="M42"]
+material = SubResource("Fur")
+size = Vector3(0.14, 0.06, 0.08)
+
+[sub_resource type="BoxMesh" id="M43"]
+material = SubResource("Fur")
+size = Vector3(0.14, 0.06, 0.08)
+
+[node name="KrampusModel" type="Node3D"]
+
+[node name="LegL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.42, 0.04)
+mesh = SubResource("M0")
+
+[node name="LegR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.42, 0.04)
+mesh = SubResource("M1")
+
+[node name="HoofL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.06, -0.02)
+mesh = SubResource("M2")
+
+[node name="HoofR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.06, -0.02)
+mesh = SubResource("M3")
+
+[node name="Torso" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9848, 0.1736, 0, -0.1736, 0.9848, 0, 1.14, 0)
+mesh = SubResource("M4")
+
+[node name="Tuft0" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9781, -0.2079, 0, 0.2048, 0.9633, 0.1736, -0.0361, -0.1699, 0.9848, -0.26, 1.38, -0.22)
+mesh = SubResource("M5")
+
+[node name="Tuft1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.829, -0.265, 0.4924, 0.2048, 0.9633, 0.1736, -0.5203, -0.0431, 0.8529, 0.24, 1.42, -0.22)
+mesh = SubResource("M6")
+
+[node name="Tuft2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.4578, -0.2511, 0.8529, 0.2048, 0.9633, 0.1736, -0.8652, 0.0951, 0.4924, -0.1, 0.96, -0.22)
+mesh = SubResource("M7")
+
+[node name="Tuft3" type="MeshInstance3D" parent="."]
+transform = Transform3D(-0.0361, -0.1699, 0.9848, 0.2048, 0.9633, 0.1736, -0.9781, 0.2079, 0, 0.2, 0.9, -0.22)
+mesh = SubResource("M8")
+
+[node name="Tuft4" type="MeshInstance3D" parent="."]
+transform = Transform3D(-0.5203, -0.0431, 0.8529, 0.2048, 0.9633, 0.1736, -0.829, 0.265, -0.4924, 0, 1.25, -0.22)
+mesh = SubResource("M9")
+
+[node name="ArmL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9511, -0.309, 0, 0.309, 0.9511, -0.4, 1.28, -0.22)
+mesh = SubResource("M10")
+
+[node name="ArmR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9511, -0.309, 0, 0.309, 0.9511, 0.4, 1.28, -0.22)
+mesh = SubResource("M11")
+
+[node name="ClawL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 1.1, -0.52)
+mesh = SubResource("M12")
+
+[node name="ClawR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 1.1, -0.52)
+mesh = SubResource("M13")
+
+[node name="Rute" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.8192, -0.5736, 0, 0.5736, 0.8192, 0.42, 1.25, -0.8)
+mesh = SubResource("M14")
+
+[node name="Twig0" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9659, -0.1485, -0.212, 0, 0.8192, -0.5736, 0.2588, 0.554, 0.7912, 0.375, 1.48, -1.05)
+mesh = SubResource("M15")
+
+[node name="Twig1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9962, -0.0594, -0.0637, 0, 0.7314, -0.682, 0.0872, 0.6794, 0.7286, 0.405, 1.5, -1.05)
+mesh = SubResource("M16")
+
+[node name="Twig2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9962, 0.0677, 0.0548, 0, 0.6293, -0.7771, -0.0872, 0.7742, 0.6269, 0.435, 1.52, -1.05)
+mesh = SubResource("M17")
+
+[node name="Twig3" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9659, 0.2219, 0.1333, 0, 0.515, -0.8572, -0.2588, 0.828, 0.4975, 0.465, 1.54, -1.05)
+mesh = SubResource("M18")
+
+[node name="Chain0" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.7071, 0.7071, 0, -0.7071, 0.7071, 0, 0, 0, 1, -0.3, 1.5, -0.24)
+mesh = SubResource("M19")
+
+[node name="Chain1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.7071, 0.7071, 0, -0.7071, 0.7071, 0, 0, 0, 1, -0.18, 1.38, -0.24)
+mesh = SubResource("M20")
+
+[node name="Chain2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.7071, 0.7071, 0, -0.7071, 0.7071, 0, 0, 0, 1, -0.06, 1.26, -0.24)
+mesh = SubResource("M21")
+
+[node name="Chain3" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.7071, 0.7071, 0, -0.7071, 0.7071, 0, 0, 0, 1, 0.06, 1.14, -0.24)
+mesh = SubResource("M22")
+
+[node name="Chain4" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.7071, 0.7071, 0, -0.7071, 0.7071, 0, 0, 0, 1, 0.18, 1.02, -0.24)
+mesh = SubResource("M23")
+
+[node name="Chain5" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.7071, 0.7071, 0, -0.7071, 0.7071, 0, 0, 0, 1, 0.3, 0.9, -0.24)
+mesh = SubResource("M24")
+
+[node name="Schelle" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 1.15, 0.33)
+mesh = SubResource("M25")
+
+[node name="Face" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.62, -0.06)
+mesh = SubResource("M26")
+
+[node name="Jaw" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.43, -0.12)
+mesh = SubResource("M27")
+
+[node name="Teeth" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -0.22)
+mesh = SubResource("M28")
+
+[node name="Tongue" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 0.9781, 0.2079, 0, -0.2079, 0.9781, 0, 1.27, -0.25)
+mesh = SubResource("M29")
+
+[node name="EyeL" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(0.9659, -0.2588, 0, 0.2588, 0.9659, 0, 0, 0, 1, -0.08, 1.7, -0.205)
+mesh = SubResource("M30")
+
+[node name="EyeR" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(0.9659, 0.2588, 0, -0.2588, 0.9659, 0, 0, 0, 1, 0.08, 1.7, -0.205)
+mesh = SubResource("M31")
+
+[node name="BeardL" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 1.38, -0.14)
+mesh = SubResource("M32")
+
+[node name="BeardR" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 1.38, -0.14)
+mesh = SubResource("M33")
+
+[node name="Horn0L" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(0.5736, -0.8192, 0, 0.8192, 0.5736, 0, 0, 0, 1, -0.287447, 1.88324, 0)
+mesh = SubResource("M34")
+
+[node name="Horn0R" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(0.5736, 0.8192, 0, -0.8192, 0.5736, 0, 0, 0, 1, 0.287447, 1.88324, 0)
+mesh = SubResource("M35")
+
+[node name="Horn1L" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(0.9063, -0.4226, 0, 0.4226, 0.9063, 0, 0, 0, 1, -0.474696, 2.10591, 0)
+mesh = SubResource("M36")
+
+[node name="Horn1R" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(0.9063, 0.4226, 0, -0.4226, 0.9063, 0, 0, 0, 1, 0.474696, 2.10591, 0)
+mesh = SubResource("M37")
+
+[node name="Horn2L" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(0.9962, 0.0872, 0, -0.0872, 0.9962, 0, 0, 0, 1, -0.516616, 2.34961, 0)
+mesh = SubResource("M38")
+
+[node name="Horn2R" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(0.9962, -0.0872, 0, 0.0872, 0.9962, 0, 0, 0, 1, 0.516616, 2.34961, 0)
+mesh = SubResource("M39")
+
+[node name="Horn3L" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(0.866, 0.5, 0, -0.5, 0.866, 0, 0, 0, 1, -0.457098, 2.545, 0)
+mesh = SubResource("M40")
+
+[node name="Horn3R" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(0.866, -0.5, 0, 0.5, 0.866, 0, 0, 0, 1, 0.457098, 2.545, 0)
+mesh = SubResource("M41")
+
+[node name="EarL" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(0.9063, -0.4226, 0, 0.4226, 0.9063, 0, 0, 0, 1, -0.24, 1.7, 0)
+mesh = SubResource("M42")
+
+[node name="EarR" type="MeshInstance3D" parent="." groups=["head_part"]]
+transform = Transform3D(0.9063, 0.4226, 0, -0.4226, 0.9063, 0, 0, 0, 1, 0.24, 1.7, 0)
+mesh = SubResource("M43")

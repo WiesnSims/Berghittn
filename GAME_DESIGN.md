@@ -100,8 +100,8 @@ Zones (each is a separate area scene joined at doors). Costs are in points.
 |---|---|---|---|---|
 | `stube` | Gaststube (main room) | yes | – | Spawn point, first wall-buy, fireplace; two-storey hall with gallery, Erker and balcony |
 | `kueche` | Küche | no | 500 | Kitchen with a Speis (pantry); Schnaps shrine (perk machine) |
-| `lager` | Matratzenlager | no | 1250 | Upstairs dorm over the Küche, door on the Stube gallery; no windows enemies can climb (they come up the stairs) |
-| `terrasse` | Terrasse | no | 750 | Open snowy terrace, long sight lines |
+| `lager` | Matratzenlager | no | 1250 | Upstairs dorm over the Küche, door on the Stube gallery; no windows enemies can climb (they come up the stairs); Munitionskiste |
+| `terrasse` | Terrasse | no | 750 | Open snowy terrace, long sight lines over the beer garden |
 | `skiraum` | Skiraum | no | 1000 | Narrow room, good chokepoint, wall-buy |
 | `schuppen` | Holzschuppen | no | 1250 | Woodshed, the mystery chest spawns here at fixed spot |
 | `seilbahn` | Seilbahn-Station | no | 1500 | Cable car station, the alphorn weapon location in later waves |
@@ -113,6 +113,18 @@ has a pantry, the Skiraum a boot corridor behind a partition (the chokepoint), t
 raised boarding platform with the gondola alongside, the Holzschuppen a hay loft up a ramp, and the
 Terrasse two levels: a deck along the hut and a lower beer garden dug into the slope. Every change of
 level is a ramp (stairs are a ramp with steps on top) with curbs, since enemies cannot climb steps.
+
+Every room has a purpose (user request, 2026-10-17), something worth going there for:
+
+| Zone | Purpose |
+|---|---|
+| `stube` | Start, Jagdflinte wall-buy, later the Kuhglocke wall-buy |
+| `kueche` | Schnaps shrine (perks) and the Brettljause in the Speis (stats), section 9; later the Schmarrnpfanne wall-buy |
+| `lager` | **Munitionskiste** (1000): refills the reserve of every carried gun at once; the only refill for chest guns. The safe-ish room: no climbable windows |
+| `terrasse` | Long sight lines over the sunken beer garden, and **die Resi**, the lost Almkuh (section 8a) who turns up in the garden. The Schneekanone trap was cut after play-testing (2026-10-17, "unfun and useless"); buyable traps or obstacles stay an idea for later |
+| `skiraum` | Chokepoint, Stutzen wall-buy |
+| `schuppen` | Hüttentruhe (mystery chest), later the Kuhfladen-Mine wall-buy |
+| `seilbahn` | Handböller wall-buy and the Alphorn in later waves; arrive with the special weapons (section 6a) |
 
 Enemy spawn points ("Fenster" and "Türen") are placed per zone as `Marker3D`
 nodes in group `spawn_points`. A spawn point is **active** only if its zone
@@ -141,10 +153,10 @@ effects, see section 6a), `secondary` (what right click does, see the rules belo
 
 | Id | Name | Type | Damage | Fire rate (shots/s) | Mag / Reserve | Cost |
 |---|---|---|---|---|---|---|
-| `pistole` | Dienstpistole | semi-auto pistol | 25 | 4 | 8 / 64 | start weapon |
+| `pistole` | Dienstpistole | semi-auto pistol | 25 | up to 10 (as fast as you click) | 8 / 64 | start weapon |
 | `jagdflinte` | Jagdflinte | double-barrel shotgun | 20 x 8 pellets | 1.5 | 2 / 24 | 500 (wall-buy, Stube) |
 | `stutzen` | Stutzen | bolt-action rifle | 120 | 0.8 | 5 / 40 | 750 (wall-buy, Skiraum) |
-| `repetierer` | Repetierer | lever/repeater rifle | 45 | 3 | 10 / 80 | 1000 (chest only) |
+| `repetierer` | Repetierer | lever/repeater rifle | 45 | 3 (5.5 fanned) | 10 / 80 | 1000 (chest only) |
 | `schaufel` | Schneeschaufel | melee | 70 | 1.2 | – | 0 (always equipped) |
 | `alphorn` | Alphorn | wonder weapon | 200 area | 0.5 | 6 / 18 | chest only, rare |
 | `knoedelwerfer` | Knödelwerfer | wonder weapon | 180 area | 1.0 | 12 / 36 | chest only, rare |
@@ -174,15 +186,32 @@ Rules:
     almost no spread, a slow sway of the aim while scoped.
   - `jagdflinte`: fire both barrels at once (press): all loaded shells in one blast, recoil per
     shell; the gun is then empty.
+  - `repetierer`: fan the lever (hold): fires from the hip on its own as fast as the lever can be
+    worked (5.5 shots/s instead of 3), +4° spread and harder kick.
+- Semi-auto guns fire once per click, as fast as the player clicks, up to `fire_rate` (user request,
+  2026-10-17); holding the button does not auto-fire. A click during the cycle is remembered for a
+  moment and fires as soon as the gun is ready, so fast clicking is never swallowed.
+- Penetration (user request, 2026-10-17): big calibres go through bodies. `penetration` is how many
+  enemies behind the first one a shot can still hit; each body passed halves the damage
+  (`penetration_falloff` 0.5: 100 %, 50 %, 25 %, …). Stutzen: 3 more, Repetierer: 1 more, pistol:
+  none. Jagdflinte pellets go through 2 more, but only within 6 m of the muzzle
+  (`penetration_range`, play-test 2026-10-17): up close a blast hits the whole front of a crowd.
 - Bloom (user request, 2026-10-16): each shot widens the spread a little (`bloom_per_shot`, capped
   at `bloom_max`), and it settles back; the crosshair arms move apart by the same amount, so it stays
   honest about where shots can go. Kept small: rapid fire loosens the aim, it does not ruin it.
+  Exception, the pistol (play-test 2026-10-17): spam-clicking must cost accuracy, so each shot adds
+  1.5° (up to 6°) and it settles at 4°/s. Clicking about twice a second stays precise, ten a
+  second sprays.
 - Slots: 2 gun slots (wonder weapons and the hand mortar use a gun slot),
   1 melee slot (starts with the shovel, can be replaced), 1 equipment slot
   (stackable throwables, see section 6a).
 - **Hüttentruhe (mystery chest):** costs 950, gives a random weapon from the
   chest pool, weighted (each wonder weapon weight 1, all others weight 5). Fixed location in
   `schuppen`. Animation: lid opens, weapon floats for 4 s, player must take it.
+  Details (M5): the pool lives in `data/chest_pool.tres`; it never offers a gun the buyer already
+  carries. The guns cycle for 2.5 s, slowing down, before one settles. Taking it fills a free slot or
+  swaps out the gun in hand; not taken in 4 s, it sinks back and the points are gone.
+  Until the special weapons exist the pool is Repetierer, Jagdflinte and Stutzen.
 - **Alphorn:** fires a cone-shaped sound wave that damages and knocks back
   all enemies in a 12 m cone; funny low horn sound, screen shake.
 
@@ -228,6 +257,7 @@ Alpine folk culture.
 |---|---|---|---|---|---|
 | `kuhglocke` | Kuhglocke | Thrown decoy cowbell; rings for 10 s and attracts all enemies within 20 m | 300 | 2 | wall-buy, Stube |
 | `kuhfladen` | Kuhfladen-Mine | Placed on the floor; enemies stepping in it are slowed 60% for 5 s and take 40 damage | 250 | 3 | wall-buy, Schuppen |
+| `eisstock` | Eisstock | Thrown low, slides along the floor like a curling stone, bounces off walls up to 3 times and damages every enemy it slides through. Deliberately overpowered (user request, 2026-10-17) | – | 2 | only as an event reward (section 8a): no wall-buy, no refill |
 
 Balance notes: wonder weapons must feel exciting but not make the game trivial.
 Tune damage numbers by playtesting, and keep every number in the data
@@ -238,7 +268,9 @@ resources so changes never require code edits.
 All enemies share a base `Enemy` scene and are configured by `EnemyData`
 resources. Navigation uses `NavigationAgent3D` with a baked navmesh per zone.
 Enemy AI is simple: move to nearest player; if a barricade is in the way,
-attack it; attack in melee range.
+attack it; attack in melee range. An enemy that stops making headway while chasing (pressed into a
+door edge or a corner, or blocked by other bodies) sidesteps and repaths after 0.8 s, and an enemy
+never rides on top of another one (play-test bug, 2026-10-17).
 
 | Id | Name | HP formula | Speed | Damage | Notes |
 |---|---|---|---|---|---|
@@ -247,6 +279,13 @@ attack it; attack in melee range.
 | `knappe` | Bergknappe (miner) | 400 + 50·wave | 1.8 m/s | 45 | Tank, appears from wave 6 |
 | `perchte` | Perchte | 250 + 30·wave | 4.0 m/s | 30 | Wooden-mask monster, appears from wave 8, short lunge attack |
 | `krampus` | Krampus (boss) | 3000 + 500·(wave/5) | 3.0 m/s | 60 | Boss wave every 5th wave starting wave 5, spawns with 6 wanderers |
+
+Boss waves (M5): from wave 5, every 5th wave is the Krampus plus 6 wanderers instead of the usual
+mix, announced with "Da Krampus kummt!" and a boss health bar. The Perchte lunge: from up to 4.5 m
+with a clear line it crouches (0.35 s, the moment to side-step) and leaps, striking on contact; then
+3 s until the next one. Heavy enemies (Knappe, Krampus) are drawn bigger and barely flinch.
+Enemy mix weights (`wave_table.tres`): wanderer 6, tourist 2 (from wave 3), knappe 0.8 (from 6),
+perchte 1.2 (from 8).
 
 Headshots deal `headshot_multiplier` x damage (default 2.0).
 Death: ragdoll-lite (simple fall animation or particle puff), disappears
@@ -280,18 +319,64 @@ Optional power-ups dropped from enemies (random 3%): **Doppelte Punkte** (30 s),
 **Sofort-Kill** (20 s), **Nachschub** (full ammo). Implement only after
 milestone 5.
 
-## 9. Perks: the Schnaps shrine (Küche)
+## 8a. Events (user request, 2026-10-17)
 
-One shrine in the kitchen sells perks, each once per life. Costs in points.
+Funny, typically Austrian things that happen now and then between and during waves. Each one is
+announced to every player with a banner and stays findable from anywhere on the map: a tall light
+column over it, an arrow at the screen edge pointing to it, and a label that shows through walls.
+Their sounds (the bell, the scream, the beer) come with M6; the Murmeltier's scream must be our own
+take on the meme, not the clip itself.
 
-| Perk | Cost | Effect |
-|---|---|---|
-| Enzian | 2000 | +50 max health |
-| Marillenbrand | 2500 | Revive speed x2, reload speed +25% |
-| Jagertee | 1500 | Movement speed +15% |
-| Zirbenschnaps | 3000 | Weapon damage +20% |
+**Die Resi (main event, Terrasse).** "Die Resi hat si verlaufen!" A lost Almkuh with a flower wreath
+and a huge bell wanders into the beer garden. She only comes while the Terrasse is open, every 3 to 5
+waves from wave 3, and stays 45 s.
+- Hold E next to her to milk her: fresh Almmilch heals fully and gives a free helping from the
+  Brettljause (one not yet at five).
+- Her bell draws every enemy within 20 m to her, so getting the milk is a fight.
+- If enemies reach her, she bolts off mooing and the milk is gone.
+
+**Random events.** At most one per wave, with a chance each wave from wave 2 (not every wave, and
+never on a boss wave); the same one does not come twice in a row.
+- **"Bierfassl kert onzapft!"** A beer barrel breaks loose up on the alm and rolls down the slope
+  across the beer garden, bouncing, flattening every enemy in its way. Whoever stops it (walks into
+  it) and taps it (hold E) gets Freibier: a random Schnaps they do not own yet, for free.
+- **The Murmeltier.** A marmot pops out of the floor somewhere on the open part of the map, indoors
+  too, screams the meme scream and ducks away again, a few times in different spots close by. Hit it
+  (shot or melee) before it is gone for points and a full refill of the gun in hand.
+- **"Deitscha Tourist"** A lost German tourist in sandals and socks gets off at the Seilbahn and
+  heads for the Stube. Enemies go for him too; escort him there alive and he hands over the only
+  Eisstöcke in the game ("Das ist ja total urig hier!").
+
+## 9. Perks: the Schnaps shrine (Küche) and the Brettljause (Speis)
+
+One shrine in the kitchen sells perks, each once per life. Costs in points. Every Schnaps gives one
+signature effect you notice in a fight, not a plain stat (play-test, 2026-10-17); plain stats come
+from the Brettljause below. Tuning numbers are `PERK_*` in constants.gd.
+
+| Schnaps | Perk | Cost | Effect |
+|---|---|---|---|
+| Jagertee | **Gmiatlichkeit** | 1500 | Stand still or crouch for 2 s: health regenerates at once (no 5 s wait) and three times as fast; a warm glow shows it |
+| Enzian | **Sturschädl** | 2000 | Once per wave a deadly hit leaves 1 HP and 4 s of invincibility: pulsing gold screen glow, banner "Na, sicher ned!" |
+| Marillenbrand | **Böllerschuss** | 2500 | Starting a reload on an empty magazine sets off a Schützen black-powder Böller at your feet: 150 + 20·wave damage within 4.5 m (half at the edge, walls block it), survivors are thrown back; 6 s to pack the next charge |
+| Obstler | **Grantler** | 2500 | +5 % damage for every enemy within 5 m, up to +30 %; the tile shows the bonus |
+| Zirbenschnaps | **Durchschlag** | 3000 | Every gun goes through one more enemy (on top of section 6's penetration; buckshot still only up close) |
+| Jagamoasta | **56 gsunde Kräuter** | 3500 | Every kill is a herb; at 56 you are fully healed and hit twice as hard for 10 s (the Kräuterrausch, green glow); the tile counts the herbs |
 
 Perks are lost when the player is downed (solo: irrelevant, game over).
+The shrine (M5) is a painted wall cabinet with one bottle per Schnaps, cheapest on the left; the
+bottle you look at is the one E buys (with several things in reach, the one looked at most directly
+wins). Owned perks show as coloured tiles above the health bar with a short badge and what the perk
+is doing (cooldown, bonus, herbs); a spent or idle one is greyed out.
+
+**Brettljause** (play-test, 2026-10-17): a wooden board on a table in the Speis. Each thing on it can
+be bought again and again, five helpings each, every helping costing more; the gains stay for the
+whole run, even when downed.
+
+| Jause | Per helping | First helping | Each further one |
+|---|---|---|---|
+| Speck | +20 max health | 750 | +750 |
+| Germknedl | +10 % reload speed | 750 | +750 |
+| Pinzgauer Kasnockn | +10 % weapon damage | 1000 | +1000 |
 
 ## 10. Co-op (1–4 players) — design only, build late
 
@@ -366,6 +451,9 @@ fix console errors, commit. Stop and report after each milestone.
 
 **M5 — Shrine, chest, more enemies**
 - Perks, Hüttentruhe, `tourist`, `knappe`, `perchte`, `krampus` boss wave.
+- Events (section 8a), one at a time: die Resi first (with the event director and the map-wide
+  markers), then the Bierfassl, the Murmeltier, and the Deitscha Tourist with the Eisstock (which
+  brings the equipment slot).
 - Special weapons from section 6a, one at a time in this order: alphorn,
   Schmarrnpfanne, Knödelwerfer, Kuhglocke, Kuhfladen-Mine, then the rest.
   Report after each one; the user may stop adding weapons at any point.

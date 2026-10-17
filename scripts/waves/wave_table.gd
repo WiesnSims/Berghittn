@@ -14,6 +14,17 @@ extends Resource
 ## Seconds of break between waves.
 @export var break_time: float = 10.0
 @export var entries: Array[WaveEntry] = []
+## Boss waves (section 7): from boss_first_wave on, every boss_every-th wave is the boss plus
+## boss_escort_count escorts instead of the usual mix. 0 boss_every = no boss waves.
+@export var boss: EnemyData
+@export var boss_escort: EnemyData
+@export var boss_escort_count: int = 6
+@export var boss_first_wave: int = 5
+@export var boss_every: int = 5
+
+
+func is_boss_wave(wave: int) -> bool:
+	return boss != null and boss_every > 0 and wave >= boss_first_wave and (wave - boss_first_wave) % boss_every == 0
 
 
 func enemy_count(wave: int, players: int) -> int:

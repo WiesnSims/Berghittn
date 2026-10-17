@@ -37,17 +37,27 @@ func _use() -> void:
 
 
 func _find_target() -> Node3D:
+	# Of everything in reach, the one looked at most directly wins, so items side by side (the
+	# shrine's bottles) can each be picked by looking at them.
 	var best: Node3D = null
-	var best_distance: float = Constants.INTERACT_RANGE
+	var best_score: float = INF
+	var eye: Node3D = _player.weapons
+	var look: Vector3 = -eye.global_basis.z
 	for node: Node in get_tree().get_nodes_in_group("interactables"):
 		var candidate := node as Node3D
 		if candidate.get_interact_prompt(_player) == "":
 			continue
-		var offset: Vector3 = candidate.get_interact_position() - _player.global_position
+		var at: Vector3 = candidate.get_interact_position()
+		var offset: Vector3 = at - _player.global_position
 		if absf(offset.y) > Constants.INTERACT_MAX_HEIGHT:
 			continue
 		var distance: float = Vector2(offset.x, offset.z).length()
-		if distance < best_distance:
+		if distance >= Constants.INTERACT_RANGE:
+			continue
+		var to_item: Vector3 = at - eye.global_position
+		var angle: float = look.angle_to(to_item) if to_item.length_squared() > 0.0001 else 0.0
+		var score: float = distance + angle * Constants.INTERACT_LOOK_WEIGHT
+		if score < best_score:
 			best = candidate
-			best_distance = distance
+			best_score = score
 	return best

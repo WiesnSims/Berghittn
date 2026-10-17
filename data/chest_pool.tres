@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ChestPool" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/chest/chest_pool.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/chest/chest_entry.gd" id="2"]
+[ext_resource type="Resource" path="res://data/weapons/repetierer.tres" id="3"]
+[ext_resource type="Resource" path="res://data/weapons/jagdflinte.tres" id="4"]
+[ext_resource type="Resource" path="res://data/weapons/stutzen.tres" id="5"]
+
+[sub_resource type="Resource" id="Repetierer"]
+script = ExtResource("2")
+weapon = ExtResource("3")
+weight = 5.0
+
+[sub_resource type="Resource" id="Jagdflinte"]
+script = ExtResource("2")
+weapon = ExtResource("4")
+weight = 5.0
+
+[sub_resource type="Resource" id="Stutzen"]
+script = ExtResource("2")
+weapon = ExtResource("5")
+weight = 5.0
+
+[resource]
+script = ExtResource("1")
+cost = 950
+roll_time = 2.5
+offer_time = 4.0
+entries = Array[ExtResource("2")]([SubResource("Repetierer"), SubResource("Jagdflinte"), SubResource("Stutzen")])
