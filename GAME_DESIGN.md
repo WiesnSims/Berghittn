@@ -121,7 +121,7 @@ Every room has a purpose (user request, 2026-10-17), something worth going there
 | `stube` | Start, Jagdflinte wall-buy, later the Kuhglocke wall-buy |
 | `kueche` | Schnaps shrine (perks) and the Brettljause in the Speis (stats), section 9; later the Schmarrnpfanne wall-buy |
 | `lager` | **Munitionskiste** (1000): refills the reserve of every carried gun at once; the only refill for chest guns. The safe-ish room: no climbable windows |
-| `terrasse` | Long sight lines over the sunken beer garden. Purpose still open: the Schneekanone trap was cut after play-testing (2026-10-17, "unfun and useless"). Buyable traps or obstacles stay an idea for later |
+| `terrasse` | Long sight lines over the sunken beer garden, and **die Resi**, the lost Almkuh (section 8a) who turns up in the garden. The Schneekanone trap was cut after play-testing (2026-10-17, "unfun and useless"); buyable traps or obstacles stay an idea for later |
 | `skiraum` | Chokepoint, Stutzen wall-buy |
 | `schuppen` | Hüttentruhe (mystery chest), later the Kuhfladen-Mine wall-buy |
 | `seilbahn` | Handböller wall-buy and the Alphorn in later waves; arrive with the special weapons (section 6a) |
@@ -257,7 +257,7 @@ Alpine folk culture.
 |---|---|---|---|---|---|
 | `kuhglocke` | Kuhglocke | Thrown decoy cowbell; rings for 10 s and attracts all enemies within 20 m | 300 | 2 | wall-buy, Stube |
 | `kuhfladen` | Kuhfladen-Mine | Placed on the floor; enemies stepping in it are slowed 60% for 5 s and take 40 damage | 250 | 3 | wall-buy, Schuppen |
-| `eisstock` | Eisstock | Thrown low, slides along the floor like a curling stone, bounces off walls up to 3 times and damages every enemy it slides through (user request, 2026-10-17) | 400 | 2 | wall-buy, Terrasse (proposed) |
+| `eisstock` | Eisstock | Thrown low, slides along the floor like a curling stone, bounces off walls up to 3 times and damages every enemy it slides through. Deliberately overpowered (user request, 2026-10-17) | – | 2 | only as an event reward (section 8a): no wall-buy, no refill |
 
 Balance notes: wonder weapons must feel exciting but not make the game trivial.
 Tune damage numbers by playtesting, and keep every number in the data
@@ -318,6 +318,34 @@ Points:
 Optional power-ups dropped from enemies (random 3%): **Doppelte Punkte** (30 s),
 **Sofort-Kill** (20 s), **Nachschub** (full ammo). Implement only after
 milestone 5.
+
+## 8a. Events (user request, 2026-10-17)
+
+Funny, typically Austrian things that happen now and then between and during waves. Each one is
+announced to every player with a banner and stays findable from anywhere on the map: a tall light
+column over it, an arrow at the screen edge pointing to it, and a label that shows through walls.
+Their sounds (the bell, the scream, the beer) come with M6; the Murmeltier's scream must be our own
+take on the meme, not the clip itself.
+
+**Die Resi (main event, Terrasse).** "Die Resi hat si verlaufen!" A lost Almkuh with a flower wreath
+and a huge bell wanders into the beer garden. She only comes while the Terrasse is open, every 3 to 5
+waves from wave 3, and stays 45 s.
+- Hold E next to her to milk her: fresh Almmilch heals fully and gives a free helping from the
+  Brettljause (one not yet at five).
+- Her bell draws every enemy within 20 m to her, so getting the milk is a fight.
+- If enemies reach her, she bolts off mooing and the milk is gone.
+
+**Random events.** At most one per wave, with a chance each wave from wave 2 (not every wave, and
+never on a boss wave); the same one does not come twice in a row.
+- **"Bierfassl kert onzapft!"** A beer barrel breaks loose up on the alm and rolls down the slope
+  across the beer garden, bouncing, flattening every enemy in its way. Whoever stops it (walks into
+  it) and taps it (hold E) gets Freibier: a random Schnaps they do not own yet, for free.
+- **The Murmeltier.** A marmot pops out of the floor somewhere on the open part of the map, indoors
+  too, screams the meme scream and ducks away again, a few times in different spots close by. Hit it
+  (shot or melee) before it is gone for points and a full refill of the gun in hand.
+- **"Deitscha Tourist"** A lost German tourist in sandals and socks gets off at the Seilbahn and
+  heads for the Stube. Enemies go for him too; escort him there alive and he hands over the only
+  Eisstöcke in the game ("Das ist ja total urig hier!").
 
 ## 9. Perks: the Schnaps shrine (Küche) and the Brettljause (Speis)
 
@@ -423,8 +451,11 @@ fix console errors, commit. Stop and report after each milestone.
 
 **M5 — Shrine, chest, more enemies**
 - Perks, Hüttentruhe, `tourist`, `knappe`, `perchte`, `krampus` boss wave.
+- Events (section 8a), one at a time: die Resi first (with the event director and the map-wide
+  markers), then the Bierfassl, the Murmeltier, and the Deitscha Tourist with the Eisstock (which
+  brings the equipment slot).
 - Special weapons from section 6a, one at a time in this order: alphorn,
-  Schmarrnpfanne, Knödelwerfer, Kuhglocke, Kuhfladen-Mine, Eisstock, then the rest.
+  Schmarrnpfanne, Knödelwerfer, Kuhglocke, Kuhfladen-Mine, then the rest.
   Report after each one; the user may stop adding weapons at any point.
 - Acceptance: all items purchasable, wave 10 reachable.
 
