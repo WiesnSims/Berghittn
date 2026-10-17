@@ -171,6 +171,7 @@ func _run() -> void:
 	await _check_wall_buys()
 	await _check_shotgun_points()
 	await _check_secondary_modes()
+	_check_repetierer_buy()
 
 	print("RESULT: ", "PASS" if failures.is_empty() else "FAIL (%d)" % failures.size())
 	get_tree().quit(0 if failures.is_empty() else 1)
@@ -227,6 +228,16 @@ func _check_wall_buys() -> void:
 	_check(weapons.mag == 6, "Stutzen reload with a round chambered: 6 (got %d)" % weapons.mag)
 	player.points.total = 300
 	_check(rifle_buy.get_interact_prompt(player).contains("375"), "Stutzen ammo costs 375: %s" % rifle_buy.get_interact_prompt(player))
+
+
+func _check_repetierer_buy() -> void:
+	# On the hut wall over the Terrasse deck, since the Hüttentruhe gives only special weapons (#52).
+	var buy := main.get_node("World/Terrasse/WallBuyRepetierer") as WallBuy
+	_stand_at(buy)
+	_check(player.interactor._find_target() == buy, "E targets the Repetierer wall-buy on the Terrasse")
+	player.points.total = 1200
+	buy.interact(player)
+	_check(player.weapons.weapon.id == &"repetierer" and player.points.total == 200, "Repetierer bought for 1000")
 
 
 func _check_shotgun_points() -> void:

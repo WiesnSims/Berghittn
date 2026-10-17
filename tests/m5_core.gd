@@ -428,7 +428,9 @@ func _clear_enemies(list: Array[Enemy]) -> void:
 func _chest() -> void:
 	var chest := _find(Huettentruhe)[0] as Huettentruhe
 	var pool: ChestPool = chest.pool
-	# Weights: 5 for regular guns, 1 for wonder weapons; every gun comes up about that often.
+	# Only special weapons, each about as often as its weight says (#52: no wall-buy regulars).
+	var regulars: Array = [&"pistole", &"jagdflinte", &"stutzen", &"repetierer"]
+	_check(pool.entries.all(func(e: ChestEntry) -> bool: return not regulars.has(e.weapon.id)) and pool.cost == 1500, "the chest holds only special weapons, for %d" % pool.cost)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 3
 	var counts: Dictionary = {}
@@ -450,10 +452,10 @@ func _chest() -> void:
 	_place(chest.get_interact_position())
 	_look_at(chest.global_position + Vector3(0, 0.6, 0))
 	await _frames(2)
-	_check(player.interactor._find_target() == chest and chest.get_interact_prompt(player).contains("950"), "chest prompt: %s" % chest.get_interact_prompt(player))
+	_check(player.interactor._find_target() == chest and chest.get_interact_prompt(player).contains(str(pool.cost)), "chest prompt: %s" % chest.get_interact_prompt(player))
 	var before: int = player.points.total
 	chest.interact(player)
-	_check(chest.state == Huettentruhe.State.ROLLING and player.points.total == before - 950, "chest opens for 950")
+	_check(chest.state == Huettentruhe.State.ROLLING and player.points.total == before - pool.cost, "chest opens for %d" % pool.cost)
 	await _seconds(pool.roll_time + 0.1)
 	_check(chest.state == Huettentruhe.State.OFFERING and chest.offer != null and not player.weapons.has_weapon(chest.offer), "rolled %s, not one already carried" % (chest.offer.id if chest.offer else &"nothing"))
 	var offer: WeaponData = chest.offer

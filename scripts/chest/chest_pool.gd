@@ -2,7 +2,7 @@ class_name ChestPool
 extends Resource
 ## What the Hüttentruhe costs, how its roll plays out, and what can come out of it (section 6).
 
-@export var cost: int = 950
+@export var cost: int = 1500
 ## Seconds the weapons cycle with the lid open before one is picked, and how long the pick then
 ## floats for the buyer to take it.
 @export var roll_time: float = 2.5

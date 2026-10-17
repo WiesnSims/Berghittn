@@ -106,7 +106,7 @@ godot --headless --fixed-fps 60 res://tests/m4_zones.tscn
 
 Unlocks all six zones on the real main scene with points from the debug key: prompts and costs at
 every door, spawn activation after each purchase against section 4, navmesh paths through opened
-doors, the self-opening last door, both wall-buys, ammo refills at half price, gun slots and switching,
+doors, the self-opening last door, the Jagdflinte, Stutzen and Repetierer wall-buys, ammo refills at half price, gun slots and switching,
 the chamber rule for the new guns, and one payout per shotgun blast (not per pellet).
 
 ```

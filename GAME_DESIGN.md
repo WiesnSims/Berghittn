@@ -124,10 +124,19 @@ Every room has a purpose (user request, 2026-10-17), something worth going there
 | `stube` | Start, Jagdflinte wall-buy, later the Kuhglocke wall-buy |
 | `kueche` | Schnaps shrine (perks) and the Brettljause in the Speis (stats), section 9; later the Schmarrnpfanne wall-buy |
 | `lager` | **Munitionskiste** (1000): refills the reserve of every carried gun at once; the only refill for chest guns. The safe-ish room: no climbable windows |
-| `terrasse` | Long sight lines over the open beer garden, and **die Resi**, the lost Almkuh (section 8a) who turns up in the garden. The Schneekanone trap was cut after play-testing (2026-10-17, "unfun and useless"); buyable traps or obstacles stay an idea for later |
+| `terrasse` | Long sight lines over the open beer garden, the Repetierer wall-buy (1000) on the hut wall of the deck, and **die Resi**, the lost Almkuh (section 8a) who turns up in the garden. The Schneekanone trap was cut after play-testing (2026-10-17, "unfun and useless"); buyable traps or obstacles stay an idea for later |
 | `skiraum` | Chokepoint, Stutzen wall-buy |
 | `schuppen` | Hüttentruhe (mystery chest), later the Kuhfladen-Mine wall-buy |
 | `seilbahn` | Handböller wall-buy, and from wave 10 the Alphorn wall-buy (announced when it appears). The gondola portal stays barred: every neighbour is already a door away, so a way out there would only be a new entrance (2026-10-17) |
+
+**Change TODO: map layout pass (play-test 2026-10-17, issue #53; user: "we will do later").** Not
+started; do it when the user calls for it, with a sketch approved first:
+- every room gets at least 2 ways in and out (today the Matratzenlager is the only dead end; the
+  other rooms form one ring Stube - Küche - Skiraum - Seilbahn - Schuppen - Terrasse - Stube),
+- several paths, so enemies can come at the players from every side,
+- more open: wider rooms and openings, fewer narrow parts,
+- the Matratzenlager (big and empty) gets a second way out and a real use, or shrinks; the
+  Munitionskiste can move to any other room.
 
 Enemy spawn points ("Fenster" and "Türen") are placed per zone as `Marker3D`
 nodes in group `spawn_points`. A spawn point is **active** only if its zone
@@ -159,7 +168,7 @@ effects, see section 6a), `secondary` (what right click does, see the rules belo
 | `pistole` | Dienstpistole | semi-auto pistol | 25 | up to 10 (as fast as you click) | 8 / 64 | start weapon |
 | `jagdflinte` | Jagdflinte | double-barrel shotgun | 20 x 8 pellets | 3.3 (the recoil settles in 0.3 s) | 2 / 24 | 500 (wall-buy, Stube) |
 | `stutzen` | Stutzen | bolt-action rifle | 120 | 1.33 (the bolt is worked in 0.75 s) | 5 / 40 | 750 (wall-buy, Skiraum) |
-| `repetierer` | Repetierer | lever/repeater rifle | 90 (two shots for small enemies, play-test 2026-10-17) | 3 (5.5 fanned) | 10 / 80 | 1000 (chest only) |
+| `repetierer` | Repetierer | lever/repeater rifle | 90 (two shots for small enemies, play-test 2026-10-17) | 3 (5.5 fanned) | 10 / 80 | 1000 (wall-buy, Terrasse; it was chest only until the chest went specials-only, #52) |
 | `schaufel` | Schneeschaufel | melee | 70 | 1.2 | – | 0 (always equipped) |
 | `alphorn` | Alphorn | wonder weapon | 200 area | 0.5 | 6 / 18 | chest (rare); from wave 10 also 4000 at the Seilbahn wall (user decision, 2026-10-17) |
 | `knoedelwerfer` | Knödelwerfer | wonder weapon | 180 area | 1.0 | 12 / 36 | chest only, rare |
@@ -228,14 +237,16 @@ Rules:
 - Slots: 2 gun slots (wonder weapons and the hand mortar use a gun slot),
   1 melee slot (starts with the shovel, can be replaced), 1 equipment slot
   (stackable throwables, see section 6a).
-- **Hüttentruhe (mystery chest):** costs 950, gives a random weapon from the
-  chest pool, weighted (each wonder weapon weight 1, all others weight 5). Fixed location in
-  `schuppen`. Animation: lid opens, weapon floats for 4 s, player must take it.
+- **Hüttentruhe (mystery chest):** costs 1500, gives a random special weapon from the
+  chest pool, weighted (each weight 1). Fixed location in `schuppen`. Animation: lid opens, weapon
+  floats for 4 s, player must take it.
+  Play-test 2026-10-17 (#52): the chest gave the wall-buy guns too often (5 in 6 spins), so it now
+  holds only special weapons and costs 1500 instead of 950 (to be tested). The Repetierer, chest
+  only until then, got a wall-buy on the Terrasse.
   Details (M5): the pool lives in `data/chest_pool.tres`; it never offers a gun the buyer already
   carries. The guns cycle for 2.5 s, slowing down, before one settles. Taking it fills a free slot or
   swaps out the gun in hand; not taken in 4 s, it sinks back and the points are gone.
-  The pool is Repetierer, Jagdflinte and Stutzen, plus each wonder weapon as it is built (Alphorn,
-  Knödelwerfer).
+  The pool is each special weapon as it is built (Alphorn, Knödelwerfer, Rodelkanone, ...).
 - **Alphorn:** fires a cone-shaped sound wave that damages and knocks back
   all enemies in a 12 m cone; funny low horn sound, screen shake.
   Details (M5): the cone is 30° each side of the aim; 200 damage to every body in it with a clear
@@ -535,6 +546,7 @@ fix console errors, commit. Stop and report after each milestone.
 - Special weapons from section 6a, one at a time in this order: alphorn,
   Schmarrnpfanne, Knödelwerfer, Kuhglocke, Kuhfladen-Mine, then the rest.
   Report after each one; the user may stop adding weapons at any point.
+- Change TODO, later (user, 2026-10-17): the map layout pass from section 4 (#53).
 - Acceptance: all items purchasable, wave 10 reachable.
 
 **M6 — Art and audio pass**
