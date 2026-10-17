@@ -1,6 +1,6 @@
 extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/m5_events.tscn
-## Section 8a events on the real main scene. Die Resi: only with the Terrasse open, walks down into the
+## Section 8a events on the real main scene. Die Resi: only with the Terrasse open, walks into the
 ## beer garden, is marked map-wide, her bell pulls outside enemies to her (they make her bolt), and
 ## milking her heals fully and gives a free Brettljause helping.
 
@@ -50,6 +50,7 @@ func _run() -> void:
 	for zone: ZoneData in zones.table.zones:
 		zones.unlock(zone.id, null)
 	await _frames(30)
+	_tables_off_navmesh()
 	await _resi_walks_in()
 	await _resi_lures()
 	await _resi_milked()
@@ -68,6 +69,13 @@ func _schedule() -> void:
 	await _frames(1)
 
 
+func _tables_off_navmesh() -> void:
+	# Play-test: table tops were navmesh islands, and an enemy shoved onto one pathed in circles.
+	var map: RID = player.get_world_3d().navigation_map
+	var top: Vector3 = NavigationServer3D.map_get_closest_point(map, Vector3(-7.5, 0.8, 9.0))
+	_check(top.y < 0.3, "no navmesh on the Terrasse table (closest point %s)" % top.snapped(Vector3.ONE * 0.1))
+
+
 func _resi_walks_in() -> void:
 	var resi: Resi = director.send_resi()
 	_check(resi != null and _banners.back() == "Die Resi hat si verlaufen!", "announced: %s" % [_banners.back() if not _banners.is_empty() else "-"])
@@ -79,7 +87,7 @@ func _resi_walks_in() -> void:
 			grazed = true
 			break
 	var p: Vector3 = resi.global_position
-	_check(grazed and p.y < -1.2 and p.x > -11.0 and p.x < 7.0 and p.z > 11.3 and p.z < 18.0, "she walks down into the beer garden (%s)" % p.snapped(Vector3.ONE * 0.1))
+	_check(grazed and p.y < 0.0 and p.x > -16.0 and p.x < 7.0 and p.z > 11.3 and p.z < 24.0, "she walks into the beer garden (%s)" % p.snapped(Vector3.ONE * 0.1))
 	resi.queue_free()
 	await _frames(2)
 

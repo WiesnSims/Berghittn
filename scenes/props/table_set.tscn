@@ -3,7 +3,7 @@
 [ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="1"]
 [ext_resource type="Material" path="res://assets/materials/greybox_wood_wall.tres" id="2"]
 
-[node name="TableSet" type="CSGCombiner3D"]
+[node name="TableSet" type="CSGCombiner3D" groups=["nav_blockers"]]
 use_collision = true
 
 [node name="Base" type="CSGBox3D" parent="."]

@@ -5,7 +5,7 @@ extends Node
 ## the Repetierer's fanning, the Lager's ammo crate, every Schnaps perk and the Brettljause.
 
 # Open pasture in front of the hut, clear of furniture.
-const FIELD: Vector3 = Vector3(-12.0, -0.3, 22.0)
+const FIELD: Vector3 = Vector3(10.0, -0.3, 31.0)
 const ALL_ZONES: Array[StringName] = [&"kueche", &"lager", &"terrasse", &"skiraum", &"schuppen", &"seilbahn"]
 
 var main: Node
@@ -50,6 +50,15 @@ func _spawn(data: EnemyData, at: Vector3, facing: Vector3 = Vector3.ZERO) -> Ene
 	# The wave manager is switched off in this test; its enemies must not inherit that.
 	enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
 	return enemy
+
+
+## No scope sway or recoil left on the camera for the next shot, so it flies exactly where it is aimed.
+func _steady() -> void:
+	var camera := player.get_node("Head/Camera3D") as CameraRecoil
+	camera.sway = Vector2.ZERO
+	camera._target = Vector2.ZERO
+	camera._current = Vector2.ZERO
+	camera.rotation = Vector3.ZERO
 
 
 func _look_at(point: Vector3) -> void:
@@ -130,9 +139,11 @@ func _penetration() -> void:
 		line.append(_spawn(wanderer, FIELD + Vector3(i * 1.2, 0.0, 0.0), FIELD + Vector3(-3.0, 0.0, 0.0)))
 	player.weapons.give_weapon(stutzen)
 	await _seconds(0.6)
+	# Hurt boxes are areas: the physics space only sees where they were moved after a couple of steps.
 	for i: int in line.size():
+		line[i].set_physics_process(false)
 		line[i].global_position = FIELD + Vector3(i * 1.2, 0.0, 0.0)
-	await _frames(1)
+	await _frames(3)
 	_look_at(FIELD + Vector3(8.0, 1.0, 0.0))
 	player.weapons.aim_amount = 1.0
 	player.weapons.bloom = 0.0
@@ -140,6 +151,7 @@ func _penetration() -> void:
 	var before: Array[int] = []
 	for e: Enemy in line:
 		before.append(e.health)
+	_steady()
 	player.weapons._fire()
 	var dealt: Array[int] = []
 	for i: int in line.size():
@@ -156,6 +168,7 @@ func _penetration() -> void:
 	player.weapons.aim_amount = 1.0
 	player.weapons.bloom = 0.0
 	await _frames(1)
+	_steady()
 	player.weapons._fire()
 	_check(line[1].health < h1 and line[2].health == h2, "pistol stops in the first body (%d -> %d, behind %d -> %d)" % [h1, line[1].health, h2, line[2].health])
 	_check(pistol.fire_rate >= 8.0 and not pistol.is_auto, "pistol fires as fast as clicked: up to %.0f/s, one shot per click" % pistol.fire_rate)

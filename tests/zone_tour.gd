@@ -25,12 +25,12 @@ const VIEWS: Array = [
 	["schuppen", Vector3(8.0, 1.8, 10.3), Vector3(20.0, 2.0, 17.0)],
 	["schuppen_loft", Vector3(16.0, 5.2, 10.0), Vector3(9.0, 1.0, 18.0)],
 	["terrasse", Vector3(-10.0, 1.7, 7.0), Vector3(6.0, -1.0, 17.0)],
-	["terrasse_garden", Vector3(5.5, 0.2, 17.5), Vector3(-6.0, 0.5, 8.0)],
+	["terrasse_garden", Vector3(5.5, 1.4, 23.0), Vector3(-8.0, 0.5, 12.0)],
 	["outside", Vector3(-16.0, 9.0, 30.0), Vector3(6.0, 2.0, 2.0)],
 	["alm_valley", Vector3(0.0, 1.7, 10.0), Vector3(0.0, -6.0, 70.0)],
 	["alm_summit", Vector3(2.0, 1.7, -20.0), Vector3(2.0, 14.0, -80.0)],
 	["alm_cable", Vector3(23.0, 1.7, 8.0), Vector3(60.0, 14.0, 4.0)],
-	["alm_signpost", Vector3(-6.8, 1.7, 16.4), Vector3(-10.0, 1.7, 19.5)],
+	["alm_signpost", Vector3(-6.8, 1.7, 23.4), Vector3(-10.0, 1.7, 26.5)],
 	["alm_aerial", Vector3(-45.0, 28.0, 55.0), Vector3(7.0, 0.0, 0.0)],
 ]
 

@@ -101,7 +101,7 @@ Zones (each is a separate area scene joined at doors). Costs are in points.
 | `stube` | Gaststube (main room) | yes | – | Spawn point, first wall-buy, fireplace; two-storey hall with gallery, Erker and balcony |
 | `kueche` | Küche | no | 500 | Kitchen with a Speis (pantry); Schnaps shrine (perk machine) |
 | `lager` | Matratzenlager | no | 1250 | Upstairs dorm over the Küche, door on the Stube gallery; no windows enemies can climb (they come up the stairs); Munitionskiste |
-| `terrasse` | Terrasse | no | 750 | Open snowy terrace, long sight lines over the beer garden |
+| `terrasse` | Terrasse | no | 750 | Big open terrace, deck and beer garden on one level, long sight lines |
 | `skiraum` | Skiraum | no | 1000 | Narrow room, good chokepoint, wall-buy |
 | `schuppen` | Holzschuppen | no | 1250 | Woodshed, the mystery chest spawns here at fixed spot |
 | `seilbahn` | Seilbahn-Station | no | 1500 | Cable car station, the alphorn weapon location in later waves |
@@ -111,7 +111,9 @@ not plain boxes. The Stube is a two-storey hall (7 m) with a gallery along two w
 an Erker (bay) with the Herrgottswinkel, and a balcony over the Terrasse off the gallery. The Küche
 has a pantry, the Skiraum a boot corridor behind a partition (the chokepoint), the Seilbahn-Station a
 raised boarding platform with the gondola alongside, the Holzschuppen a hay loft up a ramp, and the
-Terrasse two levels: a deck along the hut and a lower beer garden dug into the slope. Every change of
+Terrasse a deck along the hut that runs out over a full-width gentle ramp onto a big, open beer
+garden at the level of the alm (play-test 2026-10-17: the sunken garden, down and up again, looked
+odd and was crowded), fenced with three gates enemies come in by, with few objects in it. Every change of
 level is a ramp (stairs are a ramp with steps on top) with curbs, since enemies cannot climb steps.
 
 Every room has a purpose (user request, 2026-10-17), something worth going there for:
@@ -121,7 +123,7 @@ Every room has a purpose (user request, 2026-10-17), something worth going there
 | `stube` | Start, Jagdflinte wall-buy, later the Kuhglocke wall-buy |
 | `kueche` | Schnaps shrine (perks) and the Brettljause in the Speis (stats), section 9; later the Schmarrnpfanne wall-buy |
 | `lager` | **Munitionskiste** (1000): refills the reserve of every carried gun at once; the only refill for chest guns. The safe-ish room: no climbable windows |
-| `terrasse` | Long sight lines over the sunken beer garden, and **die Resi**, the lost Almkuh (section 8a) who turns up in the garden. The Schneekanone trap was cut after play-testing (2026-10-17, "unfun and useless"); buyable traps or obstacles stay an idea for later |
+| `terrasse` | Long sight lines over the open beer garden, and **die Resi**, the lost Almkuh (section 8a) who turns up in the garden. The Schneekanone trap was cut after play-testing (2026-10-17, "unfun and useless"); buyable traps or obstacles stay an idea for later |
 | `skiraum` | Chokepoint, Stutzen wall-buy |
 | `schuppen` | Hüttentruhe (mystery chest), later the Kuhfladen-Mine wall-buy |
 | `seilbahn` | Handböller wall-buy and the Alphorn in later waves; arrive with the special weapons (section 6a) |
@@ -156,7 +158,7 @@ effects, see section 6a), `secondary` (what right click does, see the rules belo
 | `pistole` | Dienstpistole | semi-auto pistol | 25 | up to 10 (as fast as you click) | 8 / 64 | start weapon |
 | `jagdflinte` | Jagdflinte | double-barrel shotgun | 20 x 8 pellets | 1.5 | 2 / 24 | 500 (wall-buy, Stube) |
 | `stutzen` | Stutzen | bolt-action rifle | 120 | 0.8 | 5 / 40 | 750 (wall-buy, Skiraum) |
-| `repetierer` | Repetierer | lever/repeater rifle | 45 | 3 (5.5 fanned) | 10 / 80 | 1000 (chest only) |
+| `repetierer` | Repetierer | lever/repeater rifle | 90 (two shots for small enemies, play-test 2026-10-17) | 3 (5.5 fanned) | 10 / 80 | 1000 (chest only) |
 | `schaufel` | Schneeschaufel | melee | 70 | 1.2 | – | 0 (always equipped) |
 | `alphorn` | Alphorn | wonder weapon | 200 area | 0.5 | 6 / 18 | chest only, rare |
 | `knoedelwerfer` | Knödelwerfer | wonder weapon | 180 area | 1.0 | 12 / 36 | chest only, rare |
@@ -301,7 +303,7 @@ Wave formulas (n = wave number, starting at 1):
 - Total enemies in wave: `6 + 2*n` (solo). Co-op: multiply by `1 + 0.5*(players - 1)`.
 - Max alive at once: 24.
 - Spawn interval: `max(0.6, 2.5 - 0.1*n)` seconds.
-- Between waves: 10 s break, a message "Welle N" appears, barricades can be repaired.
+- Between waves: 30 s break (play-test 2026-10-17, was 10 s), a message "Welle N" appears, barricades can be repaired.
 - Enemy type mix: determined by `wave_table.tres` (data resource), not hardcoded.
 
 Points:
