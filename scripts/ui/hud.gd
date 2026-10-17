@@ -61,6 +61,7 @@ func _process(delta: float) -> void:
 		if camera:
 			var half_fov: float = deg_to_rad(camera.fov) * 0.5
 			_crosshair.set_spread(tan(deg_to_rad(_weapons.current_bloom())) / tan(half_fov) * size.y * 0.5)
+		_crosshair.set_progress(_weapons.reload_progress(), _weapons.cycle_progress(), 1.0 / _weapons.weapon.fire_rate if _weapons.weapon else 0.0)
 	# The UI keeps running under the pause menu; the countdown must not.
 	if _countdown_left < 0.0 or get_tree().paused:
 		return

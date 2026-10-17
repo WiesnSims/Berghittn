@@ -83,6 +83,7 @@ func _run() -> void:
 	await _echo()
 	await _ammo()
 	_chest()
+	_portal()
 
 	print("RESULT: %s" % ("PASS" if failures.is_empty() else "%d FAILED" % failures.size()))
 	get_tree().quit(1 if failures.size() > 0 else 0)
@@ -202,8 +203,22 @@ func _ammo() -> void:
 	holder.fire_secondary()
 	_check(holder.mag == 1, "no Echo with one note left")
 	holder.start_reload()
+	await _seconds(horn.reload_time * 0.5)
+	var half: float = holder.reload_progress()
+	_check(absf(half - 0.5) < 0.05, "the ready ring shows the reload half done (%.2f)" % half)
+	await _seconds(horn.reload_time * 0.5 + 0.2)
+	_check(holder.reload_progress() < 0.0, "ring gone once reloaded")
+	holder._cooldown = 0.0
+	holder._fire()
+	await _seconds(0.5)
+	var cycle: float = holder.cycle_progress()
+	_check(absf(cycle - 0.25) < 0.05, "a quarter of the 2 s between notes shows on the ring (%.2f)" % cycle)
+	await _seconds(1.6)
+	_check(holder.cycle_progress() < 0.0, "ready again after 2 s")
+	holder.mag = horn.mag_size - 1
+	holder.start_reload()
 	await _seconds(horn.reload_time + 0.2)
-	_check(holder.mag == horn.mag_size and holder.reserve == horn.reserve_ammo - (horn.mag_size - 1), "caught breath: %d / %d" % [holder.mag, holder.reserve])
+	_check(holder.mag == horn.mag_size and holder.reserve == horn.reserve_ammo - horn.mag_size, "caught breath: %d / %d" % [holder.mag, holder.reserve])
 
 
 func _chest() -> void:
@@ -213,3 +228,11 @@ func _chest() -> void:
 	var display: Node3D = chest._displays[chest._weapons.find(horn)]
 	var bounds: AABB = chest._mesh_bounds(display, display.transform)
 	_check(bounds.get_longest_axis_size() <= Constants.CHEST_DISPLAY_MAX_LENGTH + 0.01 and bounds.get_center().length() < 0.05, "shown in the chest %.2f m long, centred" % bounds.get_longest_axis_size())
+
+
+func _portal() -> void:
+	# The Seilbahn's gondola portal: open to look through, closed to players walking out.
+	var space: PhysicsDirectSpaceState3D = player.get_world_3d().direct_space_state
+	var through := PhysicsRayQueryParameters3D.create(Vector3(19.0, 3.0, 6.1), Vector3(24.0, 3.0, 6.1), Constants.LAYER_WORLD)
+	var blocked := PhysicsRayQueryParameters3D.create(Vector3(19.0, 2.0, 6.1), Vector3(24.0, 2.0, 6.1), Constants.LAYER_PLAYER_BLOCKER)
+	_check(space.intersect_ray(through).is_empty() and not space.intersect_ray(blocked).is_empty(), "the gondola portal is open, but players cannot walk out of it")

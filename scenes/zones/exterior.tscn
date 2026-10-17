@@ -159,6 +159,7 @@ text = "Ins Tal  2 h  >"
 double_sided = false
 
 [node name="CableCar" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
 
 [node name="Mast" type="CSGBox3D" parent="CableCar"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 6.2, 6.6)

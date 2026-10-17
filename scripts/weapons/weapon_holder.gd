@@ -45,6 +45,9 @@ var reserve: int = 0
 var _slots: Array[GunSlot] = []
 var _current: int = -1
 var _cooldown: float = 0.0
+# How long the current cooldown and reload are in all, for the ready ring at the crosshair.
+var _cooldown_total: float = 0.0
+var _reload_total: float = 0.0
 # A click that came in while the gun was still cycling; it fires as soon as it can, so fast clicking
 # is never swallowed.
 var _fire_buffer_left: float = 0.0
@@ -163,6 +166,16 @@ func gun_count() -> int:
 
 func is_reloading() -> bool:
 	return _reload_left > 0.0
+
+
+## Share of the running reload done (0..1), or -1 when not reloading.
+func reload_progress() -> float:
+	return 1.0 - _reload_left / _reload_total if is_reloading() and _reload_total > 0.0 else -1.0
+
+
+## Share of the gun's cycle after a shot done (0..1), or -1 when it is ready to fire again.
+func cycle_progress() -> float:
+	return 1.0 - _cooldown / _cooldown_total if _cooldown > 0.0 and _cooldown_total > 0.0 else -1.0
 
 
 ## Aiming right now (right click held on a gun that aims). Movement slows down and sprint is off.
@@ -295,6 +308,7 @@ func start_reload() -> void:
 	var speed: float = _perks().reload_time_multiplier() if _perks() else 1.0
 	var chamber: float = weapon.chamber_time * speed if mag == 0 else 0.0
 	_reload_left = weapon.reload_time * speed + chamber
+	_reload_total = _reload_left
 	reload_started.emit(_reload_left)
 	if _viewmodel:
 		_viewmodel.play_reload(weapon.reload_time * speed, chamber)
@@ -371,7 +385,7 @@ func fire_secondary() -> void:
 	if _behavior == null or mag < rounds:
 		return
 	mag -= rounds
-	_cooldown = 1.0 / weapon.fire_rate
+	_set_cooldown(1.0 / weapon.fire_rate)
 	_behavior.fire_secondary()
 	fired.emit(rounds)
 	ammo_changed.emit(mag, reserve)
@@ -455,7 +469,7 @@ func _fire(rounds: int = 1) -> void:
 	rounds = mini(rounds, mag)
 	mag -= rounds
 	bloom = minf(bloom + weapon.bloom_per_shot * rounds, weapon.bloom_max)
-	_cooldown = 1.0 / (weapon.rapid_fire_rate if _fanning else weapon.fire_rate)
+	_set_cooldown(1.0 / (weapon.rapid_fire_rate if _fanning else weapon.fire_rate))
 	# Pellets that hit the same enemy land as one hit: one flinch, one hit marker and one set of
 	# points per shot, not one per pellet.
 	if _behavior:
@@ -479,6 +493,11 @@ func _after_shot(rounds: int) -> void:
 	ammo_changed.emit(mag, reserve)
 	if _viewmodel:
 		_viewmodel.play_fire(rounds)
+
+
+func _set_cooldown(time: float) -> void:
+	_cooldown = time
+	_cooldown_total = time
 
 
 func _start_melee() -> void:

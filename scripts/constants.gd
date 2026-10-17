@@ -77,6 +77,11 @@ const ENEMY_KNOCKBACK_HOP: float = 2.5
 # Lures (die Resi's bell, later the Kuhglocke): how close an enemy must get to count as there.
 const ENEMY_LURE_REACH: float = 1.6
 
+# Event markers (section 8a): the light column's opacity, and the distances (m) between which it fades
+# in, so it does not hang over the thing it marks when the player is right next to it.
+const MARKER_COLUMN_ALPHA: float = 0.22
+const MARKER_COLUMN_FADE_NEAR: float = 6.0
+const MARKER_COLUMN_FADE_FAR: float = 14.0
 # Events (section 8a). Die Resi: first wave, waves between visits, seconds into the wave she arrives,
 # how long she stays, how far her bell carries, seconds of milking, and her walking and bolting speeds.
 const RESI_FIRST_WAVE: int = 3
@@ -236,6 +241,11 @@ const ENEMY_HIT_FLASH_TIME: float = 0.12
 const IMPACT_MARK_COUNT: int = 32
 const IMPACT_MARK_LIFETIME: float = 8.0
 const HIT_MARKER_TIME: float = 0.15
+# Ready ring at the crosshair (play-test, Alphorn): guns whose shot-to-shot time is at least this
+# show it cycling (Alphorn, Stutzen, Jagdflinte; not the pistol or the Repetierer), and seconds the
+# pulse takes when the gun is ready again.
+const READY_RING_MIN_CYCLE: float = 0.6
+const READY_PULSE_TIME: float = 0.3
 const DAMAGE_FLASH_TIME: float = 0.4
 
 # Quick melee: share of the swing time before the blow lands, the width of the arc in front of the

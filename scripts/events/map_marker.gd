@@ -2,7 +2,8 @@ class_name MapMarker
 extends Node3D
 ## Makes an event findable from anywhere on the map (section 8a): a tall light column over it and a
 ## name label, both drawn through walls, plus an arrow at the screen edge (MarkerArrows on the HUD)
-## while it is off screen. Put it under the thing it marks.
+## while it is off screen. Put it under the thing it marks. Up close the column fades out (play-test:
+## starting in mid-air over the Deitscha Tourist's head it looked like a stray blue glow); the label stays.
 
 ## Translation key of the label.
 @export var text: String = ""
@@ -12,6 +13,7 @@ extends Node3D
 @export var label_height: float = 2.4
 
 var _label: Label3D
+var _glow: StandardMaterial3D
 
 
 func _ready() -> void:
@@ -31,8 +33,9 @@ func _ready() -> void:
 	glow.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 	glow.cull_mode = BaseMaterial3D.CULL_DISABLED
 	glow.no_depth_test = true
-	glow.albedo_color = Color(color.r, color.g, color.b, 0.22)
+	glow.albedo_color = Color(color.r, color.g, color.b, Constants.MARKER_COLUMN_ALPHA)
 	column.material_override = glow
+	_glow = glow
 	column.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	# Starts above the label, so up close it does not hide what it marks.
 	column.position = Vector3.UP * (label_height + 0.6 + column_height * 0.5)
@@ -48,6 +51,14 @@ func _ready() -> void:
 	_label.modulate = color
 	_label.position = Vector3.UP * label_height
 	add_child(_label)
+
+
+func _process(_delta: float) -> void:
+	var camera: Camera3D = get_viewport().get_camera_3d()
+	if camera == null:
+		return
+	var distance: float = camera.global_position.distance_to(focus())
+	_glow.albedo_color.a = Constants.MARKER_COLUMN_ALPHA * smoothstep(Constants.MARKER_COLUMN_FADE_NEAR, Constants.MARKER_COLUMN_FADE_FAR, distance)
 
 
 ## The point arrows and labels aim at.

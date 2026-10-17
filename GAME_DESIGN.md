@@ -110,7 +110,8 @@ Layout (user request, 2026-10-16, before M5): rooms are bigger than the Stube's 
 not plain boxes. The Stube is a two-storey hall (7 m) with a gallery along two walls reached by stairs,
 an Erker (bay) with the Herrgottswinkel, and a balcony over the Terrasse off the gallery. The Küche
 has a pantry, the Skiraum a boot corridor behind a partition (the chokepoint), the Seilbahn-Station a
-raised boarding platform with the gondola alongside, the Holzschuppen a hay loft up a ramp, and the
+raised boarding platform with the gondola alongside (it leaves through a big portal in the east wall
+under the cable, play-test 2026-10-17; barred for players, too high for enemies), the Holzschuppen a hay loft up a ramp, and the
 Terrasse a deck along the hut that runs out over a full-width gentle ramp onto a big, open beer
 garden at the level of the alm (play-test 2026-10-17: the sunken garden, down and up again, looked
 odd and was crowded), fenced with three 3.5 m gates enemies come in by, with few objects in it. Every change of
@@ -193,6 +194,9 @@ Rules:
   - `alphorn`: the Echo (press): the bell swings up to the sky and the note comes down all around
     the player, 200 damage within 6 m in every direction and a harder shove; uses two notes. The
     panic button when surrounded.
+- Ready ring (play-test 2026-10-17): a ring around the crosshair fills while the gun reloads (amber)
+  and, on guns with at least 0.6 s between shots, while it cycles after a shot (white), and pulses
+  once when the gun is ready again.
 - Semi-auto guns fire once per click, as fast as the player clicks, up to `fire_rate` (user request,
   2026-10-17); holding the button does not auto-fire. A click during the cycle is remembered for a
   moment and fires as soon as the gun is ready, so fast clicking is never swallowed.
