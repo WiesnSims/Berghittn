@@ -8,20 +8,39 @@
 script = ExtResource("1")
 
 [node name="Hinge" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0, 0.105)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3, 0, 0.105)
 
 [node name="Panel" type="CSGBox3D" parent="Hinge"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 1.1, -0.105)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.65, 1.25, -0.105)
 use_collision = true
-size = Vector3(1.4, 2.2, 0.12)
+size = Vector3(1.3, 2.5, 0.12)
 material = ExtResource("2")
 
 [node name="Handle" type="CSGBox3D" parent="Hinge/Panel"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0.09)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, -0.1, 0.09)
 size = Vector3(0.12, 0.04, 0.06)
 material = ExtResource("3")
 
 [node name="HandleBack" type="CSGBox3D" parent="Hinge/Panel"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, -0.09)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, -0.1, -0.09)
+size = Vector3(0.12, 0.04, 0.06)
+material = ExtResource("3")
+
+[node name="HingeRight" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 0, 0.105)
+
+[node name="Panel" type="CSGBox3D" parent="HingeRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.65, 1.25, -0.105)
+use_collision = true
+size = Vector3(1.3, 2.5, 0.12)
+material = ExtResource("2")
+
+[node name="Handle" type="CSGBox3D" parent="HingeRight/Panel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, -0.1, 0.09)
+size = Vector3(0.12, 0.04, 0.06)
+material = ExtResource("3")
+
+[node name="HandleBack" type="CSGBox3D" parent="HingeRight/Panel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, -0.1, -0.09)
 size = Vector3(0.12, 0.04, 0.06)
 material = ExtResource("3")

@@ -47,8 +47,9 @@ func _stand_at(target: Node3D) -> void:
 func _expected_active() -> Array[StringName]:
 	# Section 4 by hand, from the table of doors: unlocked zones plus their neighbours.
 	var adjacent := {
-		&"stube": [&"kueche", &"terrasse", &"lager"], &"kueche": [&"stube", &"skiraum"], &"lager": [&"stube"], &"terrasse": [&"stube", &"schuppen"],
-		&"skiraum": [&"kueche", &"seilbahn"], &"seilbahn": [&"skiraum", &"schuppen"], &"schuppen": [&"seilbahn", &"terrasse"],
+		&"stube": [&"kueche", &"terrasse", &"lager", &"seilbahn"], &"kueche": [&"stube", &"skiraum", &"lager"], &"lager": [&"stube", &"kueche"],
+		&"terrasse": [&"stube", &"schuppen"], &"skiraum": [&"kueche", &"seilbahn"], &"seilbahn": [&"skiraum", &"schuppen", &"stube"],
+		&"schuppen": [&"seilbahn", &"terrasse"],
 	}
 	var active: Array[StringName] = []
 	# Zones without spawn points of their own (the Lager upstairs: enemies come up the stairs) never show up.
@@ -122,11 +123,11 @@ func _run() -> void:
 	await _frames(5)
 
 	_check(zones.unlocked_count() == 1 and zones.is_unlocked(&"stube"), "only the Stube starts open")
-	_check(get_tree().get_nodes_in_group("zone_doors").size() == 7, "seven doors")
+	_check(get_tree().get_nodes_in_group("zone_doors").size() == 10, "ten doors")
 	_check_spawns("start")
 	var stube_spot := Vector3(-1, 0, 2)
 	var schuppen_spot := Vector3(14.3, 0, 13)
-	_check(not _reachable(stube_spot, Vector3(1, 0, -8)), "Kueche not reachable on foot while locked")
+	_check(not _reachable(stube_spot, Vector3(1, 0, -10)), "Kueche not reachable on foot while locked")
 
 	# Not enough points: nothing happens, and the prompt says what is missing.
 	var kueche_door: ZoneDoor = _door(&"stube", &"kueche")
@@ -147,7 +148,7 @@ func _run() -> void:
 
 	await _buy_door(&"stube", &"kueche", &"kueche")
 	await _frames(3)
-	_check(_reachable(stube_spot, Vector3(1, 0, -8)), "Kueche reachable through its door after the rebake")
+	_check(_reachable(stube_spot, Vector3(1, 0, -10)), "Kueche reachable through its door after the rebake")
 	# Upstairs: the Lager door on the gallery sits right above the Kueche door; E must pick the one at your level.
 	_check(not _reachable(stube_spot, Vector3(-2, 3.5, -8)), "Lager not reachable while locked")
 	await _buy_door(&"stube", &"lager", &"lager")

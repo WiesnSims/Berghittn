@@ -100,9 +100,9 @@ Zones (each is a separate area scene joined at doors). Costs are in points.
 |---|---|---|---|---|
 | `stube` | Gaststube (main room) | yes | – | Spawn point, first wall-buy, fireplace; two-storey hall with gallery, Erker and balcony |
 | `kueche` | Küche | no | 500 | Kitchen with a Speis (pantry); Schnaps shrine (perk machine) |
-| `lager` | Matratzenlager | no | 1250 | Upstairs dorm over the Küche, door on the Stube gallery; no windows enemies can climb (they come up the stairs); Munitionskiste |
-| `terrasse` | Terrasse | no | 750 | Big open terrace, deck and beer garden on one level, long sight lines |
-| `skiraum` | Skiraum | no | 1000 | Narrow room, good chokepoint, wall-buy |
+| `lager` | Matratzenlager | no | 1250 | Upstairs dorm over the Küche, door on the Stube gallery and the Küchenstiege down into the Küche; no windows enemies can climb (they come up the stairs); Munitionskiste |
+| `terrasse` | Terrasse | no | 750 | Big open terrace, deck and beer garden on one level, long sight lines; the balcony and its Außenstiege belong to it |
+| `skiraum` | Skiraum | no | 1000 | Boot corridor behind a partition, good chokepoint, wall-buy |
 | `schuppen` | Holzschuppen | no | 1250 | Woodshed, the mystery chest spawns here at fixed spot |
 | `seilbahn` | Seilbahn-Station | no | 1500 | Cable car station, the alphorn weapon location in later waves |
 
@@ -114,8 +114,27 @@ raised boarding platform with the gondola alongside (it leaves through a big por
 under the cable, play-test 2026-10-17; barred for players, too high for enemies), the Holzschuppen a hay loft up a ramp, and the
 Terrasse a deck along the hut that runs out over a full-width gentle ramp onto a big, open beer
 garden at the level of the alm (play-test 2026-10-17: the sunken garden, down and up again, looked
-odd and was crowded), fenced with three 3.5 m gates enemies come in by, with few objects in it. Every change of
+odd and was crowded), fenced with four 3.5 m gates enemies come in by, with few objects in it. Every change of
 level is a ramp (stairs are a ramp with steps on top) with curbs, since enemies cannot climb steps.
+
+Layout pass (play-test 2026-10-17, issue #53, plan approved by the user the same day): every room
+has at least two ways in and out, and the doors make four loops instead of one ring.
+- Doors are 2.6 m double doors (2.0 m on the balcony and at the top of the Küchenstiege, 2.4 m
+  between Terrasse and Schuppen). Costs did not change.
+- Stube - Seilbahn: a door in the Stube's east wall, south of the fireplace, onto the Seilbahn's
+  west platform ramp. The Seilbahn (1500) can be opened straight from the Stube, and its spawns are
+  active from wave 1 (user: OK, cost stays 1500). The Kuhglocke wall-buy sits just south of it.
+- Küchenstiege: a 2 m ramp along the Küche's south wall up to a landing in the Lager, with the
+  Lager - Küche door at its top and a railed opening in the Lager floor above it. Indoor loop:
+  Stube, stairs, gallery, Lager, Küchenstiege, Küche, Stube. The Munitionskiste stays in the Lager
+  (user decision); the middle bunks were shortened to keep the way to the landing wide.
+- Außenstiege: an outside stair from the west end of the balcony down into the beer garden. The
+  balcony door on the gallery is a second Stube - Terrasse door, so enemies from the garden can
+  come up to the gallery.
+- Tor Ost: a fourth garden gate in the east fence, south of the Schuppen.
+- Skiraum: the openings into the boot corridor are 3 m wide; the corridor stays (user decision).
+- Holzschuppen: the hay loft has no rail, so players can jump down and see the whole Schuppen
+  (user request with the approval).
 
 Every room has a purpose (user request, 2026-10-17), something worth going there for:
 
@@ -128,15 +147,6 @@ Every room has a purpose (user request, 2026-10-17), something worth going there
 | `skiraum` | Chokepoint, Stutzen wall-buy |
 | `schuppen` | Hüttentruhe (mystery chest), later the Kuhfladen-Mine wall-buy |
 | `seilbahn` | Handböller wall-buy, and from wave 10 the Alphorn wall-buy (announced when it appears). The gondola portal stays barred: every neighbour is already a door away, so a way out there would only be a new entrance (2026-10-17) |
-
-**Change TODO: map layout pass (play-test 2026-10-17, issue #53; user: "we will do later").** Not
-started; do it when the user calls for it, with a sketch approved first:
-- every room gets at least 2 ways in and out (today the Matratzenlager is the only dead end; the
-  other rooms form one ring Stube - Küche - Skiraum - Seilbahn - Schuppen - Terrasse - Stube),
-- several paths, so enemies can come at the players from every side,
-- more open: wider rooms and openings, fewer narrow parts,
-- the Matratzenlager (big and empty) gets a second way out and a real use, or shrinks; the
-  Munitionskiste can move to any other room.
 
 Enemy spawn points ("Fenster" and "Türen") are placed per zone as `Marker3D`
 nodes in group `spawn_points`. A spawn point is **active** only if its zone
@@ -595,7 +605,7 @@ fix console errors, commit. Stop and report after each milestone.
 - Special weapons from section 6a, one at a time in this order: alphorn,
   Schmarrnpfanne, Knödelwerfer, Kuhglocke, Kuhfladen-Mine, then the rest.
   Report after each one; the user may stop adding weapons at any point.
-- Change TODO, later (user, 2026-10-17): the map layout pass from section 4 (#53).
+- Map layout pass from section 4 (#53): done 2026-10-17, before M6.
 - Acceptance: all items purchasable, wave 10 reachable.
   Checked 2026-10-17 by `tests/m5_acceptance` (every weapon and piece of equipment has a way in, and
   every wall-buy, Schnaps, Brettljause item, the Munitionskiste and the Hüttentruhe can be walked to

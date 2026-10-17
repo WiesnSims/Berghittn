@@ -263,17 +263,17 @@ func _guest_escorted() -> void:
 
 func _eisstock() -> void:
 	# Three in a row in the beer garden; one stone through all of them.
-	player.global_position = Vector3(-12.0, -0.3, 14.0)
+	player.global_position = Vector3(-12.0, -0.3, 16.5)
 	player.velocity = Vector3.ZERO
 	var row: Array[Enemy] = []
 	for x: float in [-8.0, -6.0, -4.0]:
 		var enemy := waves._create_enemy()
-		enemy.activate(load("res://data/enemies/knappe.tres"), 10, Transform3D(Basis.IDENTITY, Vector3(x, -0.3, 14.0)))
+		enemy.activate(load("res://data/enemies/knappe.tres"), 10, Transform3D(Basis.IDENTITY, Vector3(x, -0.3, 16.5)))
 		enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
 		enemy.set_physics_process(false)
 		row.append(enemy)
 	await _frames(3)
-	_look_at(Vector3(0.0, 0.5, 14.0))
+	_look_at(Vector3(0.0, 0.5, 16.5))
 	var points: int = player.points.total
 	_check(player.equipment.throw(), "thrown")
 	await _seconds(2.0)

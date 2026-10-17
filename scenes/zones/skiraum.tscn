@@ -47,15 +47,15 @@ size = Vector3(0.2, 3.5, 15)
 material = ExtResource("2")
 
 [node name="PartitionNorthHole" type="CSGBox3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.4, 1.1, -13.3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.4, 1.25, -13.3)
 operation = 2
-size = Vector3(0.6, 2.2, 1.4)
+size = Vector3(0.6, 2.5, 3)
 material = ExtResource("3")
 
 [node name="PartitionSouthHole" type="CSGBox3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.4, 1.1, -4.3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.4, 1.25, -4.3)
 operation = 2
-size = Vector3(0.6, 2.2, 1.4)
+size = Vector3(0.6, 2.5, 3)
 material = ExtResource("3")
 
 [node name="WindowEastNorthHole" type="CSGBox3D" parent="Walls"]
