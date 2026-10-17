@@ -1,0 +1,62 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/zones/wall_buy.gd" id="1"]
+[ext_resource type="Resource" path="res://data/equipment/kuhglocke.tres" id="2"]
+[ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="3"]
+[ext_resource type="Material" path="res://assets/materials/greybox_chalk.tres" id="4"]
+
+[node name="WallBuyKuhglocke" type="Node3D"]
+script = ExtResource("1")
+equipment = ExtResource("2")
+
+[node name="Board" type="CSGBox3D" parent="."]
+position = Vector3(0, 0, -0.015)
+size = Vector3(0.7, 0.8, 0.03)
+material = ExtResource("3")
+
+[node name="Outline" type="Node3D" parent="."]
+
+[node name="Left" type="CSGBox3D" parent="Outline"]
+position = Vector3(-0.13, -0.08, -0.035)
+rotation = Vector3(0, 0, -0.2)
+size = Vector3(0.014, 0.4, 0.006)
+material = ExtResource("4")
+
+[node name="Right" type="CSGBox3D" parent="Outline"]
+position = Vector3(0.13, -0.08, -0.035)
+rotation = Vector3(0, 0, 0.2)
+size = Vector3(0.014, 0.4, 0.006)
+material = ExtResource("4")
+
+[node name="Top" type="CSGBox3D" parent="Outline"]
+position = Vector3(0, 0.115, -0.035)
+size = Vector3(0.18, 0.014, 0.006)
+material = ExtResource("4")
+
+[node name="Mouth" type="CSGBox3D" parent="Outline"]
+position = Vector3(0, -0.275, -0.035)
+size = Vector3(0.34, 0.014, 0.006)
+material = ExtResource("4")
+
+[node name="StrapLeft" type="CSGBox3D" parent="Outline"]
+position = Vector3(-0.05, 0.22, -0.035)
+rotation = Vector3(0, 0, 0.35)
+size = Vector3(0.014, 0.22, 0.006)
+material = ExtResource("4")
+
+[node name="StrapRight" type="CSGBox3D" parent="Outline"]
+position = Vector3(0.05, 0.22, -0.035)
+rotation = Vector3(0, 0, -0.35)
+size = Vector3(0.014, 0.22, 0.006)
+material = ExtResource("4")
+
+[node name="Clapper" type="CSGBox3D" parent="Outline"]
+position = Vector3(0, -0.33, -0.035)
+size = Vector3(0.05, 0.05, 0.006)
+material = ExtResource("4")
+
+[node name="Light" type="OmniLight3D" parent="."]
+position = Vector3(0, 0.5, -0.5)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 0.6
+omni_range = 2.5

@@ -1,0 +1,113 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/equipment/kuhglocke.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="Bronze"]
+albedo_color = Color(0.72, 0.52, 0.22, 1)
+metallic = 0.75
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Dark"]
+albedo_color = Color(0.12, 0.09, 0.06, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Strap"]
+albedo_color = Color(0.62, 0.1, 0.08, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Edelweiss"]
+albedo_color = Color(0.95, 0.94, 0.9, 1)
+roughness = 0.7
+
+[sub_resource type="CylinderMesh" id="BodyMesh"]
+material = SubResource("Bronze")
+top_radius = 0.07
+bottom_radius = 0.11
+height = 0.2
+radial_segments = 4
+rings = 1
+cap_bottom = false
+
+[sub_resource type="CylinderMesh" id="MouthMesh"]
+material = SubResource("Dark")
+top_radius = 0.06
+bottom_radius = 0.1
+height = 0.18
+radial_segments = 4
+rings = 1
+cap_top = false
+
+[sub_resource type="BoxMesh" id="StrapMesh"]
+material = SubResource("Strap")
+size = Vector3(0.05, 0.14, 0.012)
+
+[sub_resource type="BoxMesh" id="FlowerMesh"]
+material = SubResource("Edelweiss")
+size = Vector3(0.03, 0.03, 0.006)
+
+[sub_resource type="SphereMesh" id="ClapperMesh"]
+material = SubResource("Dark")
+radius = 0.025
+height = 0.05
+radial_segments = 8
+rings = 4
+
+[sub_resource type="StandardMaterial3D" id="PulseMaterial"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+cull_mode = 2
+albedo_color = Color(1, 0.85, 0.4, 0.45)
+
+[sub_resource type="TorusMesh" id="PulseMesh"]
+inner_radius = 0.92
+outer_radius = 1.0
+rings = 32
+ring_segments = 4
+
+[node name="Kuhglocke" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Model" type="Node3D" parent="."]
+scale = Vector3(1.8, 1.8, 1.8)
+
+[node name="Body" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0.1, 0)
+rotation = Vector3(0, 0.7854, 0)
+cast_shadow = 0
+mesh = SubResource("BodyMesh")
+
+[node name="Mouth" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0.095, 0)
+rotation = Vector3(0, 0.7854, 0)
+cast_shadow = 0
+mesh = SubResource("MouthMesh")
+
+[node name="Clapper" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0.03, 0)
+cast_shadow = 0
+mesh = SubResource("ClapperMesh")
+
+[node name="StrapLeft" type="MeshInstance3D" parent="Model"]
+position = Vector3(-0.035, 0.25, 0)
+rotation = Vector3(0, 0, 0.35)
+cast_shadow = 0
+mesh = SubResource("StrapMesh")
+
+[node name="StrapRight" type="MeshInstance3D" parent="Model"]
+position = Vector3(0.035, 0.25, 0)
+rotation = Vector3(0, 0, -0.35)
+cast_shadow = 0
+mesh = SubResource("StrapMesh")
+
+[node name="Flower" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0.27, 0.008)
+rotation = Vector3(0, 0, 0.785)
+cast_shadow = 0
+mesh = SubResource("FlowerMesh")
+
+[node name="Pulse" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.03, 0)
+cast_shadow = 0
+mesh = SubResource("PulseMesh")
+material_override = SubResource("PulseMaterial")

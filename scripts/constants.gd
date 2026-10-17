@@ -264,6 +264,14 @@ const CHEST_DISPLAY_MAX_LENGTH: float = 1.2
 const AREA_MAX_TARGETS: int = 64
 const AREA_AIM_HEIGHT: float = 1.1
 const AREA_BODY_MARGIN: float = 0.5
+# Kuhglocke (section 6a): throw speed (m/s, along the view, a little upwards), the share of speed kept
+# on bouncing off a wall, seconds it rings, the reach it draws enemies from (m), and how often the
+# comic "BIMM!" floats up while it rings (s).
+const KUHGLOCKE_THROW_SPEED: float = 11.0
+const KUHGLOCKE_BOUNCE_KEEP: float = 0.35
+const KUHGLOCKE_RING_TIME: float = 10.0
+const KUHGLOCKE_LURE_RADIUS: float = 20.0
+const KUHGLOCKE_WORD_EVERY: float = 1.2
 # Knödelwerfer: dumplings and piles kept in pools (oldest reused when all are out), and seconds a
 # dumpling may fly before it bursts in the air.
 const KNOEDEL_POOL: int = 12

@@ -73,6 +73,10 @@ func lure_radius() -> float:
 	return Constants.RESI_LURE_RADIUS
 
 
+func pulls_inside() -> bool:
+	return false
+
+
 func lure_reached(_enemy: Node3D) -> void:
 	if is_luring():
 		_leave(true)

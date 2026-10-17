@@ -610,13 +610,18 @@ func _movement_mask() -> int:
 ## The nearest lure whose pull reaches this enemy (die Resi's bell), or null. Enemies already inside the
 ## hut stay with the players.
 func _find_lure() -> Node3D:
-	if _inside:
+	# Bosses do not fall for decoys (crowd control, section 6a).
+	if data.is_boss:
 		return null
 	var best: Node3D = null
 	var best_distance: float = INF
 	for node: Node in get_tree().get_nodes_in_group("lures"):
 		var lure := node as Node3D
 		if lure == null or not lure.is_luring():
+			continue
+		# Once in through a window, a lure out in the garden (die Resi) no longer pulls it back out;
+		# a cowbell thrown anywhere does.
+		if _inside and not lure.pulls_inside():
 			continue
 		var distance: float = global_position.distance_to(lure.global_position)
 		if distance <= lure.lure_radius() and distance < best_distance:
