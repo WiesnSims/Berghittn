@@ -57,6 +57,8 @@ messages = {
 [&"", &"HIT_JUCHHE"]: [&"JUCHHE!"],
 [&"", &"WEAPON_BRENNKESSEL"]: [&"Brennkessel-Werfer"],
 [&"", &"HIT_WUSCH"]: [&"WUSCH!"],
+[&"", &"WEAPON_GOASSL"]: [&"Goaßl"],
+[&"", &"HIT_SCHNALZ"]: [&"SCHNALZ!"],
 [&"", &"EVENT_ALPHORN_READY"]: [&"Des Alphorn hängt jetzt in da Seilbahn!"],
 [&"", &"HIT_SPLAT"]: [&"SPLATSCH!"],
 [&"", &"PERK_ENZIAN"]: [&"Enzian"],

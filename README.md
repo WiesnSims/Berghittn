@@ -204,6 +204,16 @@ the tick animation length and the chest weight.
 godot --headless --fixed-fps 60 res://tests/m3_smoke.tscn
 ```
 
+```
+godot --headless --fixed-fps 60 res://tests/m5_goassl.tscn
+```
+
+The Goaßl: on V in place of the shovel; the crack hits its 3.5 m cone for 40 and stuns (the Knappe
+right in front does not swing, a stunned one stands still, free again after 1.5 s), not 60° aside or
+5 m out; the Krampus takes the crack unstunned; V held past the crack lashes and drags in a wanderer
+6 m out (slow walk, dazed, stunned after letting go), nothing to lash 9 m out; the chest handing it
+into the melee slot.
+
 A bot holds the middle of the Stube and plays to wave 3 (shooting head and body, shovel kills, repairing
 in the break). Checks wave sizes, spawn interval and break length against the formulas, that no enemy
 climbs through a window that still has boards, and that the points (and the HUD) match the bot's own
@@ -242,7 +252,7 @@ frame with the HUD, or shooting an enemy (wall puffs, hit flash, casings, head p
 visuals without playing.
 
 ```
-godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne|knoedel|glocke|fladen|boeller|rodel|harmonika|brennkessel
+godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne|knoedel|glocke|fladen|boeller|rodel|harmonika|brennkessel|goassl|mistgabel|rute
 ```
 
 Also needs a window: one frame per zone (all doors open), the wall-buys and a door mid-swing; or

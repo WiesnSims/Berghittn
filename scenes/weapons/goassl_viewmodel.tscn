@@ -1,0 +1,164 @@
+[gd_scene load_steps=19 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/goassl_viewmodel.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="Wood"]
+albedo_color = Color(0.5, 0.31, 0.15, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Leather"]
+albedo_color = Color(0.66, 0.47, 0.28, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Red"]
+albedo_color = Color(0.8, 0.12, 0.1, 1)
+
+[sub_resource type="StandardMaterial3D" id="Green"]
+albedo_color = Color(0.15, 0.5, 0.2, 1)
+
+[sub_resource type="StandardMaterial3D" id="White"]
+albedo_color = Color(0.95, 0.94, 0.9, 1)
+
+[sub_resource type="CylinderMesh" id="HandleMesh"]
+material = SubResource("Wood")
+top_radius = 0.016
+bottom_radius = 0.02
+height = 0.32
+radial_segments = 8
+rings = 1
+
+[sub_resource type="BoxMesh" id="RibbonRed"]
+material = SubResource("Red")
+size = Vector3(0.012, 0.004, 0.14)
+
+[sub_resource type="BoxMesh" id="RibbonGreen"]
+material = SubResource("Green")
+size = Vector3(0.012, 0.004, 0.12)
+
+[sub_resource type="BoxMesh" id="CrackerMesh"]
+material = SubResource("White")
+size = Vector3(0.01, 0.01, 0.12)
+
+[sub_resource type="BoxMesh" id="Seg0"]
+material = SubResource("Leather")
+size = Vector3(0.0300, 0.0300, 0.155)
+
+[sub_resource type="BoxMesh" id="Seg1"]
+material = SubResource("Leather")
+size = Vector3(0.0275, 0.0275, 0.155)
+
+[sub_resource type="BoxMesh" id="Seg2"]
+material = SubResource("Leather")
+size = Vector3(0.0250, 0.0250, 0.155)
+
+[sub_resource type="BoxMesh" id="Seg3"]
+material = SubResource("Leather")
+size = Vector3(0.0225, 0.0225, 0.155)
+
+[sub_resource type="BoxMesh" id="Seg4"]
+material = SubResource("Leather")
+size = Vector3(0.0200, 0.0200, 0.155)
+
+[sub_resource type="BoxMesh" id="Seg5"]
+material = SubResource("Leather")
+size = Vector3(0.0175, 0.0175, 0.155)
+
+[sub_resource type="BoxMesh" id="Seg6"]
+material = SubResource("Leather")
+size = Vector3(0.0150, 0.0150, 0.155)
+
+[sub_resource type="BoxMesh" id="Seg7"]
+material = SubResource("Leather")
+size = Vector3(0.0125, 0.0125, 0.155)
+
+[node name="GoasslViewmodel" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Model" type="Node3D" parent="."]
+
+[node name="Handle" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, -0.12)
+cast_shadow = 0
+mesh = SubResource("HandleMesh")
+
+[node name="RibbonR" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 0.94, -0.34, 0, 0.34, 0.94, 0.015, -0.02, 0.07)
+cast_shadow = 0
+mesh = SubResource("RibbonRed")
+
+[node name="RibbonG" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 0.9, -0.43, 0, 0.43, 0.9, -0.015, -0.025, 0.06)
+cast_shadow = 0
+mesh = SubResource("RibbonGreen")
+
+[node name="Lash" type="Node3D" parent="Model"]
+position = Vector3(0, 0, -0.28)
+
+[node name="Link" type="Node3D" parent="Model/Lash"]
+position = Vector3(0, 0, 0)
+
+[node name="Seg" type="MeshInstance3D" parent="Model/Lash/Link"]
+position = Vector3(0, 0, -0.075)
+cast_shadow = 0
+mesh = SubResource("Seg0")
+
+[node name="Link" type="Node3D" parent="Model/Lash/Link"]
+position = Vector3(0, 0, -0.15)
+
+[node name="Seg" type="MeshInstance3D" parent="Model/Lash/Link/Link"]
+position = Vector3(0, 0, -0.075)
+cast_shadow = 0
+mesh = SubResource("Seg1")
+
+[node name="Link" type="Node3D" parent="Model/Lash/Link/Link"]
+position = Vector3(0, 0, -0.15)
+
+[node name="Seg" type="MeshInstance3D" parent="Model/Lash/Link/Link/Link"]
+position = Vector3(0, 0, -0.075)
+cast_shadow = 0
+mesh = SubResource("Seg2")
+
+[node name="Link" type="Node3D" parent="Model/Lash/Link/Link/Link"]
+position = Vector3(0, 0, -0.15)
+
+[node name="Seg" type="MeshInstance3D" parent="Model/Lash/Link/Link/Link/Link"]
+position = Vector3(0, 0, -0.075)
+cast_shadow = 0
+mesh = SubResource("Seg3")
+
+[node name="Link" type="Node3D" parent="Model/Lash/Link/Link/Link/Link"]
+position = Vector3(0, 0, -0.15)
+
+[node name="Seg" type="MeshInstance3D" parent="Model/Lash/Link/Link/Link/Link/Link"]
+position = Vector3(0, 0, -0.075)
+cast_shadow = 0
+mesh = SubResource("Seg4")
+
+[node name="Link" type="Node3D" parent="Model/Lash/Link/Link/Link/Link/Link"]
+position = Vector3(0, 0, -0.15)
+
+[node name="Seg" type="MeshInstance3D" parent="Model/Lash/Link/Link/Link/Link/Link/Link"]
+position = Vector3(0, 0, -0.075)
+cast_shadow = 0
+mesh = SubResource("Seg5")
+
+[node name="Link" type="Node3D" parent="Model/Lash/Link/Link/Link/Link/Link/Link"]
+position = Vector3(0, 0, -0.15)
+
+[node name="Seg" type="MeshInstance3D" parent="Model/Lash/Link/Link/Link/Link/Link/Link/Link"]
+position = Vector3(0, 0, -0.075)
+cast_shadow = 0
+mesh = SubResource("Seg6")
+
+[node name="Link" type="Node3D" parent="Model/Lash/Link/Link/Link/Link/Link/Link/Link"]
+position = Vector3(0, 0, -0.15)
+
+[node name="Seg" type="MeshInstance3D" parent="Model/Lash/Link/Link/Link/Link/Link/Link/Link/Link"]
+position = Vector3(0, 0, -0.075)
+cast_shadow = 0
+mesh = SubResource("Seg7")
+
+[node name="Cracker" type="MeshInstance3D" parent="Model/Lash/Link/Link/Link/Link/Link/Link/Link/Link"]
+transform = Transform3D(1, 0, 0, 0, 0.97, 0.26, 0, -0.26, 0.97, 0, 0, -0.2)
+cast_shadow = 0
+mesh = SubResource("CrackerMesh")
