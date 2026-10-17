@@ -596,6 +596,9 @@ fix console errors, commit. Stop and report after each milestone.
   Report after each one; the user may stop adding weapons at any point.
 - Change TODO, later (user, 2026-10-17): the map layout pass from section 4 (#53).
 - Acceptance: all items purchasable, wave 10 reachable.
+  Checked 2026-10-17 by `tests/m5_acceptance` (every weapon and piece of equipment has a way in, and
+  every wall-buy, Schnaps, Brettljause item, the Munitionskiste and the Hüttentruhe can be walked to
+  and bought, the chest handing out its whole pool) and `tests/m5_waves` (waves 1 to 10).
 
 **M6 — Art and audio pass**
 - Replace greybox with low-poly assets, lighting, snow effects, sounds,
