@@ -217,7 +217,10 @@ Rules:
     the attacker is bonked back; you walk at 60 % and cannot shoot until you let go. Hits from the side
     or behind still land, so you keep turning to face them.
 - Ready ring (play-test 2026-10-17): a ring around the crosshair fills while the gun reloads (amber)
-  and, for the Alphorn, between notes (white), and pulses once when the gun is ready again. Guns that
+  and, for the Alphorn and the Rodelkanone (play-test 2026-10-17), between shots (white), and pulses
+  once when the gun is ready again.
+- An emptied gun reloads by itself as soon as its last shot has cycled (play-test 2026-10-17: a
+  click on the empty gun during the cycle could be lost, so R was needed). Guns that
   work an action after a shot fire again the moment the animation ends (play-test: the Stutzen's bolt
   and the Jagdflinte's recoil had finished well before the gun could fire; fire rates set to match).
 - Semi-auto guns fire once per click, as fast as the player clicks, up to `fire_rate` (user request,

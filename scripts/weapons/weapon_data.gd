@@ -72,7 +72,8 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR, BLOCK }
 @export var slow_factor: float = 1.0
 @export var slow_time: float = 0.0
 ## Show the ready ring at the crosshair while the gun cycles between shots (play-test: only for the
-## Alphorn's long gap; other guns show it in their animation, and fire again as it ends).
+## long gaps, the Alphorn's and the Rodelkanone's; other guns show it in their animation, and fire
+## again as it ends).
 @export var cycle_ring: bool = false
 ## Translation key of a comic word that pops up where a melee blow lands (the pan's "BONK!"), until
 ## the M6 sounds; empty = none.

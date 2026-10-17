@@ -172,6 +172,7 @@ func _run() -> void:
 	await _check_shotgun_points()
 	await _check_secondary_modes()
 	_check_repetierer_buy()
+	await _check_auto_reload()
 
 	print("RESULT: ", "PASS" if failures.is_empty() else "FAIL (%d)" % failures.size())
 	get_tree().quit(0 if failures.is_empty() else 1)
@@ -238,6 +239,18 @@ func _check_repetierer_buy() -> void:
 	player.points.total = 1200
 	buy.interact(player)
 	_check(player.weapons.weapon.id == &"repetierer" and player.points.total == 200, "Repetierer bought for 1000")
+
+
+func _check_auto_reload() -> void:
+	# An emptied gun reloads by itself once the shot has cycled, without R or another click.
+	var weapons: WeaponHolder = player.weapons
+	await _frames(int(Constants.WEAPON_SWITCH_TIME * 60) + 2)
+	weapons.mag = 1
+	weapons.reserve = 20
+	weapons._fire()
+	await _frames(int(60.0 / weapons.weapon.fire_rate) + 3)
+	_check(weapons.is_reloading(), "an emptied %s reloads by itself" % weapons.weapon.id)
+	weapons._finish_reload()
 
 
 func _check_shotgun_points() -> void:

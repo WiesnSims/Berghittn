@@ -515,7 +515,8 @@ func _ammo_crate() -> void:
 
 
 func _boss_wave() -> void:
-	# Straight into wave 5 with the real wave manager.
+	# Straight into wave 5 with the real wave manager; no random event (a Bierfassl's banner) on top.
+	main.get_node("EventDirector").process_mode = Node.PROCESS_MODE_DISABLED
 	_place(Vector3(-2.0, 0.0, 3.5))
 	waves._alive = 0
 	waves.process_mode = Node.PROCESS_MODE_INHERIT
