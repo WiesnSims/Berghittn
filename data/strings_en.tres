@@ -47,6 +47,8 @@ messages = {
 [&"", &"WEAPON_ALPHORN"]: [&"Alphorn"],
 [&"", &"WEAPON_SCHMARRNPFANNE"]: [&"Schmarrnpfanne"],
 [&"", &"HIT_BONK"]: [&"BONK!"],
+[&"", &"WEAPON_KNOEDELWERFER"]: [&"Knödelwerfer"],
+[&"", &"HIT_SPLAT"]: [&"SPLATSCH!"],
 [&"", &"PERK_ENZIAN"]: [&"Enzian"],
 [&"", &"PERK_MARILLENBRAND"]: [&"Marillenbrand"],
 [&"", &"PERK_JAGERTEE"]: [&"Jagertee"],

@@ -60,6 +60,17 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR, BLOCK }
 @export var area_angle: float = 0.0
 @export var knockback: float = 0.0
 @export var shake: float = 0.0
+## Launched weapons (the Knödelwerfer, read by their behavior): launch speed (m/s) and the gravity the
+## shot falls with (m/s²), the blast radius where it lands (m), and the sticky pile it leaves: its
+## radius (m), how long it lies (s), and the slow it puts on enemies in it (speed factor, and seconds
+## it lasts after they step out).
+@export var projectile_speed: float = 0.0
+@export var projectile_gravity: float = 9.8
+@export var area_radius: float = 0.0
+@export var pile_radius: float = 0.0
+@export var pile_time: float = 0.0
+@export var slow_factor: float = 1.0
+@export var slow_time: float = 0.0
 ## Show the ready ring at the crosshair while the gun cycles between shots (play-test: only for the
 ## Alphorn's long gap; other guns show it in their animation, and fire again as it ends).
 @export var cycle_ring: bool = false

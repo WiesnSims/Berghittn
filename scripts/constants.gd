@@ -264,6 +264,11 @@ const CHEST_DISPLAY_MAX_LENGTH: float = 1.2
 const AREA_MAX_TARGETS: int = 64
 const AREA_AIM_HEIGHT: float = 1.1
 const AREA_BODY_MARGIN: float = 0.5
+# Knödelwerfer: dumplings and piles kept in pools (oldest reused when all are out), and seconds a
+# dumpling may fly before it bursts in the air.
+const KNOEDEL_POOL: int = 12
+const KNOEDEL_PILE_POOL: int = 10
+const KNOEDEL_MAX_FLIGHT: float = 4.0
 # Screen shake from blasts: seconds it lasts and how fast it trembles (cycles per second).
 const SHAKE_TIME: float = 0.45
 const SHAKE_FREQUENCY: float = 18.0
