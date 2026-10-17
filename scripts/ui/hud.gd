@@ -23,6 +23,7 @@ const SPENT_COLOR: Color = Color(0.9, 0.3, 0.25, 1)
 @onready var _perk_icons: HBoxContainer = %PerkIcons
 @onready var _perk_glow: TextureRect = %PerkGlow
 @onready var _equipment_label: Label = %EquipmentLabel
+@onready var _melee_label: Label = %MeleeLabel
 
 var _weapons: WeaponHolder
 var _dead: bool = false
@@ -88,6 +89,10 @@ func bind_player(player: Player) -> void:
 	player.perks.triggered.connect(func(_id: StringName, text: String) -> void: _show_banner(tr(text)))
 	_points_label.text = str(player.points.total)
 	_on_weapon_changed(_weapons.weapon)
+	if _weapons.melee_weapon:
+		_melee_label.text = tr("UI_MELEE") % tr(_weapons.melee_weapon.display_name)
+	# Connected after the start weapon is shown, so only a new one gets the banner.
+	_weapons.melee_changed.connect(_on_melee_changed)
 	_on_ammo_changed(_weapons.mag, _weapons.reserve)
 	_on_health_changed(player.health.current(), player.health.max_health)
 
@@ -99,6 +104,11 @@ func _on_ammo_changed(mag: int, reserve: int) -> void:
 
 func _on_weapon_changed(data: WeaponData) -> void:
 	_weapon_label.text = tr(data.display_name)
+
+
+func _on_melee_changed(data: WeaponData) -> void:
+	_melee_label.text = tr("UI_MELEE") % tr(data.display_name)
+	_show_banner(tr("UI_MELEE_TAKEN") % tr(data.display_name))
 
 
 func _on_reload_changed() -> void:

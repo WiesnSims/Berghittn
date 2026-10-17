@@ -56,6 +56,14 @@ theme_override_font_sizes/font_size = 34
 text = "UI_CLICK_TO_PLAY"
 horizontal_alignment = 1
 
+[node name="SettingsButton" type="Button" parent="Center/Box"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 48)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 24
+text = "UI_SETTINGS"
+
 [node name="Controls" type="Label" parent="Center/Box"]
 layout_mode = 2
 custom_minimum_size = Vector2(880, 0)

@@ -22,6 +22,13 @@ const PLAYER_FALL_RESPAWN_Y: float = -20.0
 # Radians of view rotation per screen pixel of mouse movement.
 const DEFAULT_MOUSE_SENSITIVITY: float = 0.002
 const DEFAULT_LOCALE: String = "en"
+# Settings menu ranges (M6). Volumes are linear 0..1 per audio bus.
+const MOUSE_SENSITIVITY_MIN: float = 0.0005
+const MOUSE_SENSITIVITY_MAX: float = 0.006
+const AIM_SENSITIVITY_MIN: float = 0.2
+const AIM_SENSITIVITY_MAX: float = 1.0
+const DEFAULT_VOLUME: float = 0.8
+const RENDER_SCALE_MIN: float = 0.5
 
 # Chrome refuses a new pointer lock for about a second after the user pressed Esc to exit one.
 const POINTER_RELOCK_DELAY: float = 1.2
@@ -215,7 +222,7 @@ const SCOPE_SHOW_AT: float = 0.95
 const SCOPE_SWAY_DEGREES: float = 0.35
 const SCOPE_SWAY_SPEED: float = 0.35
 # Aiming (any aimed secondary) multiplies the mouse sensitivity by this, on top of the zoom scaling
-# (play-test #17). Becomes a player setting with the M6 settings menu.
+# (play-test #17). A player setting since M6.
 const DEFAULT_AIM_SENSITIVITY: float = 0.6
 # Fully aimed, the muzzle flash shrinks to this size and its light to this share, so it does not
 # cover the target in front of the sights (play-test #16).
@@ -346,3 +353,26 @@ const LARVE_LINGER: float = 1.0
 # Screen shake from blasts: seconds it lasts and how fast it trembles (cycles per second).
 const SHAKE_TIME: float = 0.45
 const SHAKE_FREQUENCY: float = 18.0
+
+# Atmosphere (M6). The roof map covers the play area (the navmesh bake box is 60 m wide) in cells
+# this size; heights are cast down from ROOF_MAP_CAST_FROM, and NO_ROOF marks a miss.
+const ROOF_MAP_HALF_SIZE: float = 32.0
+const ROOF_MAP_CELL: float = 0.4
+const ROOF_MAP_CAST_FROM: float = 60.0
+const ROOF_MAP_NO_ROOF: float = -50.0
+# The camera counts as indoors this far below a roof (so standing in a doorway does not flicker).
+const ROOF_MAP_MARGIN: float = 0.1
+# Seconds for the fog and ambient light to change over between outdoors and indoors.
+const ATMOSPHERE_BLEND_TIME: float = 1.2
+const ATMOSPHERE_CUT_DISTANCE: float = 3.0
+# Seconds outdoors until the screen is frozen over at the edges, and indoors until it has thawed.
+const FROST_BUILD_TIME: float = 10.0
+const FROST_THAW_TIME: float = 3.0
+# Shader warm-up at load: frames the weapon models are drawn for, their size, and where (metres ahead
+# of the camera and apart).
+const WARMUP_FRAMES: int = 4
+const WARMUP_SCALE: float = 0.02
+const WARMUP_DISTANCE: float = 0.5
+const WARMUP_SPACING: float = 0.02
+# The snow emitter box is centred this far above the camera.
+const SNOW_EMITTER_ABOVE: float = 4.0

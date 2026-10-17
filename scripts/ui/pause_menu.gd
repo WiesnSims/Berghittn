@@ -2,6 +2,7 @@ class_name PauseMenu
 extends Control
 
 signal resume_requested
+signal settings_requested
 
 @onready var _resume_button: Button = %ResumeButton
 @onready var _relock_timer: Timer = $RelockTimer
@@ -9,6 +10,7 @@ signal resume_requested
 
 func _ready() -> void:
 	_resume_button.pressed.connect(resume_requested.emit)
+	(%SettingsButton as Button).pressed.connect(settings_requested.emit)
 	_relock_timer.wait_time = Constants.POINTER_RELOCK_DELAY
 	_relock_timer.timeout.connect(_on_relock_timeout)
 	visibility_changed.connect(_on_visibility_changed)

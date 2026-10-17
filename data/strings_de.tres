@@ -136,5 +136,18 @@ messages = {
 [&"", &"EVENT_GUEST_REWARD"]: [&"Er lasst da seine zwoa Eisstöck do! Werfen mit G oder der mittleren Maustaste"],
 [&"", &"EVENT_GUEST_DIED"]: [&"Der Tourist hat's ned gschafft"],
 [&"", &"EVENT_GUEST_GAVE_UP"]: [&"Der Tourist fahrt mit der nächsten Gondel hoam"],
-[&"", &"UI_EQUIPMENT"]: [&"%s ×%d   [G]"]
+[&"", &"UI_EQUIPMENT"]: [&"%s ×%d   [G]"],
+[&"", &"UI_SETTINGS"]: [&"Einstellungen"],
+[&"", &"UI_BACK"]: [&"Zurück"],
+[&"", &"UI_SET_SENSITIVITY"]: [&"Mausempfindlichkeit"],
+[&"", &"UI_SET_AIM_SENSITIVITY"]: [&"Empfindlichkeit beim Zielen"],
+[&"", &"UI_SET_INVERT_Y"]: [&"Maus-Y umkehren"],
+[&"", &"UI_SET_VOLUME_MASTER"]: [&"Gesamtlautstärke"],
+[&"", &"UI_SET_VOLUME_MUSIC"]: [&"Musik"],
+[&"", &"UI_SET_VOLUME_EFFECTS"]: [&"Effekte"],
+[&"", &"UI_SET_VOLUME_AMBIENCE"]: [&"Umgebung"],
+[&"", &"UI_SET_LANGUAGE"]: [&"Sprache"],
+[&"", &"UI_SET_RENDER_SCALE"]: [&"Renderauflösung"],
+[&"", &"UI_MELEE"]: [&"%s   [V]"],
+[&"", &"UI_MELEE_TAKEN"]: [&"%s auf V"]
 }

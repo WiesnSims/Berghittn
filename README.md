@@ -98,6 +98,25 @@ only climbs in once they are all gone; one enemy works a window at a time, the r
 E at the repair spot inside to nail boards back on. Points live per player in `PlayerPoints`, which
 listens to `Events` and credits only its own player (`source` on every hit, kill and repair).
 
+## Look and settings (M6)
+
+- `RoofMap` (`scripts/effects/roof_map.gd`) casts rays down over the play area once at load
+  (about 60 ms) and keeps the height of the highest solid surface per 0.4 m cell, grown by a cell so
+  walls never leak. Snow hides below it and `Atmosphere` uses it to tell indoors from outdoors.
+- `Atmosphere` eases the one global fog and the ambient light between the cold storm outside and the
+  warm, clear Stube inside. The `Environment` in `main.tscn` holds the outdoor look, because the
+  mountain backdrop reads its fog colour at load.
+- `Snowfall` is a `GPUParticles3D` whose box follows the camera while the flakes stay in world space;
+  `assets/shaders/snowflake.gdshader` drops every flake under a roof.
+- `PostFX` (a `CanvasLayer` under the HUD) grades and vignettes, and draws the frost
+  (`assets/shaders/post_fx.gdshader`); `Atmosphere` sets its `frost` amount, building up over
+  `FROST_BUILD_TIME` outdoors and thawing over `FROST_THAW_TIME` indoors.
+- `Settings` (autoload) holds sensitivity, aiming sensitivity, invert Y, the volume of each bus in
+  `default_bus_layout.tres` (Master, Music, Effects, Ambience), language and render resolution,
+  saved to `user://settings.cfg` (IndexedDB in the browser). The menu
+  (`scenes/ui/settings_menu.tscn`) opens from the start screen and the pause menu, applies changes
+  live and saves on Back.
+
 ## Tests
 
 ```
@@ -300,6 +319,16 @@ godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|p
 
 Also needs a window: one frame per zone (all doors open), the wall-buys and a door mid-swing; or
 the Jagdflinte and Stutzen being drawn, fired and reloaded.
+
+```
+godot res://tests/hitch_probe.tscn
+```
+
+Needs a window too: frame times around first-time moments (a door bought, the Hüttentruhe's glow
+and roll, taking a weapon, each enemy type turning up), printing every frame over 25 ms. A first
+draw compiles shaders, which stalls far longer in the browser than on desktop, so
+`ShaderWarmup` (`scripts/effects/shader_warmup.gd`) draws every weapon model once behind the start
+screen; without it the first chest roll took 77 ms on desktop and 1-2 s in the browser.
 
 ## Deploy
 

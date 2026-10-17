@@ -81,6 +81,9 @@ func _run() -> void:
 	zones = main.get_node("Zones")
 	waves = main.get_node("WaveManager")
 	waves.process_mode = Node.PROCESS_MODE_DISABLED
+	# The checks below emit wave_started themselves; a random event it set off (a Murmeltier's
+	# banner) used to land on the boss wave's banner check now and then.
+	main.get_node("EventDirector").process_mode = Node.PROCESS_MODE_DISABLED
 	Events.boss_spawned.connect(func(e: Node3D) -> void: _boss_seen = e)
 	for zone: StringName in ALL_ZONES:
 		zones.unlock(zone, player)
@@ -454,6 +457,14 @@ func _chest() -> void:
 	for entry: ChestEntry in pool.entries:
 		even = even and absf(counts.get(entry.weapon.id, 0) / 6000.0 - entry.weight / total) < 0.03
 	_check(even, "chest pool shares %s" % counts)
+	# The slot checks below are about guns; a melee roll (Goaßl, Mistgabel) goes to V instead and is
+	# covered by m5_acceptance. Without this the test failed whenever the chest rolled one.
+	var all_entries: Array[ChestEntry] = pool.entries.duplicate()
+	var guns_only: Array[ChestEntry] = []
+	for entry: ChestEntry in all_entries:
+		if not entry.weapon.is_melee:
+			guns_only.append(entry)
+	pool.entries = guns_only
 	# Only the pistol in hand, so a free slot.
 	while player.weapons.gun_count() > 1:
 		player.weapons._slots.remove_at(player.weapons._slots.size() - 1)
@@ -486,6 +497,7 @@ func _chest() -> void:
 	chest.interact(player)
 	_check(player.weapons.has_weapon(swap) and not player.weapons.has_weapon(in_hand) and player.weapons.gun_count() == 2, "swapped the %s for the %s" % [in_hand.id, swap.id])
 	await _seconds(1.2)
+	pool.entries = all_entries
 
 
 func _fanning() -> void:
@@ -525,8 +537,7 @@ func _ammo_crate() -> void:
 
 
 func _boss_wave() -> void:
-	# Straight into wave 5 with the real wave manager; no random event (a Bierfassl's banner) on top.
-	main.get_node("EventDirector").process_mode = Node.PROCESS_MODE_DISABLED
+	# Straight into wave 5 with the real wave manager (the event director is off since the start).
 	_place(Vector3(-2.0, 0.0, 3.5))
 	waves._alive = 0
 	waves.process_mode = Node.PROCESS_MODE_INHERIT
