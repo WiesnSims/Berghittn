@@ -222,6 +222,10 @@ Rules:
     straight 15 m never fits.
   - Melee weapons live on V, not in hand, so their mode is **holding V past the blow** (M5): tap V
     swings as before, keep it held and the weapon stays up.
+  - `goassl`: the lash (hold V): the whip wraps round the first body along the aim within 7 m and
+    drags it to the player (5 m/s, stopping 1.6 m short) for as long as V is held, 3 s at most,
+    dazed all the while; let go, it stays stunned for 1.5 s. Pulls a Perchte out of a crowd or one
+    off a window. Bosses are too heavy; with nothing in reach the whip just drops.
   - `schmarrnpfanne`: the pan as a shield (hold V): hits from the front (60° each side) are caught and
     the attacker is bonked back; you walk at 60 % and cannot shoot until you let go. Hits from the side
     or behind still land, so you keep turning to face them.
@@ -334,6 +338,10 @@ Alpine folk culture.
   sound comes with M6. A Kaiserschmarrn is still in it.
 - **Goaßl:** a long whip (Goaßlschnalzen). Cracks loudly, hits in a short
   cone, and stuns enemies for 1.5 s.
+  Details (M5): on V in place of the shovel (chest only, weight 1; the chest hands a melee weapon
+  into the melee slot, never in place of a gun). 40 to everything within 3.5 m and 30° either side of
+  the aim (walls shield), 1.5 crack-blows a second; stunned enemies stand dazed, swaying, and cannot
+  attack; bosses take the blow but are not stunned. "SCHNALZ!" at the tip until the M6 crack sound.
 - **Mistgabel:** pitchfork with long reach; pierces and hits two enemies in
   a line.
 - **Krampus-Rute:** birch rod dropped by the Krampus boss. Hits cause enemies

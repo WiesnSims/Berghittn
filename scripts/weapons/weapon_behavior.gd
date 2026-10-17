@@ -38,3 +38,25 @@ func fire_secondary() -> void:
 ## Every frame right click is held on a PLAY secondary (its rounds are paid by the WeaponHolder).
 func play_secondary(_delta: float) -> void:
 	pass
+
+
+## Melee weapons (quick melee on V) with a behavior: the blow lands now. True when the behavior dealt
+## it itself; false leaves it to the WeaponHolder's plain arc.
+func melee_hit() -> bool:
+	return false
+
+
+## V still held after the blow, on a melee weapon whose secondary is BEHAVIOR: true starts the held
+## mode (walking slowed, guns down), false lets the weapon drop as usual.
+func hold_start() -> bool:
+	return false
+
+
+## Every frame of the held mode; false ends it.
+func hold(_delta: float) -> bool:
+	return false
+
+
+## The held mode ends: V let go, or hold() said so.
+func hold_end() -> void:
+	pass

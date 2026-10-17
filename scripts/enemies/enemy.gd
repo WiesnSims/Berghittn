@@ -59,6 +59,19 @@ var _sidestep_left: float = 0.0
 var _sidestep_side: float = 1.0
 # Thrown back (Böllerschuss): the push that is left, flat.
 var _knock: Vector3
+# Stunned by the Goaßl (standing dazed), or fleeing from the Krampus-Rute: seconds left, and where
+# from.
+var _stun_left: float = 0.0
+var _flee_left: float = 0.0
+var _flee_from: Vector3
+# Lifted on the Mistgabel (carried, no will of its own), then hurled: flying until it lands, when
+# _on_land is called with it. Its collision is off meanwhile, so it cannot shove the player.
+var _lifted: bool = false
+var _hurled: bool = false
+var _hurl_time: float = 0.0
+var _on_land: Callable
+var _body_layer: int = 0
+var _body_mask: int = 0
 # Dancing to the Harmonika: seconds left.
 var _dance_left: float = 0.0
 var _dance_phase: float = 0.0
@@ -100,6 +113,13 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 	max_health = health
 	_lunge_cooldown_left = 0.0
 	_dance_left = 0.0
+	_stun_left = 0.0
+	_flee_left = 0.0
+	if _lifted or _hurled:
+		_lifted = false
+		_hurled = false
+		collision_layer = _body_layer
+		collision_mask = _body_mask
 	for dot: Dot in _dots.values():
 		dot.left = 0.0
 	_scorch_paid_left = 0.0
@@ -207,6 +227,98 @@ func dance(duration: float, dps: int, source: Node3D) -> void:
 		_state = State.CHASING
 
 
+## The Goaßl's crack: dazed on the spot for `duration` (no walking, no attacks; a swing in progress
+## is dropped). Bosses shrug it off.
+func stun(duration: float) -> void:
+	if not is_alive() or data.is_boss:
+		return
+	_stun_left = maxf(_stun_left, duration)
+	_drop_swing()
+
+
+func is_stunned() -> bool:
+	return _stun_left > 0.0 and is_alive() and _can_dance()
+
+
+## The Krampus-Rute: runs away from `from` for `duration`, attacking nobody. Bosses shrug it off.
+func flee(from: Vector3, duration: float) -> void:
+	if not is_alive() or data.is_boss:
+		return
+	_flee_from = from
+	if _flee_left <= 0.0:
+		_repath_left = 0.0
+	_flee_left = maxf(_flee_left, duration)
+	_drop_swing()
+
+
+func is_fleeing() -> bool:
+	return _flee_left > 0.0 and is_alive() and _can_dance()
+
+
+## The Mistgabel: lifted up on the fork. Its holder moves it (carry_to) until it is hurled or let go.
+## Bosses are too heavy: false.
+func lift() -> bool:
+	if not is_alive() or data.is_boss or _lifted or _hurled or not _can_dance():
+		return false
+	_lifted = true
+	_drop_swing()
+	_body_layer = collision_layer
+	_body_mask = collision_mask
+	collision_layer = 0
+	collision_mask = 0
+	velocity = Vector3.ZERO
+	return true
+
+
+func is_lifted() -> bool:
+	return _lifted and is_alive()
+
+
+## Where a lifted enemy is carried to (its feet), facing `facing`.
+func carry_to(at: Vector3, facing: Vector3) -> void:
+	if not _lifted:
+		return
+	global_position = at
+	_face(facing, 1.0 / Engine.physics_ticks_per_second)
+	_visual.rotation.z = sin(Time.get_ticks_msec() * 0.02) * 0.3
+
+
+## Throws a lifted enemy along `launch` (m/s); `landed` is called with it where it comes down.
+func hurl(launch: Vector3, landed: Callable) -> void:
+	if not _lifted:
+		return
+	_lifted = false
+	_hurled = true
+	_hurl_time = 0.0
+	_on_land = landed
+	velocity = launch
+	# It lands on the world, but still passes through the player.
+	collision_mask = Constants.LAYER_WORLD
+
+
+func _hurling(delta: float) -> void:
+	_hurl_time += delta
+	velocity.y -= _gravity * delta
+	move_and_slide()
+	_visual.rotation.x += 8.0 * delta
+	if _hurl_time > 0.15 and (is_on_floor() or is_on_wall()) or _hurl_time > Constants.LOBBED_MAX_FLIGHT:
+		_hurled = false
+		_visual.rotation.x = 0.0
+		_visual.rotation.z = 0.0
+		velocity = Vector3.ZERO
+		collision_layer = _body_layer
+		collision_mask = _body_mask
+		if _on_land.is_valid():
+			_on_land.call(self)
+
+
+func _drop_swing() -> void:
+	if _state == State.ATTACKING:
+		_kill_tween()
+		_visual.rotation.x = 0.0
+		_state = State.CHASING
+
+
 func is_dancing() -> bool:
 	return _dance_left > 0.0 and is_alive() and _can_dance()
 
@@ -269,6 +381,11 @@ func _physics_process(delta: float) -> void:
 	if _knock != Vector3.ZERO and (_state == State.CHASING or _state == State.ATTACKING or _state == State.QUEUED):
 		_knocked(delta)
 		return
+	if _lifted:
+		return
+	if _hurled:
+		_hurling(delta)
+		return
 	if _dance_left > 0.0:
 		_dance_left -= delta
 		if _can_dance() and is_alive():
@@ -276,6 +393,27 @@ func _physics_process(delta: float) -> void:
 			if _dance_left <= 0.0:
 				_visual.rotation.z = 0.0
 				_visual.position.y = 0.0
+			return
+	if _stun_left > 0.0:
+		_stun_left -= delta
+		if _can_dance() and is_alive():
+			_halt(delta)
+			# Dazed: swaying on the spot.
+			_visual.rotation.z = sin(_stun_left * 9.0) * 0.12
+			if _stun_left <= 0.0:
+				_visual.rotation.z = 0.0
+			return
+	if _flee_left > 0.0:
+		_flee_left -= delta
+		if _can_dance() and is_alive():
+			_state = State.CHASING
+			var away := _flat(global_position - _flee_from)
+			if away.length() < 0.1:
+				away = -global_basis.z
+			_walk_towards(global_position + away.normalized() * Constants.FLEE_LOOKAHEAD, delta)
+			if _flee_left <= 0.0:
+				# Straight back on the chase, not on along the last run away.
+				_repath_left = 0.0
 			return
 	match _state:
 		State.CHASING:
@@ -698,6 +836,10 @@ func _leave_window() -> void:
 
 func _die(is_headshot: bool, is_melee: bool, source: Node3D) -> void:
 	_state = State.DEAD
+	if _lifted or _hurled:
+		_lifted = false
+		_hurled = false
+		_visual.rotation.x = 0.0
 	if _burn_fx:
 		_burn_fx.emitting = false
 	_leave_window()

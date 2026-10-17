@@ -319,6 +319,15 @@ const BURN_TIME: float = 3.0
 const LACKE_POOL: int = 4
 const LACKE_TIME: float = 6.0
 const LACKE_INTERVAL: float = 0.25
+# Melee behaviors: degrees either side of the aim that count as "straight along it" (the Goaßl's
+# lash, the Mistgabel's thrust), and how far ahead a fleeing enemy aims its run (metres).
+const LINE_HALF_ANGLE: float = 10.0
+const FLEE_LOOKAHEAD: float = 5.0
+# Goaßl: seconds a crack (and letting go of the lash) stuns, the longest a lash can hold, and how near
+# the player a lashed enemy is pulled before it stops.
+const GOASSL_STUN_TIME: float = 1.5
+const GOASSL_HOLD_MAX: float = 3.0
+const GOASSL_PULL_STOP: float = 1.6
 # Screen shake from blasts: seconds it lasts and how fast it trembles (cycles per second).
 const SHAKE_TIME: float = 0.45
 const SHAKE_FREQUENCY: float = 18.0

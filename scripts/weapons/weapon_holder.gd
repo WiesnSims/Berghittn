@@ -66,6 +66,8 @@ var _play_left: float = 0.0
 var _viewmodel: Viewmodel
 var _behavior: WeaponBehavior
 var _melee_viewmodel: MeleeViewmodel
+# The melee weapon's own blow and held mode (section 6a's Goaßl, Mistgabel, Krampus-Rute), or null.
+var _melee_behavior: WeaponBehavior
 # Seconds left of the current swing, and until its blow lands (negative once it has).
 var _melee_left: float = 0.0
 # Holding the melee weapon up as a guard (BLOCK secondary), and a hold of V without a keyboard for tests.
@@ -87,6 +89,8 @@ func _ready() -> void:
 	if melee_weapon and melee_weapon.viewmodel:
 		_melee_viewmodel = melee_weapon.viewmodel.instantiate() as MeleeViewmodel
 		_motion.add_child(_melee_viewmodel)
+	if melee_weapon:
+		_melee_behavior = WeaponBehavior.create(melee_weapon, self)
 
 
 func set_owner_body(body: CollisionObject3D) -> void:
@@ -141,6 +145,7 @@ func set_melee(data: WeaponData) -> void:
 		_melee_viewmodel.queue_free()
 		_melee_viewmodel = null
 	melee_weapon = data
+	_melee_behavior = WeaponBehavior.create(data, self)
 	if data.viewmodel:
 		_melee_viewmodel = data.viewmodel.instantiate() as MeleeViewmodel
 		_motion.add_child(_melee_viewmodel)
@@ -154,7 +159,7 @@ func is_blocking() -> bool:
 ## A hit is coming in from `attacker`: true when the guard is up and faces it, so the hit is caught
 ## (block_share of it still gets through) and the attacker is bonked back.
 func block(attacker: Node3D) -> bool:
-	if not _blocking or attacker == null:
+	if not _blocking or attacker == null or melee_weapon.secondary != WeaponData.Secondary.BLOCK:
 		return false
 	var to: Vector3 = attacker.global_position - global_position
 	var flat := Vector3(to.x, 0.0, to.z)
@@ -301,7 +306,7 @@ func _physics_process(delta: float) -> void:
 	var captured: bool = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
 	_update_aim(delta, force_aim or (captured and Input.is_action_pressed("secondary")))
 	if _blocking:
-		if not _melee_held():
+		if not _melee_held() or (_melee_behavior and melee_weapon.secondary == WeaponData.Secondary.BEHAVIOR and not _melee_behavior.hold(delta)):
 			_end_block()
 		return
 	if _melee_left > 0.0:
@@ -620,8 +625,8 @@ func _bodies_in(center: Vector3, forward: Vector3, half_angle: float, reach: flo
 
 ## One body hit for behaviors that find their own targets (the Rodelkanone's sled): `amount` (before
 ## perks), and a survivor thrown along `push` (scaled like area_hit's, by how much it flinches).
-func strike(hurtbox: Hurtbox, amount: int, push: Vector3) -> Hurtbox.Result:
-	var result: Hurtbox.Result = hurtbox.take_hit(_damage(amount), 1.0, false, _shooter)
+func strike(hurtbox: Hurtbox, amount: int, push: Vector3, is_melee: bool = false) -> Hurtbox.Result:
+	var result: Hurtbox.Result = hurtbox.take_hit(_damage(amount), 1.0, is_melee, _shooter)
 	if result == Hurtbox.Result.IGNORED:
 		return result
 	var target: Vector3 = hurtbox.global_position + Vector3.UP * Constants.AREA_AIM_HEIGHT * hurtbox.scale.y
@@ -631,6 +636,34 @@ func strike(hurtbox: Hurtbox, amount: int, push: Vector3) -> Hurtbox.Result:
 	if enemy and enemy.is_alive():
 		enemy.apply_knockback(push * sqrt(enemy.data.flinch_multiplier))
 	return result
+
+
+## The bodies in front of the shooter for a melee behavior: within `reach` and `half_angle` degrees of
+## the aim, walls shielding, nearest first. Each as {hurtbox, target, to_target, distance}.
+func bodies_ahead(reach: float, half_angle: float) -> Array[Dictionary]:
+	var bodies: Array[Dictionary] = _bodies_in(global_position, -global_basis.z, half_angle, reach)
+	bodies.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.distance < b.distance)
+	return bodies
+
+
+## The first body straight along the aim within `reach` (a narrow line, walls stopping it), or null.
+func body_in_line(reach: float) -> Hurtbox:
+	var bodies: Array[Dictionary] = bodies_ahead(reach, Constants.LINE_HALF_ANGLE)
+	return bodies[0].hurtbox if not bodies.is_empty() else null
+
+
+## A melee blow from a behavior on one body: `amount` (before perks) counted as melee for points,
+## the survivor thrown along `push`, and the weapon's comic word where it lands.
+func melee_strike(hurtbox: Hurtbox, amount: int, push: Vector3) -> Hurtbox.Result:
+	var result: Hurtbox.Result = strike(hurtbox, amount, push, true)
+	if result != Hurtbox.Result.IGNORED:
+		_show_hit_text(hurtbox.global_position + Vector3.UP * Constants.MELEE_AIM_HEIGHT * hurtbox.scale.y)
+	return result
+
+
+## The melee weapon's first-person model, for behaviors that animate it during their held mode.
+func melee_viewmodel() -> MeleeViewmodel:
+	return _melee_viewmodel
 
 
 ## A jolt of the shooter's view that is not recoil (a blast going off).
@@ -729,9 +762,13 @@ func _update_melee(delta: float) -> void:
 		_melee_hit_in -= delta
 		if _melee_hit_in < 0.0:
 			_melee_hit()
-			# Still holding V after the blow: the weapon stays up as a guard.
-			if melee_weapon.secondary == WeaponData.Secondary.BLOCK and _melee_held():
-				_start_block()
+			# Still holding V after the blow: the weapon stays up as a guard, or goes into its own held
+			# mode (BEHAVIOR on a melee weapon).
+			if _melee_held():
+				if melee_weapon.secondary == WeaponData.Secondary.BLOCK:
+					_start_block()
+				elif melee_weapon.secondary == WeaponData.Secondary.BEHAVIOR and _melee_behavior and _melee_behavior.hold_start():
+					_start_block()
 
 
 func _melee_held() -> bool:
@@ -752,6 +789,8 @@ func _end_block() -> void:
 	if not _blocking:
 		return
 	_blocking = false
+	if _melee_behavior and melee_weapon.secondary == WeaponData.Secondary.BEHAVIOR:
+		_melee_behavior.hold_end()
 	if _melee_viewmodel:
 		_melee_viewmodel.end_guard()
 	_switch_left = Constants.BLOCK_LOWER_TIME
@@ -789,6 +828,8 @@ func _float_word(at: Vector3, key: String) -> void:
 
 
 func _melee_hit() -> void:
+	if _melee_behavior and _melee_behavior.melee_hit():
+		return
 	# The swing sweeps an arc in front of the player and hits every enemy in it, once each.
 	var sphere := SphereShape3D.new()
 	sphere.radius = melee_weapon.range

@@ -22,6 +22,9 @@ extends Node
 ## JUCHHE!), the held Landler, the reload.
 ## brennkessel: the lance in hand, the flame poured into a crowd on the pasture (burning bodies),
 ## the stream stopping at the hut wall, the Brennlacke, the reload with the gauge climbing.
+## goassl / mistgabel / rute: the melee weapon on V: a blow into wanderers on the pasture, then V held
+## past the blow (the Goaßl's lash, the Mistgabel lifting and hurling, the Rute's Larve); for the
+## Rute also the Krampus dropping it.
 ## alphorn: the horn in hand, a blast into a crowd on the pasture, the Echo, the reload, and the horn
 ## shown over the Hüttentruhe.
 
@@ -103,6 +106,8 @@ func _ready() -> void:
 		await _harmonika_tour(main)
 	elif mode == "brennkessel":
 		await _brennkessel_tour(main)
+	elif mode in ["goassl", "mistgabel", "rute"]:
+		await _melee_tour(main, mode)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -812,3 +817,39 @@ func _brennkessel_tour(main: Node) -> void:
 	weapons.mag = 30
 	weapons.start_reload()
 	await _save_series("brennkessel_reload", 8, gun.reload_time / 8.0)
+
+
+func _melee_tour(main: Node, mode: String) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	main.get_node("EventDirector").process_mode = Node.PROCESS_MODE_DISABLED
+	var player := main.get_node("Player") as Player
+	var waves := main.get_node("WaveManager") as WaveManager
+	var id: String = "krampusrute" if mode == "rute" else mode
+	var weapon: WeaponData = load("res://data/weapons/%s.tres" % id)
+	var weapons: WeaponHolder = player.weapons
+	weapons.give_weapon(weapon)
+	var center := Vector3(10.0, -0.3, 31.0)
+	player.global_position = center
+	player.rotation.y = -PI * 0.5
+	(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(-6.0)
+	var crowd: Array[Enemy] = []
+	for i: int in 5:
+		var enemy: Enemy = waves._create_enemy()
+		var spot := center + Vector3(1.6 + (i % 2) * 0.9, 0.0, -1.0 + i * 0.5)
+		if i == 4:
+			spot = center + Vector3(5.5, 0.0, 0.0)
+		enemy.activate(load("res://data/enemies/wanderer.tres"), 12, Transform3D(Basis.IDENTITY, spot).looking_at(center, Vector3.UP))
+		enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
+		enemy.health = 100000
+		enemy.data = enemy.data.duplicate()
+		enemy.data.speed = 0.6
+		crowd.append(enemy)
+	await get_tree().create_timer(0.5).timeout
+	weapons._start_melee()
+	await _save_series("%s_blow" % mode, 10, 0.07)
+	await get_tree().create_timer(1.2).timeout
+	weapons.force_melee_hold = true
+	weapons._start_melee()
+	await _save_series("%s_hold" % mode, 12, 0.15)
+	weapons.force_melee_hold = false
+	await _save_series("%s_release" % mode, 8, 0.12)
