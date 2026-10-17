@@ -20,6 +20,8 @@ extends Node
 ## reload, then the Kehre banking round the Stube.
 ## harmonika: the Harmonika in hand, a polka making a ring of wanderers dance on the pasture (notes,
 ## JUCHHE!), the held Landler, the reload.
+## brennkessel: the lance in hand, the flame poured into a crowd on the pasture (burning bodies),
+## the stream stopping at the hut wall, the Brennlacke, the reload with the gauge climbing.
 ## alphorn: the horn in hand, a blast into a crowd on the pasture, the Echo, the reload, and the horn
 ## shown over the Hüttentruhe.
 
@@ -99,6 +101,8 @@ func _ready() -> void:
 		await _rodel_tour(main)
 	elif mode == "harmonika":
 		await _harmonika_tour(main)
+	elif mode == "brennkessel":
+		await _brennkessel_tour(main)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -753,3 +757,58 @@ func _harmonika_tour(main: Node) -> void:
 	weapons.mag = 0
 	weapons.start_reload()
 	await _save_series("harmonika_reload", 8, gun.reload_time / 8.0)
+
+
+func _brennkessel_tour(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	main.get_node("EventDirector").process_mode = Node.PROCESS_MODE_DISABLED
+	var player := main.get_node("Player") as Player
+	var waves := main.get_node("WaveManager") as WaveManager
+	var gun: WeaponData = load("res://data/weapons/brennkessel.tres")
+	var weapons: WeaponHolder = player.weapons
+	weapons.give_weapon(gun)
+	var center := Vector3(10.0, -0.3, 31.0)
+	player.global_position = center
+	player.rotation.y = -PI * 0.5
+	(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(-4.0)
+	for i: int in 5:
+		var enemy: Enemy = waves._create_enemy()
+		var spot := center + Vector3(3.5 + i * 1.1, 0.0, -0.8 + (i % 3) * 0.8)
+		enemy.activate(load("res://data/enemies/knappe.tres" if i == 2 else "res://data/enemies/wanderer.tres"), 12, Transform3D(Basis.IDENTITY, spot).looking_at(center, Vector3.UP))
+		enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
+		enemy.set_physics_process(true)
+		enemy.health = 100000
+		enemy.data = enemy.data.duplicate()
+		enemy.data.speed = 0.3
+	await get_tree().create_timer(0.6).timeout
+	await _save("brennkessel_idle")
+	# Held down for two seconds, a frame every quarter second.
+	for i: int in 8:
+		for t: int in 2:
+			weapons._cooldown = 0.0
+			weapons._fire()
+			await get_tree().create_timer(0.125).timeout
+		await _save("brennkessel_flame_%02d" % i)
+	await _save_series("brennkessel_burning", 4, 0.4)
+	# The stream against the hut wall, from the deck.
+	player.global_position = Vector3(-3.8, 0.0, 9.0)
+	player.rotation.y = 0.0
+	(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(-5.0)
+	await get_tree().create_timer(0.4).timeout
+	for i: int in 6:
+		weapons._cooldown = 0.0
+		weapons._fire()
+		await get_tree().create_timer(0.125).timeout
+	await _save("brennkessel_wall")
+	await get_tree().create_timer(0.5).timeout
+	# The Brennlacke onto the pasture.
+	player.global_position = center
+	player.rotation.y = -PI * 0.5
+	(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(-12.0)
+	await get_tree().create_timer(0.4).timeout
+	weapons._cooldown = 0.0
+	weapons.fire_secondary()
+	await _save_series("brennkessel_lacke", 10, 0.15)
+	weapons.mag = 30
+	weapons.start_reload()
+	await _save_series("brennkessel_reload", 8, gun.reload_time / 8.0)
