@@ -296,6 +296,13 @@ leaving players alone, also those already inside the hut; the Krampus ignores it
 to crowd control). A ring pulses on the floor and "BIMM!" floats up until the M6 sound. The wall-buy
 on the Stube east wall fills the slot to two for 300 and warns when it would replace an Eisstock.
 Equipment keeps G as its only action, no second mode.
+
+Kuhfladen details (M5): placed on the floor a step ahead (at the feet if a wall is in the way). Each
+enemy that steps in it, once, takes 40 and moves at 40 % for 5 s ("PFLATSCH!"); bosses take the
+damage but shrug off slows, from the Knödel pile too (immune to crowd control). After four enemies,
+or two minutes, it is trodden flat; at most six lie about, placing another removes the oldest. Best
+in a doorway: in the open, enemies' paths often pass beside it. The wall-buy on the Schuppen west
+wall fills the slot to three for 250.
 | `kuhfladen` | Kuhfladen-Mine | Placed on the floor; enemies stepping in it are slowed 60% for 5 s and take 40 damage | 250 | 3 | wall-buy, Schuppen |
 | `eisstock` | Eisstock | Thrown low, slides along the floor like a curling stone, bounces off walls up to 3 times and damages every enemy it slides through (5000, a boss 1500 and a shove; 16 m/s, slows down over about 30 m). Deliberately overpowered (user request, 2026-10-17) | – | 2 | only as an event reward (section 8a): no wall-buy, no refill |
 

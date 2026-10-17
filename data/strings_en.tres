@@ -111,6 +111,8 @@ messages = {
 [&"", &"GUEST_OUCH"]: [&"Aua! Hilfe!"],
 [&"", &"EQUIP_EISSTOCK"]: [&"Eisstock"],
 [&"", &"EQUIP_KUHGLOCKE"]: [&"Kuhglocke"],
+[&"", &"EQUIP_KUHFLADEN"]: [&"Kuhfladen-Mine"],
+[&"", &"HIT_PFLATSCH"]: [&"PFLATSCH!"],
 [&"", &"HIT_BIMM"]: [&"BIMM!"],
 [&"", &"UI_BUY_EQUIP_SWAP"]: [&"Press E to buy the %s (%d) instead of your %s"],
 [&"", &"EVENT_GUEST_REWARD"]: [&"He leaves you his two Eisstöcke! Throw them with G or the middle mouse button"],

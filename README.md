@@ -144,6 +144,14 @@ The Kuhglocke: the Stube wall-buy (300 for two, the Eisstock warning, refill), t
 Krampus do not), and the end after 10 s.
 
 ```
+godot --headless --fixed-fps 60 res://tests/m5_kuhfladen.tscn
+```
+
+The Kuhfladen-Mine: the Schuppen wall-buy (250 for three), one placed in the Schuppen doorway, a
+wanderer coming through (40 and slowed, once), the Krampus (hurt, not slowed), trodden flat after
+four, at most six lying about.
+
+```
 godot --headless --fixed-fps 60 res://tests/upstairs.tscn
 godot --headless --fixed-fps 60 res://tests/spawn_paths.tscn
 ```
@@ -195,7 +203,7 @@ frame with the HUD, or shooting an enemy (wall puffs, hit flash, casings, head p
 visuals without playing.
 
 ```
-godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne|knoedel|glocke
+godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne|knoedel|glocke|fladen
 ```
 
 Also needs a window: one frame per zone (all doors open), the wall-buys and a door mid-swing; or

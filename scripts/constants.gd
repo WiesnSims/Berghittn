@@ -272,6 +272,18 @@ const KUHGLOCKE_BOUNCE_KEEP: float = 0.35
 const KUHGLOCKE_RING_TIME: float = 10.0
 const KUHGLOCKE_LURE_RADIUS: float = 20.0
 const KUHGLOCKE_WORD_EVERY: float = 1.2
+# Kuhfladen-Mine (section 6a): how far ahead it is placed (m), its reach (m: the 0.6 m pat plus a foot
+# stepping in at its edge, measured to the enemy's middle), what it does to each
+# enemy that steps in (damage, speed factor, seconds), how many it catches before it is trodden flat,
+# seconds it lies at most, and how many can lie about at once.
+const KUHFLADEN_PLACE_DISTANCE: float = 0.6
+const KUHFLADEN_RADIUS: float = 1.0
+const KUHFLADEN_DAMAGE: int = 40
+const KUHFLADEN_SLOW_FACTOR: float = 0.4
+const KUHFLADEN_SLOW_TIME: float = 5.0
+const KUHFLADEN_CATCHES: int = 4
+const KUHFLADEN_LIFETIME: float = 120.0
+const KUHFLADEN_MAX_ACTIVE: int = 6
 # Knödelwerfer: dumplings and piles kept in pools (oldest reused when all are out), and seconds a
 # dumpling may fly before it bursts in the air.
 const KNOEDEL_POOL: int = 12
