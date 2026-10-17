@@ -42,6 +42,7 @@ func _ready() -> void:
 	Events.wave_started.connect(_on_wave_started)
 	Events.wave_cleared.connect(_on_wave_cleared)
 	Events.boss_spawned.connect(_on_boss_spawned)
+	Events.event_announced.connect(_show_banner)
 
 
 func _process(delta: float) -> void:

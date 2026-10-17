@@ -81,5 +81,12 @@ messages = {
 [&"", &"JAUSE_GERMKNEDL_DESC"]: [&"+10 % Nachladegeschwindigkeit"],
 [&"", &"JAUSE_KASNOCKN_DESC"]: [&"+10 % Waffenschaden"],
 [&"", &"UI_JAUSE_BUY"]: [&"E drücken: %s (%d): %s, Portion %d von %d"],
-[&"", &"UI_JAUSE_FULL"]: [&"%s: genug gegessen"]
+[&"", &"UI_JAUSE_FULL"]: [&"%s: genug gegessen"],
+[&"", &"EVENT_RESI_ARRIVES"]: [&"Die Resi hat si verlaufen!"],
+[&"", &"EVENT_RESI_BOLTED"]: [&"Die Resi is davon!"],
+[&"", &"MARKER_RESI"]: [&"Resi"],
+[&"", &"EVENT_RESI_MILKED"]: [&"Frische Almmilch! Voll geheilt, und a %s aufs Haus"],
+[&"", &"EVENT_RESI_MILKED_FULL"]: [&"Frische Almmilch! Voll geheilt"],
+[&"", &"UI_MILK"]: [&"E halten: die Resi melken"],
+[&"", &"UI_MILKING"]: [&"Melken… %d %%"]
 }

@@ -58,6 +58,8 @@ func _ready() -> void:
 		await _m5(main)
 	elif mode == "perks":
 		await _perks_tour(main)
+	elif mode == "resi":
+		await _resi_tour(main)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -218,6 +220,38 @@ func _perks_tour(main: Node) -> void:
 	player.take_damage(100)
 	await get_tree().create_timer(0.3).timeout
 	await _save("perks_hud_sturschaedl")
+
+
+## resi: die Resi close up in the beer garden (walking, grazing), her marker from inside the Stube, and
+## the HUD edge arrow when she is behind the player.
+func _resi_tour(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	var player := main.get_node("Player") as Player
+	var zones := main.get_node("Zones") as ZoneMap
+	for id: StringName in [&"kueche", &"lager", &"terrasse", &"skiraum", &"seilbahn", &"schuppen"]:
+		zones.unlock(id, player)
+	(main.get_node("WaveManager") as Node).process_mode = Node.PROCESS_MODE_DISABLED
+	await get_tree().create_timer(1.0).timeout
+	var resi: Resi = (main.get_node("EventDirector") as EventDirector).send_resi()
+	var camera := Camera3D.new()
+	camera.fov = 60.0
+	add_child(camera)
+	camera.current = true
+	(main.get_node("UI") as CanvasLayer).hide()
+	await get_tree().create_timer(4.0).timeout
+	camera.look_at_from_position(resi.to_global(Vector3(2.4, 1.6, -1.6)), resi.to_global(Vector3(0, 1.0, -0.2)))
+	await _save("resi_walk")
+	await get_tree().create_timer(12.0).timeout
+	camera.look_at_from_position(resi.to_global(Vector3(-2.2, 1.3, -1.8)), resi.to_global(Vector3(0, 0.9, -0.3)))
+	await _save("resi_graze")
+	camera.look_at_from_position(Vector3(-2.0, 1.7, -2.0), Vector3(-1.0, 1.0, 12.0))
+	await _save("resi_marker_inside")
+	camera.current = false
+	(main.get_node("UI") as CanvasLayer).show()
+	player.global_position = Vector3(-2.0, 0.0, -1.0)
+	player.rotation.y = 0.0
+	await get_tree().create_timer(0.3).timeout
+	await _save("resi_arrow")
 
 
 func _m5(main: Node) -> void:

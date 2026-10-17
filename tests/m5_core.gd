@@ -183,8 +183,11 @@ func _shotgun_close() -> void:
 	# so every pellet flies down the line.
 	var wanderer: EnemyData = load("res://data/enemies/wanderer.tres")
 	var flinte: WeaponData = load("res://data/weapons/jagdflinte.tres")
+	# Bloom too: each shot adds it before its pellets fly.
 	var spread: float = flinte.spread
+	var bloom: float = flinte.bloom_per_shot
 	flinte.spread = 0.0
+	flinte.bloom_per_shot = 0.0
 	player.weapons.give_weapon(flinte)
 	await _seconds(0.6)
 	for distance: float in [2.0, 10.0]:
@@ -211,6 +214,7 @@ func _shotgun_close() -> void:
 				e.receive_hit(10000, false, false, null)
 		await _seconds(0.2)
 	flinte.spread = spread
+	flinte.bloom_per_shot = bloom
 
 
 func _lunge() -> void:

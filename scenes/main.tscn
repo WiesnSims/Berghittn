@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3]
+[gd_scene load_steps=27 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/zones/stube.tscn" id="2"]
@@ -22,6 +22,8 @@
 [ext_resource type="Script" path="res://scripts/waves/wave_manager.gd" id="9"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/enemy.tscn" id="10"]
 [ext_resource type="Resource" path="res://data/wave_table.tres" id="11"]
+[ext_resource type="Script" path="res://scripts/events/event_director.gd" id="23"]
+[ext_resource type="PackedScene" path="res://scenes/events/resi.tscn" id="24"]
 
 [sub_resource type="NavigationMesh" id="NavMesh"]
 geometry_collision_mask = 1
@@ -129,6 +131,12 @@ script = ExtResource("9")
 enemy_scene = ExtResource("10")
 wave_table = ExtResource("11")
 zones = NodePath("../Zones")
+
+[node name="EventDirector" type="Node" parent="." node_paths=PackedStringArray("zones", "stage")]
+script = ExtResource("23")
+zones = NodePath("../Zones")
+resi_scene = ExtResource("24")
+stage = NodePath("../World")
 
 [node name="UI" type="CanvasLayer" parent="."]
 

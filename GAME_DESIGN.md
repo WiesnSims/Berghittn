@@ -329,7 +329,8 @@ take on the meme, not the clip itself.
 
 **Die Resi (main event, Terrasse).** "Die Resi hat si verlaufen!" A lost Almkuh with a flower wreath
 and a huge bell wanders into the beer garden. She only comes while the Terrasse is open, every 3 to 5
-waves from wave 3, and stays 45 s.
+waves from wave 3 (never on a boss wave: then she comes the wave after), arrives 12 s into the wave
+and stays 45 s.
 - Hold E next to her to milk her: fresh Almmilch heals fully and gives a free helping from the
   Brettljause (one not yet at five).
 - Her bell draws every enemy within 20 m to her, so getting the milk is a fight.

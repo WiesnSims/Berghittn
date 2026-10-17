@@ -23,3 +23,6 @@ signal boss_spawned(enemy: Node3D)
 ## A door was bought and its zone is open (section 4). `source` is the player who paid.
 @warning_ignore("unused_signal")
 signal zone_unlocked(zone: StringName, source: Node3D)
+## An event (section 8a) has news for every player: already translated, shown as a banner.
+@warning_ignore("unused_signal")
+signal event_announced(text: String)
