@@ -511,6 +511,21 @@ func area_hit(center: Vector3, forward: Vector3, half_angle: float, reach: float
 	return struck.size()
 
 
+## One body hit for behaviors that find their own targets (the Rodelkanone's sled): `amount` (before
+## perks), and a survivor thrown along `push` (scaled like area_hit's, by how much it flinches).
+func strike(hurtbox: Hurtbox, amount: int, push: Vector3) -> Hurtbox.Result:
+	var result: Hurtbox.Result = hurtbox.take_hit(_damage(amount), 1.0, false, _shooter)
+	if result == Hurtbox.Result.IGNORED:
+		return result
+	var target: Vector3 = hurtbox.global_position + Vector3.UP * Constants.AREA_AIM_HEIGHT * hurtbox.scale.y
+	_hit_puffs.play(target, -push.normalized() if push.length() > 0.01 else Vector3.UP)
+	hit_confirmed.emit(false, result == Hurtbox.Result.KILLED)
+	var enemy := hurtbox.receiver as Enemy
+	if enemy and enemy.is_alive():
+		enemy.apply_knockback(push * sqrt(enemy.data.flinch_multiplier))
+	return result
+
+
 ## A jolt of the shooter's view that is not recoil (a blast going off).
 func shake_view(degrees: float) -> void:
 	var player := _shooter as Player

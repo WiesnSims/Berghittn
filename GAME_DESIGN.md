@@ -199,6 +199,9 @@ Rules:
   - `handboeller`: the Doppelladung (press): a second measure of powder poured in, the loaded round
     plus one from the reserve; the shell flies 1.5 times as fast and flatter, bursts for 260 within
     4.5 m, and the kick shoves the shooter back.
+  - `rodelkanone`: the Kehre (press): a sled shot with a double charge (two rounds) that banks off
+    walls up to three times instead of breaking and runs 25 m; for rooms and corridors where a
+    straight 15 m never fits.
   - Melee weapons live on V, not in hand, so their mode is **holding V past the blow** (M5): tap V
     swings as before, keep it held and the weapon stays up.
   - `schmarrnpfanne`: the pan as a shield (hold V): hits from the front (60° each side) are caught and
@@ -262,6 +265,16 @@ Alpine folk culture.
 - **Rodelkanone:** fires a wooden sled that slides along the ground in a
   straight line for 15 m, hitting every enemy on the path for 300 damage with
   knockback. The sled then disappears with a crash.
+  Details (M5): the sled leaves the muzzle at 14 m/s where the player aims and flies in an arc
+  (heavy: 18 m/s² gravity, so level it comes down about 6 m out, aimed up about 12 m); it strikes
+  bodies it flies through, breaks on a wall, drops off a ceiling. Where it comes down on a floor it
+  runs its 15 m along the ground at 14 m/s, over steps up to 0.4 m,
+  up and down slopes and off edges (lost after a 4 m drop). Everything in its lane (0.7 m around its
+  middle at body height) is struck once and thrown forward and sideways out of the lane; the first
+  wall breaks it early ("KRACH!" and flying planks), nothing behind a wall is touched. "RUMMS!" pops
+  up on each hit until the sound comes with M6. The next sled slides forward in the open chute as the
+  gun is ready again (2.5 s). 4 / 12, reload 3.5 s (the chute tips up and two sleds drop in). In the
+  chest at weight 1. Sleds are pooled.
 - **Brennkessel-Werfer:** a copper schnaps still strapped to the back with a
   hose. Continuous flame cone, 8 m range, 15 damage per tick plus burning
   (10 damage/s for 3 s). Consumes fuel while the trigger is held.

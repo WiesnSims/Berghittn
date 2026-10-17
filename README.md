@@ -160,6 +160,16 @@ the Doppelladung from the reserve and its kick) and the Alphorn, hidden until wa
 announced and on sale for 4000. Lobbed shots share `LobbedShot` (Knödel, Böller shell).
 
 ```
+godot --headless --fixed-fps 60 res://tests/m5_rodelkanone.tscn
+```
+
+The Rodelkanone: a sled shot a little down that flies, comes down about 4 m out and runs 15 m along
+the pasture from there (300 to each enemy in its lane once, thrown aside, none beside the lane or
+past its run), one aimed high that flies over a body close by and strikes the one past its landing, broken by a wall with nothing behind it hurt, the Kehre banking off a
+slanted wall to reach round it and banking round the Stube without passing through a wall, the sled
+pool, the next sled ready with the gun, and the chest weight.
+
+```
 godot --headless --fixed-fps 60 res://tests/upstairs.tscn
 godot --headless --fixed-fps 60 res://tests/spawn_paths.tscn
 ```
@@ -211,7 +221,7 @@ frame with the HUD, or shooting an enemy (wall puffs, hit flash, casings, head p
 visuals without playing.
 
 ```
-godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne|knoedel|glocke|fladen|boeller
+godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne|knoedel|glocke|fladen|boeller|rodel
 ```
 
 Also needs a window: one frame per zone (all doors open), the wall-buys and a door mid-swing; or

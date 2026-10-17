@@ -293,6 +293,14 @@ const KUHFLADEN_MAX_ACTIVE: int = 6
 const KNOEDEL_POOL: int = 12
 const KNOEDEL_PILE_POOL: int = 10
 const LOBBED_MAX_FLIGHT: float = 4.0
+# Rodelkanone: sleds kept in a pool; the lane a sled sweeps (metres either side of its runners' line,
+# measured at body height), how high a step or kerb it rides over, how far it can drop before
+# it is lost, and how hard it throws what it hits sideways out of its lane (times its forward push).
+const RODEL_POOL: int = 4
+const RODEL_LANE: float = 0.7
+const RODEL_STEP: float = 0.4
+const RODEL_MAX_DROP: float = 4.0
+const RODEL_SIDE_PUSH: float = 1.2
 # Screen shake from blasts: seconds it lasts and how fast it trembles (cycles per second).
 const SHAKE_TIME: float = 0.45
 const SHAKE_FREQUENCY: float = 18.0
