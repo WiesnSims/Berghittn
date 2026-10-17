@@ -125,7 +125,7 @@ mesh = SubResource("LidBand")
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.36, -0.753)
 pixel_size = 0.0022
 text = "Hüttentruhe
-950"
+1500"
 font_size = 48
 outline_size = 0
 modulate = Color(0.98, 0.92, 0.7, 1)

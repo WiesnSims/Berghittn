@@ -23,6 +23,7 @@ knockback = 9.0
 shake = 0.8
 projectile_speed = 14.0
 projectile_gravity = 18.0
+cycle_ring = true
 hit_text = "HIT_RUMMS"
 viewmodel = ExtResource("2")
 secondary = 5

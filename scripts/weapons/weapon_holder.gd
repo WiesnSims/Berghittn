@@ -308,6 +308,11 @@ func _physics_process(delta: float) -> void:
 		if _reload_left <= 0.0:
 			_finish_reload()
 		return
+	# An empty gun reloads by itself once its last shot has cycled (play-test 2026-10-17: a click on
+	# the empty gun during the cycle could run out before it counted, so R was needed).
+	if mag == 0 and reserve > 0 and _cooldown <= 0.0:
+		start_reload()
+		return
 	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		return
 	if Input.is_action_just_pressed("reload"):
