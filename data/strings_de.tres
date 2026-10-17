@@ -94,5 +94,9 @@ messages = {
 [&"", &"EVENT_FASSL_FREIBIER"]: [&"Freibier! %s: %s, aufs Haus"],
 [&"", &"EVENT_FASSL_POINTS"]: [&"Freibier! +%d"],
 [&"", &"UI_TAP"]: [&"E halten: Fassl anzapfen"],
-[&"", &"UI_TAPPING"]: [&"Anzapfen… %d %%"]
+[&"", &"UI_TAPPING"]: [&"Anzapfen… %d %%"],
+[&"", &"EVENT_MURMEL_APPEARS"]: [&"Da schreit a Murmeltier!"],
+[&"", &"MARKER_MURMEL"]: [&"Murmeltier"],
+[&"", &"EVENT_MURMEL_CAUGHT"]: [&"Murmeltier erwischt! +%d und volle Waffe"],
+[&"", &"EVENT_MURMEL_GONE"]: [&"Des Murmeltier is weg"]
 }

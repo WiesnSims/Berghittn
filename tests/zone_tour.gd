@@ -62,6 +62,8 @@ func _ready() -> void:
 		await _resi_tour(main)
 	elif mode == "fassl":
 		await _fassl_tour(main)
+	elif mode == "murmel":
+		await _murmel_tour(main)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -288,6 +290,30 @@ func _fassl_tour(main: Node) -> void:
 		await get_tree().create_timer(fassl.interact_repeat).timeout
 	await get_tree().create_timer(0.4).timeout
 	await _save("fassl_foam")
+
+
+## murmel: the Murmeltier rising out of its hole in the Stube and screaming, close up and from afar.
+func _murmel_tour(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	(main.get_node("WaveManager") as Node).process_mode = Node.PROCESS_MODE_DISABLED
+	await get_tree().create_timer(1.0).timeout
+	var murmel := (load("res://scenes/events/murmeltier.tscn") as PackedScene).instantiate() as Murmeltier
+	main.get_node("World").add_child(murmel)
+	murmel.start(Vector3(-4.0, 0.0, 2.5), Vector3(-4.0, 0.0, 0.0))
+	murmel._pops_left = 99
+	var camera := Camera3D.new()
+	camera.fov = 50.0
+	add_child(camera)
+	camera.current = true
+	(main.get_node("UI") as CanvasLayer).hide()
+	camera.look_at_from_position(Vector3(-3.2, 0.6, 1.0), Vector3(-4.0, 0.35, 2.5))
+	await get_tree().create_timer(0.12).timeout
+	await _save("murmel_rise")
+	await get_tree().create_timer(0.5).timeout
+	await _save("murmel_scream")
+	camera.fov = 70.0
+	camera.look_at_from_position(Vector3(2.0, 1.7, -3.0), Vector3(-4.0, 0.4, 2.5))
+	await _save("murmel_far")
 
 
 func _m5(main: Node) -> void:

@@ -105,6 +105,18 @@ const FASSL_TAP_TIME: float = 2.0
 const FASSL_REST_TIME: float = 60.0
 const FASSL_POINTS_IF_FULL: int = 2000
 
+# Murmeltier: pops per visit, seconds rising/ducking, screaming and hidden between pops, how far from
+# the player the first pop is and from one pop to the next (m), and the points for catching it.
+const MURMEL_POPS: int = 4
+const MURMEL_RISE_TIME: float = 0.25
+const MURMEL_SCREAM_TIME: float = 1.8
+const MURMEL_HIDE_TIME: float = 1.2
+const MURMEL_FIRST_MIN: float = 6.0
+const MURMEL_FIRST_MAX: float = 22.0
+const MURMEL_HOP_MIN: float = 2.5
+const MURMEL_HOP_MAX: float = 7.0
+const MURMEL_POINTS: int = 500
+
 # Schnaps perks (section 9). Durchschlag: extra bodies per shot.
 const PERK_PIERCE_BONUS: int = 1
 # Böllerschuss: blast radius (m), damage at the centre (half at the edge), push, and the wait between blasts.

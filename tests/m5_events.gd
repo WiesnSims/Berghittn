@@ -4,6 +4,7 @@ extends Node
 ## beer garden, is marked map-wide, her bell pulls outside enemies to her (they make her bolt), and
 ## milking her heals fully and gives a free Brettljause helping. The Bierfassl rolls down off the alm
 ## into the garden, flattens what is in its way, stops at a wall or a player, and tapping it gives a Schnaps.
+## The Murmeltier pops up near the player where players can walk, screams, hops, and pays out when hit.
 
 var main: Node
 var player: Player
@@ -46,6 +47,8 @@ func _run() -> void:
 	director = main.get_node("EventDirector")
 	hud = main.get_node("UI/Hud")
 	waves.process_mode = Node.PROCESS_MODE_DISABLED
+	# Events are started by hand here; none must turn up on their own in between.
+	director.random_events = false
 	player.global_position = Vector3(-2.0, 0.0, 1.0)
 	await _schedule()
 	for zone: ZoneData in zones.table.zones:
@@ -59,12 +62,17 @@ func _run() -> void:
 	_random_events()
 	await _fassl()
 	await _fassl_stopped()
+	await _murmeltier_caught()
+	await _murmeltier_escapes()
 	print("RESULT: ", "PASS" if failures.is_empty() else "%d FAILED" % failures.size())
 	get_tree().quit(0 if failures.is_empty() else 1)
 
 
 func _random_events() -> void:
-	_check(director.available_random_events() == [&"fassl"], "random events with the Terrasse open: %s" % [director.available_random_events()])
+	_check(director.available_random_events() == [&"fassl", &"murmeltier"], "random events with the Terrasse open: %s" % [director.available_random_events()])
+	director._last_random = &"fassl"
+	_check(director.available_random_events() == [&"murmeltier"], "not the same one twice in a row: %s" % [director.available_random_events()])
+	director._last_random = &""
 	# Never on a boss wave: not even Resi, who is due.
 	var due: int = director._next_resi
 	director._next_resi = 5
@@ -121,6 +129,91 @@ func _fassl_stopped() -> void:
 	_check(fassl.is_resting() and p.x < spot.x and p.x > spot.x - 2.0, "a player in its way stops it (%s)" % p.snapped(Vector3.ONE * 0.1))
 	fassl.queue_free()
 	await _frames(2)
+
+
+func _murmeltier_caught() -> void:
+	player.global_position = Vector3(-2.0, 0.0, 1.0)
+	player.velocity = Vector3.ZERO
+	await _frames(2)
+	var murmel: Murmeltier = director.start_event(&"murmeltier") as Murmeltier
+	var d: float = murmel.global_position.distance_to(player.global_position) if murmel else -1.0
+	_check(murmel != null and d >= Constants.MURMEL_FIRST_MIN and d <= Constants.MURMEL_FIRST_MAX, "a Murmeltier pops up %.1f m away at %s" % [d, murmel.global_position.snapped(Vector3.ONE * 0.1) if murmel else Vector3.ZERO])
+	_check(_banners.back() == "Da schreit a Murmeltier!", "announced: %s" % _banners.back())
+	while not murmel.is_up() or murmel._state != Murmeltier.State.SCREAMING:
+		await get_tree().physics_frame
+	await _frames(2)
+	_check(murmel._shout.visible, "it screams (AAAAAAH! until the sound comes in M6)")
+	# Shoot it with an almost empty pistol from 3 m.
+	var spot: Vector3 = murmel.global_position
+	murmel._pops_left = 99
+	murmel._state = Murmeltier.State.SCREAMING
+	murmel._time = -100.0
+	player.weapons.give_weapon(load("res://data/weapons/pistole.tres"))
+	await _seconds(0.6)
+	# A spot close by with a clear view of it.
+	var space: PhysicsDirectSpaceState3D = player.get_world_3d().direct_space_state
+	var stand: Vector3 = Vector3.INF
+	for i: int in 30:
+		var near: Vector3 = EventDirector.reachable_spot(player.get_world_3d(), spot, 2.0, 3.5)
+		if near == Vector3.INF:
+			continue
+		var view := PhysicsRayQueryParameters3D.create(near + Vector3.UP * 1.5, spot + Vector3.UP * 0.45, Constants.LAYER_WORLD)
+		if space.intersect_ray(view).is_empty():
+			stand = near
+			break
+	player.global_position = stand
+	player.velocity = Vector3.ZERO
+	await _frames(3)
+	_look_at(spot + Vector3.UP * 0.45)
+	_steady()
+	player.weapons.mag = 2
+	player.weapons.reserve = 5
+	player.weapons.aim_amount = 1.0
+	player.weapons.bloom = 0.0
+	var points: int = player.points.total
+	player.weapons._fire()
+	_check(player.points.total == points + Constants.MURMEL_POINTS, "caught with a shot: +%d points" % (player.points.total - points))
+	_check(player.weapons.mag == player.weapons.weapon.mag_size and player.weapons.reserve == player.weapons.weapon.reserve_ammo, "and the gun in hand is full (%d / %d)" % [player.weapons.mag, player.weapons.reserve])
+	_check(_banners.back().begins_with("Murmeltier erwischt!"), "announced: %s" % _banners.back())
+	await _seconds(1.0)
+	_check(not is_instance_valid(murmel), "bonk, gone")
+
+
+func _murmeltier_escapes() -> void:
+	player.global_position = Vector3(-2.0, 0.0, 1.0)
+	await _frames(2)
+	var murmel: Murmeltier = director.start_event(&"murmeltier") as Murmeltier
+	var spots: Array[Vector3] = [murmel.global_position]
+	for i: int in 60 * 30:
+		await get_tree().physics_frame
+		if not is_instance_valid(murmel):
+			break
+		if murmel.global_position.distance_to(spots.back()) > 0.1:
+			spots.append(murmel.global_position)
+	var hops_ok: bool = true
+	for i: int in range(1, spots.size()):
+		var hop: float = spots[i].distance_to(spots[i - 1])
+		hops_ok = hops_ok and hop >= Constants.MURMEL_HOP_MIN - 0.01 and hop <= Constants.MURMEL_HOP_MAX + 0.01
+	var inside: bool = spots.all(func(v: Vector3) -> bool: return not (v.x < -16.0 or v.z > 24.0 or (v.x < -11.2 and v.z < 11.3)))
+	_check(inside, "never beyond the garden fence or outside the hut")
+	_check(spots.size() == Constants.MURMEL_POPS and hops_ok, "not caught, it pops up %d times close by: %s" % [spots.size(), spots.map(func(v: Vector3) -> Vector3: return v.snapped(Vector3.ONE * 0.1))])
+	_check(not is_instance_valid(murmel) and _banners.back() == tr("EVENT_MURMEL_GONE"), "then it is gone: %s" % _banners.back())
+
+
+func _look_at(point: Vector3) -> void:
+	var head := player.get_node("Head") as Node3D
+	var cam := player.get_node("Head/Camera3D") as Camera3D
+	player.look_at(Vector3(point.x, player.global_position.y, point.z), Vector3.UP)
+	var d: Vector3 = point - cam.global_position
+	head.rotation.x = atan2(d.y, Vector2(d.x, d.z).length())
+
+
+func _steady() -> void:
+	var camera := player.get_node("Head/Camera3D") as CameraRecoil
+	camera.sway = Vector2.ZERO
+	camera._target = Vector2.ZERO
+	camera._current = Vector2.ZERO
+	camera.rotation = Vector3.ZERO
 
 
 func _schedule() -> void:

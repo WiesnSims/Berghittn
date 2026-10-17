@@ -347,9 +347,11 @@ when another one could come.
   fence or table, or when a player steps in its way. Tap it (hold E for 2 s) for Freibier: a random
   Schnaps the tapper does not own yet, for free (2000 points if they have them all). Only while the
   Terrasse is open; an untapped barrel is gone after 60 s.
-- **The Murmeltier.** A marmot pops out of the floor somewhere on the open part of the map, indoors
-  too, screams the meme scream and ducks away again, a few times in different spots close by. Hit it
-  (shot or melee) before it is gone for points and a full refill of the gun in hand.
+- **The Murmeltier.** A marmot pops out of a hole in the floor 6 to 22 m from a player, anywhere
+  players can walk (indoors too, never beyond a fence or outside a shut zone), stands up with its
+  arms raised and screams the meme scream ("AAAAAAH!" on screen until the sound in M6), ducks away,
+  and pops up again 2.5 to 7 m away, four times in all (about 13 s). Hit it while it is up (shot or
+  shovel) for 500 points and a full refill of the gun in hand (magazine and reserve).
 - **"Deitscha Tourist"** A lost German tourist in sandals and socks gets off at the Seilbahn and
   heads for the Stube. Enemies go for him too; escort him there alive and he hands over the only
   Eisstöcke in the game ("Das ist ja total urig hier!").
@@ -469,6 +471,9 @@ fix console errors, commit. Stop and report after each milestone.
 **M6 — Art and audio pass**
 - Replace greybox with low-poly assets, lighting, snow effects, sounds,
   German/English strings, settings menu (sensitivity, volume).
+- Ragdolls for dead enemies (user decision, 2026-10-17): skeletal ragdolls on the rigged M6 models,
+  capped to the last few corpses (older ones keep the fall animation), colliding with the world only;
+  check the browser frame rate with a crowd (Jolt if Godot Physics is too slow).
 - Acceptance: file sizes within budget, 60 FPS target met.
 
 **M7 — Co-op (decision gate)**

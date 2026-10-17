@@ -1,0 +1,215 @@
+[gd_scene load_steps=26 format=3]
+
+[sub_resource type="StandardMaterial3D" id="Fur"]
+albedo_color = Color(0.45, 0.36, 0.26, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Belly"]
+albedo_color = Color(0.66, 0.56, 0.42, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Dark"]
+albedo_color = Color(0.14, 0.1, 0.08, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Teeth"]
+albedo_color = Color(0.95, 0.62, 0.2, 1)
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Mouth"]
+albedo_color = Color(0.35, 0.08, 0.08, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Eye"]
+albedo_color = Color(0.03, 0.03, 0.03, 1)
+roughness = 0.2
+
+[sub_resource type="SphereMesh" id="M0"]
+material = SubResource("Fur")
+radius = 0.17
+height = 0.42
+radial_segments = 10
+rings = 6
+
+[sub_resource type="SphereMesh" id="M1"]
+material = SubResource("Belly")
+radius = 0.13
+height = 0.32
+radial_segments = 10
+rings = 6
+
+[sub_resource type="BoxMesh" id="M2"]
+material = SubResource("Dark")
+size = Vector3(0.07, 0.04, 0.11)
+
+[sub_resource type="BoxMesh" id="M3"]
+material = SubResource("Dark")
+size = Vector3(0.07, 0.04, 0.11)
+
+[sub_resource type="CylinderMesh" id="M4"]
+material = SubResource("Dark")
+top_radius = 0.03
+bottom_radius = 0.045
+height = 0.16
+radial_segments = 10
+
+[sub_resource type="SphereMesh" id="M5"]
+material = SubResource("Fur")
+radius = 0.11
+height = 0.2
+radial_segments = 10
+rings = 6
+
+[sub_resource type="SphereMesh" id="M6"]
+material = SubResource("Belly")
+radius = 0.065
+height = 0.1
+radial_segments = 10
+rings = 6
+
+[sub_resource type="SphereMesh" id="M7"]
+material = SubResource("Dark")
+radius = 0.022
+height = 0.04
+radial_segments = 10
+rings = 6
+
+[sub_resource type="BoxMesh" id="M8"]
+material = SubResource("Mouth")
+size = Vector3(0.07, 0.06, 0.03)
+
+[sub_resource type="BoxMesh" id="M9"]
+material = SubResource("Teeth")
+size = Vector3(0.016, 0.03, 0.01)
+
+[sub_resource type="BoxMesh" id="M10"]
+material = SubResource("Teeth")
+size = Vector3(0.016, 0.03, 0.01)
+
+[sub_resource type="SphereMesh" id="M11"]
+material = SubResource("Eye")
+radius = 0.018
+height = 0.036
+radial_segments = 10
+rings = 6
+
+[sub_resource type="SphereMesh" id="M12"]
+material = SubResource("Eye")
+radius = 0.018
+height = 0.036
+radial_segments = 10
+rings = 6
+
+[sub_resource type="SphereMesh" id="M13"]
+material = SubResource("Dark")
+radius = 0.03
+height = 0.03
+radial_segments = 10
+rings = 6
+
+[sub_resource type="SphereMesh" id="M14"]
+material = SubResource("Dark")
+radius = 0.03
+height = 0.03
+radial_segments = 10
+rings = 6
+
+[sub_resource type="BoxMesh" id="M15"]
+material = SubResource("Fur")
+size = Vector3(0.05, 0.16, 0.05)
+
+[sub_resource type="BoxMesh" id="M16"]
+material = SubResource("Fur")
+size = Vector3(0.05, 0.16, 0.05)
+
+[sub_resource type="SphereMesh" id="M17"]
+material = SubResource("Dark")
+radius = 0.03
+height = 0.05
+radial_segments = 10
+rings = 6
+
+[sub_resource type="SphereMesh" id="M18"]
+material = SubResource("Dark")
+radius = 0.03
+height = 0.05
+radial_segments = 10
+rings = 6
+
+[node name="MurmeltierModel" type="Node3D"]
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 0)
+mesh = SubResource("M0")
+
+[node name="BellyPatch" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, -0.06)
+mesh = SubResource("M1")
+
+[node name="FootL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.08, 0.02, -0.04)
+mesh = SubResource("M2")
+
+[node name="FootR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, 0.02, -0.04)
+mesh = SubResource("M3")
+
+[node name="Tail" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, -0.866, 0, 0.866, 0.5, 0, 0.08, 0.17)
+mesh = SubResource("M4")
+
+[node name="HeadSkull" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.01)
+mesh = SubResource("M5")
+
+[node name="HeadSnout" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.47, -0.1)
+mesh = SubResource("M6")
+
+[node name="HeadNose" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.16)
+mesh = SubResource("M7")
+
+[node name="HeadMouth" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42, -0.13)
+mesh = SubResource("M8")
+
+[node name="HeadToothL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.011, 0.45, -0.15)
+mesh = SubResource("M9")
+
+[node name="HeadToothR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.011, 0.45, -0.15)
+mesh = SubResource("M10")
+
+[node name="HeadEyeL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, 0.54, -0.08)
+mesh = SubResource("M11")
+
+[node name="HeadEyeR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06, 0.54, -0.08)
+mesh = SubResource("M12")
+
+[node name="HeadEarL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.08, 0.6, 0.01)
+mesh = SubResource("M13")
+
+[node name="HeadEarR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, 0.6, 0.01)
+mesh = SubResource("M14")
+
+[node name="ArmL" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9659, 0.2588, 0, -0.2588, 0.9659, 0, 0, 0, 1, -0.13, 0.27, -0.07)
+mesh = SubResource("M15")
+
+[node name="ArmR" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9659, -0.2588, 0, 0.2588, 0.9659, 0, 0, 0, 1, 0.13, 0.27, -0.07)
+mesh = SubResource("M16")
+
+[node name="ArmPawL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.19, -0.08)
+mesh = SubResource("M17")
+
+[node name="ArmPawR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.19, -0.08)
+mesh = SubResource("M18")

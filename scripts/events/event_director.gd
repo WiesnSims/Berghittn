@@ -8,13 +8,17 @@ extends Node
 @export var zones: ZoneMap
 @export var resi_scene: PackedScene
 @export var fassl_scene: PackedScene
+@export var murmel_scene: PackedScene
 ## Where the actors appear; defaults to the parent.
 @export var stage: Node3D
+## Off: no random events are rolled (Resi still comes). For tests that start events themselves.
+@export var random_events: bool = true
 
 var _rng := RandomNumberGenerator.new()
 var _next_resi: int = Constants.RESI_FIRST_WAVE
 var _resi: Resi
 var _fassl: Bierfassl
+var _murmel: Murmeltier
 var _last_random: StringName = &""
 
 
@@ -32,7 +36,7 @@ func _on_wave_started(wave: int, is_boss_wave: bool) -> void:
 		# A little into the wave, so she walks into the fight rather than an empty garden.
 		get_tree().create_timer(Constants.RESI_DELAY).timeout.connect(send_resi)
 		return
-	if wave >= Constants.RANDOM_EVENT_FIRST_WAVE and _rng.randf() < Constants.RANDOM_EVENT_CHANCE:
+	if random_events and wave >= Constants.RANDOM_EVENT_FIRST_WAVE and _rng.randf() < Constants.RANDOM_EVENT_CHANCE:
 		var event: StringName = pick_random_event()
 		if event != &"":
 			var delay: float = _rng.randf_range(Constants.RANDOM_EVENT_DELAY_MIN, Constants.RANDOM_EVENT_DELAY_MAX)
@@ -45,6 +49,9 @@ func available_random_events() -> Array[StringName]:
 	# The barrel ends up in the beer garden: only worth it with the Terrasse open.
 	if zones.is_unlocked(&"terrasse") and not is_instance_valid(_fassl):
 		events.append(&"fassl")
+	# Pops up anywhere players can walk to.
+	if not is_instance_valid(_murmel):
+		events.append(&"murmeltier")
 	if events.size() > 1:
 		events.erase(_last_random)
 	return events
@@ -60,6 +67,8 @@ func start_event(event: StringName) -> Node:
 	match event:
 		&"fassl":
 			return send_fassl()
+		&"murmeltier":
+			return send_murmeltier()
 	return null
 
 
@@ -95,6 +104,58 @@ func send_fassl() -> Bierfassl:
 	_stage().add_child(_fassl)
 	_fassl.start(route)
 	return _fassl
+
+
+## Sends the Murmeltier to a spot near the player (also used by tests).
+func send_murmeltier() -> Murmeltier:
+	if is_instance_valid(_murmel):
+		return _murmel
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	if player == null:
+		return null
+	var spot: Vector3 = reachable_spot(player.get_world_3d(), player.global_position, Constants.MURMEL_FIRST_MIN, Constants.MURMEL_FIRST_MAX)
+	if spot == Vector3.INF:
+		return null
+	_murmel = murmel_scene.instantiate() as Murmeltier
+	_stage().add_child(_murmel)
+	_murmel.start(spot, player.global_position)
+	return _murmel
+
+
+## A random navmesh point `min_distance` to `max_distance` from `from` that can be walked to without
+## climbing through a window or passing a player blocker (the beer garden gates are open to enemies
+## only): the open part of the map, never outside a closed zone or on a roof.
+## Vector3.INF if none turns up.
+static func reachable_spot(world: World3D, from: Vector3, min_distance: float, max_distance: float) -> Vector3:
+	var map: RID = world.navigation_map
+	var query := NavigationPathQueryParameters3D.new()
+	query.map = map
+	query.start_position = from
+	var result := NavigationPathQueryResult3D.new()
+	for i: int in 400:
+		var spot: Vector3 = NavigationServer3D.map_get_random_point(map, 1, true)
+		var distance: float = spot.distance_to(from)
+		if distance < min_distance or distance > max_distance:
+			continue
+		query.target_position = spot
+		NavigationServer3D.query_path(query, result)
+		var path: PackedVector3Array = result.path
+		if path.is_empty() or path[path.size() - 1].distance_to(spot) > 0.3:
+			continue
+		if result.path_types.has(NavigationPathQueryResult3D.PATH_SEGMENT_TYPE_LINK) or _crosses_blocker(world, path):
+			continue
+		return spot
+	return Vector3.INF
+
+
+static func _crosses_blocker(world: World3D, path: PackedVector3Array) -> bool:
+	var space: PhysicsDirectSpaceState3D = world.direct_space_state
+	for i: int in range(1, path.size()):
+		var up := Vector3.UP * 1.0
+		var leg := PhysicsRayQueryParameters3D.create(path[i - 1] + up, path[i] + up, Constants.LAYER_PLAYER_BLOCKER)
+		if not space.intersect_ray(leg).is_empty():
+			return true
+	return false
 
 
 func _stage() -> Node:
