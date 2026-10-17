@@ -36,7 +36,7 @@ func _launch(direction: Vector3, damage: int, radius: float, size: float) -> voi
 func burst(at: Vector3, damage: int, radius: float, size: float) -> void:
 	# Measured from a little above the splat, so a bump in the alm between it and a body cannot hide it.
 	holder.area_hit(at + Vector3.UP * 0.5, Vector3.FORWARD, 180.0, radius, damage, data.knockback)
-	holder.show_word(at + Vector3.UP * 0.5, data.hit_text)
+	Sound.play_at(data.hit_sound, at)
 	var space: PhysicsDirectSpaceState3D = holder.get_world_3d().direct_space_state
 	var down := PhysicsRayQueryParameters3D.create(at + Vector3.UP * 0.2, at + Vector3.DOWN * 3.0, Constants.LAYER_WORLD)
 	var floor_hit: Dictionary = space.intersect_ray(down)

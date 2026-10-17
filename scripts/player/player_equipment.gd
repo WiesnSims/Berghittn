@@ -40,6 +40,7 @@ func throw() -> bool:
 	_player.get_parent().add_child(thrown)
 	thrown.launch(_player.global_position + forward * 0.7 + Vector3.UP * 0.05, forward, _player)
 	_player.kick_view(-1.5, 1.0)
+	Sound.play(&"throw")
 	changed.emit(item, count)
 	if count == 0:
 		item = null

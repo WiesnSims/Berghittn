@@ -130,6 +130,7 @@ func _open(buyer: Player) -> void:
 		return
 	_buyer = buyer
 	state = State.ROLLING
+	Sound.play_at(&"chest_open", global_position)
 	_time_left = pool.roll_time
 	_flip_left = 0.0
 	_glow.visible = true
@@ -155,6 +156,8 @@ func _process(delta: float) -> void:
 				var progress: float = 1.0 - _time_left / pool.roll_time
 				_flip_left = lerpf(0.06, 0.32, progress * progress)
 				_show((_shown + 1 + _rng.randi() % maxi(_displays.size() - 1, 1)) % _displays.size())
+				# A music-box note for every weapon it flips to.
+				Sound.play_at(&"chest_tick", _display.global_position)
 		State.OFFERING:
 			_time_left -= delta
 			_display.position.y = float_height + sin(_spin * 3.0) * 0.03
@@ -167,6 +170,7 @@ func _settle() -> void:
 	state = State.OFFERING
 	_time_left = pool.offer_time
 	_show(_weapons.find(offer))
+	Sound.play_at(&"chest_reveal", _display.global_position)
 	offered.emit(offer)
 
 

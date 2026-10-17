@@ -41,6 +41,11 @@ extends Resource
 @export var is_boss: bool = false
 ## Left behind where it dies, for a player to pick up (the Krampus drops his Rute); null = nothing.
 @export var drop: WeaponData
+## Sounds (Sound ids, M6 part 2): groans now and then while it is about (one picked at random), its
+## cry as it dies, and the pitch its attack grunt and death cry are played at.
+@export var groan_sounds: Array[StringName] = []
+@export var death_sound: StringName = &"enemy_death"
+@export var voice_pitch: float = 1.0
 
 
 func health_for_wave(wave: int) -> int:

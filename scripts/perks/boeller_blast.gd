@@ -26,6 +26,12 @@ func _ready() -> void:
 	tween.tween_property(ring, "scale", Vector3(radius, 1.0, radius), 0.3).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	tween.tween_property(ring.material_override, "albedo_color:a", 0.0, 0.45)
 	get_tree().create_timer(LIFETIME).timeout.connect(queue_free)
+	# Deferred: whoever made it puts it in place right after adding it.
+	_bang.call_deferred()
+
+
+func _bang() -> void:
+	Sound.play_at(&"boeller_bang", global_position)
 
 
 func _smoke(radius: float) -> CPUParticles3D:

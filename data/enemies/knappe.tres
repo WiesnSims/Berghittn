@@ -22,3 +22,5 @@ model_scale = 1.12
 flinch_multiplier = 0.25
 lunge_range = 0.0
 is_boss = false
+groan_sounds = Array[StringName]([&"groan_knappe"])
+voice_pitch = 0.88

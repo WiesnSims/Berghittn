@@ -22,3 +22,5 @@ model_scale = 0.97
 flinch_multiplier = 1.0
 lunge_range = 0.0
 is_boss = false
+groan_sounds = Array[StringName]([&"groan_tourist"])
+voice_pitch = 1.15

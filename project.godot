@@ -13,6 +13,7 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 Settings="*res://scripts/autoload/settings.gd"
 Events="*res://scripts/autoload/events.gd"
 GameState="*res://scripts/autoload/game_state.gd"
+Sound="*res://scripts/autoload/sound.gd"
 
 [input]
 

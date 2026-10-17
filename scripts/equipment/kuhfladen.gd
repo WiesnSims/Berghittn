@@ -2,7 +2,7 @@ class_name Kuhfladen
 extends Node3D
 ## A Kuhfladen-Mine (section 6a): placed on the floor a step ahead of the player. Every enemy that
 ## steps in it takes KUHFLADEN_DAMAGE and is slowed for KUHFLADEN_SLOW_TIME (once per enemy, with a
-## "PFLATSCH!"); after KUHFLADEN_CATCHES of them, or KUHFLADEN_LIFETIME, it is trodden flat and gone.
+## squelch); after KUHFLADEN_CATCHES of them, or KUHFLADEN_LIFETIME, it is trodden flat and gone.
 ## At most KUHFLADEN_MAX_ACTIVE lie about at once: placing another removes the oldest. Flies circle it.
 
 const GROUP: String = "kuhfladen"
@@ -40,6 +40,7 @@ func launch(from: Vector3, direction: Vector3, thrower: Node3D) -> void:
 	var floor_hit: Dictionary = space.intersect_ray(down)
 	global_position = floor_hit.position if not floor_hit.is_empty() else spot
 	rotation.y = randf() * TAU
+	Sound.play_at(&"kuhfladen_splat", global_position)
 
 
 func catches() -> int:
@@ -69,26 +70,7 @@ func _physics_process(delta: float) -> void:
 		_catches += 1
 		enemy.apply_slow(Constants.KUHFLADEN_SLOW_FACTOR, Constants.KUHFLADEN_SLOW_TIME)
 		enemy.receive_hit(Constants.KUHFLADEN_DAMAGE, false, false, _thrower)
-		_float_word()
+		Sound.play_at(&"kuhfladen_squelch", global_position)
 		if _catches >= Constants.KUHFLADEN_CATCHES:
 			_left = 0.0
 			break
-
-
-func _float_word() -> void:
-	var label := Label3D.new()
-	label.text = tr("HIT_PFLATSCH")
-	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	label.no_depth_test = true
-	label.fixed_size = true
-	label.pixel_size = 0.0012
-	label.font_size = 56
-	label.outline_size = 10
-	label.modulate = Color(0.75, 0.55, 0.25)
-	label.outline_modulate = Color(0.2, 0.12, 0.05)
-	add_child(label)
-	label.position = Vector3(0.0, 0.5, 0.0)
-	var tween := label.create_tween().set_parallel()
-	tween.tween_property(label, "position:y", 1.2, Constants.HIT_TEXT_TIME).set_ease(Tween.EASE_OUT)
-	tween.tween_property(label, "modulate:a", 0.0, Constants.HIT_TEXT_TIME).set_ease(Tween.EASE_IN)
-	tween.chain().tween_callback(label.queue_free)

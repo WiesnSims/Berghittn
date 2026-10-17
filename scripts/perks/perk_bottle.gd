@@ -34,6 +34,7 @@ func interact(player: Node3D) -> void:
 	if not buyer.perks.wants(perk) or not buyer.points.spend(perk.cost):
 		return
 	buyer.perks.add(perk)
+	Sound.play(&"perk_drink")
 	# A little toast from the bottle: it tips, pours and stands back up.
 	if _tween:
 		_tween.kill()

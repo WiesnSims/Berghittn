@@ -23,3 +23,5 @@ cost = 0
 ammo_cost = 0
 behavior = &""
 viewmodel = ExtResource("2")
+swing_sound = &"swing"
+hit_sound = &"schaufel_hit"

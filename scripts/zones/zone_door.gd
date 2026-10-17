@@ -91,6 +91,7 @@ func _on_zone_unlocked() -> void:
 
 func _swing_open() -> void:
 	_open = true
+	Sound.play_at(&"door_open", global_position + Vector3.UP * 1.2)
 	# Out of the way at once (and out of the navmesh rebake that follows); the swing is just for show.
 	var tween: Tween = create_tween().set_parallel()
 	for i: int in 2:

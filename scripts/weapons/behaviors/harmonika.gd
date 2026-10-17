@@ -19,8 +19,6 @@ func fire(_rounds: int) -> void:
 	holder.dance_around(data.range, Constants.DANCE_TIME, data.damage)
 	_show_notes(data.range, 1.0)
 	holder.shake_view(data.shake)
-	var ahead: Vector3 = -holder.global_basis.z
-	holder.show_word(holder.global_position + Vector3(ahead.x, 0.0, ahead.z).normalized() * 2.5, data.hit_text)
 
 
 func play_secondary(delta: float) -> void:

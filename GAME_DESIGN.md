@@ -305,7 +305,7 @@ Alpine folk culture.
   Details (M5): 20 m/s launch under normal gravity; it bursts on the first wall, floor or body (in
   the air after 4 s), walls shield what is behind them, survivors are shoved a little. The pile is
   2 m in radius and lies 6 s; whoever wades in moves at half speed while in it and 4 s
-  after. "SPLATSCH!" pops up until the sound comes with M6. The next dumpling slides into the muzzle
+  after. A wet splat where it bursts (M6 sound). The next dumpling slides into the muzzle
   as the gun is ready again (1 s). 12 / 36, reload 3 s (the lid of the Knödeltopf on top opens and
   three drop in). In the chest at weight 1. Dumplings and piles are pooled.
 - **Rodelkanone:** fires a wooden sled that slides along the ground in a
@@ -317,8 +317,8 @@ Alpine folk culture.
   runs its 15 m along the ground at 14 m/s, over steps up to 0.4 m,
   up and down slopes and off edges (lost after a 4 m drop). Everything in its lane (0.7 m around its
   middle at body height) is struck once and thrown forward and sideways out of the lane; the first
-  wall breaks it early ("KRACH!" and flying planks), nothing behind a wall is touched. "RUMMS!" pops
-  up on each hit until the sound comes with M6. The next sled slides forward in the open chute as the
+  wall breaks it early (a louder crash and flying planks), nothing behind a wall is touched. A wooden
+  thud and clatter on each hit (M6). The next sled slides forward in the open chute as the
   gun is ready again (2.5 s). 4 / 12, reload 3.5 s (the chute tips up and two sleds drop in). In the
   chest at weight 1. Sleds are pooled.
 - **Brennkessel-Werfer:** a copper schnaps still strapped to the back with a
@@ -336,10 +336,10 @@ Alpine folk culture.
   dancing. Bosses are immune to the dance but take the damage.
   Details (M5): walls shield, all around the player (not a cone). A dancer hops and spins on the
   spot; a swing it had started is dropped. The 20 a second is paid as one hit per second (a flash and
-  the usual hit points to the player who played), and is not doubled itself. "JUCHHE!" pops up and
-  golden notes rise all around (3D shapes, user decision 2026-10-17: quarters, eighths, sixteenths,
-  beamed pairs and hollow half notes, mixed), with a ring rolling out to the 8 m edge, until the polka sound comes
-  with M6. The bellows pump through the polka and close as the next can start (3.3 s, with the white
+  the usual hit points to the player who played), and is not doubled itself. A fiery 4-bar polka
+  plays on the musette accordion (M6) while golden notes rise all around (3D shapes, user decision
+  2026-10-17: quarters, eighths, sixteenths, beamed pairs and hollow half notes, mixed), with a ring
+  rolling out to the 8 m edge; the held Landler plays a slow tune in three. The bellows pump through the polka and close as the next can start (3.3 s, with the white
   ready ring). 3 / 9, reload 3 s (the air button: bellows pulled wide open and pressed shut). In the
   chest at weight 1.
 
@@ -349,30 +349,30 @@ Alpine folk culture.
   Schützen celebrations. One loud shot, 3 m explosion, very long reload.
   Details (M5): 1500 at the Seilbahn's north wall (ammo 750). The iron shell is lobbed at 22 m/s and
   bursts like the Böllerschuss (the same smoke, sparks and shock ring) for 150 within 3 m, shoving
-  survivors; "BUMM!" until the M6 sound. 1 / 10, a 4.5 s reload: muzzle up, the ball dropped in, two
+  survivors, with the Böller bang (M6). 1 / 10, a 4.5 s reload: muzzle up, the ball dropped in, two
   strokes of the ramrod. No self-damage.
 - **Schmarrnpfanne:** a heavy frying pan. Satisfying "bonk" sound, small
   knockback, fastest strong melee.
   Details (M5): bought at the Küche east wall for 400; it replaces the shovel in the melee slot. 90 per
-  blow, a shove of 4 m/s (heavy enemies less), and a comic "BONK!" pops up where it lands until the
-  sound comes with M6. A Kaiserschmarrn is still in it.
+  blow, a shove of 4 m/s (heavy enemies less), and a ringing cartoon "bonk" where it lands (M6). A
+  Kaiserschmarrn is still in it.
 - **Goaßl:** a long whip (Goaßlschnalzen). Cracks loudly, hits in a short
   cone, and stuns enemies for 1.5 s.
   Details (M5): on V in place of the shovel (chest only, weight 1; the chest hands a melee weapon
   into the melee slot, never in place of a gun). 40 to everything within 3.5 m and 30° either side of
   the aim (walls shield), 1.5 crack-blows a second; stunned enemies stand dazed, swaying, and cannot
-  attack; bosses take the blow but are not stunned. "SCHNALZ!" at the tip until the M6 crack sound.
+  attack; bosses take the blow but are not stunned. The crack sounds at the tip, hit or miss (M6).
 - **Mistgabel:** pitchfork with long reach; pierces and hits two enemies in
   a line.
   Details (M5): on V in place of the shovel (chest only, weight 1). A thrust, not a swing: 3 m
   straight along the aim (10° either side, measured on the ground), through the first two bodies,
-  100 each and a small push; once a second. "ZACK!" until the M6 sound.
+  100 each and a small push; once a second, with a stab and a ring of the tines (M6).
 - **Krampus-Rute:** birch rod dropped by the Krampus boss. Hits cause enemies
   in a small radius to flee for 3 s.
   Details (M5): when the Krampus falls he leaves the Rute on the floor there, turning over a red glow,
   announced ("Da Krampus hat sei Rute verlorn!"); E takes it onto V in place of the shovel (or the
   melee weapon carried); it stays until someone takes it. Swung sideways like the shovel (2 m, the
-  shovel's arc), 150 a blow, 1.4 a second, "ZWICK!"; every body it strikes, and every enemy within
+  shovel's arc), 150 a blow, 1.4 a second, a swish and a slap of twigs; every body it strikes, and every enemy within
   2.5 m of one, runs away from the player for 3 s and attacks nobody. Bosses are not scared.
 
 **Equipment (1 slot, stackable, thrown or placed with G or the middle mouse button; one kind at a
@@ -385,7 +385,7 @@ time, shown on the HUD above the gun name)**
 Kuhglocke details (M5): thrown in an arc where the player looks (gallery and garden reachable), it
 bounces off walls and rings once it lies still. Enemies within 20 m walk to it and stand round it,
 leaving players alone, also those already inside the hut; the Krampus ignores it (bosses are immune
-to crowd control). A ring pulses on the floor and "BIMM!" floats up until the M6 sound. The wall-buy
+to crowd control). A ring pulses on the floor and the bell clanks as it swings (M6). The wall-buy
 on the Stube east wall fills the slot to two for 300 and warns when it would replace an Eisstock.
 Equipment keeps G as its only action, no second mode.
 
@@ -463,8 +463,9 @@ milestone 5.
 Funny, typically Austrian things that happen now and then between and during waves. Each one is
 announced to every player with a banner and stays findable from anywhere on the map: a tall light
 column over it, an arrow at the screen edge pointing to it, and a label that shows through walls.
-Their sounds (the bell, the scream, the beer) come with M6; the Murmeltier's scream must be our own
-take on the meme, not the clip itself.
+Their sounds came with M6 part 2 (Resi's bell and moos, the rolling barrel and the tapping, the
+Murmeltier's scream, the tourist's camera, a flugelhorn call with each banner); the Murmeltier's
+scream is our own synthesised take on the meme, not the clip itself.
 
 **Die Resi (main event, Terrasse).** "Die Resi hat si verlaufen!" A lost Almkuh with a flower wreath
 and a huge bell wanders into the beer garden. She only comes while the Terrasse is open, every 3 to 5
@@ -486,7 +487,7 @@ when another one could come.
   Terrasse is open; an untapped barrel is gone after 60 s.
 - **The Murmeltier.** A marmot pops out of a hole in the floor 6 to 22 m from a player, anywhere
   players can walk (indoors too, never beyond a fence or outside a shut zone), stands up with its
-  arms raised and screams the meme scream ("AAAAAAH!" on screen until the sound in M6), ducks away,
+  arms raised and screams our own take on the meme scream (synthesised in M6), ducks away,
   and pops up again 2.5 to 7 m away, four times in all (about 13 s). Hit it while it is up (shot or
   shovel) for 500 points and a full refill of the gun in hand (magazine and reserve).
 - **"Deitscha Tourist"** A lost German tourist (sunburnt, souvenir Tirolerhut, socks in sandals,
@@ -626,7 +627,18 @@ fix console errors, commit. Stop and report after each milestone.
      outdoors and thaws indoors, snowfall that stays out from under roofs, settings menu
      (sensitivity, aiming sensitivity, invert Y, volume per bus, language, render resolution), saved
      in the browser. No film grain (play-test 2026-10-17).
-  2. Audio: every sound and the brass band tune, self-made (synthesised), OGG.
+  2. Audio: every sound and the brass band tune, self-made (synthesised), OGG. Built from oscillators,
+     noise and filters by `tools/audio` (numpy, scipy, soundfile), mono OGG Vorbis, about 4.7 MB in
+     all. The band plays an original polka ("Da Berghittn-Polka", B-flat, A A B A) through a worn-out
+     gramophone: a slow take under the title screen, then each wave the hut bell rings and the band
+     strikes up one tempo tier faster (100 bpm in wave 1 up to 172 bpm from wave 8, then 2 % higher and
+     faster every wave up to +20 %), a "ta-da" when a wave is cleared, a quiet break, and the record
+     winding down at game over. The storm wind is muffled and quieter under a roof, the timbers creak
+     indoors and the fire crackles. Every gun, reload, swing and hit has its sound, as do enemies
+     (groans per type, attack grunts, death cries, boards ripped out and climbing through), footsteps
+     (boards indoors, snow outdoors), purchases (till or a short "no"), doors, the Hüttentruhe (a
+     music-box note per weapon it flips to), the Schnaps and the Jause, the equipment and the events.
+     The comic hit words ("BONK!", "BIMM!", "AAAAAAH!" ...) are gone now that the sounds are in.
   3. Textures: low-resolution photo textures (CC0 libraries, once the user approves them).
   4. Low-poly models for props, enemies and weapons, and the ragdolls.
 

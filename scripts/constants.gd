@@ -100,6 +100,9 @@ const RESI_LURE_RADIUS: float = 20.0
 const RESI_MILK_TIME: float = 2.5
 const RESI_WALK_SPEED: float = 1.1
 const RESI_BOLT_SPEED: float = 6.0
+# Seconds between her moos (random in between).
+const RESI_MOO_MIN: float = 7.0
+const RESI_MOO_MAX: float = 15.0
 
 # Random events: from which wave, the chance per wave, and when in the wave (seconds).
 const RANDOM_EVENT_FIRST_WAVE: int = 2
@@ -262,10 +265,8 @@ const MELEE_HIT_FRACTION: float = 0.3
 const MELEE_ARC_DEGREES: float = 110.0
 const MELEE_MAX_TARGETS: int = 32
 const MELEE_AIM_HEIGHT: float = 1.3
-# Guard (Schmarrnpfanne): seconds to bring the gun back up after lowering the guard, and how long a
-# comic hit word ("BONK!") floats.
+# Guard (Schmarrnpfanne): seconds to bring the gun back up after lowering the guard.
 const BLOCK_LOWER_TIME: float = 0.25
-const HIT_TEXT_TIME: float = 0.6
 # Longest a weapon may be shown floating over the Hüttentruhe (metres); longer ones are shrunk.
 const CHEST_DISPLAY_MAX_LENGTH: float = 1.2
 # Area weapons (Alphorn, section 6a): the most hit boxes one blast checks (two per enemy), where on a
@@ -275,13 +276,11 @@ const AREA_MAX_TARGETS: int = 64
 const AREA_AIM_HEIGHT: float = 1.1
 const AREA_BODY_MARGIN: float = 0.5
 # Kuhglocke (section 6a): throw speed (m/s, along the view, a little upwards), the share of speed kept
-# on bouncing off a wall, seconds it rings, the reach it draws enemies from (m), and how often the
-# comic "BIMM!" floats up while it rings (s).
+# on bouncing off a wall, seconds it rings, and the reach it draws enemies from (m).
 const KUHGLOCKE_THROW_SPEED: float = 11.0
 const KUHGLOCKE_BOUNCE_KEEP: float = 0.35
 const KUHGLOCKE_RING_TIME: float = 10.0
 const KUHGLOCKE_LURE_RADIUS: float = 20.0
-const KUHGLOCKE_WORD_EVERY: float = 1.2
 # Handböller (section 6a): the double charge flies this many times faster, and shoves the player
 # back this hard (m/s, flat).
 const HANDBOELLER_DOUBLE_SPEED: float = 1.5
@@ -376,3 +375,42 @@ const WARMUP_DISTANCE: float = 0.5
 const WARMUP_SPACING: float = 0.02
 # The snow emitter box is centred this far above the camera.
 const SNOW_EMITTER_ABOVE: float = 4.0
+
+# Sound (M6 part 2): players in the pools (own sounds, menu sounds, sounds out in the world), the
+# distance a world sound is at full level and the farthest it carries (m), the cutoff it is
+# muffled to far away (Hz), and the random pitch spread of each play (share).
+const SOUND_POOL_2D: int = 12
+const SOUND_POOL_UI: int = 4
+const SOUND_POOL_3D: int = 32
+const SOUND_UNIT_SIZE: float = 3.0
+const SOUND_MAX_DISTANCE: float = 50.0
+const SOUND_DISTANCE_CUTOFF: float = 5000.0
+const SOUND_PITCH_JITTER: float = 0.05
+# A sled breaking apart at a wall sounds this much louder (dB) than one knocking into a body.
+const SLED_CRASH_LOUDER: float = 3.0
+# Footsteps: metres walked per step (longer strides sprinting), and the fall speed (m/s) that makes
+# a landing audible.
+const STEP_DISTANCE: float = 1.7
+const STEP_DISTANCE_SPRINT: float = 2.4
+const LAND_SOUND_SPEED: float = 4.0
+# Seconds between two hurt grunts, however fast the hits come.
+const HURT_SOUND_GAP: float = 0.35
+# Seconds between an enemy's groans (random in between).
+const GROAN_MIN: float = 3.0
+const GROAN_MAX: float = 9.0
+# Where an enemy's voice comes from, above its feet (m, at model scale 1).
+const ENEMY_MOUTH_HEIGHT: float = 1.6
+# The storm indoors: how much quieter (dB) and how muffled (Hz) the wind gets under a roof, and the
+# cutoff outdoors (open).
+const WIND_INDOOR_DB: float = -12.0
+const WIND_INDOOR_CUTOFF: float = 650.0
+const WIND_OUTDOOR_CUTOFF: float = 20000.0
+# Indoors the hut creaks now and then (seconds between, random) somewhere this far from the player.
+const CREAK_MIN: float = 6.0
+const CREAK_MAX: float = 16.0
+const CREAK_DISTANCE: float = 4.0
+# The band: seconds to fade between tunes, and past its fastest tier how much higher (and faster) it
+# plays each further wave, up to a limit.
+const BAND_FADE_TIME: float = 1.5
+const BAND_PITCH_PER_WAVE: float = 0.02
+const BAND_PITCH_MAX: float = 1.2

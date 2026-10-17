@@ -17,7 +17,7 @@ func melee_hit() -> bool:
 		if enemy and enemy.is_alive():
 			enemy.stun(Constants.GOASSL_STUN_TIME)
 	# One crack, out at the tip of the whip, hit or miss.
-	holder.show_word(holder.global_position - holder.global_basis.z * data.range, data.hit_text)
+	Sound.play_at(data.hit_sound, holder.global_position - holder.global_basis.z * data.range)
 	return true
 
 

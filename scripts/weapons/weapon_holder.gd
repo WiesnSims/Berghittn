@@ -81,6 +81,10 @@ var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 # The shooter's own body, so rays never hit it, and who gets the points.
 var _exclude: Array[RID] = []
 var _shooter: Node3D
+# The looping sound of held fire (the flame) or of a held tune, and seconds the flame's loop runs on
+# waiting for the next shot.
+var _loop_sound: AudioStreamPlayer
+var _fire_loop_left: float = 0.0
 
 
 func _ready() -> void:
@@ -94,6 +98,10 @@ func _ready() -> void:
 		_motion.add_child(_melee_viewmodel)
 	if melee_weapon:
 		_melee_behavior = WeaponBehavior.create(melee_weapon, self)
+	_loop_sound = AudioStreamPlayer.new()
+	_loop_sound.bus = &"Effects"
+	add_child(_loop_sound)
+	hit_confirmed.connect(_on_hit_confirmed)
 
 
 func set_owner_body(body: CollisionObject3D) -> void:
@@ -174,7 +182,7 @@ func block(attacker: Node3D) -> bool:
 	if enemy and enemy.is_alive():
 		enemy.apply_knockback(flat.normalized() * melee_weapon.secondary_knockback * sqrt(enemy.data.flinch_multiplier))
 	_hit_puffs.play(global_position + forward * 0.5 + Vector3.DOWN * 0.3, -forward)
-	_show_hit_text(global_position + forward * 0.8)
+	Sound.play(&"block_hit")
 	if _melee_viewmodel:
 		_melee_viewmodel.play_bonk()
 	var player := _shooter as Player
@@ -297,6 +305,10 @@ func _physics_process(delta: float) -> void:
 		return
 	_cooldown = maxf(_cooldown - delta, 0.0)
 	bloom = move_toward(bloom, 0.0, weapon.bloom_recover * delta)
+	if _fire_loop_left > 0.0:
+		_fire_loop_left -= delta
+		if _fire_loop_left <= 0.0:
+			_stop_loop()
 	# Set again below once the hands are free to work the action.
 	_fanning = false
 	var was_playing: bool = _playing
@@ -379,11 +391,14 @@ func _physics_process(delta: float) -> void:
 		else:
 			# Pulling the trigger on an empty mag is the most common way players "ask" for a reload.
 			start_reload()
+			if reserve <= 0 and Input.is_action_just_pressed("fire"):
+				Sound.play(&"dry_click")
 
 
 func _play(delta: float, was_playing: bool) -> void:
 	if not was_playing:
 		_play_left = 0.0
+		_start_loop(weapon.play_sound)
 	_play_left -= delta
 	if _play_left <= 0.0:
 		# The next round of the tune; out of rounds, the music stops and the gun reloads.
@@ -405,6 +420,7 @@ func _play(delta: float, was_playing: bool) -> void:
 
 func _stop_playing() -> void:
 	_play_left = 0.0
+	_stop_loop()
 	# The bellows are closed up before the next polka.
 	_set_cooldown(weapon.secondary_round_time)
 	if _viewmodel:
@@ -425,6 +441,8 @@ func start_reload() -> void:
 	_reload_left = weapon.reload_time * speed + chamber
 	_reload_total = _reload_left
 	reload_started.emit(_reload_left)
+	_stop_loop()
+	Sound.play(weapon.reload_sound)
 	if _viewmodel:
 		_viewmodel.play_reload(weapon.reload_time * speed, chamber)
 
@@ -435,6 +453,7 @@ func _finish_reload() -> void:
 	mag += moved
 	reserve -= moved
 	reload_finished.emit()
+	Sound.play(weapon.reload_end_sound)
 	ammo_changed.emit(mag, reserve)
 
 
@@ -466,7 +485,10 @@ func _select(index: int) -> void:
 		return
 	# A switch drops a running reload, like in every shooter: the mag swap starts over next time.
 	_cancel_reload()
+	_stop_loop()
 	if _current >= 0 and _current < _slots.size():
+		# Not for the gun in hand at the start: that one is not drawn.
+		Sound.play(&"weapon_raise")
 		var old: GunSlot = _slots[_current]
 		old.mag = mag
 		old.reserve = reserve
@@ -505,6 +527,7 @@ func fire_secondary() -> void:
 	reserve -= from_reserve
 	_set_cooldown(1.0 / weapon.fire_rate)
 	_behavior.fire_secondary()
+	Sound.play(weapon.secondary_sound if weapon.secondary_sound != &"" else weapon.fire_sound)
 	fired.emit(rounds)
 	ammo_changed.emit(mag, reserve)
 	if _viewmodel:
@@ -660,11 +683,11 @@ func body_in_line(reach: float) -> Hurtbox:
 
 
 ## A melee blow from a behavior on one body: `amount` (before perks) counted as melee for points,
-## the survivor thrown along `push`, and the weapon's comic word where it lands.
+## the survivor thrown along `push`, and the weapon's hit sound where it lands.
 func melee_strike(hurtbox: Hurtbox, amount: int, push: Vector3) -> Hurtbox.Result:
 	var result: Hurtbox.Result = strike(hurtbox, amount, push, true)
 	if result != Hurtbox.Result.IGNORED:
-		_show_hit_text(hurtbox.global_position + Vector3.UP * Constants.MELEE_AIM_HEIGHT * hurtbox.scale.y)
+		Sound.play_at(melee_weapon.hit_sound, hurtbox.global_position + Vector3.UP * Constants.MELEE_AIM_HEIGHT * hurtbox.scale.y)
 	return result
 
 
@@ -693,11 +716,6 @@ func shooter() -> Node3D:
 ## The shooter's own body, so its projectiles never hit it.
 func shooter_exclude() -> Array[RID]:
 	return _exclude
-
-
-## A comic word floating up over a spot, for behaviors (the Knödel's "SPLAT!").
-func show_word(at: Vector3, key: String) -> void:
-	_float_word(at, key)
 
 
 ## Puts a short-lived effect into the world where the camera is, looking along the aim.
@@ -741,6 +759,16 @@ func _fire(rounds: int = 1) -> void:
 
 
 func _after_shot(rounds: int) -> void:
+	if weapon.fire_loop_sound != &"":
+		# Held fire: the start once, then the loop for as long as the shots keep coming.
+		if not _loop_sound.playing:
+			Sound.play(weapon.fire_sound)
+			_start_loop(weapon.fire_loop_sound)
+		_fire_loop_left = 2.0 / weapon.fire_rate
+	elif rounds > 1 and weapon.secondary_sound != &"":
+		Sound.play(weapon.secondary_sound)
+	else:
+		Sound.play(weapon.fire_sound)
 	fired.emit(rounds)
 	ammo_changed.emit(mag, reserve)
 	if _viewmodel:
@@ -757,6 +785,7 @@ func _start_melee() -> void:
 	_cancel_reload()
 	_melee_left = 1.0 / melee_weapon.fire_rate
 	_melee_hit_in = _melee_left * Constants.MELEE_HIT_FRACTION
+	Sound.play(melee_weapon.swing_sound)
 	if _viewmodel:
 		_viewmodel.play_lower(_melee_left)
 	if _melee_viewmodel:
@@ -806,32 +835,22 @@ func _end_block() -> void:
 		_viewmodel.play_raise(Constants.BLOCK_LOWER_TIME)
 
 
-## The melee weapon's comic word where a blow lands (WeaponData.hit_text).
-func _show_hit_text(at: Vector3) -> void:
-	_float_word(at, melee_weapon.hit_text)
-
-
-## A comic word at `at`, floating up and fading.
-func _float_word(at: Vector3, key: String) -> void:
-	if key == "":
+func _start_loop(id: StringName) -> void:
+	if id == &"" or not Sound.has(id):
 		return
-	var label := Label3D.new()
-	label.text = tr(key)
-	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	label.no_depth_test = true
-	# Same size on screen near or far, so a burst across the garden can be read too.
-	label.fixed_size = true
-	label.font_size = 64
-	label.outline_size = 12
-	label.pixel_size = 0.0012
-	label.modulate = Color(1.0, 0.85, 0.3)
-	label.outline_modulate = Color(0.25, 0.1, 0.05)
-	_shooter.get_parent().add_child(label)
-	label.global_position = at
-	var tween := label.create_tween().set_parallel()
-	tween.tween_property(label, "global_position", at + Vector3.UP * 0.6, Constants.HIT_TEXT_TIME).set_ease(Tween.EASE_OUT)
-	tween.tween_property(label, "modulate:a", 0.0, Constants.HIT_TEXT_TIME).set_ease(Tween.EASE_IN)
-	tween.chain().tween_callback(label.queue_free)
+	_loop_sound.stream = Sound.stream(id)
+	_loop_sound.volume_db = Sound.level(id)
+	_loop_sound.play()
+
+
+func _stop_loop() -> void:
+	_fire_loop_left = 0.0
+	if _loop_sound:
+		_loop_sound.stop()
+
+
+func _on_hit_confirmed(is_headshot: bool, _killed: bool) -> void:
+	Sound.play(&"headshot" if is_headshot else &"hitmarker")
 
 
 func _melee_hit() -> void:
@@ -870,7 +889,7 @@ func _melee_hit() -> void:
 		if result != Hurtbox.Result.IGNORED:
 			_hit_puffs.play(target, -to_target.normalized())
 			hit_confirmed.emit(false, result == Hurtbox.Result.KILLED)
-			_show_hit_text(target)
+			Sound.play_at(melee_weapon.hit_sound, target)
 			var enemy := hurtbox.receiver as Enemy
 			if enemy and enemy.is_alive() and melee_weapon.knockback > 0.0:
 				enemy.apply_knockback(flat.normalized() * melee_weapon.knockback * sqrt(enemy.data.flinch_multiplier))

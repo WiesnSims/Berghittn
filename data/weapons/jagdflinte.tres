@@ -30,3 +30,7 @@ ammo_cost = 250
 behavior = &""
 viewmodel = ExtResource("2")
 secondary = 3
+fire_sound = &"shot_jagdflinte"
+secondary_sound = &"shot_jagdflinte_both"
+reload_sound = &"break_open"
+reload_end_sound = &"break_close"

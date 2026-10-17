@@ -1,7 +1,7 @@
 extends Node3D
 ## The Harmonika's tune made visible: a ring rolling out over the floor to the edge of its reach, and
 ## golden notes rising and swaying all around the player. Placed at the camera; built in code, gone
-## after a moment. The polka itself comes with the M6 sounds.
+## after a moment.
 
 const LIFETIME: float = 1.6
 const RING_TIME: float = 0.5

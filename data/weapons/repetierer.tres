@@ -33,3 +33,6 @@ secondary = 4
 rapid_fire_rate = 5.5
 rapid_spread = 4.0
 rapid_recoil_multiplier = 1.6
+fire_sound = &"shot_repetierer"
+reload_sound = &"lever_open"
+reload_end_sound = &"lever_close"

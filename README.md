@@ -117,6 +117,33 @@ listens to `Events` and credits only its own player (`source` on every hit, kill
   (`scenes/ui/settings_menu.tscn`) opens from the start screen and the pause menu, applies changes
   live and saves on Back.
 
+## Sound (M6)
+
+Every sound is synthesised by `tools/audio/` (no samples). To change one, edit its recipe in
+`tools/audio/sfx.py` (effects) or `tools/audio/music.py` (the band, the Harmonika, the stingers) and
+rebuild:
+
+```
+pip install numpy scipy soundfile
+python tools/audio/build.py               # everything, prints sizes
+python tools/audio/build.py swing band_3  # only these
+python tools/audio/inspect_audio.py <out_dir>   # levels, clipping, DC, loop seams, spectrograms
+```
+
+- Files are `assets/audio/<folder>/<id>_<n>.ogg`; `_n` are variants, picked at random. The folder is
+  the bus: `sfx` Effects, `music` Music, `ambience` Ambience (the wind goes through its own `Wind`
+  bus into Ambience, whose low-pass muffles it indoors).
+- `Sound` (autoload, `scripts/autoload/sound.gd`) loads them all at start. `play(id)` for the
+  player's own sounds, `play_at(id, position)` for sounds in the world, `attach(id, node)` for a
+  loop that rides on a node. `MIX` sets each sound's level, `VOICES` how many may play at once,
+  `LOOPS` which loop. Every button clicks.
+- Weapons name their sounds in their `.tres` (`fire_sound`, `fire_loop_sound`, `secondary_sound`,
+  `play_sound`, `reload_sound`, `reload_end_sound`, `swing_sound`, `hit_sound`), enemies theirs in
+  `data/enemies` (`groan_sounds`, `death_sound`, `voice_pitch`).
+- `BandDirector` (`scripts/audio/band_director.gd`) plays the band: one tempo tier per wave
+  (`band_1` to `band_8`), pitched up past the last; `Ambience` (`scripts/audio/ambience.gd`) the
+  storm and the creaks.
+
 ## Tests
 
 ```
@@ -127,6 +154,14 @@ Unlocks all six zones on the real main scene with points from the debug key: pro
 every door, spawn activation after each purchase against section 4, navmesh paths through opened
 doors, the self-opening last door, the Jagdflinte, Stutzen and Repetierer wall-buys, ammo refills at half price, gun slots and switching,
 the chamber rule for the new guns, and one payout per shotgun blast (not per pellet).
+
+```
+godot --headless --fixed-fps 60 res://tests/m6_audio.tscn
+```
+
+The sound: every sound the weapons, enemies and scripts ask for exists and the loops loop, the audio
+stays under 8 MB, the band's title tune, one faster tier per wave and the quiet break, guns, reloads,
+footsteps on boards and snow, groans, purchases, and the storm muffled indoors.
 
 ```
 godot --headless --fixed-fps 60 res://tests/m5_core.tscn
