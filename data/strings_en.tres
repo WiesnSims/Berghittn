@@ -136,5 +136,17 @@ messages = {
 [&"", &"EVENT_GUEST_REWARD"]: [&"He leaves you his two Eisstöcke! Throw them with G or the middle mouse button"],
 [&"", &"EVENT_GUEST_DIED"]: [&"The Tourist did not make it"],
 [&"", &"EVENT_GUEST_GAVE_UP"]: [&"The Tourist took the next gondola home"],
-[&"", &"UI_EQUIPMENT"]: [&"%s ×%d   [G]"]
+[&"", &"UI_EQUIPMENT"]: [&"%s ×%d   [G]"],
+[&"", &"UI_SETTINGS"]: [&"Settings"],
+[&"", &"UI_BACK"]: [&"Back"],
+[&"", &"UI_SET_SENSITIVITY"]: [&"Mouse sensitivity"],
+[&"", &"UI_SET_AIM_SENSITIVITY"]: [&"Aiming sensitivity"],
+[&"", &"UI_SET_INVERT_Y"]: [&"Invert mouse Y"],
+[&"", &"UI_SET_VOLUME_MASTER"]: [&"Master volume"],
+[&"", &"UI_SET_VOLUME_MUSIC"]: [&"Music"],
+[&"", &"UI_SET_VOLUME_EFFECTS"]: [&"Effects"],
+[&"", &"UI_SET_VOLUME_AMBIENCE"]: [&"Ambience"],
+[&"", &"UI_SET_LANGUAGE"]: [&"Language"],
+[&"", &"UI_SET_RENDER_SCALE"]: [&"Render resolution"],
+[&"", &"UI_SET_FILM_GRAIN"]: [&"Film grain"]
 }

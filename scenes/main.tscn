@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3]
+[gd_scene load_steps=31 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/zones/stube.tscn" id="2"]
@@ -27,6 +27,13 @@
 [ext_resource type="PackedScene" path="res://scenes/events/bierfassl.tscn" id="25"]
 [ext_resource type="PackedScene" path="res://scenes/events/murmeltier.tscn" id="26"]
 [ext_resource type="PackedScene" path="res://scenes/events/tourist_guest.tscn" id="27"]
+[ext_resource type="PackedScene" path="res://scenes/ui/settings_menu.tscn" id="28"]
+[ext_resource type="Shader" path="res://assets/shaders/snowflake.gdshader" id="29"]
+[ext_resource type="Shader" path="res://assets/shaders/post_fx.gdshader" id="30"]
+[ext_resource type="Script" path="res://scripts/effects/roof_map.gd" id="31"]
+[ext_resource type="Script" path="res://scripts/effects/atmosphere.gd" id="32"]
+[ext_resource type="Script" path="res://scripts/effects/snowfall.gd" id="33"]
+[ext_resource type="Script" path="res://scripts/effects/post_fx.gd" id="34"]
 
 [sub_resource type="NavigationMesh" id="NavMesh"]
 geometry_collision_mask = 1
@@ -39,14 +46,43 @@ filter_baking_aabb = AABB(-30, -3, -30, 60, 11, 60)
 
 [sub_resource type="Environment" id="Env"]
 background_mode = 1
-background_color = Color(0.07, 0.08, 0.11, 1)
+background_color = Color(0.2, 0.23, 0.3, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.4, 0.45, 0.55, 1)
-ambient_light_energy = 0.35
+ambient_light_color = Color(0.42, 0.48, 0.6, 1)
+ambient_light_energy = 0.45
+tonemap_mode = 2
+tonemap_exposure = 1.1
+glow_enabled = true
+glow_intensity = 0.6
+glow_bloom = 0.05
+glow_hdr_threshold = 0.9
 fog_enabled = true
-fog_light_color = Color(0.32, 0.36, 0.44, 1)
-fog_density = 0.035
+fog_light_color = Color(0.36, 0.4, 0.5, 1)
+fog_density = 0.045
 fog_sky_affect = 1.0
+
+[sub_resource type="ParticleProcessMaterial" id="SnowProcess"]
+emission_shape = 3
+emission_box_extents = Vector3(12, 6, 12)
+direction = Vector3(0.35, -1, 0.15)
+spread = 12.0
+initial_velocity_min = 1.8
+initial_velocity_max = 3.2
+gravity = Vector3(0, 0, 0)
+scale_min = 0.6
+scale_max = 1.4
+
+[sub_resource type="ShaderMaterial" id="SnowMaterial"]
+render_priority = 0
+shader = ExtResource("29")
+
+[sub_resource type="QuadMesh" id="SnowFlake"]
+material = SubResource("SnowMaterial")
+size = Vector2(0.07, 0.07)
+
+[sub_resource type="ShaderMaterial" id="PostMaterial"]
+shader = ExtResource("30")
+shader_parameter/grain = 0.07
 
 [node name="Main" type="Node3D"]
 process_mode = 3
@@ -59,6 +95,38 @@ environment = SubResource("Env")
 transform = Transform3D(1, 0, 0, 0, 0.643, -0.766, 0, 0.766, 0.643, 0, 10, 0)
 light_color = Color(0.6, 0.7, 1, 1)
 light_energy = 0.25
+
+[node name="RoofMap" type="Node" parent="."]
+script = ExtResource("31")
+
+[node name="Atmosphere" type="Node" parent="." node_paths=PackedStringArray("environment", "roof_map")]
+script = ExtResource("32")
+environment = NodePath("../WorldEnvironment")
+roof_map = NodePath("../RoofMap")
+
+[node name="Snowfall" type="GPUParticles3D" parent="." node_paths=PackedStringArray("roof_map")]
+amount = 5000
+lifetime = 4.0
+preprocess = 4.0
+local_coords = false
+visibility_aabb = AABB(-24, -16, -24, 48, 30, 48)
+process_material = SubResource("SnowProcess")
+draw_pass_1 = SubResource("SnowFlake")
+script = ExtResource("33")
+roof_map = NodePath("../RoofMap")
+
+[node name="PostFX" type="CanvasLayer" parent="."]
+layer = 0
+
+[node name="Grade" type="ColorRect" parent="PostFX"]
+material = SubResource("PostMaterial")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("34")
 
 [node name="World" type="Node3D" parent="."]
 process_mode = 1
@@ -191,3 +259,5 @@ script = ExtResource("6")
 [node name="PauseMenu" parent="UI" instance=ExtResource("5")]
 
 [node name="DeathScreen" parent="UI" instance=ExtResource("8")]
+
+[node name="SettingsMenu" parent="UI" instance=ExtResource("28")]

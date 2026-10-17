@@ -98,6 +98,24 @@ only climbs in once they are all gone; one enemy works a window at a time, the r
 E at the repair spot inside to nail boards back on. Points live per player in `PlayerPoints`, which
 listens to `Events` and credits only its own player (`source` on every hit, kill and repair).
 
+## Look and settings (M6)
+
+- `RoofMap` (`scripts/effects/roof_map.gd`) casts rays down over the play area once at load
+  (about 60 ms) and keeps the height of the highest solid surface per 0.4 m cell, grown by a cell so
+  walls never leak. Snow hides below it and `Atmosphere` uses it to tell indoors from outdoors.
+- `Atmosphere` eases the one global fog and the ambient light between the cold storm outside and the
+  warm, clear Stube inside. The `Environment` in `main.tscn` holds the outdoor look, because the
+  mountain backdrop reads its fog colour at load.
+- `Snowfall` is a `GPUParticles3D` whose box follows the camera while the flakes stay in world space;
+  `assets/shaders/snowflake.gdshader` drops every flake under a roof.
+- `PostFX` (a `CanvasLayer` under the HUD) grades, vignettes and adds film grain
+  (`assets/shaders/post_fx.gdshader`).
+- `Settings` (autoload) holds sensitivity, aiming sensitivity, invert Y, the volume of each bus in
+  `default_bus_layout.tres` (Master, Music, Effects, Ambience), language, render resolution and film
+  grain, saved to `user://settings.cfg` (IndexedDB in the browser). The menu
+  (`scenes/ui/settings_menu.tscn`) opens from the start screen and the pause menu, applies changes
+  live and saves on Back.
+
 ## Tests
 
 ```

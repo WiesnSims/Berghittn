@@ -618,6 +618,14 @@ fix console errors, commit. Stop and report after each milestone.
   capped to the last few corpses (older ones keep the fall animation), colliding with the world only;
   check the browser frame rate with a crowd (Jolt if Godot Physics is too slow).
 - Acceptance: file sizes within budget, 60 FPS target met.
+- Done in parts, one PR each (2026-10-17), reporting after each:
+  1. Look and settings: grade, film grain and vignette, fog and ambient light that change between
+     the storm outside and the warm hut inside, snowfall that stays out from under roofs, settings
+     menu (sensitivity, aiming sensitivity, invert Y, volume per bus, language, render resolution,
+     film grain), saved in the browser.
+  2. Audio: every sound and the brass band tune, self-made (synthesised), OGG.
+  3. Textures: low-resolution photo textures (CC0 libraries, once the user approves them).
+  4. Low-poly models for props, enemies and weapons, and the ragdolls.
 
 **M7 — Co-op (decision gate)**
 - Before coding, write `NETWORKING.md`: chosen transport, relay approach on

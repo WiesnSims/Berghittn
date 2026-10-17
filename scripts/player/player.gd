@@ -115,7 +115,8 @@ func _look(relative: Vector2) -> void:
 	var aim: float = weapons.aim_eased() if weapons.weapon else 0.0
 	var sensitivity: float = Settings.mouse_sensitivity * lerpf(1.0, Settings.aim_sensitivity, aim) 			* tan(deg_to_rad(_camera.fov) * 0.5) / tan(deg_to_rad(_base_fov) * 0.5)
 	rotate_y(-relative.x * sensitivity)
-	_head.rotation.x = clampf(_head.rotation.x - relative.y * sensitivity, -_max_pitch, _max_pitch)
+	var pitch_input: float = -relative.y if Settings.invert_y else relative.y
+	_head.rotation.x = clampf(_head.rotation.x - pitch_input * sensitivity, -_max_pitch, _max_pitch)
 
 
 func _update_horizontal_velocity(delta: float) -> void:

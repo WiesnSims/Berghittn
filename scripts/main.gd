@@ -9,6 +9,7 @@ enum State { MENU, CAPTURING, PLAYING, DEAD }
 @onready var _start_screen: StartScreen = $UI/StartScreen
 @onready var _pause_menu: PauseMenu = $UI/PauseMenu
 @onready var _death_screen: DeathScreen = $UI/DeathScreen
+@onready var _settings_menu: SettingsMenu = $UI/SettingsMenu
 @onready var _waves: WaveManager = $WaveManager
 
 var _state: State = State.MENU
@@ -22,6 +23,8 @@ func _ready() -> void:
 	_start_screen.play_requested.connect(_request_play)
 	_pause_menu.resume_requested.connect(_request_play)
 	_death_screen.restart_requested.connect(_restart)
+	_start_screen.settings_requested.connect(_settings_menu.open)
+	_pause_menu.settings_requested.connect(_settings_menu.open)
 	_enter_menu()
 	if GameState.has_started:
 		# A restart already asked for pointer lock; go straight in once the browser grants it.
