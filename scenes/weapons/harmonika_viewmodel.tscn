@@ -1,0 +1,397 @@
+[gd_scene load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/harmonika_viewmodel.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="Lacquer"]
+albedo_color = Color(0.12, 0.28, 0.18, 1)
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="Wood"]
+albedo_color = Color(0.55, 0.32, 0.16, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="Gold"]
+albedo_color = Color(0.85, 0.68, 0.3, 1)
+metallic = 0.7
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Pearl"]
+albedo_color = Color(0.93, 0.9, 0.82, 1)
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="Red"]
+albedo_color = Color(0.68, 0.08, 0.08, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Black"]
+albedo_color = Color(0.08, 0.07, 0.07, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="Leather"]
+albedo_color = Color(0.3, 0.17, 0.09, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="EndMesh"]
+material = SubResource("Lacquer")
+size = Vector3(0.07, 0.2, 0.15)
+
+[sub_resource type="BoxMesh" id="FrameMesh"]
+material = SubResource("Wood")
+size = Vector3(0.074, 0.012, 0.154)
+
+[sub_resource type="BoxMesh" id="TrimMesh"]
+material = SubResource("Gold")
+size = Vector3(0.004, 0.17, 0.006)
+
+[sub_resource type="CylinderMesh" id="ButtonMesh"]
+material = SubResource("Pearl")
+top_radius = 0.008
+bottom_radius = 0.008
+height = 0.012
+radial_segments = 8
+rings = 1
+
+[sub_resource type="BoxMesh" id="PleatRed"]
+material = SubResource("Red")
+size = Vector3(0.016, 0.196, 0.146)
+
+[sub_resource type="BoxMesh" id="PleatBlack"]
+material = SubResource("Black")
+size = Vector3(0.008, 0.2, 0.15)
+
+[sub_resource type="BoxMesh" id="CornerMesh"]
+material = SubResource("Gold")
+size = Vector3(0.162, 0.008, 0.008)
+
+[sub_resource type="BoxMesh" id="StrapMesh"]
+material = SubResource("Leather")
+size = Vector3(0.012, 0.16, 0.03)
+
+[node name="HarmonikaViewmodel" type="Node3D"]
+script = ExtResource("1")
+kick_distance = 0.0
+kick_angle = 0.0
+kick_time = 0.2
+reload_offset = Vector3(0, 0.05, 0.03)
+lower_drop = 0.35
+
+[node name="Model" type="Node3D" parent="."]
+position = Vector3(0.06, -0.25, -0.5)
+rotation = Vector3(0.12, -0.12, 0)
+scale = Vector3(0.75, 0.75, 0.75)
+
+[node name="Bass" type="Node3D" parent="Model"]
+position = Vector3(-0.115, 0, 0)
+
+[node name="Box" type="MeshInstance3D" parent="Model/Bass"]
+position = Vector3(0, 0, 0)
+cast_shadow = 0
+mesh = SubResource("EndMesh")
+
+[node name="FrameTop" type="MeshInstance3D" parent="Model/Bass"]
+position = Vector3(0, 0.104, 0)
+cast_shadow = 0
+mesh = SubResource("FrameMesh")
+
+[node name="FrameBottom" type="MeshInstance3D" parent="Model/Bass"]
+position = Vector3(0, -0.104, 0)
+cast_shadow = 0
+mesh = SubResource("FrameMesh")
+
+[node name="TrimFront" type="MeshInstance3D" parent="Model/Bass"]
+position = Vector3(-0.036, 0, 0.06)
+cast_shadow = 0
+mesh = SubResource("TrimMesh")
+
+[node name="TrimBack" type="MeshInstance3D" parent="Model/Bass"]
+position = Vector3(-0.036, 0, -0.06)
+cast_shadow = 0
+mesh = SubResource("TrimMesh")
+
+[node name="Treble" type="Node3D" parent="Model"]
+position = Vector3(0.115, 0, 0)
+
+[node name="Box" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0, 0, 0)
+cast_shadow = 0
+mesh = SubResource("EndMesh")
+
+[node name="FrameTop" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0, 0.104, 0)
+cast_shadow = 0
+mesh = SubResource("FrameMesh")
+
+[node name="FrameBottom" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0, -0.104, 0)
+cast_shadow = 0
+mesh = SubResource("FrameMesh")
+
+[node name="TrimFront" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0.036, 0, 0.06)
+cast_shadow = 0
+mesh = SubResource("TrimMesh")
+
+[node name="TrimBack" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0.036, 0, -0.06)
+cast_shadow = 0
+mesh = SubResource("TrimMesh")
+
+[node name="Button0" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(-0.022, -0.065, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button1" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(-0.022, -0.044, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button2" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(-0.022, -0.023, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button3" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(-0.022, -0.002, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button4" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(-0.022, 0.019, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button5" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(-0.022, 0.04, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button6" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(-0.022, 0.061, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button7" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0, -0.075, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button8" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0, -0.054, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button9" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0, -0.033, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button10" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0, -0.012, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button11" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0, 0.009, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button12" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0, 0.03, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button13" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0, 0.051, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button14" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0, 0.072, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button15" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0.022, -0.065, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button16" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0.022, -0.044, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button17" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0.022, -0.023, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button18" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0.022, -0.002, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button19" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0.022, 0.019, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button20" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0.022, 0.04, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Button21" type="MeshInstance3D" parent="Model/Treble"]
+position = Vector3(0.022, 0.061, 0.079)
+rotation = Vector3(1.571, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="BassButton00" type="MeshInstance3D" parent="Model/Bass"]
+position = Vector3(-0.04, -0.03, -0.02)
+rotation = Vector3(0, 0, 1.571)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="BassButton01" type="MeshInstance3D" parent="Model/Bass"]
+position = Vector3(-0.04, -0.03, 0.01)
+rotation = Vector3(0, 0, 1.571)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="BassButton10" type="MeshInstance3D" parent="Model/Bass"]
+position = Vector3(-0.04, -0.005, -0.02)
+rotation = Vector3(0, 0, 1.571)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="BassButton11" type="MeshInstance3D" parent="Model/Bass"]
+position = Vector3(-0.04, -0.005, 0.01)
+rotation = Vector3(0, 0, 1.571)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="BassButton20" type="MeshInstance3D" parent="Model/Bass"]
+position = Vector3(-0.04, 0.02, -0.02)
+rotation = Vector3(0, 0, 1.571)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="BassButton21" type="MeshInstance3D" parent="Model/Bass"]
+position = Vector3(-0.04, 0.02, 0.01)
+rotation = Vector3(0, 0, 1.571)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="BassButton30" type="MeshInstance3D" parent="Model/Bass"]
+position = Vector3(-0.04, 0.045, -0.02)
+rotation = Vector3(0, 0, 1.571)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="BassButton31" type="MeshInstance3D" parent="Model/Bass"]
+position = Vector3(-0.04, 0.045, 0.01)
+rotation = Vector3(0, 0, 1.571)
+cast_shadow = 0
+mesh = SubResource("ButtonMesh")
+
+[node name="Strap" type="MeshInstance3D" parent="Model/Bass"]
+position = Vector3(-0.045, 0, 0.045)
+cast_shadow = 0
+mesh = SubResource("StrapMesh")
+
+[node name="Bellows" type="Node3D" parent="Model"]
+position = Vector3(0, 0, 0)
+
+[node name="Pleat0" type="MeshInstance3D" parent="Model/Bellows"]
+position = Vector3(-0.072, 0, 0)
+cast_shadow = 0
+mesh = SubResource("PleatRed")
+
+[node name="Pleat1" type="MeshInstance3D" parent="Model/Bellows"]
+position = Vector3(-0.054, 0, 0)
+cast_shadow = 0
+mesh = SubResource("PleatBlack")
+
+[node name="Pleat2" type="MeshInstance3D" parent="Model/Bellows"]
+position = Vector3(-0.036, 0, 0)
+cast_shadow = 0
+mesh = SubResource("PleatRed")
+
+[node name="Pleat3" type="MeshInstance3D" parent="Model/Bellows"]
+position = Vector3(-0.018, 0, 0)
+cast_shadow = 0
+mesh = SubResource("PleatBlack")
+
+[node name="Pleat4" type="MeshInstance3D" parent="Model/Bellows"]
+position = Vector3(0, 0, 0)
+cast_shadow = 0
+mesh = SubResource("PleatRed")
+
+[node name="Pleat5" type="MeshInstance3D" parent="Model/Bellows"]
+position = Vector3(0.018, 0, 0)
+cast_shadow = 0
+mesh = SubResource("PleatBlack")
+
+[node name="Pleat6" type="MeshInstance3D" parent="Model/Bellows"]
+position = Vector3(0.036, 0, 0)
+cast_shadow = 0
+mesh = SubResource("PleatRed")
+
+[node name="Pleat7" type="MeshInstance3D" parent="Model/Bellows"]
+position = Vector3(0.054, 0, 0)
+cast_shadow = 0
+mesh = SubResource("PleatBlack")
+
+[node name="Pleat8" type="MeshInstance3D" parent="Model/Bellows"]
+position = Vector3(0.072, 0, 0)
+cast_shadow = 0
+mesh = SubResource("PleatRed")
+
+[node name="CornerTF" type="MeshInstance3D" parent="Model/Bellows"]
+position = Vector3(0, 0.1, 0.075)
+cast_shadow = 0
+mesh = SubResource("CornerMesh")
+
+[node name="CornerTR" type="MeshInstance3D" parent="Model/Bellows"]
+position = Vector3(0, 0.1, -0.075)
+cast_shadow = 0
+mesh = SubResource("CornerMesh")
+
+[node name="CornerBF" type="MeshInstance3D" parent="Model/Bellows"]
+position = Vector3(0, -0.1, 0.075)
+cast_shadow = 0
+mesh = SubResource("CornerMesh")
+
+[node name="CornerBR" type="MeshInstance3D" parent="Model/Bellows"]
+position = Vector3(0, -0.1, -0.075)
+cast_shadow = 0
+mesh = SubResource("CornerMesh")
+
+[node name="MuzzleFlash" type="Node3D" parent="Model"]
+position = Vector3(0, 0.1, 0)
+
+[node name="Light" type="OmniLight3D" parent="Model/MuzzleFlash"]
+light_energy = 0.0
+omni_range = 1.0

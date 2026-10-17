@@ -113,6 +113,12 @@ func play_secondary(rounds: int) -> void:
 	play_fire(rounds)
 
 
+## A held PLAY secondary is playing (set every frame while it plays) or stopped; guns with one
+## override this.
+func set_playing(_on: bool) -> void:
+	pass
+
+
 ## Aim pose blend (0 hip, 1 aimed), set every frame by the WeaponHolder.
 func set_aim(amount: float) -> void:
 	position = aim_offset * amount

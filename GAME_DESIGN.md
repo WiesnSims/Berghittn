@@ -208,6 +208,12 @@ Rules:
   - `handboeller`: the Doppelladung (press): a second measure of powder poured in, the loaded round
     plus one from the reserve; the shell flies 1.5 times as fast and flatter, bursts for 260 within
     4.5 m, and the kick shoves the shooter back.
+  - `harmonika`: the Landler (hold): a slow tune played on for as long as right click is held, one
+    round every 1.5 s (the first on the press). Everyone within 8 m keeps dancing while it plays,
+    and a second after (newcomers too), taking 20 a second; the player walks at half speed and
+    cannot shoot. Out of rounds the music stops and the gun reloads. Holds a doorway or buys time
+    to walk out of a crowd; the polka is the setup for switching to a gun and hitting dancers twice
+    as hard.
   - `rodelkanone`: the Kehre (press): a sled shot with a double charge (two rounds) that banks off
     walls up to three times instead of breaking and runs 25 m; for rooms and corridors where a
     straight 15 m never fits.
@@ -296,6 +302,13 @@ Alpine folk culture.
   makes all enemies within 8 m "dance": they stop attacking for 4 s, take
   20 damage per second, and take double damage from other weapons while
   dancing. Bosses are immune to the dance but take the damage.
+  Details (M5): walls shield, all around the player (not a cone). A dancer hops and spins on the
+  spot; a swing it had started is dropped. The 20 a second is paid as one hit per second (a flash and
+  the usual hit points to the player who played), and is not doubled itself. "JUCHHE!" pops up and
+  golden notes rise all around, with a ring rolling out to the 8 m edge, until the polka sound comes
+  with M6. The bellows pump through the polka and close as the next can start (3.3 s, with the white
+  ready ring). 3 / 9, reload 3 s (the air button: bellows pulled wide open and pressed shut). In the
+  chest at weight 1.
 
 **Regular absurd weapons**
 

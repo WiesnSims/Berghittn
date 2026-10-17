@@ -174,6 +174,17 @@ godot --headless --fixed-fps 60 res://tests/upstairs.tscn
 godot --headless --fixed-fps 60 res://tests/spawn_paths.tscn
 ```
 
+```
+godot --headless --fixed-fps 60 res://tests/m5_harmonika.tscn
+```
+
+The Steirische Harmonika: a polka making everyone within 8 m dance all around (not 11 m out, not
+behind a wall): dancers stay on the spot, the one right next to the player never swings, a hit on a
+dancer lands twice as hard, 20 a second for 4 s; the Krampus takes the damage but does not dance;
+the held Landler (a round per 1.5 s, half walking speed, newcomers dancing too, dancing past 4 s for
+as long as it plays, stopping and reloading when the rounds run out); the polka animation length
+and the chest weight.
+
 `upstairs`: the player walks up the hall stairs, and an enemy follows a player up every level change
 (gallery stairs, garden steps, hay-loft ramp, gondola platform). `spawn_paths`: from every spawn point
 active at the start, an enemy makes it into the Stube. Both catch spots where bodies get stuck that the
@@ -221,7 +232,7 @@ frame with the HUD, or shooting an enemy (wall puffs, hit flash, casings, head p
 visuals without playing.
 
 ```
-godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne|knoedel|glocke|fladen|boeller|rodel
+godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne|knoedel|glocke|fladen|boeller|rodel|harmonika
 ```
 
 Also needs a window: one frame per zone (all doors open), the wall-buys and a door mid-swing; or

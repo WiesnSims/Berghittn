@@ -60,6 +60,9 @@ var _sprint_left: float = 0.0
 var _aiming: bool = false
 # Right click held on a gun that fans its action (FAN secondary).
 var _fanning: bool = false
+# Playing the held secondary (PLAY) this frame, and seconds left of the round it is on.
+var _playing: bool = false
+var _play_left: float = 0.0
 var _viewmodel: Viewmodel
 var _behavior: WeaponBehavior
 var _melee_viewmodel: MeleeViewmodel
@@ -243,6 +246,11 @@ func is_fanning() -> bool:
 	return _fanning
 
 
+## Right click held on a PLAY weapon (the Harmonika's Landler): walking slows, no sprinting.
+func is_playing() -> bool:
+	return _playing
+
+
 ## Cone half-angle in degrees the next shot can stray: base spread plus bloom, tightened by aiming.
 func current_spread() -> float:
 	return (weapon.spread + bloom + _fan_spread()) * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
@@ -282,6 +290,8 @@ func _physics_process(delta: float) -> void:
 	bloom = move_toward(bloom, 0.0, weapon.bloom_recover * delta)
 	# Set again below once the hands are free to work the action.
 	_fanning = false
+	var was_playing: bool = _playing
+	_playing = false
 	# Reloading on the run is fine, shooting is not: the gun is lowered until the sprint ends.
 	var player := _shooter as Player
 	if player and player.is_sprinting():
@@ -310,16 +320,23 @@ func _physics_process(delta: float) -> void:
 		return
 	# An empty gun reloads by itself once its last shot has cycled (play-test 2026-10-17: a click on
 	# the empty gun during the cycle could run out before it counted, so R was needed).
-	if mag == 0 and reserve > 0 and _cooldown <= 0.0:
+	# (Not while the last round of a held tune still plays: that one ends first.)
+	if mag == 0 and reserve > 0 and _cooldown <= 0.0 and not was_playing:
 		start_reload()
 		return
-	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+	# force_aim stands in for a held right click without a mouse (tests, capture tools).
+	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED and not force_aim:
 		return
 	if Input.is_action_just_pressed("reload"):
 		start_reload()
 		return
 	if _sprint_left > 0.0:
 		return
+	if weapon.secondary == WeaponData.Secondary.PLAY and (force_aim or Input.is_action_pressed("secondary")) and (was_playing or _cooldown <= 0.0):
+		_play(delta, was_playing)
+		return
+	if was_playing:
+		_stop_playing()
 	_fanning = weapon.secondary == WeaponData.Secondary.FAN and (force_aim or Input.is_action_pressed("secondary"))
 	if _fanning:
 		if _cooldown <= 0.0:
@@ -353,6 +370,36 @@ func _physics_process(delta: float) -> void:
 		else:
 			# Pulling the trigger on an empty mag is the most common way players "ask" for a reload.
 			start_reload()
+
+
+func _play(delta: float, was_playing: bool) -> void:
+	if not was_playing:
+		_play_left = 0.0
+	_play_left -= delta
+	if _play_left <= 0.0:
+		# The next round of the tune; out of rounds, the music stops and the gun reloads.
+		if mag <= 0:
+			if was_playing:
+				_stop_playing()
+			start_reload()
+			return
+		mag -= 1
+		_play_left += weapon.secondary_round_time
+		# No fired signal: playing on has no recoil.
+		ammo_changed.emit(mag, reserve)
+	_playing = true
+	if _behavior:
+		_behavior.play_secondary(delta)
+	if _viewmodel:
+		_viewmodel.set_playing(true)
+
+
+func _stop_playing() -> void:
+	_play_left = 0.0
+	# The bellows are closed up before the next polka.
+	_set_cooldown(weapon.secondary_round_time)
+	if _viewmodel:
+		_viewmodel.set_playing(false)
 
 
 func start_reload() -> void:
@@ -514,6 +561,36 @@ func area_hit(center: Vector3, forward: Vector3, half_angle: float, reach: float
 			# Heavy bodies are shoved less, but still visibly: by the root of how much they flinch.
 			enemy.apply_knockback(away * push * falloff * sqrt(enemy.data.flinch_multiplier))
 	return struck.size()
+
+
+## Every body within `reach` of the shooter, walls shielding (the Harmonika's polka): it dances for
+## `duration` and takes `dps` (before perks) a second. Returns how many it reached.
+func dance_around(reach: float, duration: float, dps: int) -> int:
+	var center: Vector3 = global_position
+	var sphere := SphereShape3D.new()
+	sphere.radius = reach + Constants.AREA_BODY_MARGIN
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = sphere
+	query.transform = Transform3D(Basis.IDENTITY, center)
+	query.collision_mask = Constants.LAYER_HITBOX
+	query.collide_with_areas = true
+	query.collide_with_bodies = false
+	var reached: Dictionary = {}
+	for found: Dictionary in get_world_3d().direct_space_state.intersect_shape(query, Constants.AREA_MAX_TARGETS):
+		var hurtbox := found.collider as Hurtbox
+		var enemy: Enemy = hurtbox.receiver as Enemy if hurtbox else null
+		if enemy == null or reached.has(enemy) or not enemy.is_alive():
+			continue
+		var target: Vector3 = hurtbox.global_position + Vector3.UP * Constants.AREA_AIM_HEIGHT * hurtbox.scale.y
+		if target.distance_to(center) > reach + Constants.AREA_BODY_MARGIN:
+			continue
+		# Walls stop the music; the window openings themselves do not.
+		var line := PhysicsRayQueryParameters3D.create(center, target, Constants.LAYER_WORLD, _exclude)
+		if not get_world_3d().direct_space_state.intersect_ray(line).is_empty():
+			continue
+		reached[enemy] = true
+		enemy.dance(duration, _damage(dps), _shooter)
+	return reached.size()
 
 
 ## One body hit for behaviors that find their own targets (the Rodelkanone's sled): `amount` (before

@@ -9,7 +9,9 @@ extends Resource
 ## BEHAVIOR: the special weapon's own second shot from its behavior script (press); see secondary_*.
 ## BLOCK (melee): melee lives on V, not in hand, so its mode is holding V past the blow: the weapon
 ## stays up as a guard against hits from the front; see block_*.
-enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR, BLOCK }
+## PLAY: the special weapon's own held mode (hold): its behavior plays on for as long as right click
+## is held, one round per secondary_round_time, walking at aim_move_multiplier (the Harmonika).
+enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR, BLOCK, PLAY }
 
 @export var id: StringName
 ## Goes in the melee slot (quick melee on V) instead of a gun slot.
@@ -100,6 +102,8 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR, BLOCK }
 ## The secondary may take rounds beyond the magazine from the reserve (the Handböller's double charge:
 ## the loaded one plus a second measure of powder poured in).
 @export var secondary_from_reserve: bool = false
+## Held secondary (PLAY): seconds of playing that one round lasts (the first is taken on the press).
+@export var secondary_round_time: float = 1.0
 ## Guard (BLOCK): half-angle (degrees) of the front it covers, and the share of a hit that still gets
 ## through. The attacker is shoved back by secondary_knockback; walking slows to aim_move_multiplier.
 @export var block_angle: float = 60.0

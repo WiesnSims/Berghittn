@@ -301,6 +301,15 @@ const RODEL_LANE: float = 0.7
 const RODEL_STEP: float = 0.4
 const RODEL_MAX_DROP: float = 4.0
 const RODEL_SIDE_PUSH: float = 1.2
+# Steirische Harmonika: seconds a polka makes enemies dance, how much harder other hits land on a
+# dancer, and how long the held Landler's dance lingers once the playing stops.
+const DANCE_TIME: float = 4.0
+const DANCE_DAMAGE_MULTIPLIER: int = 2
+const DANCE_LINGER: float = 1.0
+# How a dancer turns (radians per second), hops (metres) and how many hops a second.
+const DANCE_SPIN: float = 5.0
+const DANCE_HOP: float = 0.18
+const DANCE_HOP_RATE: float = 2.5
 # Screen shake from blasts: seconds it lasts and how fast it trembles (cycles per second).
 const SHAKE_TIME: float = 0.45
 const SHAKE_FREQUENCY: float = 18.0
