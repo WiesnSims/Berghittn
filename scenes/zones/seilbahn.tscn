@@ -54,15 +54,15 @@ size = Vector3(0.3, 6.3, 2.7)
 material = ExtResource("2")
 
 [node name="DoorSkiraumHole" type="CSGBox3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 1.1, -1.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 1.25, -1.15)
 operation = 2
-size = Vector3(1.4, 2.2, 0.6)
+size = Vector3(2.6, 2.5, 0.6)
 material = ExtResource("3")
 
 [node name="DoorSchuppenHole" type="CSGBox3D" parent="Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 1.1, 9.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.7, 1.25, 9.15)
 operation = 2
-size = Vector3(1.4, 2.2, 0.6)
+size = Vector3(2.6, 2.5, 0.6)
 material = ExtResource("3")
 
 [node name="WindowEastNorthHole" type="CSGBox3D" parent="Walls"]

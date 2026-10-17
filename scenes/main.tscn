@@ -95,11 +95,31 @@ zone_b = &"lager"
 transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, -2.5, 0, 6.15)
 zone_a = &"stube"
 zone_b = &"terrasse"
+swing = 1.5708
+
+[node name="StubeBalkon" parent="World/Doors" instance=ExtResource("18")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, -9.8, 3.5, 6.15)
+zone_a = &"stube"
+zone_b = &"terrasse"
+width = 2.0
+swing = 1.5708
+
+[node name="StubeSeilbahn" parent="World/Doors" instance=ExtResource("18")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 7.15, 0, 3.6)
+zone_a = &"stube"
+zone_b = &"seilbahn"
 
 [node name="KuecheSkiraum" parent="World/Doors" instance=ExtResource("18")]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 7.15, 0, -12)
 zone_a = &"kueche"
 zone_b = &"skiraum"
+
+[node name="LagerKueche" parent="World/Doors" instance=ExtResource("18")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 5, 3.5, -7.3)
+zone_a = &"lager"
+zone_b = &"kueche"
+width = 2.0
+swing = 1.5708
 
 [node name="SkiraumSeilbahn" parent="World/Doors" instance=ExtResource("18")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 12, 0, -1.15)
@@ -107,14 +127,16 @@ zone_a = &"skiraum"
 zone_b = &"seilbahn"
 
 [node name="SeilbahnSchuppen" parent="World/Doors" instance=ExtResource("18")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 19, 0, 9.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 18.7, 0, 9.15)
 zone_a = &"seilbahn"
 zone_b = &"schuppen"
 
 [node name="TerrasseSchuppen" parent="World/Doors" instance=ExtResource("18")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 7.15, 0, 10.3)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 7.15, 0, 10.5)
 zone_a = &"terrasse"
 zone_b = &"schuppen"
+width = 2.4
+swing = 1.5708
 
 [node name="Navigation" type="NavigationRegion3D" parent="World" node_paths=PackedStringArray("source_root")]
 navigation_mesh = SubResource("NavMesh")
