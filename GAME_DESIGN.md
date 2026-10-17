@@ -265,7 +265,10 @@ Alpine folk culture.
 - **Rodelkanone:** fires a wooden sled that slides along the ground in a
   straight line for 15 m, hitting every enemy on the path for 300 damage with
   knockback. The sled then disappears with a crash.
-  Details (M5): the sled lands on the floor a step ahead and runs at 14 m/s, over steps up to 0.4 m,
+  Details (M5): the sled leaves the muzzle at 14 m/s where the player aims and flies in an arc
+  (heavy: 18 m/s² gravity, so level it comes down about 6 m out, aimed up about 12 m); it strikes
+  bodies it flies through, breaks on a wall, drops off a ceiling. Where it comes down on a floor it
+  runs its 15 m along the ground at 14 m/s, over steps up to 0.4 m,
   up and down slopes and off edges (lost after a 4 m drop). Everything in its lane (0.7 m around its
   middle at body height) is struck once and thrown forward and sideways out of the lane; the first
   wall breaks it early ("KRACH!" and flying planks), nothing behind a wall is touched. "RUMMS!" pops

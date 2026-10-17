@@ -1,8 +1,9 @@
 extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/m5_rodelkanone.tscn
-## Headless check of the Rodelkanone (section 6a) on the real main scene: 4 / 12, a sled that runs
-## 15 m along the ground and strikes every enemy in its lane once for 300 (not beside the lane, not
-## beyond 15 m), throws survivors aside, breaks on a wall without passing it, the Kehre banks off a
+## Headless check of the Rodelkanone (section 6a) on the real main scene: 4 / 12, a sled that flies
+## where the player aims, comes down and runs 15 m along the ground from there, striking every enemy
+## in its way once for 300 (not beside the lane, not past the end of its run), a sled aimed high flies
+## farther before it lands, throws survivors aside, breaks on a wall without passing it, the Kehre banks off a
 ## wall for two rounds and reaches what is around the corner, sleds come from a pool, the next one
 ## shows at the muzzle as the gun is ready again, and the Hüttentruhe has it at weight 1.
 
@@ -57,10 +58,10 @@ func _spawn(data: EnemyData, offset: Vector3) -> Enemy:
 	return enemy
 
 
-func _look_flat(direction: Vector3) -> void:
+func _look_flat(direction: Vector3, pitch: float = 0.0) -> void:
 	player.velocity = Vector3.ZERO
 	player.look_at(player.global_position + direction, Vector3.UP)
-	(player.get_node("Head") as Node3D).rotation.x = 0.0
+	(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(pitch)
 	var camera := player.get_node("Head/Camera3D") as CameraRecoil
 	camera._target = Vector2.ZERO
 	camera._current = Vector2.ZERO
@@ -110,6 +111,7 @@ func _run() -> void:
 	await _frames(10)
 
 	await _lane()
+	await _aim_high()
 	await _wall_stop()
 	await _kehre()
 	await _indoors()
@@ -129,10 +131,11 @@ func _lane() -> void:
 	_look_flat(Vector3(1, 0, 0))
 	var holder: WeaponHolder = player.weapons
 	_check(holder.weapon == gun and holder.mag == 4 and holder.reserve == 12, "Rodelkanone in hand, 4 / 12")
-	# In the lane at 4 m, 9 m (half a metre off its line) and 13 m; beside it at 2.5 m; past its end at 18 m.
+	# In the lane at 4 m, 9 m (half a metre off its line) and 13 m; beside it at 2.5 m; past its end at 24 m.
 	var in_lane: Array[Enemy] = [_spawn(knappe, Vector3(4, 0, 0)), _spawn(wanderer, Vector3(9, 0, 0.5)), _spawn(wanderer, Vector3(13, 0, -0.3))]
 	var beside: Enemy = _spawn(wanderer, Vector3(7, 0, 2.5))
-	var beyond: Enemy = _spawn(wanderer, Vector3(18, 0, 0))
+	var beyond: Enemy = _spawn(wanderer, Vector3(24, 0, 0))
+	_look_flat(Vector3(1, 0, 0), -15.0)
 	await _frames(3)
 	holder._fire()
 	_check(holder.mag == 3, "one sled used")
@@ -141,9 +144,16 @@ func _lane() -> void:
 	if sled == null:
 		return
 	await _frames(2)
+	_check(sled.is_flying() and sled.global_position.y - FIELD.y > 0.6, "it leaves the muzzle in the air (%.2f m up)" % (sled.global_position.y - FIELD.y))
+	while sled.is_busy() and sled.is_flying():
+		await _frames(1)
+	var landed: Vector3 = sled.landed_at
+	var out: float = landed.x - FIELD.x
+	_check(out > 2.0 and out < 5.5, "aimed a little down, it comes down %.1f m out" % out)
+	await _frames(2)
 	var start: Vector3 = sled.global_position
-	_check(absf(start.y - _ground(Vector3(start.x - FIELD.x, 0, start.z - FIELD.z)).y) < 0.05, "it rides on the ground (%.2f m up)" % (start.y - _ground(Vector3(start.x - FIELD.x, 0, start.z - FIELD.z)).y))
-	await _frames(20)
+	_check(absf(start.y - _ground(Vector3(start.x - FIELD.x, 0, start.z - FIELD.z)).y) < 0.05, "and rides on the ground (%.2f m up)" % (start.y - _ground(Vector3(start.x - FIELD.x, 0, start.z - FIELD.z)).y))
+	await _frames(10)
 	# Struck once and thrown aside, out of the lane.
 	_check(in_lane[0].health == 10000 - gun.damage and in_lane[0]._knock.length() > 1.0 and absf(in_lane[0]._knock.z) > 0.5, "the Knappe at 4 m takes %d and is thrown aside (%.1f, %.1f)" % [10000 - in_lane[0].health, in_lane[0]._knock.x, in_lane[0]._knock.z])
 	var last: Vector3 = sled.global_position
@@ -152,12 +162,41 @@ func _lane() -> void:
 	for e: Enemy in in_lane:
 		_check(e.health == 10000 - gun.damage, "struck once in the lane for %d" % (10000 - e.health))
 	_check(beside.health == 10000, "not 2.5 m beside the lane")
-	_check(beyond.health == 10000, "not 18 m out, past its 15 m")
-	var run: float = Vector2(sled.global_position.x - FIELD.x, sled.global_position.z - FIELD.z).length()
-	_check(run > gun.range - 0.5 and run < gun.range + 1.5, "it broke apart %.1f m out" % run)
+	_check(beyond.health == 10000, "not 24 m out, past the end of its run")
+	var run: float = Vector2(sled.global_position.x - landed.x, sled.global_position.z - landed.z).length()
+	_check(run > gun.range - 0.5 and run < gun.range + 1.0, "it ran %.1f m on the ground and broke apart" % run)
 	_check(last.x > start.x, "it went the way the player looked")
 	in_lane.append_array([beside, beyond])
 	await _clear(in_lane)
+
+
+func _aim_high() -> void:
+	var wanderer: EnemyData = load("res://data/enemies/wanderer.tres")
+	var holder: WeaponHolder = player.weapons
+	player.global_position = _ground(Vector3.ZERO)
+	_look_flat(Vector3(1, 0, 0), 30.0)
+	# Under its arc a body close by is flown over; where it comes down it rides on.
+	var under: Enemy = _spawn(wanderer, Vector3(4, 0, 0))
+	var past: Enemy = _spawn(wanderer, Vector3(16, 0, 0))
+	await _frames(3)
+	holder.mag = 4
+	holder._cooldown = 0.0
+	holder._fire()
+	var sled: Node3D = _busy_sled()
+	if sled == null:
+		_check(false, "a sled is out, aimed high")
+		return
+	var peak: float = 0.0
+	while sled.is_busy() and sled.is_flying():
+		peak = maxf(peak, sled.global_position.y - FIELD.y)
+		await _frames(1)
+	var out: float = sled.landed_at.x - FIELD.x
+	_check(peak > 2.5, "aimed high, it climbs %.1f m" % peak)
+	_check(out > 7.0 and out < 14.0, "and comes down %.1f m out" % out)
+	await _seconds(2.0)
+	_check(under.health == 10000, "flying over the one under its arc")
+	_check(past.health == 10000 - gun.damage, "and striking the one past where it landed")
+	await _clear([under, past])
 
 
 func _wall_stop() -> void:

@@ -694,6 +694,13 @@ func _rodel_tour(main: Node) -> void:
 	await _save("rodel_idle")
 	weapons._fire()
 	await _save_series("rodel_shot", 14, 0.07)
+	await get_tree().create_timer(1.5).timeout
+	# Aimed high: it flies in an arc and rides on from where it comes down.
+	(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(20.0)
+	weapons._cooldown = 0.0
+	weapons._fire()
+	await _save_series("rodel_arc", 12, 0.08)
+	(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(-6.0)
 	await get_tree().create_timer(1.0).timeout
 	weapons.mag = 0
 	weapons.start_reload()
