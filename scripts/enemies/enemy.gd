@@ -849,6 +849,8 @@ func _die(is_headshot: bool, is_melee: bool, source: Node3D) -> void:
 	collision_mask = Constants.LAYER_WORLD
 	for hurtbox: Hurtbox in _hurtboxes:
 		hurtbox.collision_layer = 0
+	if data.drop:
+		WeaponPickup.spawn(data.drop, global_position, get_parent())
 	# Points first, then the wave manager: the last kill of a wave is paid out before "wave cleared".
 	Events.enemy_killed.emit(self, is_headshot, is_melee, source)
 	died.emit(self)

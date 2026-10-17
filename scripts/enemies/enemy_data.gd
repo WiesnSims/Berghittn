@@ -39,6 +39,8 @@ extends Resource
 @export var lunge_cooldown: float = 3.0
 ## Boss (Krampus): announced, gets a health bar, and is immune to crowd control (section 6a).
 @export var is_boss: bool = false
+## Left behind where it dies, for a player to pick up (the Krampus drops his Rute); null = nothing.
+@export var drop: WeaponData
 
 
 func health_for_wave(wave: int) -> int:

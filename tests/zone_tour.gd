@@ -827,10 +827,24 @@ func _melee_tour(main: Node, mode: String) -> void:
 	var id: String = "krampusrute" if mode == "rute" else mode
 	var weapon: WeaponData = load("res://data/weapons/%s.tres" % id)
 	var weapons: WeaponHolder = player.weapons
-	weapons.give_weapon(weapon)
 	var center := Vector3(10.0, -0.3, 31.0)
 	player.global_position = center
 	player.rotation.y = -PI * 0.5
+	(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(-12.0)
+	if mode == "rute":
+		# The Krampus falls and leaves his Rute on the pasture.
+		var krampus: Enemy = waves._create_enemy()
+		krampus.activate(load("res://data/enemies/krampus.tres"), 5, Transform3D(Basis.IDENTITY, center + Vector3(3.0, 0.0, 0.0)).looking_at(center, Vector3.UP))
+		krampus.process_mode = Node.PROCESS_MODE_PAUSABLE
+		await get_tree().create_timer(0.4).timeout
+		krampus.receive_hit(1000000, false, false, player)
+		await get_tree().create_timer(1.5).timeout
+		await _save("rute_dropped")
+		for pickup: WeaponPickup in main.find_children("*", "WeaponPickup", true, false):
+			pickup.interact(player)
+		await get_tree().create_timer(Constants.ENEMY_CORPSE_TIME).timeout
+	else:
+		weapons.give_weapon(weapon)
 	(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(-6.0)
 	var crowd: Array[Enemy] = []
 	for i: int in 5:

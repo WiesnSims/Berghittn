@@ -334,6 +334,12 @@ const MISTGABEL_PIERCE: int = 2
 const MISTGABEL_HOLD_MAX: float = 3.0
 const MISTGABEL_CARRY_AHEAD: float = 1.5
 const MISTGABEL_CARRY_UP: float = 0.15
+# Krampus-Rute: seconds a swat makes enemies flee, and how far around each body it strikes the panic
+# spreads; the Larve (hold V) looks for faces every LARVE_SCAN and they flee on LARVE_LINGER after.
+const RUTE_FLEE_TIME: float = 3.0
+const RUTE_FLEE_RADIUS: float = 2.5
+const LARVE_SCAN: float = 0.2
+const LARVE_LINGER: float = 1.0
 # Screen shake from blasts: seconds it lasts and how fast it trembles (cycles per second).
 const SHAKE_TIME: float = 0.45
 const SHAKE_FREQUENCY: float = 18.0
