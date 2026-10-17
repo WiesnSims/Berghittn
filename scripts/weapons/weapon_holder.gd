@@ -589,8 +589,9 @@ func ignite_around(center: Vector3, reach: float, burn_dps: int, burn_time: floa
 
 ## The bodies (not heads) an area reaches: within `reach` of `center` and `half_angle` degrees of
 ## `forward` (180 = all around), one per receiver, with no wall between (window openings let it
-## through). Each as {hurtbox, target (its middle), to_target, distance}.
-func _bodies_in(center: Vector3, forward: Vector3, half_angle: float, reach: float) -> Array[Dictionary]:
+## through). Each as {hurtbox, target (its middle), to_target, distance}. With `flat`, the angle is
+## measured on the ground, as melee does: a body right below the eye still counts as straight ahead.
+func _bodies_in(center: Vector3, forward: Vector3, half_angle: float, reach: float, flat: bool = false) -> Array[Dictionary]:
 	var sphere := SphereShape3D.new()
 	sphere.radius = reach + Constants.AREA_BODY_MARGIN
 	var query := PhysicsShapeQueryParameters3D.new()
@@ -612,8 +613,10 @@ func _bodies_in(center: Vector3, forward: Vector3, half_angle: float, reach: flo
 		if distance > reach + Constants.AREA_BODY_MARGIN:
 			continue
 		# A body right next to the muzzle counts even if its middle is just outside the cone.
-		var off_axis: float = (to_target - forward * to_target.dot(forward)).length()
-		if half_angle < 180.0 and to_target.normalized().dot(forward) < min_dot and not (to_target.dot(forward) > 0.0 and off_axis < Constants.AREA_BODY_MARGIN):
+		var along: Vector3 = Vector3(to_target.x, 0.0, to_target.z) if flat else to_target
+		var aim: Vector3 = Vector3(forward.x, 0.0, forward.z).normalized() if flat else forward
+		var off_axis: float = (along - aim * along.dot(aim)).length()
+		if half_angle < 180.0 and along.normalized().dot(aim) < min_dot and not (along.dot(aim) > 0.0 and off_axis < Constants.AREA_BODY_MARGIN):
 			continue
 		var line := PhysicsRayQueryParameters3D.create(center, target, Constants.LAYER_WORLD, _exclude)
 		if not get_world_3d().direct_space_state.intersect_ray(line).is_empty():
@@ -641,7 +644,7 @@ func strike(hurtbox: Hurtbox, amount: int, push: Vector3, is_melee: bool = false
 ## The bodies in front of the shooter for a melee behavior: within `reach` and `half_angle` degrees of
 ## the aim, walls shielding, nearest first. Each as {hurtbox, target, to_target, distance}.
 func bodies_ahead(reach: float, half_angle: float) -> Array[Dictionary]:
-	var bodies: Array[Dictionary] = _bodies_in(global_position, -global_basis.z, half_angle, reach)
+	var bodies: Array[Dictionary] = _bodies_in(global_position, -global_basis.z, half_angle, reach, true)
 	bodies.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.distance < b.distance)
 	return bodies
 
