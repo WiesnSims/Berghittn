@@ -59,21 +59,37 @@ func _ring() -> void:
 	tween.tween_property(material, "albedo_color:a", 0.0, RING_TIME).set_delay(RING_TIME * 0.5)
 
 
-## An eighth note: an oval head, a stem and a flag, turned to face the player.
+## A note of a random kind (quarter, eighth, sixteenth, a beamed pair or a hollow half note), turned
+## to face the player. Built from meshes, so every kind can be drawn the same way.
 func _note(material: Material) -> void:
 	var note := Node3D.new()
-	var head := SphereMesh.new()
-	head.radius = 0.07
-	head.height = 0.1
-	head.radial_segments = 8
-	head.rings = 4
-	_part(note, head, Vector3.ZERO, Vector3(1.0, 0.75, 0.4), material).rotation.z = 0.4
-	var stem := BoxMesh.new()
-	stem.size = Vector3(0.018, 0.26, 0.018)
-	_part(note, stem, Vector3(0.06, 0.13, 0.0), Vector3.ONE, material)
-	var flag := BoxMesh.new()
-	flag.size = Vector3(0.1, 0.03, 0.018)
-	_part(note, flag, Vector3(0.1, 0.22, 0.0), Vector3.ONE, material).rotation.z = -0.6
+	var kind: int = randi() % 5
+	match kind:
+		0:
+			_stemmed(note, Vector3.ZERO, 0, material)
+		1:
+			_stemmed(note, Vector3.ZERO, 1, material)
+		2:
+			_stemmed(note, Vector3.ZERO, 2, material)
+		3:
+			# Two eighths joined by a beam.
+			_stemmed(note, Vector3(-0.07, 0.0, 0.0), 0, material)
+			_stemmed(note, Vector3(0.09, 0.04, 0.0), 0, material)
+			var beam := BoxMesh.new()
+			beam.size = Vector3(0.17, 0.03, 0.018)
+			_part(note, beam, Vector3(0.07, 0.27, 0.0), Vector3.ONE, material).rotation.z = 0.24
+		4:
+			# Hollow head: a ring, and a stem.
+			var ring := TorusMesh.new()
+			ring.inner_radius = 0.045
+			ring.outer_radius = 0.07
+			ring.rings = 10
+			ring.ring_segments = 4
+			var head := _part(note, ring, Vector3.ZERO, Vector3(1.0, 1.0, 0.75), material)
+			head.rotation = Vector3(PI * 0.5, 0.0, 0.4)
+			var stem := BoxMesh.new()
+			stem.size = Vector3(0.018, 0.26, 0.018)
+			_part(note, stem, Vector3(0.065, 0.13, 0.0), Vector3.ONE, material)
 	add_child(note)
 	var angle: float = randf() * TAU
 	var out: float = lerpf(1.2, reach, sqrt(randf()))
@@ -99,3 +115,20 @@ func _part(note: Node3D, mesh: Mesh, at: Vector3, size: Vector3, material: Mater
 	part.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	note.add_child(part)
 	return part
+
+
+## A filled head with a stem going up from its right side, and `flags` flags on top.
+func _stemmed(note: Node3D, at: Vector3, flags: int, material: Material) -> void:
+	var head := SphereMesh.new()
+	head.radius = 0.07
+	head.height = 0.1
+	head.radial_segments = 8
+	head.rings = 4
+	_part(note, head, at, Vector3(1.0, 0.75, 0.4), material).rotation.z = 0.4
+	var stem := BoxMesh.new()
+	stem.size = Vector3(0.018, 0.26, 0.018)
+	_part(note, stem, at + Vector3(0.06, 0.13, 0.0), Vector3.ONE, material)
+	var flag := BoxMesh.new()
+	flag.size = Vector3(0.1, 0.03, 0.018)
+	for f: int in flags:
+		_part(note, flag, at + Vector3(0.1, 0.22 - f * 0.06, 0.0), Vector3.ONE, material).rotation.z = -0.6

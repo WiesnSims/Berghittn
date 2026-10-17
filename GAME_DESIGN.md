@@ -325,7 +325,8 @@ Alpine folk culture.
   Details (M5): walls shield, all around the player (not a cone). A dancer hops and spins on the
   spot; a swing it had started is dropped. The 20 a second is paid as one hit per second (a flash and
   the usual hit points to the player who played), and is not doubled itself. "JUCHHE!" pops up and
-  golden notes rise all around, with a ring rolling out to the 8 m edge, until the polka sound comes
+  golden notes rise all around (3D shapes, user decision 2026-10-17: quarters, eighths, sixteenths,
+  beamed pairs and hollow half notes, mixed), with a ring rolling out to the 8 m edge, until the polka sound comes
   with M6. The bellows pump through the polka and close as the next can start (3.3 s, with the white
   ready ring). 3 / 9, reload 3 s (the air button: bellows pulled wide open and pressed shut). In the
   chest at weight 1.
@@ -497,7 +498,7 @@ from the Brettljause below. Tuning numbers are `PERK_*` in constants.gd.
 | Marillenbrand | **Böllerschuss** | 2500 | Starting a reload on an empty magazine sets off a Schützen black-powder Böller at your feet: 150 + 20·wave damage within 4.5 m (half at the edge, walls block it), survivors are thrown back; 6 s to pack the next charge |
 | Obstler | **Grantler** | 2500 | +5 % damage for every enemy within 5 m, up to +30 %; the tile shows the bonus |
 | Zirbenschnaps | **Durchschlag** | 3000 | Every gun goes through one more enemy (on top of section 6's penetration; buckshot still only up close) |
-| Jagamoasta | **56 gsunde Kräuter** | 3500 | Every kill is a herb; at 56 you are fully healed and hit twice as hard for 10 s (the Kräuterrausch, green glow); the tile counts the herbs |
+| Jagamoasta | **56 gsunde Kräuter** | 3500 | Every kill is a herb; at 56 you are fully healed and keep +20 % max health (+20) and +20 % damage for good, kept even when you go down (a green flash; the tile counts the herbs, then shows +20 %). An investment: once paid out it is not sold again. Play-test 2026-10-17: was a 10 s double-damage rush, which felt too little for 56 kills |
 
 Perks are lost when the player is downed (solo: irrelevant, game over).
 The shrine (M5) is a painted wall cabinet with one bottle per Schnaps, cheapest on the left; the

@@ -21,7 +21,7 @@ func get_interact_position() -> Vector3:
 
 func get_interact_prompt(player: Node3D) -> String:
 	var buyer := player as Player
-	if buyer.perks.has(perk):
+	if not buyer.perks.wants(perk):
 		return ""
 	var perk_name: String = tr(perk.display_name)
 	if not buyer.points.can_afford(perk.cost):
@@ -31,7 +31,7 @@ func get_interact_prompt(player: Node3D) -> String:
 
 func interact(player: Node3D) -> void:
 	var buyer := player as Player
-	if buyer.perks.has(perk) or not buyer.points.spend(perk.cost):
+	if not buyer.perks.wants(perk) or not buyer.points.spend(perk.cost):
 		return
 	buyer.perks.add(perk)
 	# A little toast from the bottle: it tips, pours and stands back up.
