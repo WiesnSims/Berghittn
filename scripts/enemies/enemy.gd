@@ -59,14 +59,15 @@ var _sidestep_left: float = 0.0
 var _sidestep_side: float = 1.0
 # Thrown back (Böllerschuss): the push that is left, flat.
 var _knock: Vector3
-# Dancing to the Harmonika: seconds left, and the polka's own damage (it hurts bosses too, who do
-# not dance), paid once a second to whoever played it.
+# Dancing to the Harmonika: seconds left.
 var _dance_left: float = 0.0
 var _dance_phase: float = 0.0
-var _polka_left: float = 0.0
-var _polka_dps: int = 0
-var _polka_tick: float = 0.0
-var _polka_source: Node3D
+# Damage paid out once a second for a while, by kind (&"polka", &"burn"); bosses take it too.
+var _dots: Dictionary = {}
+# Seconds until a scorch (the flame's ticks) pays hit points again.
+var _scorch_paid_left: float = 0.0
+# Flames on the body while it burns; built the first time it catches fire.
+var _burn_fx: CPUParticles3D
 # Came in through a window: lures outside (die Resi) no longer pull it back out.
 var _inside: bool = false
 var _lure: Node3D
@@ -99,8 +100,11 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 	max_health = health
 	_lunge_cooldown_left = 0.0
 	_dance_left = 0.0
-	_polka_left = 0.0
-	_polka_source = null
+	for dot: Dot in _dots.values():
+		dot.left = 0.0
+	_scorch_paid_left = 0.0
+	if _burn_fx:
+		_burn_fx.emitting = false
 	_slow_left = 0.0
 	_slow_factor = 1.0
 	global_transform = at
@@ -133,14 +137,41 @@ func receive_hit(amount: int, is_headshot: bool, is_melee: bool, source: Node3D)
 	return _take_hit(amount, is_headshot, is_melee, source)
 
 
-func _take_hit(amount: int, is_headshot: bool, is_melee: bool, source: Node3D) -> Hurtbox.Result:
+## A tick of the Brennkessel's flame: like a hit (twice as hard on a dancer), but it pays hit points
+## only once per SCORCH_PAY_INTERVAL, not eight times a second.
+func scorch(amount: int, source: Node3D) -> Hurtbox.Result:
+	if is_dancing():
+		amount *= Constants.DANCE_DAMAGE_MULTIPLIER
+	var pays: bool = _scorch_paid_left <= 0.0
+	if pays:
+		_scorch_paid_left = Constants.SCORCH_PAY_INTERVAL
+	return _take_hit(amount, false, false, source, pays)
+
+
+## Sets the enemy on fire: `dps` a second from `source` for `duration` (catching fire again while
+## burning starts the time over), with flames on the body. Bosses burn too.
+func ignite(duration: float, dps: int, source: Node3D) -> void:
+	if not is_alive():
+		return
+	_add_dot(&"burn", duration, dps, source)
+	if _burn_fx == null:
+		_burn_fx = _build_burn_fx()
+	_burn_fx.emitting = true
+
+
+func is_burning() -> bool:
+	return is_alive() and _dots.has(&"burn") and (_dots[&"burn"] as Dot).left > 0.0
+
+
+func _take_hit(amount: int, is_headshot: bool, is_melee: bool, source: Node3D, pays: bool = true) -> Hurtbox.Result:
 	if not is_alive():
 		return Hurtbox.Result.IGNORED
 	health -= amount
 	_hit_flash()
 	if health > 0:
 		_flinch(is_headshot)
-		Events.enemy_damaged.emit(self, amount, is_headshot, source)
+		if pays:
+			Events.enemy_damaged.emit(self, amount, is_headshot, source)
 		return Hurtbox.Result.HIT
 	if is_headshot and amount >= data.head_pop_damage:
 		_pop_head()
@@ -164,11 +195,7 @@ func apply_slow(factor: float, duration: float) -> void:
 func dance(duration: float, dps: int, source: Node3D) -> void:
 	if not is_alive():
 		return
-	if _polka_left <= 0.0:
-		_polka_tick = 0.0
-	_polka_left = maxf(_polka_left, duration)
-	_polka_dps = dps
-	_polka_source = source
+	_add_dot(&"polka", duration, dps, source)
 	if data.is_boss:
 		return
 	if _dance_left <= 0.0:
@@ -236,8 +263,9 @@ func _physics_process(delta: float) -> void:
 		_slow_left -= delta
 		if _slow_left <= 0.0:
 			_slow_factor = 1.0
-	if _polka_left > 0.0 and is_alive():
-		_polka(delta)
+	_scorch_paid_left -= delta
+	if not _dots.is_empty() and is_alive():
+		_tick_dots(delta)
 	if _knock != Vector3.ZERO and (_state == State.CHASING or _state == State.ATTACKING or _state == State.QUEUED):
 		_knocked(delta)
 		return
@@ -264,13 +292,42 @@ func _physics_process(delta: float) -> void:
 			_fall(delta)
 
 
-func _polka(delta: float) -> void:
-	_polka_left -= delta
-	_polka_tick += delta
-	# A second of dancing is paid as one hit (one flash, one set of points), not one per frame.
-	if _polka_tick >= 1.0:
-		_polka_tick -= 1.0
-		_take_hit(_polka_dps, false, false, _polka_source)
+func _add_dot(kind: StringName, duration: float, dps: int, source: Node3D) -> void:
+	var dot: Dot = _dots.get(kind)
+	if dot == null:
+		dot = Dot.new()
+		_dots[kind] = dot
+	if dot.left <= 0.0:
+		dot.tick = 0.0
+	dot.left = maxf(dot.left, duration)
+	dot.dps = dps
+	dot.source = source
+
+
+func _tick_dots(delta: float) -> void:
+	for kind: StringName in _dots:
+		var dot: Dot = _dots[kind]
+		if dot.left <= 0.0:
+			continue
+		dot.left -= delta
+		dot.tick += delta
+		# A second of it is paid as one hit (one flash, one set of points), not one per frame.
+		if dot.tick >= 1.0:
+			dot.tick -= 1.0
+			_take_hit(dot.dps, false, false, dot.source)
+			if not is_alive():
+				return
+		if kind == &"burn" and dot.left <= 0.0 and _burn_fx:
+			_burn_fx.emitting = false
+
+
+func _build_burn_fx() -> CPUParticles3D:
+	var fx: CPUParticles3D = Flames.particles(24, 0.5, Vector2(0.22, 0.3))
+	fx.position = Vector3(0.0, 1.0, 0.0)
+	fx.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	fx.emission_box_extents = Vector3(0.25, 0.6, 0.15)
+	_visual.add_child(fx)
+	return fx
 
 
 func _dancing(delta: float) -> void:
@@ -641,6 +698,8 @@ func _leave_window() -> void:
 
 func _die(is_headshot: bool, is_melee: bool, source: Node3D) -> void:
 	_state = State.DEAD
+	if _burn_fx:
+		_burn_fx.emitting = false
 	_leave_window()
 	collision_layer = 0
 	collision_mask = Constants.LAYER_WORLD
@@ -777,3 +836,11 @@ static func _flat(v: Vector3) -> Vector3:
 static func _yaw_towards(direction: Vector3) -> float:
 	# Godot models face -Z.
 	return atan2(-direction.x, -direction.z)
+
+
+## Damage paid out once a second for a while (the polka, burning).
+class Dot:
+	var left: float = 0.0
+	var dps: int = 0
+	var tick: float = 0.0
+	var source: Node3D

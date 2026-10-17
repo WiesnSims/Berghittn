@@ -214,6 +214,9 @@ Rules:
     cannot shoot. Out of rounds the music stops and the gun reloads. Holds a doorway or buys time
     to walk out of a crowd; the polka is the setup for switching to a gun and hitting dancers twice
     as hard.
+  - `brennkessel`: the Brennlacke (press): a gulp of 20 fuel squirted in an arc; where it comes down
+    it spreads into a burning puddle 4 m across that sets alight whoever walks through it for 6 s
+    (10 a second, 3 s after leaving it). Covers a doorway or a window while the flame works elsewhere.
   - `rodelkanone`: the Kehre (press): a sled shot with a double charge (two rounds) that banks off
     walls up to three times instead of breaking and runs 25 m; for rooms and corridors where a
     straight 15 m never fits.
@@ -298,6 +301,12 @@ Alpine folk culture.
 - **Brennkessel-Werfer:** a copper schnaps still strapped to the back with a
   hose. Continuous flame cone, 8 m range, 15 damage per tick plus burning
   (10 damage/s for 3 s). Consumes fuel while the trigger is held.
+  Details (M5): 8 ticks a second while held, one unit of fuel each (100 / 200, about 12 s of
+  flame); the cone is narrow (12° each side of the aim), walls shield, and the stream is drawn only
+  as far as the first wall. Burning lasts 3 s after a body last stood in the flame, and bosses burn
+  too. Hit points come once a second per body, not once a tick (play-test economy). Burning bodies
+  carry flames. The gauge on the lance shows the fuel left; the reload is four strokes of the pump on
+  the still (3.5 s) while the needle climbs back. In the chest at weight 1.
 - **Steirische Harmonika:** an accordion. Firing plays a short polka that
   makes all enemies within 8 m "dance": they stop attacking for 4 s, take
   20 damage per second, and take double damage from other weapons while

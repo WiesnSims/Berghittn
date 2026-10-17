@@ -191,6 +191,16 @@ active at the start, an enemy makes it into the Stube. Both catch spots where bo
 navmesh thinks are fine.
 
 ```
+godot --headless --fixed-fps 60 res://tests/m5_brennkessel.tscn
+```
+
+The Brennkessel-Werfer: two seconds of flame (16 fuel) on a crowd, 15 a tick to everyone in the cone
+(not beside it, not past 8 m, not behind a wall), set on fire and burning 10 a second until 3 s after
+the flame, hit points once a second instead of per tick, the Krampus burning too; the Brennlacke
+(20 fuel, a burning puddle that lights whoever stands in it, not someone 4 m off, gone after 6 s);
+the tick animation length and the chest weight.
+
+```
 godot --headless --fixed-fps 60 res://tests/m3_smoke.tscn
 ```
 
@@ -232,7 +242,7 @@ frame with the HUD, or shooting an enemy (wall puffs, hit flash, casings, head p
 visuals without playing.
 
 ```
-godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne|knoedel|glocke|fladen|boeller|rodel|harmonika
+godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne|knoedel|glocke|fladen|boeller|rodel|harmonika|brennkessel
 ```
 
 Also needs a window: one frame per zone (all doors open), the wall-buys and a door mid-swing; or

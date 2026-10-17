@@ -55,6 +55,8 @@ messages = {
 [&"", &"HIT_KRACH"]: [&"KRACH!"],
 [&"", &"WEAPON_HARMONIKA"]: [&"Steirische Harmonika"],
 [&"", &"HIT_JUCHHE"]: [&"JUCHHE!"],
+[&"", &"WEAPON_BRENNKESSEL"]: [&"Brennkessel-Werfer"],
+[&"", &"HIT_WUSCH"]: [&"WUSCH!"],
 [&"", &"EVENT_ALPHORN_READY"]: [&"Des Alphorn hängt jetzt in da Seilbahn!"],
 [&"", &"HIT_SPLAT"]: [&"SPLATSCH!"],
 [&"", &"PERK_ENZIAN"]: [&"Enzian"],

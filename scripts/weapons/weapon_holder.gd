@@ -519,6 +519,73 @@ func blast(half_angle: float, reach: float, amount: int, push: float) -> int:
 ## takes `amount` (before perks), and enemies that survive are thrown back; 180 degrees is all around
 ## (an explosion). Returns how many were hit.
 func area_hit(center: Vector3, forward: Vector3, half_angle: float, reach: float, amount: int, push: float) -> int:
+	var hit: int = 0
+	for body: Dictionary in _bodies_in(center, forward, half_angle, reach):
+		var hurtbox: Hurtbox = body.hurtbox
+		var to_target: Vector3 = body.to_target
+		var result: Hurtbox.Result = hurtbox.take_hit(_damage(amount), 1.0, false, _shooter)
+		if result == Hurtbox.Result.IGNORED:
+			continue
+		hit += 1
+		_hit_puffs.play(body.target, -to_target.normalized())
+		hit_confirmed.emit(false, result == Hurtbox.Result.KILLED)
+		var enemy := hurtbox.receiver as Enemy
+		if enemy and enemy.is_alive():
+			var flat := Vector3(to_target.x, 0.0, to_target.z)
+			var away: Vector3 = flat.normalized() if flat.length() > 0.05 else Vector3(forward.x, 0.0, forward.z).normalized()
+			var falloff: float = lerpf(1.0, 0.5, clampf(body.distance / reach, 0.0, 1.0))
+			# Heavy bodies are shoved less, but still visibly: by the root of how much they flinch.
+			enemy.apply_knockback(away * push * falloff * sqrt(enemy.data.flinch_multiplier))
+	return hit
+
+
+## Every body within `reach` of the shooter, walls shielding (the Harmonika's polka): it dances for
+## `duration` and takes `dps` (before perks) a second. Returns how many it reached.
+func dance_around(reach: float, duration: float, dps: int) -> int:
+	var reached: int = 0
+	for body: Dictionary in _bodies_in(global_position, -global_basis.z, 180.0, reach):
+		var enemy := (body.hurtbox as Hurtbox).receiver as Enemy
+		if enemy and enemy.is_alive():
+			enemy.dance(duration, _damage(dps), _shooter)
+			reached += 1
+	return reached
+
+
+## The Brennkessel's flame: every body within `reach` and `half_angle` degrees of the aim, walls
+## shielding, takes `amount` (before perks) and catches fire, burning for `burn_dps` (before perks)
+## a second for `burn_time`. Hit points are paid once a second per body, not per tick (Enemy.scorch).
+func scorch(half_angle: float, reach: float, amount: int, burn_dps: int, burn_time: float) -> int:
+	var hit: int = 0
+	for body: Dictionary in _bodies_in(global_position, -global_basis.z, half_angle, reach):
+		var enemy := (body.hurtbox as Hurtbox).receiver as Enemy
+		if enemy == null or not enemy.is_alive():
+			continue
+		var result: Hurtbox.Result = enemy.scorch(_damage(amount), _shooter)
+		if result == Hurtbox.Result.IGNORED:
+			continue
+		hit += 1
+		hit_confirmed.emit(false, result == Hurtbox.Result.KILLED)
+		if enemy.is_alive():
+			enemy.ignite(burn_time, _damage(burn_dps), _shooter)
+	return hit
+
+
+## Sets every body within `reach` of `center` on fire (a burning puddle): `burn_dps` (before perks) a
+## second for `burn_time`, walls shielding. Returns how many.
+func ignite_around(center: Vector3, reach: float, burn_dps: int, burn_time: float) -> int:
+	var lit: int = 0
+	for body: Dictionary in _bodies_in(center, Vector3.FORWARD, 180.0, reach):
+		var enemy := (body.hurtbox as Hurtbox).receiver as Enemy
+		if enemy and enemy.is_alive():
+			enemy.ignite(burn_time, _damage(burn_dps), _shooter)
+			lit += 1
+	return lit
+
+
+## The bodies (not heads) an area reaches: within `reach` of `center` and `half_angle` degrees of
+## `forward` (180 = all around), one per receiver, with no wall between (window openings let it
+## through). Each as {hurtbox, target (its middle), to_target, distance}.
+func _bodies_in(center: Vector3, forward: Vector3, half_angle: float, reach: float) -> Array[Dictionary]:
 	var sphere := SphereShape3D.new()
 	sphere.radius = reach + Constants.AREA_BODY_MARGIN
 	var query := PhysicsShapeQueryParameters3D.new()
@@ -528,11 +595,11 @@ func area_hit(center: Vector3, forward: Vector3, half_angle: float, reach: float
 	query.collide_with_areas = true
 	query.collide_with_bodies = false
 	var min_dot: float = cos(deg_to_rad(half_angle))
-	var struck: Dictionary = {}
+	var seen: Dictionary = {}
+	var bodies: Array[Dictionary] = []
 	for found: Dictionary in get_world_3d().direct_space_state.intersect_shape(query, Constants.AREA_MAX_TARGETS):
 		var hurtbox := found.collider as Hurtbox
-		# Body boxes: one hit per receiver, and a sound wave has no headshots.
-		if hurtbox == null or hurtbox.is_head or struck.has(hurtbox.receiver):
+		if hurtbox == null or hurtbox.is_head or seen.has(hurtbox.receiver):
 			continue
 		var target: Vector3 = hurtbox.global_position + Vector3.UP * Constants.AREA_AIM_HEIGHT * hurtbox.scale.y
 		var to_target: Vector3 = target - center
@@ -543,54 +610,12 @@ func area_hit(center: Vector3, forward: Vector3, half_angle: float, reach: float
 		var off_axis: float = (to_target - forward * to_target.dot(forward)).length()
 		if half_angle < 180.0 and to_target.normalized().dot(forward) < min_dot and not (to_target.dot(forward) > 0.0 and off_axis < Constants.AREA_BODY_MARGIN):
 			continue
-		# Walls stop it; the window openings themselves do not.
 		var line := PhysicsRayQueryParameters3D.create(center, target, Constants.LAYER_WORLD, _exclude)
 		if not get_world_3d().direct_space_state.intersect_ray(line).is_empty():
 			continue
-		struck[hurtbox.receiver] = true
-		var result: Hurtbox.Result = hurtbox.take_hit(_damage(amount), 1.0, false, _shooter)
-		if result == Hurtbox.Result.IGNORED:
-			continue
-		_hit_puffs.play(target, -to_target.normalized())
-		hit_confirmed.emit(false, result == Hurtbox.Result.KILLED)
-		var enemy := hurtbox.receiver as Enemy
-		if enemy and enemy.is_alive():
-			var flat := Vector3(to_target.x, 0.0, to_target.z)
-			var away: Vector3 = flat.normalized() if flat.length() > 0.05 else Vector3(forward.x, 0.0, forward.z).normalized()
-			var falloff: float = lerpf(1.0, 0.5, clampf(distance / reach, 0.0, 1.0))
-			# Heavy bodies are shoved less, but still visibly: by the root of how much they flinch.
-			enemy.apply_knockback(away * push * falloff * sqrt(enemy.data.flinch_multiplier))
-	return struck.size()
-
-
-## Every body within `reach` of the shooter, walls shielding (the Harmonika's polka): it dances for
-## `duration` and takes `dps` (before perks) a second. Returns how many it reached.
-func dance_around(reach: float, duration: float, dps: int) -> int:
-	var center: Vector3 = global_position
-	var sphere := SphereShape3D.new()
-	sphere.radius = reach + Constants.AREA_BODY_MARGIN
-	var query := PhysicsShapeQueryParameters3D.new()
-	query.shape = sphere
-	query.transform = Transform3D(Basis.IDENTITY, center)
-	query.collision_mask = Constants.LAYER_HITBOX
-	query.collide_with_areas = true
-	query.collide_with_bodies = false
-	var reached: Dictionary = {}
-	for found: Dictionary in get_world_3d().direct_space_state.intersect_shape(query, Constants.AREA_MAX_TARGETS):
-		var hurtbox := found.collider as Hurtbox
-		var enemy: Enemy = hurtbox.receiver as Enemy if hurtbox else null
-		if enemy == null or reached.has(enemy) or not enemy.is_alive():
-			continue
-		var target: Vector3 = hurtbox.global_position + Vector3.UP * Constants.AREA_AIM_HEIGHT * hurtbox.scale.y
-		if target.distance_to(center) > reach + Constants.AREA_BODY_MARGIN:
-			continue
-		# Walls stop the music; the window openings themselves do not.
-		var line := PhysicsRayQueryParameters3D.create(center, target, Constants.LAYER_WORLD, _exclude)
-		if not get_world_3d().direct_space_state.intersect_ray(line).is_empty():
-			continue
-		reached[enemy] = true
-		enemy.dance(duration, _damage(dps), _shooter)
-	return reached.size()
+		seen[hurtbox.receiver] = true
+		bodies.append({"hurtbox": hurtbox, "target": target, "to_target": to_target, "distance": distance})
+	return bodies
 
 
 ## One body hit for behaviors that find their own targets (the Rodelkanone's sled): `amount` (before

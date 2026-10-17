@@ -310,6 +310,15 @@ const DANCE_LINGER: float = 1.0
 const DANCE_SPIN: float = 5.0
 const DANCE_HOP: float = 0.18
 const DANCE_HOP_RATE: float = 2.5
+# Brennkessel-Werfer: how often the flame's ticks pay hit points (seconds; it hits 8 times a second),
+# and how a body it reaches burns: damage a second, for how long after it last caught fire.
+const SCORCH_PAY_INTERVAL: float = 1.0
+const BURN_DPS: int = 10
+const BURN_TIME: float = 3.0
+# Brennlacke: puddles kept in a pool, how long one burns, how often it sets what stands in it alight.
+const LACKE_POOL: int = 4
+const LACKE_TIME: float = 6.0
+const LACKE_INTERVAL: float = 0.25
 # Screen shake from blasts: seconds it lasts and how fast it trembles (cycles per second).
 const SHAKE_TIME: float = 0.45
 const SHAKE_FREQUENCY: float = 18.0
