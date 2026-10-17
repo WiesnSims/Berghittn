@@ -110,6 +110,18 @@ doors, the self-opening last door, the Jagdflinte, Stutzen and Repetierer wall-b
 the chamber rule for the new guns, and one payout per shotgun blast (not per pellet).
 
 ```
+godot --headless --fixed-fps 60 res://tests/m5_core.tscn
+godot --headless --fixed-fps 60 res://tests/m5_events.tscn
+godot --headless --fixed-fps 60 res://tests/stuck_hunt.tscn
+```
+
+`m5_core`: the enemy mix per wave, boss waves, the Perchte lunge, bullet penetration, every Schnaps perk
+and the Brettljause, the Hüttentruhe (specials only, take, let sink, swap), the Repetierer's fanning and
+the Munitionskiste. `m5_events`: die Resi, the Bierfassl, the Murmeltier and the Deitscha Tourist with
+the Eisstock (section 8a). `stuck_hunt`: all zones open, a crowd of every enemy type chasing a player
+who hops about the map; flags enemies that stop making headway.
+
+```
 godot --headless --fixed-fps 60 res://tests/m5_alphorn.tscn
 ```
 
@@ -170,11 +182,6 @@ slanted wall to reach round it and banking round the Stube without passing throu
 pool, the next sled ready with the gun, and the chest weight.
 
 ```
-godot --headless --fixed-fps 60 res://tests/upstairs.tscn
-godot --headless --fixed-fps 60 res://tests/spawn_paths.tscn
-```
-
-```
 godot --headless --fixed-fps 60 res://tests/m5_harmonika.tscn
 ```
 
@@ -184,11 +191,6 @@ dancer lands twice as hard, 20 a second for 4 s; the Krampus takes the damage bu
 the held Landler (a round per 1.5 s, half walking speed, newcomers dancing too, dancing past 4 s for
 as long as it plays, stopping and reloading when the rounds run out); the polka animation length
 and the chest weight.
-
-`upstairs`: the player walks up the hall stairs, and an enemy follows a player up every level change
-(gallery stairs, garden steps, hay-loft ramp, gondola platform). `spawn_paths`: from every spawn point
-active at the start, an enemy makes it into the Stube. Both catch spots where bodies get stuck that the
-navmesh thinks are fine.
 
 ```
 godot --headless --fixed-fps 60 res://tests/m5_brennkessel.tscn
@@ -201,10 +203,6 @@ the flame, hit points once a second instead of per tick, the Krampus burning too
 the tick animation length and the chest weight.
 
 ```
-godot --headless --fixed-fps 60 res://tests/m3_smoke.tscn
-```
-
-```
 godot --headless --fixed-fps 60 res://tests/m5_goassl.tscn
 ```
 
@@ -213,11 +211,6 @@ right in front does not swing, a stunned one stands still, free again after 1.5 
 5 m out; the Krampus takes the crack unstunned; V held past the crack lashes and drags in a wanderer
 6 m out (slow walk, dazed, stunned after letting go), nothing to lash 9 m out; the chest handing it
 into the melee slot.
-
-A bot holds the middle of the Stube and plays to wave 3 (shooting head and body, shovel kills, repairing
-in the break). Checks wave sizes, spawn interval and break length against the formulas, that no enemy
-climbs through a window that still has boards, and that the points (and the HUD) match the bot's own
-hits, kills and repairs. Exits non-zero on failure.
 
 ```
 godot --headless --fixed-fps 60 res://tests/m5_mistgabel.tscn
@@ -229,10 +222,6 @@ and it and the crowd where it lands take 80, the others nothing; the Krampus too
 3 s, the fork throws by itself.
 
 ```
-godot --headless --fixed-fps 60 res://tests/melee_arc.tscn
-```
-
-```
 godot --headless --fixed-fps 60 res://tests/m5_krampusrute.tscn
 ```
 
@@ -240,6 +229,42 @@ The Krampus-Rute: dropped where the Krampus falls (announced) and taken with E o
 sends the struck one and the one behind it running from the player for 3 s, attacking nobody, not one
 6 m off, not the Krampus; the Larve (V held) makes the one 6 m ahead flee for as long as it is held,
 not one behind; not in the chest.
+
+```
+godot --headless --fixed-fps 60 res://tests/m5_acceptance.tscn
+```
+
+M5 acceptance "all items purchasable": every weapon and piece of equipment in `data/` has a way in
+(the start, a wall-buy, the Hüttentruhe, the Krampus's drop, the Deitscha Tourist); then, with all
+seven doors bought through the real doors, every wall-buy (the Alphorn once wave 10 comes), Schnaps
+bottle, Brettljause item, the Munitionskiste and the Hüttentruhe can be walked to from the start, E
+finds it and buying it gives what it sells, and the chest hands out every weapon in its pool. "Wave 10
+reachable" is `m5_waves` (the real wave manager, waves 1 to 10 with both boss waves, against an
+immortal bot; every enemy type shows up and none gets stuck).
+
+```
+godot --headless --fixed-fps 60 res://tests/m5_waves.tscn
+godot --headless --fixed-fps 60 res://tests/upstairs.tscn
+godot --headless --fixed-fps 60 res://tests/spawn_paths.tscn
+```
+
+`upstairs`: the player walks up the hall stairs, and an enemy follows a player up every level change
+(gallery stairs, garden steps, hay-loft ramp, gondola platform). `spawn_paths`: from every spawn point
+active at the start, an enemy makes it into the Stube. Both catch spots where bodies get stuck that the
+navmesh thinks are fine.
+
+```
+godot --headless --fixed-fps 60 res://tests/m3_smoke.tscn
+```
+
+A bot holds the middle of the Stube and plays to wave 3 (shooting head and body, shovel kills, repairing
+in the break). Checks wave sizes, spawn interval and break length against the formulas, that no enemy
+climbs through a window that still has boards, and that the points (and the HUD) match the bot's own
+hits, kills and repairs. Exits non-zero on failure.
+
+```
+godot --headless --fixed-fps 60 res://tests/melee_arc.tscn
+```
 
 One shovel swing must hit every enemy in the arc in front of the player and none behind.
 

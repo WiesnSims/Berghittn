@@ -75,7 +75,7 @@ messages = {
 [&"", &"PERK_MARILLENBRAND_DESC"]: [&"reloading an empty magazine sets off a black-powder Böller around you"],
 [&"", &"PERK_JAGERTEE_DESC"]: [&"stand still or crouch for 2 s and you heal three times as fast"],
 [&"", &"PERK_ZIRBENSCHNAPS_DESC"]: [&"every gun goes through one more enemy"],
-[&"", &"UI_PERK_BUY"]: [&"Press E to drink a %s (%d): %s"],
+[&"", &"UI_PERK_BUY"]: [&"Press E for a glass of %s (%d): %s"],
 [&"", &"UI_PERK_NEED"]: [&"%s: %d points needed"],
 [&"", &"UI_CHEST_BUY"]: [&"Press E to open the Hüttentruhe (%d)"],
 [&"", &"UI_CHEST_NEED"]: [&"Hüttentruhe: %d points needed"],
