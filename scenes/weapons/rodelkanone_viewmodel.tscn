@@ -1,0 +1,216 @@
+[gd_scene load_steps=18 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/rodel_viewmodel.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="Wood"]
+albedo_color = Color(0.86, 0.62, 0.38, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="DarkWood"]
+albedo_color = Color(0.6, 0.38, 0.2, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Iron"]
+albedo_color = Color(0.3, 0.3, 0.32, 1)
+metallic = 0.6
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Rope"]
+albedo_color = Color(0.85, 0.15, 0.12, 1)
+
+[sub_resource type="StandardMaterial3D" id="Flash"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.97, 0.92, 0.75)
+
+[sub_resource type="QuadMesh" id="FlashQuad"]
+material = SubResource("Flash")
+size = Vector2(0.4, 0.4)
+
+[sub_resource type="BoxMesh" id="FloorMesh"]
+material = SubResource("DarkWood")
+size = Vector3(0.13, 0.015, 0.44)
+
+[sub_resource type="BoxMesh" id="RailMesh"]
+material = SubResource("DarkWood")
+size = Vector3(0.012, 0.045, 0.44)
+
+[sub_resource type="BoxMesh" id="StrapMesh"]
+material = SubResource("Iron")
+size = Vector3(0.16, 0.012, 0.02)
+
+[sub_resource type="CylinderMesh" id="ChamberMesh"]
+material = SubResource("Iron")
+top_radius = 0.045
+bottom_radius = 0.05
+height = 0.1
+radial_segments = 10
+rings = 1
+
+[sub_resource type="BoxMesh" id="GripMesh"]
+material = SubResource("DarkWood")
+size = Vector3(0.04, 0.12, 0.05)
+
+[sub_resource type="BoxMesh" id="StockMesh"]
+material = SubResource("DarkWood")
+size = Vector3(0.05, 0.07, 0.16)
+
+[sub_resource type="BoxMesh" id="RunnerMesh"]
+material = SubResource("DarkWood")
+size = Vector3(0.01, 0.016, 0.2)
+
+[sub_resource type="BoxMesh" id="TipMesh"]
+material = SubResource("DarkWood")
+size = Vector3(0.01, 0.016, 0.045)
+
+[sub_resource type="BoxMesh" id="SlatMesh"]
+material = SubResource("Wood")
+size = Vector3(0.1, 0.008, 0.03)
+
+[sub_resource type="BoxMesh" id="RopeMesh"]
+material = SubResource("Rope")
+size = Vector3(0.08, 0.006, 0.006)
+
+[node name="RodelkanoneViewmodel" type="Node3D"]
+script = ExtResource("1")
+kick_distance = 0.1
+kick_angle = 12.0
+kick_time = 0.3
+reload_offset = Vector3(-0.03, 0.02, 0.02)
+lower_drop = 0.35
+
+[node name="Model" type="Node3D" parent="."]
+position = Vector3(0.22, -0.24, -0.36)
+rotation = Vector3(0.12, 0.08, 0)
+
+[node name="Floor" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, -0.03, -0.12)
+cast_shadow = 0
+mesh = SubResource("FloorMesh")
+
+[node name="RailL" type="MeshInstance3D" parent="Model"]
+position = Vector3(-0.065, -0.01, -0.12)
+cast_shadow = 0
+mesh = SubResource("RailMesh")
+
+[node name="RailR" type="MeshInstance3D" parent="Model"]
+position = Vector3(0.065, -0.01, -0.12)
+cast_shadow = 0
+mesh = SubResource("RailMesh")
+
+[node name="StrapFront" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, -0.042, -0.3)
+cast_shadow = 0
+mesh = SubResource("StrapMesh")
+
+[node name="StrapBack" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, -0.042, 0.04)
+cast_shadow = 0
+mesh = SubResource("StrapMesh")
+
+[node name="Chamber" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, -0.005, 0.15)
+rotation = Vector3(-1.5708, 0, 0)
+cast_shadow = 0
+mesh = SubResource("ChamberMesh")
+
+[node name="Grip" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, -0.1, 0.08)
+rotation = Vector3(0.3, 0, 0)
+cast_shadow = 0
+mesh = SubResource("GripMesh")
+
+[node name="Stock" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, -0.04, 0.27)
+cast_shadow = 0
+mesh = SubResource("StockMesh")
+
+[node name="Loaded" type="Node3D" parent="Model"]
+position = Vector3(0, -0.012, -0.14)
+
+[node name="RunnerL" type="MeshInstance3D" parent="Model/Loaded"]
+position = Vector3(-0.04, 0, 0)
+cast_shadow = 0
+mesh = SubResource("RunnerMesh")
+
+[node name="RunnerR" type="MeshInstance3D" parent="Model/Loaded"]
+position = Vector3(0.04, 0, 0)
+cast_shadow = 0
+mesh = SubResource("RunnerMesh")
+
+[node name="TipL" type="MeshInstance3D" parent="Model/Loaded"]
+position = Vector3(-0.04, 0.014, -0.112)
+rotation = Vector3(0.95, 0, 0)
+cast_shadow = 0
+mesh = SubResource("TipMesh")
+
+[node name="TipR" type="MeshInstance3D" parent="Model/Loaded"]
+position = Vector3(0.04, 0.014, -0.112)
+rotation = Vector3(0.95, 0, 0)
+cast_shadow = 0
+mesh = SubResource("TipMesh")
+
+[node name="Slat1" type="MeshInstance3D" parent="Model/Loaded"]
+position = Vector3(0, 0.022, -0.06)
+cast_shadow = 0
+mesh = SubResource("SlatMesh")
+
+[node name="Slat2" type="MeshInstance3D" parent="Model/Loaded"]
+position = Vector3(0, 0.022, -0.015)
+cast_shadow = 0
+mesh = SubResource("SlatMesh")
+
+[node name="Slat3" type="MeshInstance3D" parent="Model/Loaded"]
+position = Vector3(0, 0.022, 0.03)
+cast_shadow = 0
+mesh = SubResource("SlatMesh")
+
+[node name="Slat4" type="MeshInstance3D" parent="Model/Loaded"]
+position = Vector3(0, 0.022, 0.075)
+cast_shadow = 0
+mesh = SubResource("SlatMesh")
+
+[node name="Rope" type="MeshInstance3D" parent="Model/Loaded"]
+position = Vector3(0, 0.026, -0.13)
+cast_shadow = 0
+mesh = SubResource("RopeMesh")
+
+[node name="Feeding" type="Node3D" parent="Model"]
+position = Vector3(0, -0.012, -0.14)
+
+[node name="RunnerL" type="MeshInstance3D" parent="Model/Feeding"]
+position = Vector3(-0.04, 0, 0)
+cast_shadow = 0
+mesh = SubResource("RunnerMesh")
+
+[node name="RunnerR" type="MeshInstance3D" parent="Model/Feeding"]
+position = Vector3(0.04, 0, 0)
+cast_shadow = 0
+mesh = SubResource("RunnerMesh")
+
+[node name="Slat1" type="MeshInstance3D" parent="Model/Feeding"]
+position = Vector3(0, 0.022, -0.05)
+cast_shadow = 0
+mesh = SubResource("SlatMesh")
+
+[node name="Slat2" type="MeshInstance3D" parent="Model/Feeding"]
+position = Vector3(0, 0.022, 0.0)
+cast_shadow = 0
+mesh = SubResource("SlatMesh")
+
+[node name="Slat3" type="MeshInstance3D" parent="Model/Feeding"]
+position = Vector3(0, 0.022, 0.05)
+cast_shadow = 0
+mesh = SubResource("SlatMesh")
+
+[node name="MuzzleFlash" type="Node3D" parent="Model"]
+position = Vector3(0, 0, -0.4)
+
+[node name="Quad" type="MeshInstance3D" parent="Model/MuzzleFlash"]
+cast_shadow = 0
+mesh = SubResource("FlashQuad")
+
+[node name="Light" type="OmniLight3D" parent="Model/MuzzleFlash"]
+light_color = Color(1, 0.9, 0.75, 1)
+light_energy = 3.0
+omni_range = 6.0

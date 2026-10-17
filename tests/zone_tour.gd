@@ -16,6 +16,8 @@ extends Node
 ## knoedel: the Knödelwerfer in hand, a dumpling lobbed into a crowd (flight, burst, pile), the
 ## Knödeltris, the reload.
 ## pfanne: the Küche wall-buy, the pan swung into a wanderer (BONK!), and held up as a guard.
+## rodel: the Rodelkanone in hand, a sled run through a line of wanderers on the pasture, the
+## reload, then the Kehre banking round the Stube.
 ## alphorn: the horn in hand, a blast into a crowd on the pasture, the Echo, the reload, and the horn
 ## shown over the Hüttentruhe.
 
@@ -90,6 +92,8 @@ func _ready() -> void:
 		await _fladen_tour(main)
 	elif mode == "boeller":
 		await _boeller_tour(main)
+	elif mode == "rodel":
+		await _rodel_tour(main)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -667,3 +671,39 @@ func _boeller_tour(main: Node) -> void:
 	weapons._cooldown = 0.0
 	weapons.fire_secondary()
 	await _save_series("boeller_double", 10, 0.08)
+
+
+func _rodel_tour(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	var player := main.get_node("Player") as Player
+	var waves := main.get_node("WaveManager") as WaveManager
+	var gun: WeaponData = load("res://data/weapons/rodelkanone.tres")
+	var weapons: WeaponHolder = player.weapons
+	var stube: Vector3 = player.global_position
+	weapons.give_weapon(gun)
+	player.global_position = Vector3(10.0, -0.3, 31.0)
+	player.rotation.y = -PI * 0.5
+	(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(-6.0)
+	for i: int in 5:
+		var enemy: Enemy = waves._create_enemy()
+		var spot := Vector3(14.0 + i * 2.2, -0.3, 31.0 + (0.4 if i % 2 == 0 else -0.4))
+		enemy.activate(load("res://data/enemies/knappe.tres" if i == 2 else "res://data/enemies/wanderer.tres"), 12, Transform3D(Basis.IDENTITY, spot).looking_at(Vector3(10.0, -0.3, 31.0), Vector3.UP))
+		enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
+		enemy.set_physics_process(false)
+	await get_tree().create_timer(0.6).timeout
+	await _save("rodel_idle")
+	weapons._fire()
+	await _save_series("rodel_shot", 14, 0.07)
+	await get_tree().create_timer(1.0).timeout
+	weapons.mag = 0
+	weapons.start_reload()
+	await _save_series("rodel_reload", 8, gun.reload_time / 8.0)
+	await get_tree().create_timer(0.5).timeout
+	# Indoors: the Kehre sent at a slant across the Stube, to bank round the hall.
+	player.global_position = Vector3(5.5, stube.y, 4.5)
+	player.look_at(Vector3(-9.0, stube.y, -4.0), Vector3.UP)
+	(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(-10.0)
+	await get_tree().create_timer(0.5).timeout
+	weapons._cooldown = 0.0
+	weapons.fire_secondary()
+	await _save_series("rodel_kehre", 16, 0.1)
