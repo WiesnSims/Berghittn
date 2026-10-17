@@ -84,6 +84,7 @@ func _run() -> void:
 	await _ammo()
 	_chest()
 	_portal()
+	_cycles()
 
 	print("RESULT: %s" % ("PASS" if failures.is_empty() else "%d FAILED" % failures.size()))
 	get_tree().quit(1 if failures.size() > 0 else 0)
@@ -236,3 +237,23 @@ func _portal() -> void:
 	var through := PhysicsRayQueryParameters3D.create(Vector3(19.0, 3.0, 6.1), Vector3(24.0, 3.0, 6.1), Constants.LAYER_WORLD)
 	var blocked := PhysicsRayQueryParameters3D.create(Vector3(19.0, 2.0, 6.1), Vector3(24.0, 2.0, 6.1), Constants.LAYER_PLAYER_BLOCKER)
 	_check(space.intersect_ray(through).is_empty() and not space.intersect_ray(blocked).is_empty(), "the gondola portal is open, but players cannot walk out of it")
+	# Enemies in at either east window get past the ramp's foot along the wall, not round the outside.
+	var map: RID = player.get_world_3d().navigation_map
+	var south := Vector3(20.5, 0.0, 8.3)
+	var north := Vector3(20.5, 0.0, 0.3)
+	var path: PackedVector3Array = NavigationServer3D.map_get_path(map, south, north, true, 3)
+	var length: float = 0.0
+	for i: int in range(1, path.size()):
+		length += path[i - 1].distance_to(path[i])
+	_check(path.size() > 1 and path[-1].distance_to(north) < 0.5 and length < 10.0, "inside the Seilbahn, south to north window along the east wall: %.1f m" % length)
+
+
+func _cycles() -> void:
+	# Guns that work their action after a shot are ready the moment the animation ends.
+	for id: String in ["stutzen", "jagdflinte"]:
+		var gun: WeaponData = load("res://data/weapons/%s.tres" % id)
+		var model := gun.viewmodel.instantiate() as Viewmodel
+		var animation: float = model.fire_animation_time()
+		model.free()
+		_check(absf(1.0 / gun.fire_rate - animation) < 0.01, "%s fires again as its animation ends (%.2f s / %.2f s)" % [id, 1.0 / gun.fire_rate, animation])
+	_check(horn.cycle_ring and not (load("res://data/weapons/stutzen.tres") as WeaponData).cycle_ring, "only the Alphorn shows the ring between shots")

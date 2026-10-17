@@ -26,6 +26,7 @@ behavior = &"alphorn"
 area_angle = 30.0
 knockback = 16.0
 shake = 1.2
+cycle_ring = true
 viewmodel = ExtResource("2")
 secondary = 5
 secondary_rounds = 2

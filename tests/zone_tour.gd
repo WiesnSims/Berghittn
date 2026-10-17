@@ -24,6 +24,8 @@ const VIEWS: Array = [
 	["skiraum_wallbuy", Vector3(9.5, 1.6, -8.0), Vector3(7.3, 1.5, -8.0)],
 	["bootroom", Vector3(19.4, 1.7, -2.3), Vector3(19.4, 1.0, -15.0)],
 	["seilbahn", Vector3(8.5, 3.0, -0.3), Vector3(20.0, 1.5, 7.0)],
+	["seilbahn_portal", Vector3(16.0, 2.4, 3.0), Vector3(21.45, 2.2, 6.1)],
+	["seilbahn_portal_out", Vector3(28.0, 3.0, 2.0), Vector3(21.45, 3.0, 6.1)],
 	["schuppen", Vector3(8.0, 1.8, 10.3), Vector3(20.0, 2.0, 17.0)],
 	["schuppen_loft", Vector3(16.0, 5.2, 10.0), Vector3(9.0, 1.0, 18.0)],
 	["terrasse", Vector3(-10.0, 1.7, 7.0), Vector3(6.0, -1.0, 17.0)],

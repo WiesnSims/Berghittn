@@ -157,8 +157,8 @@ effects, see section 6a), `secondary` (what right click does, see the rules belo
 | Id | Name | Type | Damage | Fire rate (shots/s) | Mag / Reserve | Cost |
 |---|---|---|---|---|---|---|
 | `pistole` | Dienstpistole | semi-auto pistol | 25 | up to 10 (as fast as you click) | 8 / 64 | start weapon |
-| `jagdflinte` | Jagdflinte | double-barrel shotgun | 20 x 8 pellets | 1.5 | 2 / 24 | 500 (wall-buy, Stube) |
-| `stutzen` | Stutzen | bolt-action rifle | 120 | 0.8 | 5 / 40 | 750 (wall-buy, Skiraum) |
+| `jagdflinte` | Jagdflinte | double-barrel shotgun | 20 x 8 pellets | 3.3 (the recoil settles in 0.3 s) | 2 / 24 | 500 (wall-buy, Stube) |
+| `stutzen` | Stutzen | bolt-action rifle | 120 | 1.33 (the bolt is worked in 0.75 s) | 5 / 40 | 750 (wall-buy, Skiraum) |
 | `repetierer` | Repetierer | lever/repeater rifle | 90 (two shots for small enemies, play-test 2026-10-17) | 3 (5.5 fanned) | 10 / 80 | 1000 (chest only) |
 | `schaufel` | Schneeschaufel | melee | 70 | 1.2 | – | 0 (always equipped) |
 | `alphorn` | Alphorn | wonder weapon | 200 area | 0.5 | 6 / 18 | chest only, rare |
@@ -195,8 +195,9 @@ Rules:
     the player, 200 damage within 6 m in every direction and a harder shove; uses two notes. The
     panic button when surrounded.
 - Ready ring (play-test 2026-10-17): a ring around the crosshair fills while the gun reloads (amber)
-  and, on guns with at least 0.6 s between shots, while it cycles after a shot (white), and pulses
-  once when the gun is ready again.
+  and, for the Alphorn, between notes (white), and pulses once when the gun is ready again. Guns that
+  work an action after a shot fire again the moment the animation ends (play-test: the Stutzen's bolt
+  and the Jagdflinte's recoil had finished well before the gun could fire; fire rates set to match).
 - Semi-auto guns fire once per click, as fast as the player clicks, up to `fire_rate` (user request,
   2026-10-17); holding the button does not auto-fire. A click during the cycle is remembered for a
   moment and fires as soon as the gun is ready, so fast clicking is never swallowed.

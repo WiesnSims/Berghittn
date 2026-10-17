@@ -2,7 +2,7 @@ class_name Crosshair
 extends Control
 ## Drawn crosshair plus a hit marker that flashes on confirmed hits (red on kills). The arms move apart
 ## with the gun's bloom, so rapid fire visibly loosens the aim; the base gap stays small.
-## A ring around it fills while the gun reloads or, for slow guns, cycles after a shot, and pulses
+## A ring around it fills while the gun reloads or, for the Alphorn, between notes, and pulses
 ## once when it is ready again (play-test, Alphorn), so the wait can be read without looking away.
 
 @export var gap: float = 5.0
@@ -42,14 +42,14 @@ func set_spread(pixels: float) -> void:
 		queue_redraw()
 
 
-## The ready ring: `reload` and `cycle` are shares done (0..1) or -1. A cycle only shows on guns slow
-## enough to wait for (cycle_time at least READY_RING_MIN_CYCLE seconds).
-func set_progress(reload: float, cycle: float, cycle_time: float) -> void:
+## The ready ring: `reload` and `cycle` are shares done (0..1) or -1. A cycle only shows when
+## `show_cycle` (WeaponData.cycle_ring).
+func set_progress(reload: float, cycle: float, show_cycle: bool) -> void:
 	var was: float = _progress
 	_reloading = reload >= 0.0
 	if _reloading:
 		_progress = reload
-	elif cycle >= 0.0 and cycle_time >= Constants.READY_RING_MIN_CYCLE:
+	elif cycle >= 0.0 and show_cycle:
 		_progress = cycle
 	else:
 		_progress = -1.0

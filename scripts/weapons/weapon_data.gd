@@ -56,6 +56,9 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR }
 @export var area_angle: float = 0.0
 @export var knockback: float = 0.0
 @export var shake: float = 0.0
+## Show the ready ring at the crosshair while the gun cycles between shots (play-test: only for the
+## Alphorn's long gap; other guns show it in their animation, and fire again as it ends).
+@export var cycle_ring: bool = false
 @export var viewmodel: PackedScene
 @export var secondary: Secondary = Secondary.NONE
 ## Aiming (AIM and SCOPE): field of view when fully aimed (degrees), seconds to get there, and the

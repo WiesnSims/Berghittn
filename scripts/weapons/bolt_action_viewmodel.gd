@@ -3,8 +3,8 @@ extends Viewmodel
 ## Bolt-action rifle: after every shot the hand works the bolt (up, back, the casing flies out,
 ## forward, down). The reload opens the bolt, pushes a stripper clip of rounds in and closes it.
 
-## Pause after the shot before the bolt is worked, and how long the cycle takes. Must fit inside
-## the time between shots (1 / fire_rate). Seconds.
+## Pause after the shot before the bolt is worked, and how long the cycle takes; together they are
+## the time between shots (1 / fire_rate in stutzen.tres). Seconds.
 @export var bolt_delay: float = 0.15
 @export var bolt_time: float = 0.6
 ## How far the handle is lifted (degrees) and the bolt pulled back (metres).
@@ -23,6 +23,10 @@ extends Viewmodel
 func _ready() -> void:
 	super()
 	_clip.visible = false
+
+
+func fire_animation_time() -> float:
+	return bolt_delay + bolt_time
 
 
 func play_fire(_rounds: int = 1) -> void:

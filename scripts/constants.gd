@@ -241,10 +241,7 @@ const ENEMY_HIT_FLASH_TIME: float = 0.12
 const IMPACT_MARK_COUNT: int = 32
 const IMPACT_MARK_LIFETIME: float = 8.0
 const HIT_MARKER_TIME: float = 0.15
-# Ready ring at the crosshair (play-test, Alphorn): guns whose shot-to-shot time is at least this
-# show it cycling (Alphorn, Stutzen, Jagdflinte; not the pistol or the Repetierer), and seconds the
-# pulse takes when the gun is ready again.
-const READY_RING_MIN_CYCLE: float = 0.6
+# Ready ring at the crosshair (play-test, Alphorn): seconds the pulse takes when the gun is ready again.
 const READY_PULSE_TIME: float = 0.3
 const DAMAGE_FLASH_TIME: float = 0.4
 
