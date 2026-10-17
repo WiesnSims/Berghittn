@@ -13,34 +13,35 @@ const FOLDERS: Dictionary = {"sfx": &"Effects", "ambience": &"Ambience", "music"
 ## Sounds that loop: attached ones, the band, the wind.
 const LOOPS: Array[StringName] = [
 	&"flame_loop", &"kuhglocke_ring", &"resi_bell", &"eisstock_slide", &"fassl_roll", &"wind_loop",
-	&"fire_crackle", &"harmonika_play", &"band_menu", &"band_1", &"band_2", &"band_3", &"band_4",
-	&"band_5", &"band_6", &"band_7", &"band_8",
+	&"fire_crackle", &"harmonika_play", &"band_menu",
 ]
 ## Level per sound in dB: the synth writes every file at full scale, this sets the balance.
 const MIX: Dictionary = {
-	&"shot_pistole": -4.0, &"shot_jagdflinte": -2.0, &"shot_jagdflinte_both": 0.0, &"shot_stutzen": -2.0,
-	&"shot_repetierer": -3.0, &"dry_click": -6.0, &"mag_out": -8.0, &"mag_in": -6.0, &"break_open": -6.0,
+	&"shot_pistole": 0.0, &"shot_jagdflinte": 2.0, &"shot_jagdflinte_both": 3.0, &"shot_stutzen": 1.0,
+	&"shot_repetierer": 1.0, &"dry_click": -6.0, &"mag_out": -8.0, &"mag_in": -6.0, &"break_open": -6.0,
 	&"break_close": -6.0, &"bolt_open": -6.0, &"bolt_close": -6.0, &"lever_open": -4.0,
 	&"lever_close": -6.0, &"load_clunk": -8.0, &"load_ready": -8.0, &"weapon_raise": -10.0,
 	&"hitmarker": -12.0, &"headshot": -9.0, &"bellows": -8.0, &"alphorn_load": -8.0,
 	&"swing": -9.0, &"throw": -8.0, &"schaufel_hit": -3.0, &"pfanne_bonk": -2.0, &"goassl_crack": 2.0,
 	&"mistgabel_stab": -2.0, &"rute_hit": 0.0, &"block_hit": -3.0,
-	&"alphorn_blast": -1.0, &"alphorn_echo": -1.0, &"knoedel_launch": -5.0, &"knoedel_splat": -4.0,
+	&"alphorn_blast": -1.0, &"alphorn_echo": -1.0, &"knoedel_launch": -5.0, &"knoedel_splat": -4.0, &"knoedel_ready": -8.0,
 	&"rodel_launch": -4.0, &"rodel_hit": -3.0, &"flame_loop": -8.0, &"flame_start": -5.0,
-	&"boeller_launch": -3.0, &"boeller_bang": 0.0, &"harmonika_polka": -3.0, &"harmonika_play": -4.0,
+	&"boeller_launch": 1.0, &"boeller_bang": 4.0, &"harmonika_polka": -3.0, &"harmonika_play": -4.0,
 	&"kuhglocke_ring": -5.0, &"resi_bell": -3.0, &"eisstock_slide": -6.0, &"eisstock_hit": -2.0,
 	&"kuhfladen_splat": -4.0, &"kuhfladen_squelch": -4.0,
 	&"groan_wanderer": -6.0, &"groan_knappe": -6.0, &"groan_perchte": -7.0, &"groan_tourist": -8.0,
 	&"krampus_roar": 0.0, &"chains": -6.0, &"enemy_death": -5.0, &"enemy_attack": -6.0,
 	&"board_pull": -4.0, &"board_nail": -6.0, &"window_climb": -7.0,
-	&"player_hurt": -4.0, &"player_death": -2.0, &"step_snow": -17.0, &"step_wood": -15.0, &"land": -10.0,
+	&"player_hurt": -4.0, &"player_death": -2.0, &"step_snow": -17.0, &"step_wood": -15.0, &"land": -5.0,
 	&"buy": -7.0, &"deny": -9.0, &"door_open": -2.0, &"creak": -12.0, &"chest_open": -4.0,
 	&"chest_tick": -10.0, &"chest_reveal": -6.0, &"perk_drink": -4.0, &"jause_eat": -4.0,
 	&"ammo_crate": -4.0, &"ui_click": -12.0, &"wave_start": -5.0, &"boss_wave": -2.0,
 	&"resi_moo": -2.0, &"milk": -6.0, &"fassl_roll": -3.0, &"fassl_tap": -4.0,
-	&"murmeltier_scream": -2.0, &"murmeltier_pop": -6.0, &"murmeltier_hit": -4.0, &"camera": -6.0,
+	&"murmeltier_scream": 1.0, &"murmeltier_pop": -6.0, &"murmeltier_hit": -4.0, &"camera": -6.0,
 	&"event_call": -6.0, &"wind_loop": -6.0, &"fire_crackle": -8.0,
-	&"band_menu": -9.0, &"wave_cleared": -6.0, &"game_over": -4.0,
+	# The band 25 % down (play-test 2026-10-18).
+	&"band_menu": -11.5, &"band_1": -2.5, &"band_2": -2.5, &"band_3": -2.5, &"band_4": -2.5,
+	&"band_5": -2.5, &"band_6": -2.5, &"band_7": -2.5, &"band_8": -2.5, &"game_over": -6.5,
 }
 ## At most this many of one sound at once; another one takes over the oldest. Keeps a horde from
 ## drowning out everything else.
@@ -122,12 +123,16 @@ func play_at(id: StringName, at: Vector3, volume_db: float = 0.0, pitch: float =
 
 
 ## A sound that plays (looping, if it is a loop) on `node` and moves with it. The caller frees the
-## returned player to stop it; it also goes when the node does.
-func attach(id: StringName, node: Node3D, volume_db: float = 0.0) -> AudioStreamPlayer3D:
+## returned player to stop it; it also goes when the node does. `reach` > 0 makes it carry that far
+## (metres) and fall off far more slowly, for sounds the whole map must hear.
+func attach(id: StringName, node: Node3D, volume_db: float = 0.0, reach: float = 0.0) -> AudioStreamPlayer3D:
 	if id == &"" or not has(id) or node == null:
 		return null
 	var player := AudioStreamPlayer3D.new()
 	_setup_3d(player)
+	if reach > 0.0:
+		player.max_distance = reach
+		player.unit_size = reach * Constants.SOUND_FAR_UNIT_SHARE
 	player.stream = stream(id)
 	player.bus = bus_of(id)
 	player.volume_db = level(id) + volume_db

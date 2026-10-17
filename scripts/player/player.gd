@@ -133,7 +133,8 @@ func _footsteps(delta: float, was_on_floor: bool, fall_speed: float) -> void:
 	if _roof == null:
 		_roof = get_tree().get_first_node_in_group("roof_map") as RoofMap
 	var indoors: bool = _roof != null and _roof.is_covered(global_position + Vector3.UP)
-	Sound.play(&"step_wood" if indoors else &"step_snow", -6.0 if _is_crouching() else 0.0)
+	var loudness: float = -6.0 if _is_crouching() else (Constants.STEP_SPRINT_LOUDER if _sprinting else 0.0)
+	Sound.play(&"step_wood" if indoors else &"step_snow", loudness)
 
 
 func _look(relative: Vector2) -> void:

@@ -8,6 +8,8 @@ const LIFETIME: float = 3.0
 
 ## Metres the smoke and the shock ring reach; set before it enters the tree.
 var radius: float = Constants.PERK_BOELLER_RADIUS
+## No bang (the shader warm-up draws one at load).
+var silent: bool = false
 
 
 func _ready() -> void:
@@ -31,7 +33,8 @@ func _ready() -> void:
 
 
 func _bang() -> void:
-	Sound.play_at(&"boeller_bang", global_position)
+	if not silent:
+		Sound.play_at(&"boeller_bang", global_position)
 
 
 func _smoke(radius: float) -> CPUParticles3D:

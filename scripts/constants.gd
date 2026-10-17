@@ -386,12 +386,18 @@ const SOUND_UNIT_SIZE: float = 3.0
 const SOUND_MAX_DISTANCE: float = 50.0
 const SOUND_DISTANCE_CUTOFF: float = 5000.0
 const SOUND_PITCH_JITTER: float = 0.05
+# A far-reaching sound (Sound.attach with a reach) stays at full level out to this share of its reach.
+const SOUND_FAR_UNIT_SHARE: float = 0.12
+# The Murmeltier's scream carries over the whole map (play-test 2026-10-18).
+const MURMEL_SCREAM_REACH: float = 120.0
 # A sled breaking apart at a wall sounds this much louder (dB) than one knocking into a body.
 const SLED_CRASH_LOUDER: float = 3.0
 # Footsteps: metres walked per step (longer strides sprinting), and the fall speed (m/s) that makes
 # a landing audible.
 const STEP_DISTANCE: float = 1.7
 const STEP_DISTANCE_SPRINT: float = 2.4
+# Sprinting steps land harder (dB louder).
+const STEP_SPRINT_LOUDER: float = 5.0
 const LAND_SOUND_SPEED: float = 4.0
 # Seconds between two hurt grunts, however fast the hits come.
 const HURT_SOUND_GAP: float = 0.35
@@ -412,5 +418,7 @@ const CREAK_DISTANCE: float = 4.0
 # The band: seconds to fade between tunes, and past its fastest tier how much higher (and faster) it
 # plays each further wave, up to a limit.
 const BAND_FADE_TIME: float = 1.5
+# The wave-in is never longer than this (s, play-test 2026-10-18: music only at the start of a wave).
+const BAND_INTRO_MAX: float = 15.0
 const BAND_PITCH_PER_WAVE: float = 0.02
 const BAND_PITCH_MAX: float = 1.2

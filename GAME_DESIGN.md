@@ -306,7 +306,8 @@ Alpine folk culture.
   the air after 4 s), walls shield what is behind them, survivors are shoved a little. The pile is
   2 m in radius and lies 6 s; whoever wades in moves at half speed while in it and 4 s
   after. A wet splat where it bursts (M6 sound). The next dumpling slides into the muzzle
-  as the gun is ready again (1 s). 12 / 36, reload 3 s (the lid of the Knödeltopf on top opens and
+  as the gun is ready again (1 s; the pot's lid hops as it drops through, it plops into the muzzle, and
+  the ready ring at the crosshair shows it, play-test 2026-10-18). 12 / 36, reload 3 s (the lid of the Knödeltopf on top opens and
   three drop in). In the chest at weight 1. Dumplings and piles are pooled.
 - **Rodelkanone:** fires a wooden sled that slides along the ground in a
   straight line for 15 m, hitting every enemy on the path for 300 damage with
@@ -629,11 +630,15 @@ fix console errors, commit. Stop and report after each milestone.
      in the browser. No film grain (play-test 2026-10-17).
   2. Audio: every sound and the brass band tune, self-made (synthesised), OGG. Built from oscillators,
      noise and filters by `tools/audio` (numpy, scipy, soundfile), mono OGG Vorbis, about 4.7 MB in
-     all. The band plays an original polka ("Da Berghittn-Polka", B-flat, A A B A) through a worn-out
-     gramophone: a slow take under the title screen, then each wave the hut bell rings and the band
-     strikes up one tempo tier faster (100 bpm in wave 1 up to 172 bpm from wave 8, then 2 % higher and
-     faster every wave up to +20 %), a "ta-da" when a wave is cleared, a quiet break, and the record
-     winding down at game over. The storm wind is muffled and quieter under a roof, the timbers creak
+     all. The band plays an original polka ("Da Berghittn-Polka", B-flat) as alpine Volksmusik off an
+     old gramophone (play-test 2026-10-18: Steirische Harmonika, flugelhorn and clarinet in thirds,
+     guitar off-beats and tuba, not a circus brass band): the whole tune under the title screen; at the
+     start of each wave the hut bell rings and the band plays only its first eight bars, one tempo
+     tier faster each wave (100 bpm in wave 1 up to 172 bpm from wave 8, then 2 % higher and faster
+     every wave up to +20 %); no music for the rest of the wave or the break; the record winding down
+     at game over. The music sits 25 % lower than at first. The gunshots are real recordings (CC0,
+     ASSETS.md), and the Handböller's launch and blast are a recorded shotgun pitched far down under a
+     synthesised boom; the Murmeltier screams like a man and is heard across the whole map. The storm wind is muffled and quieter under a roof, the timbers creak
      indoors and the fire crackles. Every gun, reload, swing and hit has its sound, as do enemies
      (groans per type, attack grunts, death cries, boards ripped out and climbing through), footsteps
      (boards indoors, snow outdoors), purchases (till or a short "no"), doors, the Hüttentruhe (a

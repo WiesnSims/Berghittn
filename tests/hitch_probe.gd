@@ -2,7 +2,7 @@ extends Node
 ## Frame-time probe for one-off hitches. Needs a real window (not --headless):
 ##   godot res://tests/hitch_probe.tscn
 ## Runs moments that happen for the first time in a match (a door bought, the Hüttentruhe's glow, its
-## roll, taking a weapon, each enemy type turning up) and prints every frame over SLOW_MS and the worst
+## roll, taking a weapon, each special weapon's first shot and secondary, each enemy type turning up) and prints every frame over SLOW_MS and the worst
 ## frame of each phase.
 
 const SLOW_MS: float = 25.0
@@ -86,6 +86,21 @@ func _run() -> void:
 	await _seconds(chest.pool.roll_time + 0.3)
 	chest.interact(player)
 	await _seconds(1.5)
+
+	# Every special weapon's first shot and first secondary (play-test 2026-10-18: the Brennlacke's
+	# first squirt stalled).
+	for id: String in ["brennkessel", "knoedelwerfer", "rodelkanone", "handboeller", "alphorn", "harmonika"]:
+		var gun: WeaponData = load("res://data/weapons/%s.tres" % id)
+		player.weapons.give_weapon(gun)
+		await _seconds(Constants.WEAPON_SWITCH_TIME + 0.5)
+		_phase = "fire_" + id
+		player.weapons._fire()
+		await _seconds(1.5)
+		_phase = "alt_" + id
+		if gun.secondary == WeaponData.Secondary.BEHAVIOR:
+			player.weapons._cooldown = 0.0
+			player.weapons.fire_secondary()
+		await _seconds(1.5)
 
 	for file: String in ["wanderer", "tourist", "knappe", "perchte", "krampus"]:
 		_phase = "enemy_" + file

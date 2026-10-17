@@ -1,15 +1,18 @@
 class_name KnoedelViewmodel
 extends Viewmodel
 ## Knödelwerfer: a stubby copper barrel with an enamel Knödeltopf on top as the hopper. The next
-## dumpling peeks out of the muzzle; after a shot the next one slides up into it, and when it is
-## there the gun is ready (fire_animation_time). The reload opens the pot's lid and drops three
-## dumplings in.
+## dumpling peeks out of the muzzle; after a shot the pot's lid hops as the next one drops through,
+## it slides up the barrel and bounces into the muzzle with a plop, and then the gun is ready
+## (fire_animation_time; the ready ring at the crosshair shows it too). The reload opens the pot's lid
+## and drops three dumplings in.
 
 ## Seconds from a shot until the next dumpling sits in the muzzle (= 1 / fire_rate).
 @export var ready_time: float = 1.0
 ## Degrees the lid swings open, and how far above the pot a dropped dumpling starts (metres).
 @export var lid_open: float = 100.0
 @export var drop_from: float = 0.09
+## Degrees the lid hops up between shots as the next dumpling drops out of the pot.
+@export var lid_hop: float = 35.0
 
 @onready var _lid: Node3D = $Model/Lid
 @onready var _loaded: Node3D = $Model/Loaded
@@ -59,14 +62,21 @@ func play_reload(duration: float, _chamber_time: float = 0.0) -> void:
 
 
 func _reload_next() -> void:
-	# The shot is gone; the next one slides up the barrel and shows at the muzzle when the gun is ready.
+	# The shot is gone; the lid hops as the next one drops out of the pot, it slides up the barrel and
+	# bounces into the muzzle when the gun is ready.
 	_loaded.visible = false
+	_loaded.scale = Vector3.ONE
 	_parts_tween = create_tween()
-	_parts_tween.tween_interval(ready_time * 0.5)
+	_parts_tween.tween_interval(ready_time * 0.15)
+	_parts_tween.tween_property(_lid, "rotation:x", deg_to_rad(-lid_hop), ready_time * 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_parts_tween.tween_property(_lid, "rotation:x", 0.0, ready_time * 0.18).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 	_parts_tween.tween_callback(func() -> void:
 		_loaded.position = _loaded_rest + Vector3(0, 0, 0.2)
 		_loaded.visible = true)
-	_parts_tween.tween_property(_loaded, "position", _loaded_rest, ready_time * 0.5).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_parts_tween.tween_property(_loaded, "position", _loaded_rest, ready_time * 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_parts_tween.tween_callback(func() -> void: Sound.play(&"knoedel_ready"))
+	_parts_tween.tween_property(_loaded, "scale", Vector3.ONE * 1.25, ready_time * 0.06)
+	_parts_tween.tween_property(_loaded, "scale", Vector3.ONE, ready_time * 0.09).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func _reset_parts() -> void:
@@ -75,4 +85,5 @@ func _reset_parts() -> void:
 	_falling.visible = false
 	_falling.position = _falling_rest
 	_loaded.position = _loaded_rest
+	_loaded.scale = Vector3.ONE
 	_loaded.visible = true

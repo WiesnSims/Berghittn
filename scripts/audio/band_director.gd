@@ -1,10 +1,10 @@
 class_name BandDirector
 extends Node
-## The hut's brass band (section 11, M6 part 2): "Da Berghittn-Polka" (tools/audio/music.py), played
-## off an old gramophone. A slow take under the title screen; each wave the hut bell rings and the band
-## strikes up, faster every wave (one tempo tier per wave, then a little higher and faster still);
-## a cleared wave ends on a "ta-da" and the break stays quiet but for the storm; at game over the
-## record winds down.
+## The hut's band (section 11, M6 part 2): "Da Berghittn-Polka" (tools/audio/music.py), alpine
+## Volksmusik off an old gramophone. The whole tune loops under the title screen; at the start of each
+## wave the hut bell rings and the band plays its first eight bars, faster every wave (one tempo tier
+## per wave, then a little higher and faster still), and the rest of the wave is the fight and the
+## storm (play-test 2026-10-18: music only then and in the menu). At game over the record winds down.
 
 const TIERS: int = 8
 
@@ -67,7 +67,6 @@ func _on_wave_started(wave: int, is_boss_wave: bool) -> void:
 
 func _on_wave_cleared(_wave: int) -> void:
 	_fade_out()
-	Sound.play(&"wave_cleared")
 
 
 func _on_player_died(_player: Node3D) -> void:

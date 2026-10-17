@@ -70,22 +70,6 @@ def clarinet(m, dur, vel):
     return tone * d.env_points(s, [(0, 0), (0.03, 1), (dur, 0.8), (s, 0)]) * vel
 
 
-def kick(vel=1.0):
-    return d.mix(d.sine(d.glide(0.3, 90, 45), 0.3) * d.env_exp(0.3, 0.09), sfx.click(1500, 0.002, 0.15)) * vel
-
-
-def snare(vel=1.0):
-    rattle = d.bandpass(d.noise(0.2), 1500, 7000) * d.env_exp(0.2, 0.05)
-    head = d.sine(190, 0.2) * d.env_exp(0.2, 0.03) * 0.6
-    return (rattle + head) * vel
-
-
-def cymbal(vel=1.0):
-    metal = d.partials(1.6, [(f, 0.2, 0.5) for f in (3150, 4270, 5330, 6590, 7810)])
-    wash = d.highpass(d.noise(1.6), 5000) * d.env_exp(1.6, 0.4)
-    return (metal * 0.4 + wash) * d.env_exp(1.6, 0.6) * vel
-
-
 def reed(m, dur, vel, s=None):
     """Accordion: three reeds, the outer two tuned apart for the wet musette shimmer."""
     s = s or dur + 0.05
@@ -120,63 +104,123 @@ class Score:
         return out
 
 
-def band(bpm: float, madness: float) -> np.ndarray:
-    sc = Score(bpm, 64)
-    e = sc.beat / 2  # one eighth in seconds
-    sections = [(A_MELODY, A_CHORDS, False), (A_MELODY, A_CHORDS, True), (B_MELODY, B_CHORDS, True),
-                (A_MELODY, A_CHORDS, True)]
-    bar = 0
-    for si, (mel, chords, full) in enumerate(sections):
-        if full or si == 0:
-            sc.put(bar * 2, cymbal(0.5 if si else 0.35))
-        for b in range(8):
-            at = (bar + b) * 2
-            root, fifth, pah = chords[b]
-            # Oom (tuba) on the beats, pah (horns) on the offbeats.
-            sc.put(at, brass(root - 12, e * 1.6, 0.9, 0.35))
-            sc.put(at + 1, brass(fifth - 12, e * 1.6, 0.8, 0.35))
-            for m in pah:
-                sc.put(at + 0.5, brass(m, e * 0.7, 0.22, 0.45, 0.01))
-                sc.put(at + 1.5, brass(m, e * 0.7, 0.2, 0.45, 0.01))
-            sc.put(at, kick(0.8))
-            sc.put(at + 1, kick(0.6))
-            sc.put(at + 0.5, snare(0.35))
-            sc.put(at + 1.5, snare(0.35))
-            pos = 0.0
-            for m, length in mel[b]:
-                if m is not None:
-                    dur = length * e * 0.9
-                    sc.put(at + pos, brass(m, dur, 0.55, 0.6))
-                    if full:
-                        sc.put(at + pos, brass(third_below(m), dur, 0.35, 0.5))
-                    if si == 3:
-                        sc.put(at + pos, clarinet(m + 12, dur, 0.18))
-                pos += length * 0.5
-        bar += 8
-    # A snare roll into the top of the loop.
-    for k in range(8):
-        sc.put(62 + k * 0.25, snare(0.25 + 0.05 * k))
-    return gramophone(sc.looped(), sc.length, madness)
+# The Volksmusik tune (play-test 2026-10-18: the brass band sounded like a circus). Yodel-like broken
+# chords, a duet in thirds, B-flat, 2/4.
+VOLKS_A = [
+    [(77, 1), (74, 1), (70, 1), (74, 1)], [(77, 2), (82, 2)],
+    [(81, 1), (79, 1), (77, 1), (75, 1)], [(72, 1), (75, 1), (77, 2)],
+    [(81, 1), (84, 1), (81, 1), (77, 1)], [(75, 1), (72, 1), (69, 1), (72, 1)],
+    [(74, 1), (77, 1), (82, 1), (86, 1)], [(82, 2), (None, 2)],
+]
+VOLKS_B = [
+    [(75, 1), (79, 1), (82, 1), (79, 1)], [(84, 1), (82, 1), (79, 1), (75, 1)],
+    [(74, 1), (77, 1), (82, 1), (77, 1)], [(86, 2), (82, 2)],
+    [(84, 1), (81, 1), (77, 1), (81, 1)], [(75, 1), (77, 1), (79, 1), (81, 1)],
+    [(82, 1), (77, 1), (74, 1), (77, 1)], [(70, 2), (None, 2)],
+]
+
+
+def flugel(m, dur, vel):
+    """Flugelhorn: a round, dark brass voice, softer than a trumpet."""
+    s = dur + 0.1
+    t = d.t_of(s)
+    f = hz(m) * (1 - 0.012 * np.exp(-t / 0.03))
+    if dur > 0.3:
+        f = f * (1 + 0.005 * np.sin(2 * np.pi * 5.2 * t) * np.clip((t - 0.15) / 0.3, 0, 1))
+    b = d.env_points(s, [(0, 0.15), (0.04, 0.42), (0.2, 0.34), (s, 0.3)])
+    amp = d.env_points(s, [(0, 0), (0.03, 1), (dur, 0.8), (s, 0)])
+    tone = d.harmonics(f, s, [1, 0.6, 0.35, 0.2, 0.12, 0.07, 0.04], b)
+    return (tone + d.bandpass(d.noise(s), 600, 2500) * 0.02) * amp * vel
+
+
+def guitar(m, vel):
+    """A plucked chord tone (the off-beat "zupf" of the guitar); higher partials die first."""
+    s = 0.6
+    f = hz(m)
+    parts = [(f * k, 1.0 / k, 0.35 / k ** 0.7) for k in range(1, 12)]
+    return d.partials(s, parts) * d.env_points(s, [(0, 0), (0.003, 1), (s, 1)]) * vel
+
+
+def tuba(m, dur, vel):
+    return brass(m, dur, vel, 0.22, 0.01)
+
+
+def _section(sc, at_bar, melody, chords, lead, duet):
+    """Eight bars: bass on the beats, guitar and accordion chords on the off-beats, the tune on top."""
+    e = sc.beat / 2
+    for b in range(8):
+        at = (at_bar + b) * 2
+        root, fifth, chord = chords[b]
+        sc.put(at, tuba(root - 12, e * 1.5, 0.75))
+        sc.put(at + 1, tuba(fifth - 12, e * 1.5, 0.65))
+        for k, m in enumerate(chord):
+            sc.put(at + 0.5 + k * 0.012, guitar(m - 12, 0.16))
+            sc.put(at + 1.5 + k * 0.012, guitar(m - 12, 0.14))
+            sc.put(at + 0.5, reed(m, e * 0.45, 0.06))
+            sc.put(at + 1.5, reed(m, e * 0.45, 0.06))
+        pos = 0.0
+        for m, length in melody[b]:
+            if m is not None:
+                dur = length * e * 0.92
+                if lead == "harmonika":
+                    sc.put(at + pos, reed(m, dur, 0.32))
+                else:
+                    sc.put(at + pos, flugel(m, dur, 0.5))
+                if duet:
+                    # The Volksmusik duet: clarinet a third below (and the flugelhorn when the harmonika leads).
+                    sc.put(at + pos, clarinet(third_below(m), dur, 0.22))
+            pos += length * 0.5
+
+
+def band_intro(bpm: float, madness: float) -> np.ndarray:
+    """At the start of a wave: the first eight bars, ending on the home chord (play-test: short)."""
+    sc = Score(bpm, 18, 2.5)
+    _section(sc, 0, VOLKS_A, A_CHORDS, "flugel", True)
+    # The last chord rings out on everything.
+    end = 14
+    for m in (62, 65, 70):
+        sc.put(end, reed(m, sc.beat * 2.5, 0.18))
+        sc.put(end, guitar(m - 12, 0.2))
+    sc.put(end, tuba(34, sc.beat * 2.5, 0.8))
+    x = gramophone_oneshot(sc.buf, madness)
+    return d.normalize(d.fade(d.trim(d.reverb(x, 1.0, 0.15))), 0.85)
+
+
+def band(bpm: float) -> np.ndarray:
+    """The whole tune, looped under the title screen: A (harmonika), A (duet), B (duet), A (all)."""
+    sc = Score(bpm, 64, 2.5)
+    _section(sc, 0, VOLKS_A, A_CHORDS, "harmonika", False)
+    _section(sc, 8, VOLKS_A, A_CHORDS, "flugel", True)
+    _section(sc, 16, VOLKS_B, B_CHORDS, "flugel", True)
+    _section(sc, 24, VOLKS_A, A_CHORDS, "harmonika", True)
+    return gramophone(sc.looped(), sc.length, 0.0)
 
 
 def gramophone(x: np.ndarray, length: float, madness: float) -> np.ndarray:
-    """The band through a worn-out horn: saturated, band-limited, wobbling and crackling. More madness
-    each wave."""
+    """The band off an old gramophone: a little saturated and band-limited, a slow wobble and some
+    crackle. A touch more worn each wave."""
     x = d.normalize(x)
-    x = d.drive(x, 1.6 + madness)
-    x = d.bandpass(x, 140, 5200)
+    x = d.drive(x, 1.2 + madness)
+    x = d.bandpass(x, 110, 7000)
     t = np.arange(len(x)) / d.SR
     # Wobble that fits whole cycles into the loop, so the seam stays clean.
     slow = max(1, round(length * 0.55)) / length
-    fast = max(1, round(length * 6.5)) / length
-    wobble = (0.0016 + 0.0008 * madness) * np.sin(2 * np.pi * slow * t) + 0.00025 * np.sin(2 * np.pi * fast * t)
+    wobble = (0.0009 + 0.0005 * madness) * np.sin(2 * np.pi * slow * t)
     src = (t + wobble) % length
     x = np.interp(src * d.SR, np.arange(len(x)), x, period=len(x))
     crackle = np.zeros_like(x)
-    idx = d.rng.integers(0, len(x), int(length * 9))
+    idx = d.rng.integers(0, len(x), int(length * 6))
     crackle[idx] = d.rng.uniform(-1, 1, len(idx))
-    x = x + d.lowpass(crackle, 3500) * 0.3 + d.lowpass(d.noise(length)[: len(x)], 2500) * 0.006
+    x = x + d.lowpass(crackle, 3500) * 0.15
     return d.normalize(x, 0.85)
+
+
+def gramophone_oneshot(x, madness: float = 0.0):
+    x = d.drive(d.normalize(x), 1.2 + madness)
+    crackle = np.zeros_like(x)
+    idx = d.rng.integers(0, len(x), int(len(x) / d.SR * 6))
+    crackle[idx] = d.rng.uniform(-1, 1, len(idx))
+    return d.bandpass(x, 110, 7000) + d.lowpass(crackle, 3500) * 0.15
 
 
 # Tempo per wave: the band starts at a gentle walk and gets out of hand.
@@ -184,64 +228,32 @@ TIERS = [100, 110, 120, 130, 140, 150, 160, 172]
 
 
 def band_tier(i: int):
-    return band(TIERS[i], i * 0.35)
+    return band_intro(TIERS[i], i * 0.2)
 
 
 def band_menu(_v):
-    return band(92, 0.0) * 0.8
-
-
-# --- stingers --------------------------------------------------------------------------------------
-
-def wave_cleared(_v):
-    """A short "ta-da" from the band: F, F, the high B-flat over an F-to-B-flat bass."""
-    sc = Score(140, 6, 2.5)
-    for at, m, dur in ((0, 77, 0.2), (0.5, 77, 0.2), (1.0, 82, 1.3)):
-        sc.put(at, brass(m, dur, 0.6, 0.65))
-        sc.put(at, brass(third_below(m), dur, 0.35, 0.5))
-    sc.put(0, brass(29, 0.3, 0.9, 0.35))
-    sc.put(1.0, brass(34, 1.3, 0.9, 0.35))
-    for m in (62, 65, 70):
-        sc.put(1.0, brass(m, 1.2, 0.22, 0.45))
-    sc.put(1.0, cymbal(0.5))
-    sc.put(1.0, kick(1.0))
-    return d.normalize(d.fade(gramophone_oneshot(sc.buf)), 0.85)
-
-
-def gramophone_oneshot(x):
-    x = d.drive(d.normalize(x), 2.0)
-    return d.bandpass(x, 140, 5200)
+    return band(96)
 
 
 def game_over(_v):
     """The end of the tune as the gramophone winds down and stops."""
-    sc = Score(120, 8, 3.0)
-    for b, (mel, chords) in enumerate(zip(A_MELODY[4:], A_CHORDS[4:])):
-        root, fifth, pah = chords
-        sc.put(b * 2, brass(root - 12, 0.35, 0.9, 0.35))
-        sc.put(b * 2 + 1, brass(fifth - 12, 0.35, 0.8, 0.35))
-        for m in pah:
-            sc.put(b * 2 + 0.5, brass(m, 0.18, 0.2, 0.45))
-            sc.put(b * 2 + 1.5, brass(m, 0.18, 0.2, 0.45))
-        pos = 0.0
-        for m, length in mel:
-            if m is not None:
-                sc.put(b * 2 + pos, brass(m, length * 0.22, 0.55, 0.6))
-            pos += length * 0.5
-    x = gramophone_oneshot(sc.buf)
+    sc = Score(120, 16, 3.0)
+    _section(sc, 0, VOLKS_A, A_CHORDS, "flugel", True)
+    # Its last two bars.
+    x = gramophone_oneshot(sc.buf[d.n_of(12 * sc.beat):])
     # Speed falls from 1 to about 0.25: pitch and tempo sag together.
     n = len(x)
     rate = np.linspace(1.0, 0.22, n * 2) ** 1.3
     pos = np.cumsum(rate)
     pos = pos[pos < n - 1]
-    out = np.interp(pos, np.arange(n), x)
+    out = np.interp(pos, np.arange(n), x)[: d.n_of(4.0)]
     out *= d.env_points(len(out) / d.SR, [(0, 1), (len(out) / d.SR * 0.7, 0.9), (len(out) / d.SR, 0)])
     return d.normalize(d.fade(d.trim(out)), 0.85)
 
 
 def event_call(_v):
     """A flugelhorn call for an event banner: "da-daa!" up a fourth."""
-    x = d.mix(brass(72, 0.18, 0.7, 0.55), (0.22, brass(77, 0.7, 0.8, 0.6)), (0.22, brass(72, 0.7, 0.4, 0.5)))
+    x = d.mix(flugel(72, 0.18, 0.7), (0.22, flugel(77, 0.7, 0.8)), (0.22, flugel(72, 0.7, 0.4)))
     return d.normalize(d.fade(d.reverb(gramophone_oneshot(x), 1.2, 0.25)), 0.8)
 
 
@@ -305,10 +317,10 @@ def harmonika_play(_v):
     return d.normalize(sc.looped(), 0.8)
 
 
-MUSIC = {"band_menu": band_menu, "wave_cleared": wave_cleared, "game_over": game_over}
+MUSIC = {"band_menu": band_menu, "game_over": game_over}
 for _i in range(len(TIERS)):
     MUSIC["band_%d" % (_i + 1)] = (lambda i: (lambda _v: band_tier(i)))(_i)
-MUSIC_LOOPS = {"band_menu"} | {"band_%d" % (i + 1) for i in range(len(TIERS))}
+MUSIC_LOOPS = {"band_menu"}
 
 # Played by weapons and events on the Effects bus, but written here because they are music.
 MUSICAL_SFX = {"event_call": event_call, "harmonika_polka": harmonika_polka, "harmonika_play": harmonika_play}

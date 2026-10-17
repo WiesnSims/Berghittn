@@ -257,4 +257,4 @@ func _cycles() -> void:
 		var animation: float = model.fire_animation_time()
 		model.free()
 		_check(absf(1.0 / gun.fire_rate - animation) < 0.01, "%s fires again as its animation ends (%.2f s / %.2f s)" % [id, 1.0 / gun.fire_rate, animation])
-	_check(horn.cycle_ring and not (load("res://data/weapons/stutzen.tres") as WeaponData).cycle_ring, "only the Alphorn shows the ring between shots")
+	_check(horn.cycle_ring and not (load("res://data/weapons/stutzen.tres") as WeaponData).cycle_ring, "the Alphorn shows the ring between shots, the guns do not")

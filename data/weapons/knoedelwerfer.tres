@@ -38,3 +38,4 @@ secondary_sound = &"knoedel_launch"
 hit_sound = &"knoedel_splat"
 reload_sound = &"load_clunk"
 reload_end_sound = &"load_ready"
+cycle_ring = true

@@ -53,17 +53,6 @@ def stick_slip(length: float, rate, bodies, level: float = 1.0):
 WOOD = [(310, 12, 1.0), (720, 14, 0.7), (1330, 16, 0.45), (2250, 18, 0.25)]
 
 
-def gunshot(body_lp, body_decay, thump_f, thump_decay, crack, tail, wet, drv, length=1.6):
-    crack_s = d.highpass(d.noise(0.03), 2500) * d.env_exp(0.03, 0.003) * crack
-    body = d.lowpass(d.noise(length), body_lp) * d.env_exp(length, body_decay)
-    mid = d.bandpass(d.noise(length), 400, 1800) * d.env_exp(length, body_decay * 0.6) * 0.6
-    boom = d.sine(d.glide(length, thump_f, thump_f * 0.35, 0.5), length) * d.env_exp(length, thump_decay) * 1.3
-    x = d.mix(crack_s, body, mid, boom)
-    x = d.drive(d.normalize(x), drv)
-    x = d.reverb(x, tail, wet, damp=3000)
-    return d.fade(d.trim(x), 0.0005, 0.05)
-
-
 def voice(seconds, f0, path, shift=1.0, breath=0.15, jitter=0.02, rough=0.0, drv=1.5):
     """A groan, moo or scream: buzzy source, vowel filters, a bit of breath."""
     src = d.glottal(f0, seconds, jitter=jitter, shimmer=0.25)
@@ -80,27 +69,6 @@ def bell(seconds, f, ratios, decays, amps):
 
 
 # --- player weapons --------------------------------------------------------------------------------
-
-def shot_pistole(v):
-    return gunshot(3500, 0.035, 160, 0.05, 1.0, 0.9, 0.22, 2.5)
-
-
-def shot_jagdflinte(v):
-    return gunshot(2200, 0.09, 85, 0.11, 0.8, 1.4, 0.3, 3.5)
-
-
-def shot_jagdflinte_both(v):
-    a = gunshot(2000, 0.12, 70, 0.14, 0.9, 1.8, 0.35, 4.5)
-    return d.normalize(d.mix(a, (0.018, a * 0.8)))
-
-
-def shot_stutzen(v):
-    return gunshot(4500, 0.06, 110, 0.08, 1.4, 1.8, 0.32, 3.0)
-
-
-def shot_repetierer(v):
-    return gunshot(3800, 0.05, 130, 0.07, 1.1, 1.4, 0.28, 2.8)
-
 
 def dry_click(v):
     return d.mix(click(3200, 0.003), (0.03, click(1800, 0.004, 0.5)))
@@ -268,6 +236,12 @@ def splat(v, size=1.0):
     return d.normalize(d.fade(out))
 
 
+def knoedel_ready(v):
+    """The next dumpling plops into the muzzle."""
+    plop = d.sine(d.glide(0.12, 220, 520), 0.12) * d.env_exp(0.12, 0.03)
+    return d.normalize(d.mix(plop, d.lowpass(d.noise(0.08), 900) * d.env_exp(0.08, 0.015) * 0.5, (0.02, click(1800, 0.003, 0.25))), 0.7)
+
+
 def knoedel_splat(v):
     return splat(v, 1.0)
 
@@ -305,18 +279,6 @@ def flame_start(v):
     whoom = d.lowpass(d.noise(0.6), 1200) * d.env_points(0.6, [(0, 0), (0.08, 1), (0.6, 0)])
     return d.normalize(d.mix(click(2500, 0.005, 0.4), whoom))
 
-
-def boeller_launch(v):
-    pop = d.sine(d.glide(0.4, 160, 45), 0.4) * d.env_exp(0.4, 0.08)
-    fuse = d.bandpass(d.noise(0.8), 2500, 8000) * d.env_points(0.8, [(0, 0), (0.1, 0.25), (0.8, 0)])
-    return d.normalize(d.fade(d.reverb(d.mix(pop * 1.2, d.lowpass(d.noise(0.4), 900) * d.env_exp(0.4, 0.06), fuse), 1.0, 0.25)))
-
-
-def boeller_bang(v):
-    return gunshot(1500, 0.25, 55, 0.35, 1.3, 2.8, 0.42, 5.0, length=2.5)
-
-
-# --- equipment -------------------------------------------------------------------------------------
 
 def _cowbell_hit(f, level):
     hit = bell(1.4, f, [1, 1.47, 2.09, 2.76, 3.61, 4.95], [0.5, 0.35, 0.25, 0.15, 0.1, 0.06],
@@ -659,10 +621,11 @@ def fassl_tap(v):
 
 
 def murmeltier_scream(v):
-    s = 1.7
-    f0 = d.env_points(s, [(0, 520), (0.12, 820 + 60 * v), (1.3, 780), (s, 640)])
-    f0 = f0 * (1.0 + 0.02 * d.sine(7.0, s))
-    x = voice(s, f0, [(0, "ae"), (0.15, "a"), (s, "a")], 1.35, 0.35, 0.03, 0.0, 3.0)
+    # A man yelling in panic, chest voice strained to breaking (play-test: lower, like a male scream).
+    s = 1.8
+    f0 = d.env_points(s, [(0, 190), (0.12, 300 + 25 * v), (1.3, 285 + 15 * v), (s, 230)])
+    f0 = f0 * (1.0 + 0.025 * d.sine(6.0, s))
+    x = voice(s, f0, [(0, "ae"), (0.15, "a"), (s, "a")], 1.0, 0.3, 0.04, 0.35, 3.5)
     x *= d.env_points(s, [(0, 0), (0.06, 1), (1.4, 0.95), (s, 0)])
     return d.normalize(d.fade(d.reverb(x, 1.0, 0.2)))
 
@@ -717,9 +680,8 @@ def fire_crackle(v):
 
 # name: (recipe, variants, folder). Folder picks the import loop flag in build.py.
 SOUNDS = {
-    "shot_pistole": (shot_pistole, 2), "shot_jagdflinte": (shot_jagdflinte, 2),
-    "shot_jagdflinte_both": (shot_jagdflinte_both, 1), "shot_stutzen": (shot_stutzen, 2),
-    "shot_repetierer": (shot_repetierer, 2), "dry_click": (dry_click, 1),
+    # The gunshots and the Böller are recordings: see recordings.py.
+    "dry_click": (dry_click, 1),
     "mag_out": (mag_out, 1), "mag_in": (mag_in, 1), "break_open": (break_open, 1),
     "break_close": (break_close, 1), "bolt_open": (bolt_open, 1), "bolt_close": (bolt_close, 1),
     "lever_open": (lever_open, 1), "lever_close": (lever_close, 1), "load_clunk": (load_clunk, 1),
@@ -729,10 +691,9 @@ SOUNDS = {
     "pfanne_bonk": (pfanne_bonk, 2), "goassl_crack": (goassl_crack, 2), "mistgabel_stab": (mistgabel_stab, 2),
     "rute_hit": (rute_hit, 2), "block_hit": (block_hit, 1),
     "alphorn_blast": (alphorn_blast, 1), "alphorn_echo": (alphorn_echo, 1),
-    "knoedel_launch": (knoedel_launch, 1), "knoedel_splat": (knoedel_splat, 3),
+    "knoedel_launch": (knoedel_launch, 1), "knoedel_splat": (knoedel_splat, 3), "knoedel_ready": (knoedel_ready, 1),
     "rodel_launch": (rodel_launch, 1), "rodel_hit": (rodel_hit, 2),
     "flame_loop": (flame_loop, 1), "flame_start": (flame_start, 1),
-    "boeller_launch": (boeller_launch, 1), "boeller_bang": (boeller_bang, 2),
     "kuhglocke_ring": (kuhglocke_ring, 1), "resi_bell": (resi_bell, 1),
     "eisstock_slide": (eisstock_slide, 1), "eisstock_hit": (eisstock_hit, 1),
     "kuhfladen_splat": (kuhfladen_splat, 1), "kuhfladen_squelch": (kuhfladen_squelch, 2),

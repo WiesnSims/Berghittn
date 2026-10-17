@@ -2,8 +2,8 @@ extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/m6_audio.tscn
 ## Headless check of the sound (M6 part 2) on the real main scene: every sound the weapons, enemies and
 ## scripts ask for exists (and the loops loop), all audio stays inside its 8 MB budget, the band plays
-## the title tune and then one tempo tier per wave (faster each wave, higher past the last tier) and
-## falls silent when a wave is cleared, the guns, footsteps (boards indoors, snow outdoors), groans and
+## the title tune and then a short wave-in, one tempo tier per wave (faster each wave, higher past the
+## last tier), and is silent in the break, the guns, footsteps (boards indoors, snow outdoors), groans and
 ## purchases make their sounds, and the storm is muffled indoors.
 
 const FIELD: Vector3 = Vector3(10.0, -0.3, 31.0)
@@ -148,7 +148,7 @@ func _band() -> void:
 	var faster: bool = true
 	for i: int in range(1, lengths.size()):
 		faster = faster and lengths[i] < lengths[i - 1]
-	_check(faster, "every tier plays the tune faster (%.1f s down to %.1f s a time round)" % [lengths[0], lengths[-1]])
+	_check(faster, "every tier plays the wave-in faster (%.1f s down to %.1f s)" % [lengths[0], lengths[-1]])
 	Events.wave_started.emit(1, false)
 	await _frames(2)
 	_check(band.playing_tune() == &"band_1" and _sounding(&"wave_start"), "wave 1: the hut bell rings and the band strikes up (%s)" % band.playing_tune())
@@ -162,9 +162,9 @@ func _band() -> void:
 	Events.wave_started.emit(15, true)
 	await _frames(2)
 	_check(_sounding(&"boss_wave"), "a boss wave tolls the deep bell")
+	var intro := Sound.stream(&"band_1") as AudioStreamOggVorbis
+	_check(not intro.loop and intro.get_length() < Constants.BAND_INTRO_MAX, "the band only plays the wave in (%.1f s, no loop)" % intro.get_length())
 	Events.wave_cleared.emit(15)
-	await _frames(2)
-	_check(_sounding(&"wave_cleared"), "a cleared wave ends on the band's ta-da")
 	await _seconds(Constants.BAND_FADE_TIME + 0.3)
 	_check(band.playing_tune() == &"", "and the break is quiet but for the storm")
 	_quiet()

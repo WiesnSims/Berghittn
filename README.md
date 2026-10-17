@@ -128,7 +128,12 @@ pip install numpy scipy soundfile
 python tools/audio/build.py               # everything, prints sizes
 python tools/audio/build.py swing band_3  # only these
 python tools/audio/inspect_audio.py <out_dir>   # levels, clipping, DC, loop seams, spectrograms
+python tools/audio/recordings.py "<extracted Prepared SFX Library>"  # the real gunshots
 ```
+
+The gunshots (and the core of the Böller) are real recordings from the CC0 "Free Firearm Sound
+Library" (see ASSETS.md); `recordings.py` cuts every shot out of its near-distance takes. The
+library itself (344 MB) is not in the repo; download it from OpenGameArt to rebuild them.
 
 - Files are `assets/audio/<folder>/<id>_<n>.ogg`; `_n` are variants, picked at random. The folder is
   the bus: `sfx` Effects, `music` Music, `ambience` Ambience (the wind goes through its own `Wind`
@@ -140,8 +145,9 @@ python tools/audio/inspect_audio.py <out_dir>   # levels, clipping, DC, loop sea
 - Weapons name their sounds in their `.tres` (`fire_sound`, `fire_loop_sound`, `secondary_sound`,
   `play_sound`, `reload_sound`, `reload_end_sound`, `swing_sound`, `hit_sound`), enemies theirs in
   `data/enemies` (`groan_sounds`, `death_sound`, `voice_pitch`).
-- `BandDirector` (`scripts/audio/band_director.gd`) plays the band: one tempo tier per wave
-  (`band_1` to `band_8`), pitched up past the last; `Ambience` (`scripts/audio/ambience.gd`) the
+- `BandDirector` (`scripts/audio/band_director.gd`) plays the band: the whole tune looped in the
+  menu, and at the start of each wave only its first eight bars, one tempo tier per wave (`band_1`
+  to `band_8`), pitched up past the last; `Ambience` (`scripts/audio/ambience.gd`) the
   storm and the creaks.
 
 ## Tests

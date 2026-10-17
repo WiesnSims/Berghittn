@@ -72,7 +72,7 @@ func _process(delta: float) -> void:
 			_model.position.y = lerpf(-0.7, 0.0, minf(_time / Constants.MURMEL_RISE_TIME, 1.0))
 			if _time >= Constants.MURMEL_RISE_TIME:
 				_enter(State.SCREAMING)
-				_scream = Sound.attach(&"murmeltier_scream", self)
+				_scream = Sound.attach(&"murmeltier_scream", self, 0.0, Constants.MURMEL_SCREAM_REACH)
 		State.SCREAMING:
 			var scream: float = clampf(_time / 0.25, 0.0, 1.0)
 			_pose(scream)
