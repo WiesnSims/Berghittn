@@ -124,8 +124,10 @@ has at least two ways in and out, and the doors make four loops instead of one r
 - Stube - Seilbahn: a door in the Stube's east wall, south of the fireplace, onto the Seilbahn's
   west platform ramp. The Seilbahn (1500) can be opened straight from the Stube, and its spawns are
   active from wave 1 (user: OK, cost stays 1500). The Kuhglocke wall-buy sits just south of it.
-- Küchenstiege: a 2 m ramp along the Küche's south wall up to a landing in the Lager, with the
-  Lager - Küche door at its top and a railed opening in the Lager floor above it. Indoor loop:
+- Küchenstiege: a 2 m stair along the Küche's south wall up to a landing in the Lager, open to the
+  Küche on its side (handrail) and walled in from the Lager (play-test #64, 2026-10-17): full walls
+  along its long side and its lower end, and the Lager - Küche door (1.9 m) at the top on the left
+  as you climb, off the landing. It looks like a stair (20 steps); underneath it is a ramp. Indoor loop:
   Stube, stairs, gallery, Lager, Küchenstiege, Küche, Stube. The Munitionskiste stays in the Lager
   (user decision); the middle bunks were shortened to keep the way to the landing wide.
 - Außenstiege: an outside stair from the west end of the balcony down into the beer garden. The
@@ -619,10 +621,11 @@ fix console errors, commit. Stop and report after each milestone.
   check the browser frame rate with a crowd (Jolt if Godot Physics is too slow).
 - Acceptance: file sizes within budget, 60 FPS target met.
 - Done in parts, one PR each (2026-10-17), reporting after each:
-  1. Look and settings: grade, film grain and vignette, fog and ambient light that change between
-     the storm outside and the warm hut inside, snowfall that stays out from under roofs, settings
-     menu (sensitivity, aiming sensitivity, invert Y, volume per bus, language, render resolution,
-     film grain), saved in the browser.
+  1. Look and settings: grade (cool shadows) and vignette, fog and ambient light that change between
+     the storm outside and the warm hut inside, a frost that creeps in from the screen edges
+     outdoors and thaws indoors, snowfall that stays out from under roofs, settings menu
+     (sensitivity, aiming sensitivity, invert Y, volume per bus, language, render resolution), saved
+     in the browser. No film grain (play-test 2026-10-17).
   2. Audio: every sound and the brass band tune, self-made (synthesised), OGG.
   3. Textures: low-resolution photo textures (CC0 libraries, once the user approves them).
   4. Low-poly models for props, enemies and weapons, and the ragdolls.

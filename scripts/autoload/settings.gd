@@ -22,7 +22,6 @@ var locale: String = Constants.DEFAULT_LOCALE
 var volumes: Dictionary = {}
 ## Share of the window resolution the 3D view renders at; lower helps weak laptops.
 var render_scale: float = 1.0
-var film_grain: bool = true
 
 
 func _ready() -> void:
@@ -71,7 +70,6 @@ func _load() -> void:
 	if saved_locale in LOCALES:
 		locale = saved_locale
 	render_scale = clampf(file.get_value(SECTION, "render_scale", render_scale), Constants.RENDER_SCALE_MIN, 1.0)
-	film_grain = file.get_value(SECTION, "film_grain", film_grain)
 	for bus: StringName in BUSES:
 		set_volume(bus, file.get_value(SECTION, "volume_" + bus, volume(bus)))
 
@@ -83,7 +81,6 @@ func save() -> void:
 	file.set_value(SECTION, "invert_y", invert_y)
 	file.set_value(SECTION, "locale", locale)
 	file.set_value(SECTION, "render_scale", render_scale)
-	file.set_value(SECTION, "film_grain", film_grain)
 	for bus: StringName in BUSES:
 		file.set_value(SECTION, "volume_" + bus, volume(bus))
 	file.save(SAVE_PATH)

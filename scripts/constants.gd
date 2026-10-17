@@ -365,5 +365,8 @@ const ROOF_MAP_MARGIN: float = 0.1
 # Seconds for the fog and ambient light to change over between outdoors and indoors.
 const ATMOSPHERE_BLEND_TIME: float = 1.2
 const ATMOSPHERE_CUT_DISTANCE: float = 3.0
+# Seconds outdoors until the screen is frozen over at the edges, and indoors until it has thawed.
+const FROST_BUILD_TIME: float = 10.0
+const FROST_THAW_TIME: float = 3.0
 # The snow emitter box is centred this far above the camera.
 const SNOW_EMITTER_ABOVE: float = 4.0

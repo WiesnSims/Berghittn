@@ -33,7 +33,6 @@
 [ext_resource type="Script" path="res://scripts/effects/roof_map.gd" id="31"]
 [ext_resource type="Script" path="res://scripts/effects/atmosphere.gd" id="32"]
 [ext_resource type="Script" path="res://scripts/effects/snowfall.gd" id="33"]
-[ext_resource type="Script" path="res://scripts/effects/post_fx.gd" id="34"]
 
 [sub_resource type="NavigationMesh" id="NavMesh"]
 geometry_collision_mask = 1
@@ -82,7 +81,6 @@ size = Vector2(0.07, 0.07)
 
 [sub_resource type="ShaderMaterial" id="PostMaterial"]
 shader = ExtResource("30")
-shader_parameter/grain = 0.07
 
 [node name="Main" type="Node3D"]
 process_mode = 3
@@ -99,10 +97,11 @@ light_energy = 0.25
 [node name="RoofMap" type="Node" parent="."]
 script = ExtResource("31")
 
-[node name="Atmosphere" type="Node" parent="." node_paths=PackedStringArray("environment", "roof_map")]
+[node name="Atmosphere" type="Node" parent="." node_paths=PackedStringArray("environment", "roof_map", "post_fx")]
 script = ExtResource("32")
 environment = NodePath("../WorldEnvironment")
 roof_map = NodePath("../RoofMap")
+post_fx = NodePath("../PostFX/Grade")
 
 [node name="Snowfall" type="GPUParticles3D" parent="." node_paths=PackedStringArray("roof_map")]
 amount = 5000
@@ -126,7 +125,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-script = ExtResource("34")
 
 [node name="World" type="Node3D" parent="."]
 process_mode = 1
@@ -183,10 +181,10 @@ zone_a = &"kueche"
 zone_b = &"skiraum"
 
 [node name="LagerKueche" parent="World/Doors" instance=ExtResource("18")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 5, 3.5, -7.3)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 6, 3.5, -8.5)
 zone_a = &"lager"
 zone_b = &"kueche"
-width = 2.0
+width = 1.9
 swing = 1.5708
 
 [node name="SkiraumSeilbahn" parent="World/Doors" instance=ExtResource("18")]

@@ -108,11 +108,12 @@ listens to `Events` and credits only its own player (`source` on every hit, kill
   mountain backdrop reads its fog colour at load.
 - `Snowfall` is a `GPUParticles3D` whose box follows the camera while the flakes stay in world space;
   `assets/shaders/snowflake.gdshader` drops every flake under a roof.
-- `PostFX` (a `CanvasLayer` under the HUD) grades, vignettes and adds film grain
-  (`assets/shaders/post_fx.gdshader`).
+- `PostFX` (a `CanvasLayer` under the HUD) grades and vignettes, and draws the frost
+  (`assets/shaders/post_fx.gdshader`); `Atmosphere` sets its `frost` amount, building up over
+  `FROST_BUILD_TIME` outdoors and thawing over `FROST_THAW_TIME` indoors.
 - `Settings` (autoload) holds sensitivity, aiming sensitivity, invert Y, the volume of each bus in
-  `default_bus_layout.tres` (Master, Music, Effects, Ambience), language, render resolution and film
-  grain, saved to `user://settings.cfg` (IndexedDB in the browser). The menu
+  `default_bus_layout.tres` (Master, Music, Effects, Ambience), language and render resolution,
+  saved to `user://settings.cfg` (IndexedDB in the browser). The menu
   (`scenes/ui/settings_menu.tscn`) opens from the start screen and the pause menu, applies changes
   live and saves on Back.
 

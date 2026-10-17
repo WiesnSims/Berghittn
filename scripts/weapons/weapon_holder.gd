@@ -10,6 +10,9 @@ signal reload_finished
 signal fired(rounds: int)
 ## The gun in hand changed (switch, buy, replace).
 signal weapon_changed(data: WeaponData)
+## The melee weapon on V changed (a melee wall-buy or the Hüttentruhe). It is never in hand, so the HUD
+## has to say so (play-test #65: a Goaßl from the chest seemed to vanish).
+signal melee_changed(data: WeaponData)
 ## Emitted when a shot hit an enemy, for the hit marker.
 signal hit_confirmed(is_headshot: bool, killed: bool)
 
@@ -149,6 +152,7 @@ func set_melee(data: WeaponData) -> void:
 	if data.viewmodel:
 		_melee_viewmodel = data.viewmodel.instantiate() as MeleeViewmodel
 		_motion.add_child(_melee_viewmodel)
+	melee_changed.emit(data)
 
 
 ## Holding the melee weapon up as a guard right now. Walking slows down; guns cannot fire.

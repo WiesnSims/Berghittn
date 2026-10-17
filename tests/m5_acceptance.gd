@@ -198,6 +198,8 @@ func _chest() -> void:
 	if not await _step_up(chest, "Hüttentruhe"):
 		return
 	var seen: Dictionary = {}
+	var melee_shown: Dictionary = {}
+	var melee_label: Label = main.get_node("UI/Hud/MeleeLabel")
 	for i: int in 60:
 		if seen.size() == chest.pool.entries.size():
 			break
@@ -216,6 +218,11 @@ func _chest() -> void:
 		chest.interact(player)
 		if holder.has_weapon(offer):
 			seen[offer.id] = true
+			# Play-test #65: a melee weapon goes on V, never into the hand, so the HUD must show it.
+			if offer.is_melee and melee_label.text.contains(tr(offer.display_name)):
+				melee_shown[offer.id] = true
 		await _seconds(1.2)
 	for entry: ChestEntry in chest.pool.entries:
 		_check(seen.has(entry.weapon.id), "the Hüttentruhe hands out the %s" % tr(entry.weapon.display_name))
+		if entry.weapon.is_melee:
+			_check(melee_shown.has(entry.weapon.id), "the HUD shows the %s on V once taken" % tr(entry.weapon.display_name))

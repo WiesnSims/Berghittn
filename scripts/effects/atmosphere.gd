@@ -4,9 +4,13 @@ extends Node
 ## metres. The Compatibility renderer has one global fog, so this eases it (and the ambient light)
 ## between an indoor and an outdoor look as the camera passes under a roof. The Environment resource
 ## itself holds the outdoor look, since the mountain backdrop takes its fog colour from it at load.
+## Outdoors the screen also freezes over from the edges, slowly, and thaws quicker once inside
+## (play-test 2026-10-17: the change of fog alone felt a little off).
 
 @export var environment: WorldEnvironment
 @export var roof_map: RoofMap
+## The post effect's ColorRect; its shader takes the frost amount.
+@export var post_fx: CanvasItem
 
 @export_group("Outdoors")
 @export var outdoor_fog_color: Color = Color(0.36, 0.4, 0.5)
@@ -23,6 +27,8 @@ extends Node
 # 0 = outdoors, 1 = indoors.
 var _inside: float = 1.0
 var _last_camera: Vector3 = Vector3.ZERO
+# 0 = thawed, 1 = frozen over.
+var _frost: float = 0.0
 
 
 func _process(delta: float) -> void:
@@ -40,3 +46,11 @@ func _process(delta: float) -> void:
 	env.fog_density = lerpf(outdoor_fog_density, indoor_fog_density, t)
 	env.ambient_light_color = outdoor_ambient_color.lerp(indoor_ambient_color, t)
 	env.ambient_light_energy = lerpf(outdoor_ambient_energy, indoor_ambient_energy, t)
+	if cut:
+		_frost = 1.0 - target
+	elif not get_tree().paused:
+		var rate: float = 1.0 / Constants.FROST_THAW_TIME if target > 0.5 else -1.0 / Constants.FROST_BUILD_TIME
+		_frost = clampf(_frost - rate * delta, 0.0, 1.0)
+	if post_fx:
+		# Eased, so the ice creeps in slowly at first and the thaw clears the middle of the view first.
+		(post_fx.material as ShaderMaterial).set_shader_parameter("frost", smoothstep(0.0, 1.0, _frost))

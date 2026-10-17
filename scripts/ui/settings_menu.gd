@@ -57,7 +57,6 @@ func _build() -> void:
 	_add_language()
 	_add_slider("UI_SET_RENDER_SCALE", Constants.RENDER_SCALE_MIN, 1.0, Settings.render_scale,
 			func(v: float) -> void: Settings.render_scale = v, _percent)
-	_add_toggle("UI_SET_FILM_GRAIN", Settings.film_grain, func(on: bool) -> void: Settings.film_grain = on)
 
 
 func _percent(value: float) -> String:

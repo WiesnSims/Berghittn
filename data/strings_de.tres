@@ -148,5 +148,7 @@ messages = {
 [&"", &"UI_SET_VOLUME_AMBIENCE"]: [&"Umgebung"],
 [&"", &"UI_SET_LANGUAGE"]: [&"Sprache"],
 [&"", &"UI_SET_RENDER_SCALE"]: [&"Renderauflösung"],
-[&"", &"UI_SET_FILM_GRAIN"]: [&"Filmkorn"]
+[&"", &"UI_CHEST_TAKE_MELEE"]: [&"E drücken: %s nehmen (Nahkampf, auf V)"],
+[&"", &"UI_MELEE"]: [&"%s   [V]"],
+[&"", &"UI_MELEE_TAKEN"]: [&"%s auf V"]
 }
