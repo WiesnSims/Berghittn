@@ -1,0 +1,186 @@
+[gd_scene load_steps=20 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/knoedel_viewmodel.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="Copper"]
+albedo_color = Color(0.72, 0.4, 0.22, 1)
+metallic = 0.7
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Wood"]
+albedo_color = Color(0.36, 0.22, 0.12, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Enamel"]
+albedo_color = Color(0.68, 0.12, 0.1, 1)
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="EnamelWhite"]
+albedo_color = Color(0.93, 0.92, 0.88, 1)
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="Dough"]
+albedo_color = Color(0.93, 0.85, 0.66, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="Flash"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.97, 0.9, 0.7)
+
+[sub_resource type="QuadMesh" id="FlashQuad"]
+material = SubResource("Flash")
+size = Vector2(0.28, 0.28)
+
+[sub_resource type="CylinderMesh" id="BarrelMesh"]
+material = SubResource("Copper")
+top_radius = 0.065
+bottom_radius = 0.055
+height = 0.46
+radial_segments = 12
+rings = 1
+
+[sub_resource type="CylinderMesh" id="MuzzleMesh"]
+material = SubResource("Copper")
+top_radius = 0.078
+bottom_radius = 0.07
+height = 0.04
+radial_segments = 12
+rings = 1
+cap_top = false
+
+[sub_resource type="BoxMesh" id="BodyMesh"]
+material = SubResource("Wood")
+size = Vector3(0.11, 0.11, 0.2)
+
+[sub_resource type="BoxMesh" id="GripMesh"]
+material = SubResource("Wood")
+size = Vector3(0.04, 0.12, 0.05)
+
+[sub_resource type="BoxMesh" id="StockMesh"]
+material = SubResource("Wood")
+size = Vector3(0.05, 0.07, 0.16)
+
+[sub_resource type="CylinderMesh" id="PotMesh"]
+material = SubResource("Enamel")
+top_radius = 0.055
+bottom_radius = 0.05
+height = 0.07
+radial_segments = 14
+rings = 1
+
+[sub_resource type="CylinderMesh" id="PotRimMesh"]
+material = SubResource("EnamelWhite")
+top_radius = 0.058
+bottom_radius = 0.058
+height = 0.01
+radial_segments = 14
+rings = 1
+
+[sub_resource type="CylinderMesh" id="LidMesh"]
+material = SubResource("Enamel")
+top_radius = 0.045
+bottom_radius = 0.06
+height = 0.016
+radial_segments = 14
+rings = 1
+
+[sub_resource type="SphereMesh" id="KnobMesh"]
+material = SubResource("EnamelWhite")
+radius = 0.011
+height = 0.022
+radial_segments = 8
+rings = 4
+
+[sub_resource type="SphereMesh" id="KnoedelMesh"]
+material = SubResource("Dough")
+radius = 0.055
+height = 0.11
+radial_segments = 10
+rings = 6
+
+[node name="KnoedelwerferViewmodel" type="Node3D"]
+script = ExtResource("1")
+kick_distance = 0.07
+kick_angle = 10.0
+kick_time = 0.2
+reload_offset = Vector3(-0.03, 0.03, 0)
+reload_tilt = 18.0
+slap_lift = 0.03
+lower_drop = 0.35
+
+[node name="Model" type="Node3D" parent="."]
+position = Vector3(0.2, -0.23, -0.36)
+
+[node name="Barrel" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0, -0.2)
+rotation = Vector3(-1.5708, 0, 0)
+cast_shadow = 0
+mesh = SubResource("BarrelMesh")
+
+[node name="Muzzle" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0, -0.43)
+rotation = Vector3(-1.5708, 0, 0)
+cast_shadow = 0
+mesh = SubResource("MuzzleMesh")
+
+[node name="Body" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, -0.01, 0.1)
+cast_shadow = 0
+mesh = SubResource("BodyMesh")
+
+[node name="Grip" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, -0.11, 0.13)
+rotation = Vector3(0.3, 0, 0)
+cast_shadow = 0
+mesh = SubResource("GripMesh")
+
+[node name="Stock" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, -0.03, 0.27)
+cast_shadow = 0
+mesh = SubResource("StockMesh")
+
+[node name="Pot" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0.09, -0.12)
+cast_shadow = 0
+mesh = SubResource("PotMesh")
+
+[node name="PotRim" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0.125, -0.12)
+cast_shadow = 0
+mesh = SubResource("PotRimMesh")
+
+[node name="Lid" type="Node3D" parent="Model"]
+position = Vector3(0, 0.132, -0.062)
+
+[node name="Plate" type="MeshInstance3D" parent="Model/Lid"]
+position = Vector3(0, 0, -0.058)
+cast_shadow = 0
+mesh = SubResource("LidMesh")
+
+[node name="Knob" type="MeshInstance3D" parent="Model/Lid"]
+position = Vector3(0, 0.013, -0.058)
+cast_shadow = 0
+mesh = SubResource("KnobMesh")
+
+[node name="Loaded" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0, -0.45)
+cast_shadow = 0
+mesh = SubResource("KnoedelMesh")
+
+[node name="Falling" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0.1, -0.12)
+cast_shadow = 0
+mesh = SubResource("KnoedelMesh")
+
+[node name="MuzzleFlash" type="Node3D" parent="Model"]
+position = Vector3(0, 0, -0.52)
+
+[node name="Quad" type="MeshInstance3D" parent="Model/MuzzleFlash"]
+cast_shadow = 0
+mesh = SubResource("FlashQuad")
+
+[node name="Light" type="OmniLight3D" parent="Model/MuzzleFlash"]
+light_color = Color(1, 0.95, 0.85, 1)
+light_energy = 1.0
+omni_range = 4.0

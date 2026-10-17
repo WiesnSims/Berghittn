@@ -194,6 +194,8 @@ Rules:
   - `alphorn`: the Echo (press): the bell swings up to the sky and the note comes down all around
     the player, 200 damage within 6 m in every direction and a harder shove; uses two notes. The
     panic button when surrounded.
+  - `knoedelwerfer`: the Knödeltris (press): three smaller dumplings in a fan (9° apart) for three
+    rounds, each bursting for 100 within 2 m with a smaller pile; covers a doorway or a crowd's width.
   - Melee weapons live on V, not in hand, so their mode is **holding V past the blow** (M5): tap V
     swings as before, keep it held and the weapon stays up.
   - `schmarrnpfanne`: the pan as a shield (hold V): hits from the front (60° each side) are caught and
@@ -226,7 +228,8 @@ Rules:
   Details (M5): the pool lives in `data/chest_pool.tres`; it never offers a gun the buyer already
   carries. The guns cycle for 2.5 s, slowing down, before one settles. Taking it fills a free slot or
   swaps out the gun in hand; not taken in 4 s, it sinks back and the points are gone.
-  The pool is Repetierer, Jagdflinte and Stutzen, plus each wonder weapon as it is built (Alphorn).
+  The pool is Repetierer, Jagdflinte and Stutzen, plus each wonder weapon as it is built (Alphorn,
+  Knödelwerfer).
 - **Alphorn:** fires a cone-shaped sound wave that damages and knocks back
   all enemies in a 12 m cone; funny low horn sound, screen shake.
   Details (M5): the cone is 30° each side of the aim; 200 damage to every body in it with a clear
@@ -247,6 +250,12 @@ Alpine folk culture.
 - **Knödelwerfer:** launches giant bread dumplings (Semmelknödel) in a ball
   arc. On impact: 3 m explosion for 180 damage and a sticky pile that slows
   enemies by 50% for 4 s. Comic "splat" sound.
+  Details (M5): 20 m/s launch under normal gravity; it bursts on the first wall, floor or body (in
+  the air after 4 s), walls shield what is behind them, survivors are shoved a little. The pile is
+  2 m in radius and lies 6 s; whoever wades in moves at half speed while in it and 4 s
+  after. "SPLATSCH!" pops up until the sound comes with M6. The next dumpling slides into the muzzle
+  as the gun is ready again (1 s). 12 / 36, reload 3 s (the lid of the Knödeltopf on top opens and
+  three drop in). In the chest at weight 1. Dumplings and piles are pooled.
 - **Rodelkanone:** fires a wooden sled that slides along the ground in a
   straight line for 15 m, hitting every enemy on the path for 300 damage with
   knockback. The sled then disappears with a crash.

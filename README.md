@@ -128,6 +128,14 @@ a held V (front hits caught and bonked back, hits from behind not, slower walkin
 swings against it).
 
 ```
+godot --headless --fixed-fps 60 res://tests/m5_knoedel.tscn
+```
+
+The Knödelwerfer: a dumpling into a crowd (180 within 3 m, not beyond, and a ground burst), the sticky
+pile slowing an enemy in it and for 4 s after, the Knödeltris, the dumpling pool, the muzzle showing
+the next dumpling as the gun is ready, and the chest weight.
+
+```
 godot --headless --fixed-fps 60 res://tests/upstairs.tscn
 godot --headless --fixed-fps 60 res://tests/spawn_paths.tscn
 ```
@@ -179,7 +187,7 @@ frame with the HUD, or shooting an enemy (wall puffs, hit flash, casings, head p
 visuals without playing.
 
 ```
-godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne
+godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne|knoedel
 ```
 
 Also needs a window: one frame per zone (all doors open), the wall-buys and a door mid-swing; or

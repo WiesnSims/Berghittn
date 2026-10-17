@@ -8,6 +8,8 @@ extends Node
 ## both barrels of the Jagdflinte, the Stutzen scope.
 ## m5: the enemy line-up, the Schnaps shrine, the Hüttentruhe closed and offering, the ammo crate,
 ## the boss bar, and the Repetierer firing, fanning and reloading.
+## knoedel: the Knödelwerfer in hand, a dumpling lobbed into a crowd (flight, burst, pile), the
+## Knödeltris, the reload.
 ## pfanne: the Küche wall-buy, the pan swung into a wanderer (BONK!), and held up as a guard.
 ## alphorn: the horn in hand, a blast into a crowd on the pasture, the Echo, the reload, and the horn
 ## shown over the Hüttentruhe.
@@ -75,6 +77,8 @@ func _ready() -> void:
 		await _alphorn_tour(main)
 	elif mode == "pfanne":
 		await _pfanne_tour(main)
+	elif mode == "knoedel":
+		await _knoedel_tour(main)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -520,3 +524,34 @@ func _pfanne_tour(main: Node) -> void:
 	await get_tree().create_timer(1.2).timeout
 	await _save_series("pfanne_guard_hit", 6, 0.15)
 	player.weapons.force_melee_hold = false
+
+
+func _knoedel_tour(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	var player := main.get_node("Player") as Player
+	var waves := main.get_node("WaveManager") as WaveManager
+	var gun: WeaponData = load("res://data/weapons/knoedelwerfer.tres")
+	var weapons: WeaponHolder = player.weapons
+	player.global_position = Vector3(10.0, -0.3, 31.0)
+	player.rotation.y = -PI * 0.5
+	(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(1.0)
+	weapons.give_weapon(gun)
+	for i: int in 7:
+		var enemy: Enemy = waves._create_enemy()
+		var spot := Vector3(17.0 + (i % 3) * 1.4, -0.3, 29.8 + (i / 3) * 1.3)
+		enemy.activate(load("res://data/enemies/knappe.tres" if i == 3 else "res://data/enemies/wanderer.tres"), 12, Transform3D(Basis.IDENTITY, spot).looking_at(Vector3(10.0, -0.3, 31.0), Vector3.UP))
+		enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
+	await get_tree().create_timer(0.3).timeout
+	await _save("knoedel_idle")
+	weapons._cooldown = 0.0
+	weapons._fire()
+	await _save_series("knoedel_shot", 12, 0.07)
+	await get_tree().create_timer(1.0).timeout
+	await _save("knoedel_pile")
+	weapons._cooldown = 0.0
+	weapons.fire_secondary()
+	await _save_series("knoedel_trio", 8, 0.08)
+	await get_tree().create_timer(1.0).timeout
+	weapons.mag = 0
+	weapons.start_reload()
+	await _save_series("knoedel_reload", 8, gun.reload_time / 8.0)

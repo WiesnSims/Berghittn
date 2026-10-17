@@ -447,20 +447,24 @@ func fire_secondary() -> void:
 		_viewmodel.play_secondary(rounds)
 
 
-## Area hit for behaviors (section 6a): every enemy (or other hit receiver) whose body is within
-## `reach` metres and `half_angle` degrees of the aim, with a clear line from the muzzle, takes `amount`
-## (before perks), and enemies that survive are thrown back; 180 degrees is all around. Returns how
-## many were hit.
+## Area hit from the muzzle along the aim (the Alphorn); see area_hit.
 func blast(half_angle: float, reach: float, amount: int, push: float) -> int:
+	return area_hit(global_position, -global_basis.z, half_angle, reach, amount, push)
+
+
+## Area hit for behaviors (section 6a): every enemy (or other hit receiver) whose body is within
+## `reach` metres of `center` and `half_angle` degrees of `forward`, with a clear line from the center,
+## takes `amount` (before perks), and enemies that survive are thrown back; 180 degrees is all around
+## (an explosion). Returns how many were hit.
+func area_hit(center: Vector3, forward: Vector3, half_angle: float, reach: float, amount: int, push: float) -> int:
 	var sphere := SphereShape3D.new()
 	sphere.radius = reach + Constants.AREA_BODY_MARGIN
 	var query := PhysicsShapeQueryParameters3D.new()
 	query.shape = sphere
-	query.transform = Transform3D(Basis.IDENTITY, global_position)
+	query.transform = Transform3D(Basis.IDENTITY, center)
 	query.collision_mask = Constants.LAYER_HITBOX
 	query.collide_with_areas = true
 	query.collide_with_bodies = false
-	var forward: Vector3 = -global_basis.z
 	var min_dot: float = cos(deg_to_rad(half_angle))
 	var struck: Dictionary = {}
 	for found: Dictionary in get_world_3d().direct_space_state.intersect_shape(query, Constants.AREA_MAX_TARGETS):
@@ -469,7 +473,7 @@ func blast(half_angle: float, reach: float, amount: int, push: float) -> int:
 		if hurtbox == null or hurtbox.is_head or struck.has(hurtbox.receiver):
 			continue
 		var target: Vector3 = hurtbox.global_position + Vector3.UP * Constants.AREA_AIM_HEIGHT * hurtbox.scale.y
-		var to_target: Vector3 = target - global_position
+		var to_target: Vector3 = target - center
 		var distance: float = to_target.length()
 		if distance > reach + Constants.AREA_BODY_MARGIN:
 			continue
@@ -478,7 +482,8 @@ func blast(half_angle: float, reach: float, amount: int, push: float) -> int:
 		if half_angle < 180.0 and to_target.normalized().dot(forward) < min_dot and not (to_target.dot(forward) > 0.0 and off_axis < Constants.AREA_BODY_MARGIN):
 			continue
 		# Walls stop it; the window openings themselves do not.
-		if _cast(to_target, Constants.LAYER_WORLD).collider != null:
+		var line := PhysicsRayQueryParameters3D.create(center, target, Constants.LAYER_WORLD, _exclude)
+		if not get_world_3d().direct_space_state.intersect_ray(line).is_empty():
 			continue
 		struck[hurtbox.receiver] = true
 		var result: Hurtbox.Result = hurtbox.take_hit(_damage(amount), 1.0, false, _shooter)
@@ -501,6 +506,21 @@ func shake_view(degrees: float) -> void:
 	var player := _shooter as Player
 	if player and degrees > 0.0:
 		player.shake_view(degrees)
+
+
+## Where thrown things and effects live: the world the shooter stands in.
+func world_root() -> Node:
+	return _shooter.get_parent()
+
+
+## The shooter's own body, so its projectiles never hit it.
+func shooter_exclude() -> Array[RID]:
+	return _exclude
+
+
+## A comic word floating up over a spot, for behaviors (the Knödel's "SPLAT!").
+func show_word(at: Vector3, key: String) -> void:
+	_float_word(at, key)
 
 
 ## Puts a short-lived effect into the world where the camera is, looking along the aim.
@@ -603,17 +623,24 @@ func _end_block() -> void:
 		_viewmodel.play_raise(Constants.BLOCK_LOWER_TIME)
 
 
-## A comic word where a blow lands (WeaponData.hit_text), floating up and fading.
+## The melee weapon's comic word where a blow lands (WeaponData.hit_text).
 func _show_hit_text(at: Vector3) -> void:
-	if melee_weapon.hit_text == "":
+	_float_word(at, melee_weapon.hit_text)
+
+
+## A comic word at `at`, floating up and fading.
+func _float_word(at: Vector3, key: String) -> void:
+	if key == "":
 		return
 	var label := Label3D.new()
-	label.text = tr(melee_weapon.hit_text)
+	label.text = tr(key)
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.no_depth_test = true
+	# Same size on screen near or far, so a burst across the garden can be read too.
+	label.fixed_size = true
 	label.font_size = 64
 	label.outline_size = 12
-	label.pixel_size = 0.004
+	label.pixel_size = 0.0012
 	label.modulate = Color(1.0, 0.85, 0.3)
 	label.outline_modulate = Color(0.25, 0.1, 0.05)
 	_shooter.get_parent().add_child(label)
