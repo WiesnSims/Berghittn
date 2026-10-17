@@ -110,11 +110,7 @@ func get_interact_prompt(player: Node3D) -> String:
 			if buyer != _buyer:
 				return ""
 			# A melee weapon goes into the melee slot, in place of the shovel: never a gun swap.
-			var key: String = "UI_CHEST_TAKE"
-			if offer.is_melee:
-				key = "UI_CHEST_TAKE_MELEE"
-			elif buyer.weapons.gun_count() >= Constants.GUN_SLOTS:
-				key = "UI_CHEST_SWAP"
+			var key: String = "UI_CHEST_TAKE" if offer.is_melee or buyer.weapons.gun_count() < Constants.GUN_SLOTS else "UI_CHEST_SWAP"
 			return tr(key) % tr(offer.display_name)
 	return ""
 

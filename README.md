@@ -320,6 +320,16 @@ godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|p
 Also needs a window: one frame per zone (all doors open), the wall-buys and a door mid-swing; or
 the Jagdflinte and Stutzen being drawn, fired and reloaded.
 
+```
+godot res://tests/hitch_probe.tscn
+```
+
+Needs a window too: frame times around first-time moments (a door bought, the Hüttentruhe's glow
+and roll, taking a weapon, each enemy type turning up), printing every frame over 25 ms. A first
+draw compiles shaders, which stalls far longer in the browser than on desktop, so
+`ShaderWarmup` (`scripts/effects/shader_warmup.gd`) draws every weapon model once behind the start
+screen; without it the first chest roll took 77 ms on desktop and 1-2 s in the browser.
+
 ## Deploy
 
 Cloudflare Pages project `berghittn` -> https://berghittn.pages.dev

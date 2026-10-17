@@ -368,5 +368,11 @@ const ATMOSPHERE_CUT_DISTANCE: float = 3.0
 # Seconds outdoors until the screen is frozen over at the edges, and indoors until it has thawed.
 const FROST_BUILD_TIME: float = 10.0
 const FROST_THAW_TIME: float = 3.0
+# Shader warm-up at load: frames the weapon models are drawn for, their size, and where (metres ahead
+# of the camera and apart).
+const WARMUP_FRAMES: int = 4
+const WARMUP_SCALE: float = 0.02
+const WARMUP_DISTANCE: float = 0.5
+const WARMUP_SPACING: float = 0.02
 # The snow emitter box is centred this far above the camera.
 const SNOW_EMITTER_ABOVE: float = 4.0

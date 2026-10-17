@@ -33,6 +33,7 @@
 [ext_resource type="Script" path="res://scripts/effects/roof_map.gd" id="31"]
 [ext_resource type="Script" path="res://scripts/effects/atmosphere.gd" id="32"]
 [ext_resource type="Script" path="res://scripts/effects/snowfall.gd" id="33"]
+[ext_resource type="Script" path="res://scripts/effects/shader_warmup.gd" id="35"]
 
 [sub_resource type="NavigationMesh" id="NavMesh"]
 geometry_collision_mask = 1
@@ -113,6 +114,9 @@ process_material = SubResource("SnowProcess")
 draw_pass_1 = SubResource("SnowFlake")
 script = ExtResource("33")
 roof_map = NodePath("../RoofMap")
+
+[node name="ShaderWarmup" type="Node3D" parent="."]
+script = ExtResource("35")
 
 [node name="PostFX" type="CanvasLayer" parent="."]
 layer = 0

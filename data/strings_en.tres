@@ -148,7 +148,6 @@ messages = {
 [&"", &"UI_SET_VOLUME_AMBIENCE"]: [&"Ambience"],
 [&"", &"UI_SET_LANGUAGE"]: [&"Language"],
 [&"", &"UI_SET_RENDER_SCALE"]: [&"Render resolution"],
-[&"", &"UI_CHEST_TAKE_MELEE"]: [&"Press E to take the %s (melee, on V)"],
 [&"", &"UI_MELEE"]: [&"%s   [V]"],
 [&"", &"UI_MELEE_TAKEN"]: [&"%s on V"]
 }
