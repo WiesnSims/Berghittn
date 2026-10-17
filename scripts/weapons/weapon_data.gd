@@ -96,6 +96,9 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR, BLOCK }
 @export var secondary_range: float = 0.0
 @export var secondary_knockback: float = 0.0
 @export var secondary_shake: float = 0.0
+## The secondary may take rounds beyond the magazine from the reserve (the Handböller's double charge:
+## the loaded one plus a second measure of powder poured in).
+@export var secondary_from_reserve: bool = false
 ## Guard (BLOCK): half-angle (degrees) of the front it covers, and the share of a hit that still gets
 ## through. The attacker is shoved back by secondary_knockback; walking slows to aim_move_multiplier.
 @export var block_angle: float = 60.0

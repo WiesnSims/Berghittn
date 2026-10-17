@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Material" path="res://assets/materials/greybox_concrete.tres" id="1"]
 [ext_resource type="Material" path="res://assets/materials/greybox_wood_wall.tres" id="2"]
@@ -10,6 +10,8 @@
 [ext_resource type="Material" path="res://assets/materials/greybox_lamp.tres" id="8"]
 [ext_resource type="Material" path="res://assets/materials/greybox_snow.tres" id="9"]
 [ext_resource type="Script" path="res://scripts/zones/spawn_point.gd" id="10"]
+[ext_resource type="PackedScene" path="res://scenes/zones/wallbuy_handboeller.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://scenes/zones/wallbuy_alphorn.tscn" id="12"]
 
 [sub_resource type="BoxShape3D" id="PortalBlockerShape"]
 size = Vector3(0.6, 5, 2.6)
@@ -272,3 +274,10 @@ zone = &"seilbahn"
 
 [node name="GuestArrival" type="Marker3D" parent="." groups=["guest_arrival"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.3, 1, 3.9)
+
+[node name="WallBuyHandboeller" parent="." instance=ExtResource("11")]
+position = Vector3(16.5, 1.5, -1)
+rotation = Vector3(0, 3.14159, 0)
+
+[node name="WallBuyAlphorn" parent="." instance=ExtResource("12")]
+position = Vector3(12.5, 1.6, 9)

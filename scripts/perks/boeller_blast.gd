@@ -1,13 +1,16 @@
 extends Node3D
 ## Böllerschuss (Marillenbrand): the look of a Schützen black-powder salute going off at the player's
-## feet. A flash, a ring of grey powder smoke rolling outwards, sparks, and a shock ring on the floor.
-## Built in code and gone after a few seconds; CPU particles because the web build is GLES3.
+## feet; the Handböller's shells burst with it too. A flash, a ring of grey powder smoke rolling
+## outwards, sparks, and a shock ring on the floor. Built in code and gone after a few seconds; CPU
+## particles because the web build is GLES3.
 
 const LIFETIME: float = 3.0
 
+## Metres the smoke and the shock ring reach; set before it enters the tree.
+var radius: float = Constants.PERK_BOELLER_RADIUS
+
 
 func _ready() -> void:
-	var radius: float = Constants.PERK_BOELLER_RADIUS
 	add_child(_smoke(radius))
 	add_child(_sparks())
 	var ring := _shock_ring()

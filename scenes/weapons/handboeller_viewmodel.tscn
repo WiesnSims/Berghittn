@@ -1,0 +1,153 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/handboeller_viewmodel.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="Bronze"]
+albedo_color = Color(0.8, 0.58, 0.28, 1)
+metallic = 0.3
+roughness = 0.45
+
+[sub_resource type="StandardMaterial3D" id="Wood"]
+albedo_color = Color(0.5, 0.31, 0.16, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="Dark"]
+albedo_color = Color(0.05, 0.05, 0.05, 1)
+
+[sub_resource type="StandardMaterial3D" id="Iron"]
+albedo_color = Color(0.1, 0.1, 0.11, 1)
+metallic = 0.6
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Flash"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+albedo_color = Color(1, 0.7, 0.35, 1)
+
+[sub_resource type="QuadMesh" id="FlashQuad"]
+material = SubResource("Flash")
+size = Vector2(0.5, 0.5)
+
+[sub_resource type="CylinderMesh" id="TubeMesh"]
+material = SubResource("Bronze")
+top_radius = 0.06
+bottom_radius = 0.045
+height = 0.26
+radial_segments = 12
+rings = 1
+
+[sub_resource type="CylinderMesh" id="RingMesh"]
+material = SubResource("Bronze")
+top_radius = 0.072
+bottom_radius = 0.066
+height = 0.035
+radial_segments = 12
+rings = 1
+cap_top = false
+
+[sub_resource type="CylinderMesh" id="BoreMesh"]
+material = SubResource("Dark")
+top_radius = 0.048
+bottom_radius = 0.048
+height = 0.02
+radial_segments = 12
+rings = 1
+
+[sub_resource type="SphereMesh" id="BreechMesh"]
+material = SubResource("Bronze")
+radius = 0.052
+height = 0.104
+radial_segments = 10
+rings = 5
+
+[sub_resource type="SphereMesh" id="BallMesh"]
+material = SubResource("Iron")
+radius = 0.04
+height = 0.08
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CylinderMesh" id="RodMesh"]
+material = SubResource("Wood")
+top_radius = 0.008
+bottom_radius = 0.008
+height = 0.35
+radial_segments = 6
+rings = 1
+
+[sub_resource type="BoxMesh" id="StockMesh"]
+material = SubResource("Wood")
+size = Vector3(0.05, 0.075, 0.3)
+
+[sub_resource type="BoxMesh" id="GripMesh"]
+material = SubResource("Wood")
+size = Vector3(0.04, 0.12, 0.05)
+
+[node name="HandboellerViewmodel" type="Node3D"]
+script = ExtResource("1")
+kick_distance = 0.12
+kick_angle = 18.0
+kick_time = 0.35
+reload_offset = Vector3(-0.02, 0.0, 0.02)
+lower_drop = 0.35
+
+[node name="Model" type="Node3D" parent="."]
+position = Vector3(0.24, -0.27, -0.4)
+rotation = Vector3(0.15, 0.35, 0)
+
+[node name="Stock" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, -0.03, 0.1)
+cast_shadow = 0
+mesh = SubResource("StockMesh")
+
+[node name="Grip" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, -0.1, 0.1)
+rotation = Vector3(0.3, 0, 0)
+cast_shadow = 0
+mesh = SubResource("GripMesh")
+
+[node name="Barrel" type="Node3D" parent="Model"]
+position = Vector3(0, 0.02, -0.12)
+rotation = Vector3(-1.5708, 0, 0)
+
+[node name="Breech" type="MeshInstance3D" parent="Model/Barrel"]
+cast_shadow = 0
+mesh = SubResource("BreechMesh")
+
+[node name="Tube" type="MeshInstance3D" parent="Model/Barrel"]
+position = Vector3(0, 0.13, 0)
+cast_shadow = 0
+mesh = SubResource("TubeMesh")
+
+[node name="Ring" type="MeshInstance3D" parent="Model/Barrel"]
+position = Vector3(0, 0.255, 0)
+cast_shadow = 0
+mesh = SubResource("RingMesh")
+
+[node name="Bore" type="MeshInstance3D" parent="Model/Barrel"]
+position = Vector3(0, 0.255, 0)
+cast_shadow = 0
+mesh = SubResource("BoreMesh")
+
+[node name="Ball" type="MeshInstance3D" parent="Model/Barrel"]
+position = Vector3(0, 0.22, 0)
+cast_shadow = 0
+mesh = SubResource("BallMesh")
+
+[node name="Ramrod" type="MeshInstance3D" parent="Model/Barrel"]
+position = Vector3(0, 0.3, 0)
+cast_shadow = 0
+mesh = SubResource("RodMesh")
+
+[node name="MuzzleFlash" type="Node3D" parent="Model"]
+position = Vector3(0, 0.02, -0.42)
+
+[node name="Quad" type="MeshInstance3D" parent="Model/MuzzleFlash"]
+cast_shadow = 0
+mesh = SubResource("FlashQuad")
+
+[node name="Light" type="OmniLight3D" parent="Model/MuzzleFlash"]
+light_color = Color(1, 0.7, 0.35, 1)
+light_energy = 7.0
+omni_range = 9.0

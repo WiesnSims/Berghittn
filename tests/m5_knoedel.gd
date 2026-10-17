@@ -179,7 +179,7 @@ func _pool() -> void:
 		holder._fire()
 		await _frames(2)
 	_check(_knoedel_nodes().size() <= Constants.KNOEDEL_POOL, "20 shots, %d dumplings built (pool of %d)" % [_knoedel_nodes().size(), Constants.KNOEDEL_POOL])
-	await _seconds(Constants.KNOEDEL_MAX_FLIGHT + 0.5)
+	await _seconds(Constants.LOBBED_MAX_FLIGHT + 0.5)
 	_check(_knoedel_nodes().all(func(k: Node3D) -> bool: return not k.is_busy()), "every dumpling has landed or burst")
 
 

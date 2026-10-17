@@ -1,23 +1,15 @@
-extends Node3D
-## One flying Semmelknödel from the Knödelwerfer, pooled. Falls in a ball arc, spinning, and bursts on
-## the first wall, floor or body it touches (or in the air after KNOEDEL_MAX_FLIGHT), into a cloud of
-## bread crumbs. Built in code: a pale bread ball with darker crust flecks.
+extends LobbedShot
+## One flying Semmelknödel from the Knödelwerfer (a LobbedShot), spinning in its ball arc and bursting
+## into a cloud of bread crumbs. Built in code: a pale bread ball with darker crust flecks.
 
 const RADIUS: float = 0.17
 
-var _launcher: Object
-var _velocity: Vector3
-var _gravity: float = 9.8
-var _damage: int = 0
-var _radius: float = 0.0
-var _size: float = 1.0
-var _flying: bool = false
-var _flight: float = 0.0
 var _ball: Node3D
 var _crumbs: CPUParticles3D
 
 
 func _ready() -> void:
+	hit_radius = RADIUS
 	_ball = Node3D.new()
 	add_child(_ball)
 	var dough := StandardMaterial3D.new()
@@ -71,45 +63,15 @@ func _ready() -> void:
 	_ball.visible = false
 
 
-func is_busy() -> bool:
-	return _flying
-
-
-func launch(launcher: Object, from: Vector3, velocity: Vector3, damage: int, radius: float, size: float) -> void:
-	_launcher = launcher
-	global_position = from
-	_velocity = velocity
-	_gravity = launcher.get("data").projectile_gravity
-	_damage = damage
-	_radius = radius
-	_size = size
-	_flight = 0.0
-	_flying = true
-	_ball.scale = Vector3.ONE * size
+func _on_launch() -> void:
+	_ball.scale = Vector3.ONE * _size
 	_ball.visible = true
 
 
-func _physics_process(delta: float) -> void:
-	if not _flying:
-		return
-	_flight += delta
-	_velocity.y -= _gravity * delta
-	var step: Vector3 = _velocity * delta
-	var query := PhysicsRayQueryParameters3D.create(global_position, global_position + step + step.normalized() * RADIUS * _size, Constants.LAYER_WORLD | Constants.LAYER_HITBOX, _launcher.get("holder").shooter_exclude())
-	query.collide_with_areas = true
-	var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
-	if not hit.is_empty():
-		_burst(hit.position + hit.normal * 0.15)
-		return
-	global_position += step
-	_ball.rotate(Vector3(_velocity.z, 0.0, -_velocity.x).normalized(), 9.0 * delta)
-	if _flight >= Constants.KNOEDEL_MAX_FLIGHT:
-		_burst(global_position)
+func _on_fly(delta: float, velocity: Vector3) -> void:
+	_ball.rotate(Vector3(velocity.z, 0.0, -velocity.x).normalized(), 9.0 * delta)
 
 
-func _burst(at: Vector3) -> void:
-	_flying = false
+func _on_burst(_at: Vector3) -> void:
 	_ball.visible = false
-	global_position = at
 	_crumbs.restart()
-	_launcher.call("burst", at, _damage, _radius, _size)
