@@ -194,6 +194,11 @@ Rules:
   - `alphorn`: the Echo (press): the bell swings up to the sky and the note comes down all around
     the player, 200 damage within 6 m in every direction and a harder shove; uses two notes. The
     panic button when surrounded.
+  - Melee weapons live on V, not in hand, so their mode is **holding V past the blow** (M5): tap V
+    swings as before, keep it held and the weapon stays up.
+  - `schmarrnpfanne`: the pan as a shield (hold V): hits from the front (60° each side) are caught and
+    the attacker is bonked back; you walk at 60 % and cannot shoot until you let go. Hits from the side
+    or behind still land, so you keep turning to face them.
 - Ready ring (play-test 2026-10-17): a ring around the crosshair fills while the gun reloads (amber)
   and, for the Alphorn, between notes (white), and pulses once when the gun is ready again. Guns that
   work an action after a shot fire again the moment the animation ends (play-test: the Stutzen's bolt
@@ -259,6 +264,9 @@ Alpine folk culture.
   Schützen celebrations. One loud shot, 3 m explosion, very long reload.
 - **Schmarrnpfanne:** a heavy frying pan. Satisfying "bonk" sound, small
   knockback, fastest strong melee.
+  Details (M5): bought at the Küche east wall for 400; it replaces the shovel in the melee slot. 90 per
+  blow, a shove of 4 m/s (heavy enemies less), and a comic "BONK!" pops up where it lands until the
+  sound comes with M6. A Kaiserschmarrn is still in it.
 - **Goaßl:** a long whip (Goaßlschnalzen). Cracks loudly, hits in a short
   cone, and stuns enemies for 1.5 s.
 - **Mistgabel:** pitchfork with long reach; pierces and hits two enemies in

@@ -45,6 +45,8 @@ messages = {
 [&"", &"ENEMY_KRAMPUS"]: [&"Krampus"],
 [&"", &"WEAPON_REPETIERER"]: [&"Repetierer"],
 [&"", &"WEAPON_ALPHORN"]: [&"Alphorn"],
+[&"", &"WEAPON_SCHMARRNPFANNE"]: [&"Schmarrnpfanne"],
+[&"", &"HIT_BONK"]: [&"BONK!"],
 [&"", &"PERK_ENZIAN"]: [&"Enzian"],
 [&"", &"PERK_MARILLENBRAND"]: [&"Marillenbrand"],
 [&"", &"PERK_JAGERTEE"]: [&"Jagertee"],

@@ -50,7 +50,10 @@ func is_targetable() -> bool:
 	return not health.is_dead()
 
 
-func take_damage(amount: int) -> void:
+## `attacker` lets a raised guard (the Schmarrnpfanne) catch hits from the front.
+func take_damage(amount: int, attacker: Node3D = null) -> void:
+	if weapons.block(attacker):
+		amount = roundi(amount * weapons.melee_weapon.block_share)
 	health.take_damage(amount)
 
 
@@ -126,6 +129,8 @@ func _base_speed(input: Vector2) -> float:
 		return Constants.PLAYER_CROUCH_SPEED
 	if weapons.is_aiming():
 		return Constants.PLAYER_WALK_SPEED * weapons.weapon.aim_move_multiplier
+	if weapons.is_blocking():
+		return Constants.PLAYER_WALK_SPEED * weapons.melee_weapon.aim_move_multiplier
 	# Sprinting only counts while moving forward, so you cannot sprint backwards or sideways.
 	if Input.is_action_pressed("sprint") and input.y < 0.0:
 		return Constants.PLAYER_SPRINT_SPEED

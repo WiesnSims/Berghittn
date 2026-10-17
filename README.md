@@ -120,6 +120,14 @@ offering it at weight 1. Special weapons are a `WeaponData` plus a behavior scri
 reloads and recoil and calls the behavior instead of the hitscan ray.
 
 ```
+godot --headless --fixed-fps 60 res://tests/m5_pfanne.tscn
+```
+
+The Schmarrnpfanne: its Küche wall-buy replacing the shovel, the blow and its shove, and the guard on
+a held V (front hits caught and bonked back, hits from behind not, slower walking, a real enemy's
+swings against it).
+
+```
 godot --headless --fixed-fps 60 res://tests/upstairs.tscn
 godot --headless --fixed-fps 60 res://tests/spawn_paths.tscn
 ```
@@ -171,7 +179,7 @@ frame with the HUD, or shooting an enemy (wall puffs, hit flash, casings, head p
 visuals without playing.
 
 ```
-godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn
+godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne
 ```
 
 Also needs a window: one frame per zone (all doors open), the wall-buys and a door mid-swing; or

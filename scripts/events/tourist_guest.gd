@@ -58,7 +58,7 @@ func is_targetable() -> bool:
 	return is_alive()
 
 
-func take_damage(amount: int) -> void:
+func take_damage(amount: int, _attacker: Node3D = null) -> void:
 	if not is_alive():
 		return
 	health -= amount

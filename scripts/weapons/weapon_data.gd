@@ -7,9 +7,13 @@ extends Resource
 ## ALL_BARRELS: every loaded round in one blast (press).
 ## FAN: work the action as fast as the hand can, firing from the hip (hold); see rapid_*.
 ## BEHAVIOR: the special weapon's own second shot from its behavior script (press); see secondary_*.
-enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR }
+## BLOCK (melee): melee lives on V, not in hand, so its mode is holding V past the blow: the weapon
+## stays up as a guard against hits from the front; see block_*.
+enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR, BLOCK }
 
 @export var id: StringName
+## Goes in the melee slot (quick melee on V) instead of a gun slot.
+@export var is_melee: bool = false
 ## Translation key, not display text.
 @export var display_name: String
 @export var damage: int = 10
@@ -59,6 +63,9 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR }
 ## Show the ready ring at the crosshair while the gun cycles between shots (play-test: only for the
 ## Alphorn's long gap; other guns show it in their animation, and fire again as it ends).
 @export var cycle_ring: bool = false
+## Translation key of a comic word that pops up where a melee blow lands (the pan's "BONK!"), until
+## the M6 sounds; empty = none.
+@export var hit_text: String = ""
 @export var viewmodel: PackedScene
 @export var secondary: Secondary = Secondary.NONE
 ## Aiming (AIM and SCOPE): field of view when fully aimed (degrees), seconds to get there, and the
@@ -78,6 +85,10 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR }
 @export var secondary_range: float = 0.0
 @export var secondary_knockback: float = 0.0
 @export var secondary_shake: float = 0.0
+## Guard (BLOCK): half-angle (degrees) of the front it covers, and the share of a hit that still gets
+## through. The attacker is shoved back by secondary_knockback; walking slows to aim_move_multiplier.
+@export var block_angle: float = 60.0
+@export var block_share: float = 0.0
 
 
 func can_aim() -> bool:

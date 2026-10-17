@@ -65,6 +65,9 @@ var _behavior: WeaponBehavior
 var _melee_viewmodel: MeleeViewmodel
 # Seconds left of the current swing, and until its blow lands (negative once it has).
 var _melee_left: float = 0.0
+# Holding the melee weapon up as a guard (BLOCK secondary), and a hold of V without a keyboard for tests.
+var _blocking: bool = false
+var force_melee_hold: bool = false
 var _melee_hit_in: float = -1.0
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 # The shooter's own body, so rays never hit it, and who gets the points.
@@ -91,6 +94,9 @@ func set_owner_body(body: CollisionObject3D) -> void:
 ## Puts a gun in hand: into a free slot if there is one, otherwise in place of the gun in hand.
 ## Handed over ready to fire, chambered and with full reserve.
 func give_weapon(data: WeaponData) -> void:
+	if data.is_melee:
+		set_melee(data)
+		return
 	var owned: int = _slot_of(data)
 	if owned >= 0:
 		_select(owned)
@@ -118,7 +124,51 @@ func give_weapon(data: WeaponData) -> void:
 
 
 func has_weapon(data: WeaponData) -> bool:
+	if data.is_melee:
+		return melee_weapon != null and melee_weapon.id == data.id
 	return _slot_of(data) >= 0
+
+
+## Puts a melee weapon in the melee slot (section 6), in place of the one carried (the shovel).
+func set_melee(data: WeaponData) -> void:
+	_end_block()
+	_melee_left = 0.0
+	_melee_hit_in = -1.0
+	if _melee_viewmodel:
+		_melee_viewmodel.queue_free()
+		_melee_viewmodel = null
+	melee_weapon = data
+	if data.viewmodel:
+		_melee_viewmodel = data.viewmodel.instantiate() as MeleeViewmodel
+		_motion.add_child(_melee_viewmodel)
+
+
+## Holding the melee weapon up as a guard right now. Walking slows down; guns cannot fire.
+func is_blocking() -> bool:
+	return _blocking
+
+
+## A hit is coming in from `attacker`: true when the guard is up and faces it, so the hit is caught
+## (block_share of it still gets through) and the attacker is bonked back.
+func block(attacker: Node3D) -> bool:
+	if not _blocking or attacker == null:
+		return false
+	var to: Vector3 = attacker.global_position - global_position
+	var flat := Vector3(to.x, 0.0, to.z)
+	var forward := Vector3(-global_basis.z.x, 0.0, -global_basis.z.z).normalized()
+	if flat.length() > 0.05 and flat.normalized().dot(forward) < cos(deg_to_rad(melee_weapon.block_angle)):
+		return false
+	var enemy := attacker as Enemy
+	if enemy and enemy.is_alive():
+		enemy.apply_knockback(flat.normalized() * melee_weapon.secondary_knockback * sqrt(enemy.data.flinch_multiplier))
+	_hit_puffs.play(global_position + forward * 0.5 + Vector3.DOWN * 0.3, -forward)
+	_show_hit_text(global_position + forward * 0.8)
+	if _melee_viewmodel:
+		_melee_viewmodel.play_bonk()
+	var player := _shooter as Player
+	if player:
+		player.kick_view(3.0, 1.5)
+	return true
 
 
 ## True when the gun is carried and its reserve is not full, so buying ammo would do something.
@@ -240,6 +290,10 @@ func _physics_process(delta: float) -> void:
 		_sprint_left = maxf(_sprint_left - delta, 0.0)
 	var captured: bool = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
 	_update_aim(delta, force_aim or (captured and Input.is_action_pressed("secondary")))
+	if _blocking:
+		if not _melee_held():
+			_end_block()
+		return
 	if _melee_left > 0.0:
 		_update_melee(delta)
 		return
@@ -457,12 +511,13 @@ func add_effect(effect: Node3D) -> void:
 
 func _update_aim(delta: float, held: bool) -> void:
 	# Reloading, switching or swinging the shovel drops the aim; it comes back once the hands are free.
-	_aiming = held and weapon != null and weapon.can_aim() and not is_reloading() and _switch_left <= 0.0 and _melee_left <= 0.0
+	_aiming = held and weapon != null and weapon.can_aim() and not is_reloading() and _switch_left <= 0.0 and _melee_left <= 0.0 and not _blocking
 	var speed: float = 1.0 / weapon.aim_time if weapon and weapon.aim_time > 0.0 else 1.0 / Constants.WEAPON_SWITCH_TIME
 	aim_amount = move_toward(aim_amount, 1.0 if _aiming else 0.0, speed * delta)
 	if _viewmodel:
 		_viewmodel.set_aim(aim_eased())
-		_viewmodel.visible = not is_scoped()
+		# Out of the way behind the scope, and down while a melee guard is up.
+		_viewmodel.visible = not is_scoped() and not _blocking
 
 
 func _fire(rounds: int = 1) -> void:
@@ -517,6 +572,56 @@ func _update_melee(delta: float) -> void:
 		_melee_hit_in -= delta
 		if _melee_hit_in < 0.0:
 			_melee_hit()
+			# Still holding V after the blow: the weapon stays up as a guard.
+			if melee_weapon.secondary == WeaponData.Secondary.BLOCK and _melee_held():
+				_start_block()
+
+
+func _melee_held() -> bool:
+	return force_melee_hold or (Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Input.is_action_pressed("melee"))
+
+
+func _start_block() -> void:
+	_blocking = true
+	_melee_left = 0.0
+	# The gun stays down for as long as the guard is up.
+	if _viewmodel:
+		_viewmodel.visible = false
+	if _melee_viewmodel:
+		_melee_viewmodel.play_guard()
+
+
+func _end_block() -> void:
+	if not _blocking:
+		return
+	_blocking = false
+	if _melee_viewmodel:
+		_melee_viewmodel.end_guard()
+	_switch_left = Constants.BLOCK_LOWER_TIME
+	if _viewmodel:
+		_viewmodel.visible = true
+		_viewmodel.play_raise(Constants.BLOCK_LOWER_TIME)
+
+
+## A comic word where a blow lands (WeaponData.hit_text), floating up and fading.
+func _show_hit_text(at: Vector3) -> void:
+	if melee_weapon.hit_text == "":
+		return
+	var label := Label3D.new()
+	label.text = tr(melee_weapon.hit_text)
+	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	label.no_depth_test = true
+	label.font_size = 64
+	label.outline_size = 12
+	label.pixel_size = 0.004
+	label.modulate = Color(1.0, 0.85, 0.3)
+	label.outline_modulate = Color(0.25, 0.1, 0.05)
+	_shooter.get_parent().add_child(label)
+	label.global_position = at
+	var tween := label.create_tween().set_parallel()
+	tween.tween_property(label, "global_position", at + Vector3.UP * 0.6, Constants.HIT_TEXT_TIME).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label, "modulate:a", 0.0, Constants.HIT_TEXT_TIME).set_ease(Tween.EASE_IN)
+	tween.chain().tween_callback(label.queue_free)
 
 
 func _melee_hit() -> void:
@@ -553,6 +658,10 @@ func _melee_hit() -> void:
 		if result != Hurtbox.Result.IGNORED:
 			_hit_puffs.play(target, -to_target.normalized())
 			hit_confirmed.emit(false, result == Hurtbox.Result.KILLED)
+			_show_hit_text(target)
+			var enemy := hurtbox.receiver as Enemy
+			if enemy and enemy.is_alive() and melee_weapon.knockback > 0.0:
+				enemy.apply_knockback(flat.normalized() * melee_weapon.knockback * sqrt(enemy.data.flinch_multiplier))
 
 
 func _cast(offset: Vector3, mask: int = Constants.LAYER_WORLD | Constants.LAYER_HITBOX) -> Dictionary:

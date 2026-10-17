@@ -23,7 +23,7 @@ var health: int = 0
 ## Health at spawn, for the boss bar.
 var max_health: int = 0
 var _state: State = State.INACTIVE
-## A player or an escort (group "escorts"): anything with is_targetable() and take_damage(amount).
+## A player or an escort (group "escorts"): anything with is_targetable() and take_damage(amount, attacker).
 var _target: Node3D
 var _model: Node3D
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -342,7 +342,7 @@ func _attack(delta: float) -> void:
 		_has_swung = true
 		# Only lands if the player is still there: backing off during the windup is a real dodge.
 		if _target and _target.is_targetable() and _in_attack_range():
-			_target.take_damage(data.damage)
+			_target.take_damage(data.damage, self)
 	if _attack_time >= data.attack_windup + data.attack_cooldown:
 		_state = State.CHASING
 
@@ -396,7 +396,7 @@ func _lunge(delta: float) -> void:
 	move_and_slide()
 	if not _lunge_struck and _target and _target.is_targetable() and _in_attack_range():
 		_lunge_struck = true
-		_target.take_damage(data.damage)
+		_target.take_damage(data.damage, self)
 	if _lunge_struck or _lunge_time >= data.lunge_windup + data.lunge_time:
 		_end_lunge()
 
