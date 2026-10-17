@@ -252,6 +252,10 @@ const MELEE_HIT_FRACTION: float = 0.3
 const MELEE_ARC_DEGREES: float = 110.0
 const MELEE_MAX_TARGETS: int = 32
 const MELEE_AIM_HEIGHT: float = 1.3
+# Guard (Schmarrnpfanne): seconds to bring the gun back up after lowering the guard, and how long a
+# comic hit word ("BONK!") floats.
+const BLOCK_LOWER_TIME: float = 0.25
+const HIT_TEXT_TIME: float = 0.6
 # Longest a weapon may be shown floating over the Hüttentruhe (metres); longer ones are shrunk.
 const CHEST_DISPLAY_MAX_LENGTH: float = 1.2
 # Area weapons (Alphorn, section 6a): the most hit boxes one blast checks (two per enemy), where on a

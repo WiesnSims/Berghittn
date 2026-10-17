@@ -6,6 +6,7 @@
 [resource]
 script = ExtResource("1")
 id = &"schaufel"
+is_melee = true
 display_name = "WEAPON_SCHAUFEL"
 damage = 70
 headshot_multiplier = 1.0

@@ -8,6 +8,7 @@ extends Node
 ## both barrels of the Jagdflinte, the Stutzen scope.
 ## m5: the enemy line-up, the Schnaps shrine, the Hüttentruhe closed and offering, the ammo crate,
 ## the boss bar, and the Repetierer firing, fanning and reloading.
+## pfanne: the Küche wall-buy, the pan swung into a wanderer (BONK!), and held up as a guard.
 ## alphorn: the horn in hand, a blast into a crowd on the pasture, the Echo, the reload, and the horn
 ## shown over the Hüttentruhe.
 
@@ -72,6 +73,8 @@ func _ready() -> void:
 		await _guest_tour(main)
 	elif mode == "alphorn":
 		await _alphorn_tour(main)
+	elif mode == "pfanne":
+		await _pfanne_tour(main)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -482,3 +485,38 @@ func _alphorn_tour(main: Node) -> void:
 	chest.interact(player)
 	await get_tree().create_timer(chest.pool.roll_time + 0.5).timeout
 	await _save("alphorn_chest")
+
+
+func _pfanne_tour(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	var player := main.get_node("Player") as Player
+	var zones := main.get_node("Zones") as ZoneMap
+	var waves := main.get_node("WaveManager") as WaveManager
+	zones.unlock(&"kueche", player)
+	var pan: WeaponData = load("res://data/weapons/schmarrnpfanne.tres")
+	var buy: WallBuy = main.find_children("*", "WallBuy", true, false).filter(func(w: WallBuy) -> bool: return w.weapon == pan)[0]
+	player.global_position = buy.to_global(Vector3(0.6, -1.5, -2.2))
+	player.look_at(Vector3(buy.global_position.x, player.global_position.y, buy.global_position.z), Vector3.UP)
+	await get_tree().create_timer(1.0).timeout
+	await _save("pfanne_wallbuy")
+	player.weapons.give_weapon(pan)
+	# A wanderer on the pasture to bonk.
+	player.global_position = Vector3(10.0, -0.3, 31.0)
+	player.rotation.y = -PI * 0.5
+	(player.get_node("Head") as Node3D).rotation.x = 0.0
+	var enemy: Enemy = waves._create_enemy()
+	enemy.activate(load("res://data/enemies/wanderer.tres"), 10, Transform3D(Basis.IDENTITY, Vector3(11.5, -0.3, 31.0)).looking_at(Vector3(10.0, -0.3, 31.0), Vector3.UP))
+	enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
+	enemy.set_physics_process(false)
+	await get_tree().create_timer(0.3).timeout
+	player.weapons._start_melee()
+	await _save_series("pfanne_swing", 8, 0.06)
+	await get_tree().create_timer(1.0).timeout
+	enemy.set_physics_process(true)
+	player.weapons.force_melee_hold = true
+	player.weapons._start_melee()
+	await get_tree().create_timer(0.5).timeout
+	await _save("pfanne_guard")
+	await get_tree().create_timer(1.2).timeout
+	await _save_series("pfanne_guard_hit", 6, 0.15)
+	player.weapons.force_melee_hold = false

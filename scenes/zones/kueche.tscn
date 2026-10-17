@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Material" path="res://assets/materials/greybox_tile.tres" id="1"]
 [ext_resource type="Material" path="res://assets/materials/greybox_wood_floor.tres" id="2"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://scripts/zones/spawn_point.gd" id="11"]
 [ext_resource type="PackedScene" path="res://scenes/zones/schnaps_shrine.tscn" id="12"]
 [ext_resource type="PackedScene" path="res://scenes/zones/brettljause.tscn" id="13"]
+[ext_resource type="PackedScene" path="res://scenes/zones/wallbuy_schmarrnpfanne.tscn" id="14"]
 
 [node name="Kueche" type="Node3D"]
 
@@ -256,3 +257,7 @@ zone = &"kueche"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, -0.3, -9)
 script = ExtResource("11")
 zone = &"kueche"
+
+[node name="WallBuySchmarrnpfanne" parent="." instance=ExtResource("14")]
+position = Vector3(7, 1.5, -14.3)
+rotation = Vector3(0, 1.5708, 0)
