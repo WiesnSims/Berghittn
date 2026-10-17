@@ -11,3 +11,5 @@ extends Resource
 @export var projectile: PackedScene
 ## Seconds before the next one can go.
 @export var cooldown: float = 0.6
+## Points for filling the slot up to max_carry at a wall-buy (0 = not sold, like the Eisstock).
+@export var cost: int = 0

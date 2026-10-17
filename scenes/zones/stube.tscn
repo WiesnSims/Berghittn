@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene load_steps=20 format=3]
 
 [ext_resource type="Material" path="res://assets/materials/greybox_wood_floor.tres" id="1"]
 [ext_resource type="Material" path="res://assets/materials/greybox_wood_wall.tres" id="2"]
@@ -15,6 +15,7 @@
 [ext_resource type="Material" path="res://assets/materials/greybox_metal.tres" id="13"]
 [ext_resource type="PackedScene" path="res://scenes/zones/wallbuy_jagdflinte.tscn" id="14"]
 [ext_resource type="Script" path="res://scripts/zones/spawn_point.gd" id="15"]
+[ext_resource type="PackedScene" path="res://scenes/zones/wallbuy_kuhglocke.tscn" id="16"]
 
 [sub_resource type="BoxShape3D" id="BoxShape1"]
 size = Vector3(6.2, 3, 0.2)
@@ -712,3 +713,7 @@ zone = &"stube"
 
 [node name="GuestGoal" type="Marker3D" parent="." groups=["guest_goal"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 3.5)
+
+[node name="WallBuyKuhglocke" parent="." instance=ExtResource("16")]
+position = Vector3(7, 1.5, 3.6)
+rotation = Vector3(0, 1.5708, 0)

@@ -289,6 +289,13 @@ time, shown on the HUD above the gun name)**
 | Id | Name | Effect | Cost | Max carried | Where |
 |---|---|---|---|---|---|
 | `kuhglocke` | Kuhglocke | Thrown decoy cowbell; rings for 10 s and attracts all enemies within 20 m | 300 | 2 | wall-buy, Stube |
+
+Kuhglocke details (M5): thrown in an arc where the player looks (gallery and garden reachable), it
+bounces off walls and rings once it lies still. Enemies within 20 m walk to it and stand round it,
+leaving players alone, also those already inside the hut; the Krampus ignores it (bosses are immune
+to crowd control). A ring pulses on the floor and "BIMM!" floats up until the M6 sound. The wall-buy
+on the Stube east wall fills the slot to two for 300 and warns when it would replace an Eisstock.
+Equipment keeps G as its only action, no second mode.
 | `kuhfladen` | Kuhfladen-Mine | Placed on the floor; enemies stepping in it are slowed 60% for 5 s and take 40 damage | 250 | 3 | wall-buy, Schuppen |
 | `eisstock` | Eisstock | Thrown low, slides along the floor like a curling stone, bounces off walls up to 3 times and damages every enemy it slides through (5000, a boss 1500 and a shove; 16 m/s, slows down over about 30 m). Deliberately overpowered (user request, 2026-10-17) | – | 2 | only as an event reward (section 8a): no wall-buy, no refill |
 

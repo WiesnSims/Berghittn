@@ -8,6 +8,8 @@ extends Node
 ## both barrels of the Jagdflinte, the Stutzen scope.
 ## m5: the enemy line-up, the Schnaps shrine, the Hüttentruhe closed and offering, the ammo crate,
 ## the boss bar, and the Repetierer firing, fanning and reloading.
+## glocke: the Kuhglocke wall-buy in the Stube, then one thrown onto the pasture, ringing, with
+## wanderers gathering round it.
 ## knoedel: the Knödelwerfer in hand, a dumpling lobbed into a crowd (flight, burst, pile), the
 ## Knödeltris, the reload.
 ## pfanne: the Küche wall-buy, the pan swung into a wanderer (BONK!), and held up as a guard.
@@ -79,6 +81,8 @@ func _ready() -> void:
 		await _pfanne_tour(main)
 	elif mode == "knoedel":
 		await _knoedel_tour(main)
+	elif mode == "glocke":
+		await _glocke_tour(main)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -555,3 +559,32 @@ func _knoedel_tour(main: Node) -> void:
 	weapons.mag = 0
 	weapons.start_reload()
 	await _save_series("knoedel_reload", 8, gun.reload_time / 8.0)
+
+
+func _glocke_tour(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	var player := main.get_node("Player") as Player
+	var waves := main.get_node("WaveManager") as WaveManager
+	var glocke: EquipmentData = load("res://data/equipment/kuhglocke.tres")
+	var buy: WallBuy = main.find_children("*", "WallBuy", true, false).filter(func(w: WallBuy) -> bool: return w.equipment == glocke)[0]
+	player.global_position = buy.to_global(Vector3(-0.5, -1.5, -2.4))
+	player.look_at(Vector3(buy.global_position.x, player.global_position.y, buy.global_position.z), Vector3.UP)
+	player.points.add(1000)
+	await get_tree().create_timer(1.0).timeout
+	await _save("glocke_wallbuy")
+	buy.interact(player)
+	player.global_position = Vector3(10.0, -0.3, 31.0)
+	player.rotation.y = -PI * 0.5
+	(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(-8.0)
+	for i: int in 6:
+		var enemy: Enemy = waves._create_enemy()
+		var spot := Vector3(12.0 + (i % 3) * 3.0, -0.3, 25.0 + (i / 3) * 12.0)
+		enemy.activate(load("res://data/enemies/wanderer.tres"), 3, Transform3D(Basis.IDENTITY, spot))
+		enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
+	await get_tree().create_timer(0.3).timeout
+	await _save("glocke_hud")
+	player.equipment.throw()
+	await _save_series("glocke_throw", 6, 0.12)
+	(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(-12.0)
+	await get_tree().create_timer(2.5).timeout
+	await _save_series("glocke_ring", 4, 0.5)
