@@ -93,7 +93,7 @@ messages = {
 [&"", &"PERK_OBSTLER_TITLE"]: [&"Grantler"],
 [&"", &"PERK_JAGAMOASTA_TITLE"]: [&"56 gsunde Kräuter"],
 [&"", &"PERK_OBSTLER_DESC"]: [&"+5 % Schaden für jeden Gegner im Umkreis von 5 m, bis +30 %"],
-[&"", &"PERK_JAGAMOASTA_DESC"]: [&"56 gsunde Kräuter! Jeder Kill ist ein Kraut; bei 56 bist du voll geheilt und triffst 10 s doppelt so hart"],
+[&"", &"PERK_JAGAMOASTA_DESC"]: [&"56 gsunde Kräuter! Jeder Kill ist ein Kraut; bei 56 bist du voll geheilt und hast für immer +20 % Leben und +20 % Schaden, auch nach dem Umfallen"],
 [&"", &"PERK_ENZIAN_SHOUT"]: [&"Na, sicher ned!"],
 [&"", &"PERK_MARILLENBRAND_SHOUT"]: [&"Böllerschuss!"],
 [&"", &"PERK_JAGAMOASTA_SHOUT"]: [&"56 gsunde Kräuter!"],

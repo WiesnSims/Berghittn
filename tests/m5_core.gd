@@ -384,11 +384,20 @@ func _kraeuter() -> void:
 	player.health._health = 30.0
 	for i: int in Constants.PERK_HERBS - 1:
 		Events.enemy_killed.emit(null, false, false, player)
-	_check(player.perks.herbs == Constants.PERK_HERBS - 1 and player.perks.rausch_left() == 0.0, "Jagamoasta: %d herbs gathered" % player.perks.herbs)
+	_check(player.perks.herbs == Constants.PERK_HERBS - 1 and not player.perks.herbs_done and is_equal_approx(player.perks.damage_multiplier(), 1.0), "Jagamoasta: %d herbs gathered, nothing yet" % player.perks.herbs)
 	Events.enemy_killed.emit(null, false, false, player)
-	_check(player.health.current() == player.health.max_health and is_equal_approx(player.perks.damage_multiplier(), 2.0) and player.perks.herbs == 0,
-		"56 gsunde Kräuter: healed to %d, damage x%.1f" % [player.health.current(), player.perks.damage_multiplier()])
-	player.perks._rausch_left = 0.0
+	_check(player.health.max_health == 100 + Constants.PERK_HERB_HEALTH and player.health.current() == player.health.max_health and is_equal_approx(player.perks.damage_multiplier(), 1.2),
+		"56 gsunde Kräuter: max health %d, healed full, damage x%.1f" % [player.health.max_health, player.perks.damage_multiplier()])
+	_check(player.perks.status(_perk(&"jagamoasta")).text == "+20%", "the tile shows %s" % player.perks.status(_perk(&"jagamoasta")).text)
+	await _seconds(Constants.PERK_HERB_GLOW_TIME + 0.5)
+	for i: int in 60:
+		Events.enemy_killed.emit(null, false, false, player)
+	_check(is_equal_approx(player.perks.damage_multiplier(), 1.2) and player.health.max_health == 120, "for good: still x1.2 and 120 after more kills")
+	# Going down loses the Schnaps, not what the herbs paid for; and it is not sold again.
+	var jaga: PerkData = _perk(&"jagamoasta")
+	player.perks.owned.erase(jaga)
+	_check(is_equal_approx(player.perks.damage_multiplier(), 1.2) and not player.perks.wants(jaga), "kept without the Schnaps, and the bottle is sold out")
+	player.perks.owned.append(jaga)
 
 
 func _brettljause() -> void:
@@ -405,8 +414,9 @@ func _brettljause() -> void:
 			item.interact(player)
 		_check(player.perks.jause_level(item.jause) == item.jause.max_level and item.get_interact_prompt(player) == tr("UI_JAUSE_FULL") % tr(item.jause.display_name),
 			"%s eaten %d times, then enough" % [item.jause.id, item.jause.max_level])
-	_check(player.health.max_health == 200, "Speck x5: max health %d" % player.health.max_health)
-	_check(is_equal_approx(player.perks.damage_multiplier(), 1.5), "Kasnockn x5: damage x%.2f" % player.perks.damage_multiplier())
+	# On top of the Jagamoasta's +20 health and x1.2.
+	_check(player.health.max_health == 220, "Speck x5: max health %d" % player.health.max_health)
+	_check(is_equal_approx(player.perks.damage_multiplier(), 1.5 * 1.2), "Kasnockn x5: damage x%.2f" % player.perks.damage_multiplier())
 	_check(is_equal_approx(player.perks.reload_time_multiplier(), 1.0 / 1.5), "Germknedl x5: reload x%.2f" % player.perks.reload_time_multiplier())
 	player.health.heal_full()
 

@@ -161,10 +161,13 @@ const PERK_COSY_REGEN_MULTIPLIER: float = 3.0
 const PERK_GRANT_RADIUS: float = 5.0
 const PERK_GRANT_PER_ENEMY: float = 0.05
 const PERK_GRANT_MAX: float = 0.3
-# Jagamoasta: kills ("Kräuter") for the Kräuterrausch, how long it lasts, and its damage factor.
+# Jagamoasta: kills ("Kräuter") it takes, and what they pay for good (play-test 2026-10-17: an
+# investment, not a 10 s rush): max health added (20 % of the base) and the damage share; seconds of
+# green glow when it pays out.
 const PERK_HERBS: int = 56
-const PERK_RAUSCH_TIME: float = 10.0
-const PERK_RAUSCH_DAMAGE: float = 2.0
+const PERK_HERB_HEALTH: int = 20
+const PERK_HERB_DAMAGE: float = 0.2
+const PERK_HERB_GLOW_TIME: float = 2.0
 
 # Waves (section 8; the per-wave formula numbers live in data/wave_table.tres).
 # Hard performance cap from section 3, shared by all players in co-op.

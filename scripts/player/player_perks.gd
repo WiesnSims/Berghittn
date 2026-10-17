@@ -1,7 +1,8 @@
 class_name PlayerPerks
 extends Node
 ## The Schnaps this player has had (section 9) and their signature effects, plus the helpings from the
-## Brettljause (the stat gains). Schnaps are gone when the player goes down; the Jause stays.
+## Brettljause (the stat gains). Schnaps are gone when the player goes down; the Jause stays, and so does
+## what the Jagamoasta's 56 herbs paid for.
 
 signal changed(perks: Array[PerkData])
 ## A signature effect went off; `text` is a translation key for the HUD banner.
@@ -17,8 +18,10 @@ const KRAEUTER: StringName = &"jagamoasta"
 const BOELLER_BLAST: Script = preload("res://scripts/perks/boeller_blast.gd")
 
 var owned: Array[PerkData] = []
-## Kills towards the next Kräuterrausch (Jagamoasta).
+## Kills towards the 56 gsunde Kräuter (Jagamoasta), and whether they have paid out: +20 % max health
+## and +20 % damage for good, kept when the player goes down.
 var herbs: int = 0
+var herbs_done: bool = false
 @onready var _player: Player = get_parent() as Player
 @onready var _health: PlayerHealth = get_parent().get_node("Health")
 # Helpings eaten per Jause id, and the data behind them.
@@ -29,7 +32,7 @@ var _boeller_left: float = 0.0
 var _stur_used: bool = false
 var _cosy_time: float = 0.0
 var _grumps: int = 0
-var _rausch_left: float = 0.0
+var _herb_glow_left: float = 0.0
 
 
 func _ready() -> void:
@@ -41,7 +44,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_boeller_left = maxf(_boeller_left - delta, 0.0)
-	_rausch_left = maxf(_rausch_left - delta, 0.0)
+	_herb_glow_left = maxf(_herb_glow_left - delta, 0.0)
 	var cosy: bool = false
 	if has_id(GMIATLICHKEIT):
 		var moving: float = Vector2(_player.velocity.x, _player.velocity.z).length()
@@ -60,6 +63,11 @@ func has_id(id: StringName) -> bool:
 	return owned.any(func(p: PerkData) -> bool: return p.id == id)
 
 
+## Still worth buying: not had yet, and not a Jagamoasta whose herbs have already paid out.
+func wants(perk: PerkData) -> bool:
+	return not has(perk) and not (perk.id == KRAEUTER and herbs_done)
+
+
 func add(perk: PerkData) -> void:
 	if has(perk):
 		return
@@ -75,7 +83,6 @@ func clear() -> void:
 	if owned.is_empty():
 		return
 	owned.clear()
-	_rausch_left = 0.0
 	changed.emit(owned)
 
 
@@ -95,12 +102,12 @@ func eat(jause: JauseData) -> void:
 
 # --- What the rest of the game asks ---
 
-## Weapon damage factor: Pinzgauer Kasnockn, the Obstler's grumpiness and the Kräuterrausch.
+## Weapon damage factor: Pinzgauer Kasnockn, the Obstler's grumpiness and the Jagamoasta's herbs.
 func damage_multiplier() -> float:
 	var factor: float = 1.0 + _jause_sum(func(j: JauseData) -> float: return j.damage_bonus)
 	factor *= 1.0 + grantler_bonus()
-	if _rausch_left > 0.0:
-		factor *= Constants.PERK_RAUSCH_DAMAGE
+	if herbs_done:
+		factor *= 1.0 + Constants.PERK_HERB_DAMAGE
 	return factor
 
 
@@ -127,10 +134,6 @@ func is_cosy() -> bool:
 	return _health.regen_skips_delay
 
 
-func rausch_left() -> float:
-	return _rausch_left
-
-
 ## Böllerschuss: the weapon holder calls this when a reload starts on an empty magazine.
 func on_empty_reload() -> void:
 	if not has_id(BOELLERSCHUSS) or _boeller_left > 0.0:
@@ -152,22 +155,22 @@ func status(perk: PerkData) -> Dictionary:
 			var bonus: float = grantler_bonus()
 			return {"text": "+%d%%" % roundi(bonus * 100.0) if bonus > 0.0 else "", "dim": bonus <= 0.0}
 		KRAEUTER:
-			if _rausch_left > 0.0:
-				return {"text": "%.0f" % ceilf(_rausch_left), "dim": false}
+			if herbs_done:
+				return {"text": "+%d%%" % roundi(Constants.PERK_HERB_DAMAGE * 100.0), "dim": false}
 			return {"text": "%d/%d" % [herbs, Constants.PERK_HERBS], "dim": false}
 		GMIATLICHKEIT:
 			return {"text": "", "dim": not is_cosy()}
 	return {"text": "", "dim": false}
 
 
-## Full-screen glow for effects that are running: gold while Sturschädl holds, green in the
-## Kräuterrausch, warm while cosily healing. Transparent when nothing runs.
+## Full-screen glow for effects that are running: gold while Sturschädl holds, green as the 56 herbs
+## pay out, warm while cosily healing. Transparent when nothing runs.
 func glow_color() -> Color:
 	var t: float = Time.get_ticks_msec() / 1000.0
 	if is_invincible():
 		return Color(1.0, 0.78, 0.25, 0.55 + 0.25 * sin(t * TAU * 2.5))
-	if _rausch_left > 0.0:
-		return Color(0.35, 0.85, 0.3, 0.4 + 0.1 * sin(t * TAU))
+	if _herb_glow_left > 0.0:
+		return Color(0.35, 0.85, 0.3, 0.5 * _herb_glow_left / Constants.PERK_HERB_GLOW_TIME)
 	if is_cosy() and _health.current() < _health.max_health:
 		return Color(1.0, 0.6, 0.3, 0.22)
 	return Color(1, 1, 1, 0)
@@ -216,15 +219,16 @@ func _boeller() -> void:
 
 
 func _on_enemy_killed(_enemy: Node3D, _is_headshot: bool, _is_melee: bool, source: Node3D) -> void:
-	if source != _player or not has_id(KRAEUTER) or _rausch_left > 0.0:
+	if source != _player or not has_id(KRAEUTER) or herbs_done:
 		return
 	herbs += 1
 	if herbs < Constants.PERK_HERBS:
 		return
-	# 56 gsunde Kräuter: patched up completely and hitting twice as hard for a while.
-	herbs = 0
-	_rausch_left = Constants.PERK_RAUSCH_TIME
+	# 56 gsunde Kräuter: patched up completely, and stronger for good.
+	herbs_done = true
+	_health.raise_max(Constants.PERK_HERB_HEALTH)
 	_health.heal_full()
+	_herb_glow_left = Constants.PERK_HERB_GLOW_TIME
 	triggered.emit(KRAEUTER, "PERK_JAGAMOASTA_SHOUT")
 
 

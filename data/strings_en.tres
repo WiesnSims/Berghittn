@@ -93,7 +93,7 @@ messages = {
 [&"", &"PERK_OBSTLER_TITLE"]: [&"Grantler"],
 [&"", &"PERK_JAGAMOASTA_TITLE"]: [&"56 gsunde Kräuter"],
 [&"", &"PERK_OBSTLER_DESC"]: [&"+5% damage for every enemy within 5 m, up to +30%"],
-[&"", &"PERK_JAGAMOASTA_DESC"]: [&"56 gsunde Kräuter! Every kill is a herb; at 56 you are fully healed and hit twice as hard for 10 s"],
+[&"", &"PERK_JAGAMOASTA_DESC"]: [&"56 gsunde Kräuter! Every kill is a herb; at 56 you are fully healed and keep +20% max health and +20% damage for good, even after going down"],
 [&"", &"PERK_ENZIAN_SHOUT"]: [&"Na, sicher ned!"],
 [&"", &"PERK_MARILLENBRAND_SHOUT"]: [&"Böllerschuss!"],
 [&"", &"PERK_JAGAMOASTA_SHOUT"]: [&"56 gsunde Kräuter!"],
