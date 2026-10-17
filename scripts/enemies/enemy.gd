@@ -130,8 +130,11 @@ func receive_hit(amount: int, is_headshot: bool, is_melee: bool, source: Node3D)
 	return Hurtbox.Result.KILLED
 
 
-## Slows the enemy to `factor` of its speed for `duration` seconds; the stronger slow wins.
+## Slows the enemy to `factor` of its speed for `duration` seconds; the stronger slow wins. Bosses
+## shrug it off (immune to crowd control, section 6a).
 func apply_slow(factor: float, duration: float) -> void:
+	if data.is_boss:
+		return
 	if _slow_left <= 0.0 or factor <= _slow_factor:
 		_slow_factor = factor
 	_slow_left = maxf(_slow_left, duration)
