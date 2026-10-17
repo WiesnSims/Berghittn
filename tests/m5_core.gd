@@ -428,16 +428,19 @@ func _clear_enemies(list: Array[Enemy]) -> void:
 func _chest() -> void:
 	var chest := _find(Huettentruhe)[0] as Huettentruhe
 	var pool: ChestPool = chest.pool
-	# Weights: 5 each for regular guns, so equal shares now; wonder weapons (1) come later.
+	# Weights: 5 for regular guns, 1 for wonder weapons; every gun comes up about that often.
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 3
 	var counts: Dictionary = {}
-	for i: int in 3000:
+	for i: int in 6000:
 		var w: WeaponData = pool.pick(func(_w: WeaponData) -> bool: return false, rng)
 		counts[w.id] = counts.get(w.id, 0) + 1
-	var even: bool = counts.size() == 3
-	for id: StringName in counts:
-		even = even and absf(counts[id] / 3000.0 - 1.0 / 3.0) < 0.04
+	var total: float = 0.0
+	for entry: ChestEntry in pool.entries:
+		total += entry.weight
+	var even: bool = counts.size() == pool.entries.size()
+	for entry: ChestEntry in pool.entries:
+		even = even and absf(counts.get(entry.weapon.id, 0) / 6000.0 - entry.weight / total) < 0.03
 	_check(even, "chest pool shares %s" % counts)
 	# Only the pistol in hand, so a free slot.
 	while player.weapons.gun_count() > 1:

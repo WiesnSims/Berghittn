@@ -110,6 +110,16 @@ doors, the self-opening last door, both wall-buys, ammo refills at half price, g
 the chamber rule for the new guns, and one payout per shotgun blast (not per pellet).
 
 ```
+godot --headless --fixed-fps 60 res://tests/m5_alphorn.tscn
+```
+
+The Alphorn: what its cone blast hits (reach, angle, the wall in between) and how far it throws a
+wanderer and a Knappe, the Echo all around for two notes, ammo and reload, and the Hüttentruhe
+offering it at weight 1. Special weapons are a `WeaponData` plus a behavior script in
+`scripts/weapons/behaviors/` (named by `behavior`, see `WeaponBehavior`); the WeaponHolder keeps ammo,
+reloads and recoil and calls the behavior instead of the hitscan ray.
+
+```
 godot --headless --fixed-fps 60 res://tests/upstairs.tscn
 godot --headless --fixed-fps 60 res://tests/spawn_paths.tscn
 ```
@@ -161,7 +171,7 @@ frame with the HUD, or shooting an enemy (wall puffs, hit flash, casings, head p
 visuals without playing.
 
 ```
-godot res://tests/zone_tour.tscn -- <out_dir> zones|guns
+godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn
 ```
 
 Also needs a window: one frame per zone (all doors open), the wall-buys and a door mid-swing; or

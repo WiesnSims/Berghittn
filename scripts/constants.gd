@@ -77,6 +77,11 @@ const ENEMY_KNOCKBACK_HOP: float = 2.5
 # Lures (die Resi's bell, later the Kuhglocke): how close an enemy must get to count as there.
 const ENEMY_LURE_REACH: float = 1.6
 
+# Event markers (section 8a): the light column's opacity, and the distances (m) between which it fades
+# in, so it does not hang over the thing it marks when the player is right next to it.
+const MARKER_COLUMN_ALPHA: float = 0.22
+const MARKER_COLUMN_FADE_NEAR: float = 6.0
+const MARKER_COLUMN_FADE_FAR: float = 14.0
 # Events (section 8a). Die Resi: first wave, waves between visits, seconds into the wave she arrives,
 # how long she stays, how far her bell carries, seconds of milking, and her walking and bolting speeds.
 const RESI_FIRST_WAVE: int = 3
@@ -236,6 +241,8 @@ const ENEMY_HIT_FLASH_TIME: float = 0.12
 const IMPACT_MARK_COUNT: int = 32
 const IMPACT_MARK_LIFETIME: float = 8.0
 const HIT_MARKER_TIME: float = 0.15
+# Ready ring at the crosshair (play-test, Alphorn): seconds the pulse takes when the gun is ready again.
+const READY_PULSE_TIME: float = 0.3
 const DAMAGE_FLASH_TIME: float = 0.4
 
 # Quick melee: share of the swing time before the blow lands, the width of the arc in front of the
@@ -245,3 +252,14 @@ const MELEE_HIT_FRACTION: float = 0.3
 const MELEE_ARC_DEGREES: float = 110.0
 const MELEE_MAX_TARGETS: int = 32
 const MELEE_AIM_HEIGHT: float = 1.3
+# Longest a weapon may be shown floating over the Hüttentruhe (metres); longer ones are shrunk.
+const CHEST_DISPLAY_MAX_LENGTH: float = 1.2
+# Area weapons (Alphorn, section 6a): the most hit boxes one blast checks (two per enemy), where on a
+# body box it aims (metres above its origin at the feet, times the model scale), and how far beyond
+# the reach or off the cone a body still counts, since bodies have width.
+const AREA_MAX_TARGETS: int = 64
+const AREA_AIM_HEIGHT: float = 1.1
+const AREA_BODY_MARGIN: float = 0.5
+# Screen shake from blasts: seconds it lasts and how fast it trembles (cycles per second).
+const SHAKE_TIME: float = 0.45
+const SHAKE_FREQUENCY: float = 18.0

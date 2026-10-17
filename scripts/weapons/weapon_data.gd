@@ -6,7 +6,8 @@ extends Resource
 ## AIM: down the sights (hold). SCOPE: through a scope with an overlay (hold).
 ## ALL_BARRELS: every loaded round in one blast (press).
 ## FAN: work the action as fast as the hand can, firing from the hip (hold); see rapid_*.
-enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN }
+## BEHAVIOR: the special weapon's own second shot from its behavior script (press); see secondary_*.
+enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR }
 
 @export var id: StringName
 ## Translation key, not display text.
@@ -45,8 +46,19 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN }
 @export var penetration_range: float = 0.0
 @export var cost: int = 0
 @export var ammo_cost: int = 0
-## Optional id of a behavior script for special weapons (section 6a). Empty = plain hitscan.
+## Optional id of a behavior script for special weapons (section 6a), a file in
+## scripts/weapons/behaviors/. Empty = plain hitscan.
 @export var behavior: StringName
+## Area weapons (read by their behavior): the half-angle of the cone a shot fills (degrees, 180 = all
+## around; its length is `range`), how hard it throws the survivors back (m/s right at the muzzle,
+## half at the far end; heavy enemies less, by the root of their flinch_multiplier), and the screen shake it gives the
+## shooter (degrees).
+@export var area_angle: float = 0.0
+@export var knockback: float = 0.0
+@export var shake: float = 0.0
+## Show the ready ring at the crosshair while the gun cycles between shots (play-test: only for the
+## Alphorn's long gap; other guns show it in their animation, and fire again as it ends).
+@export var cycle_ring: bool = false
 @export var viewmodel: PackedScene
 @export var secondary: Secondary = Secondary.NONE
 ## Aiming (AIM and SCOPE): field of view when fully aimed (degrees), seconds to get there, and the
@@ -60,6 +72,12 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN }
 @export var rapid_fire_rate: float = 0.0
 @export var rapid_spread: float = 0.0
 @export var rapid_recoil_multiplier: float = 1.0
+## Behavior secondary (BEHAVIOR): rounds it uses, and its damage, reach (m), knockback (m/s) and shake.
+@export var secondary_rounds: int = 1
+@export var secondary_damage: int = 0
+@export var secondary_range: float = 0.0
+@export var secondary_knockback: float = 0.0
+@export var secondary_shake: float = 0.0
 
 
 func can_aim() -> bool:

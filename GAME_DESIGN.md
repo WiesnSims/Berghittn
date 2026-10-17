@@ -110,7 +110,8 @@ Layout (user request, 2026-10-16, before M5): rooms are bigger than the Stube's 
 not plain boxes. The Stube is a two-storey hall (7 m) with a gallery along two walls reached by stairs,
 an Erker (bay) with the Herrgottswinkel, and a balcony over the Terrasse off the gallery. The Küche
 has a pantry, the Skiraum a boot corridor behind a partition (the chokepoint), the Seilbahn-Station a
-raised boarding platform with the gondola alongside, the Holzschuppen a hay loft up a ramp, and the
+raised boarding platform with the gondola alongside (it leaves through a big portal in the east wall
+under the cable, play-test 2026-10-17; barred for players, too high for enemies), the Holzschuppen a hay loft up a ramp, and the
 Terrasse a deck along the hut that runs out over a full-width gentle ramp onto a big, open beer
 garden at the level of the alm (play-test 2026-10-17: the sunken garden, down and up again, looked
 odd and was crowded), fenced with three 3.5 m gates enemies come in by, with few objects in it. Every change of
@@ -156,8 +157,8 @@ effects, see section 6a), `secondary` (what right click does, see the rules belo
 | Id | Name | Type | Damage | Fire rate (shots/s) | Mag / Reserve | Cost |
 |---|---|---|---|---|---|---|
 | `pistole` | Dienstpistole | semi-auto pistol | 25 | up to 10 (as fast as you click) | 8 / 64 | start weapon |
-| `jagdflinte` | Jagdflinte | double-barrel shotgun | 20 x 8 pellets | 1.5 | 2 / 24 | 500 (wall-buy, Stube) |
-| `stutzen` | Stutzen | bolt-action rifle | 120 | 0.8 | 5 / 40 | 750 (wall-buy, Skiraum) |
+| `jagdflinte` | Jagdflinte | double-barrel shotgun | 20 x 8 pellets | 3.3 (the recoil settles in 0.3 s) | 2 / 24 | 500 (wall-buy, Stube) |
+| `stutzen` | Stutzen | bolt-action rifle | 120 | 1.33 (the bolt is worked in 0.75 s) | 5 / 40 | 750 (wall-buy, Skiraum) |
 | `repetierer` | Repetierer | lever/repeater rifle | 90 (two shots for small enemies, play-test 2026-10-17) | 3 (5.5 fanned) | 10 / 80 | 1000 (chest only) |
 | `schaufel` | Schneeschaufel | melee | 70 | 1.2 | – | 0 (always equipped) |
 | `alphorn` | Alphorn | wonder weapon | 200 area | 0.5 | 6 / 18 | chest only, rare |
@@ -190,6 +191,13 @@ Rules:
     shell; the gun is then empty.
   - `repetierer`: fan the lever (hold): fires from the hip on its own as fast as the lever can be
     worked (5.5 shots/s instead of 3), +4° spread and harder kick.
+  - `alphorn`: the Echo (press): the bell swings up to the sky and the note comes down all around
+    the player, 200 damage within 6 m in every direction and a harder shove; uses two notes. The
+    panic button when surrounded.
+- Ready ring (play-test 2026-10-17): a ring around the crosshair fills while the gun reloads (amber)
+  and, for the Alphorn, between notes (white), and pulses once when the gun is ready again. Guns that
+  work an action after a shot fire again the moment the animation ends (play-test: the Stutzen's bolt
+  and the Jagdflinte's recoil had finished well before the gun could fire; fire rates set to match).
 - Semi-auto guns fire once per click, as fast as the player clicks, up to `fire_rate` (user request,
   2026-10-17); holding the button does not auto-fire. A click during the cycle is remembered for a
   moment and fires as soon as the gun is ready, so fast clicking is never swallowed.
@@ -213,9 +221,14 @@ Rules:
   Details (M5): the pool lives in `data/chest_pool.tres`; it never offers a gun the buyer already
   carries. The guns cycle for 2.5 s, slowing down, before one settles. Taking it fills a free slot or
   swaps out the gun in hand; not taken in 4 s, it sinks back and the points are gone.
-  Until the special weapons exist the pool is Repetierer, Jagdflinte and Stutzen.
+  The pool is Repetierer, Jagdflinte and Stutzen, plus each wonder weapon as it is built (Alphorn).
 - **Alphorn:** fires a cone-shaped sound wave that damages and knocks back
   all enemies in a 12 m cone; funny low horn sound, screen shake.
+  Details (M5): the cone is 30° each side of the aim; 200 damage to every body in it with a clear
+  line from the horn (walls stop it, no headshots), and survivors are thrown back (16 m/s at the bell,
+  half at 12 m; heavy enemies by the root of their flinch, so a Knappe slides about a metre and the
+  Krampus barely moves). Pale rings of sound roll out along the cone. 6 notes, 18 spare; the reload is
+  catching your breath (2.5 s). In the chest at weight 1.
 
 ### 6a. Absurd weapons: behaviors and equipment
 

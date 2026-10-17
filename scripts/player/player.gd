@@ -63,6 +63,11 @@ func kick_view(pitch_degrees: float, yaw_degrees: float) -> void:
 	_camera.kick(pitch_degrees, yaw_degrees)
 
 
+## The view trembles for a moment (the Alphorn's blast).
+func shake_view(degrees: float) -> void:
+	_camera.shake(degrees)
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if health.is_dead():
 		return

@@ -102,6 +102,17 @@ func play_fire(_rounds: int = 1) -> void:
 	_eject_casing()
 
 
+## Seconds the shot animation runs; guns whose action is worked after a shot (Stutzen, Jagdflinte)
+## have fire_rate set so the next shot is ready right as it ends (play-test).
+func fire_animation_time() -> float:
+	return kick_time
+
+
+## A special weapon's second shot (BEHAVIOR secondary); guns with one override this.
+func play_secondary(rounds: int) -> void:
+	play_fire(rounds)
+
+
 ## Aim pose blend (0 hip, 1 aimed), set every frame by the WeaponHolder.
 func set_aim(amount: float) -> void:
 	position = aim_offset * amount

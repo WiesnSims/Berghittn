@@ -27,6 +27,10 @@ func _ready() -> void:
 	_round.visible = false
 
 
+func fire_animation_time() -> float:
+	return lever_delay + lever_time
+
+
 func play_fire(_rounds: int = 1) -> void:
 	_flash_and_kick()
 	_parts_tween = create_tween()

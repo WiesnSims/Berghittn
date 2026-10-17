@@ -59,11 +59,39 @@ func _add_display(weapon: WeaponData) -> void:
 	model.transform = Transform3D.IDENTITY
 	# Side-on to the player, muzzle to the right.
 	model.rotation.y = -PI * 0.5
-	model.scale = Vector3.ONE * display_scale
+	# A long one (the Alphorn) is shrunk to fit the chest and centred on it.
+	var bounds: AABB = _mesh_bounds(model, Transform3D.IDENTITY)
+	var length: float = bounds.get_longest_axis_size() * display_scale
+	var fit: float = minf(1.0, Constants.CHEST_DISPLAY_MAX_LENGTH / length) if length > 0.0 else 1.0
+	model.scale = Vector3.ONE * display_scale * fit
+	if fit < 1.0:
+		model.position = -(model.basis * bounds.get_center())
 	model.visible = false
 	_display.add_child(model)
 	_displays.append(model)
 	_weapons.append(weapon)
+
+
+## Bounds of every mesh under `node`, in the space `xf` maps it into (the node is not in the tree yet).
+func _mesh_bounds(node: Node3D, xf: Transform3D) -> AABB:
+	var bounds := AABB()
+	var first: bool = true
+	for child: Node in node.get_children():
+		var child_3d := child as Node3D
+		if child_3d == null:
+			continue
+		var child_xf: Transform3D = xf * child_3d.transform
+		var part := AABB()
+		var mesh := child_3d as MeshInstance3D
+		if mesh and mesh.mesh:
+			part = child_xf * mesh.mesh.get_aabb()
+			bounds = part if first else bounds.merge(part)
+			first = false
+		var inner: AABB = _mesh_bounds(child_3d, child_xf)
+		if inner.size != Vector3.ZERO:
+			bounds = inner if first else bounds.merge(inner)
+			first = false
+	return bounds
 
 
 # Interactable interface (see Interactor).
