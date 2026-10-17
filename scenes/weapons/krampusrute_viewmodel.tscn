@@ -1,0 +1,137 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/rute_viewmodel.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="Twig"]
+albedo_color = Color(0.36, 0.22, 0.15, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="TwigLight"]
+albedo_color = Color(0.5, 0.36, 0.26, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Ribbon"]
+albedo_color = Color(0.75, 0.08, 0.08, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="Chain"]
+albedo_color = Color(0.3, 0.3, 0.32, 1)
+metallic = 0.7
+roughness = 0.4
+
+[sub_resource type="CylinderMesh" id="GripMesh"]
+material = SubResource("Ribbon")
+top_radius = 0.026
+bottom_radius = 0.024
+height = 0.15
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="TwigMesh"]
+material = SubResource("Twig")
+top_radius = 0.003
+bottom_radius = 0.007
+height = 0.7
+radial_segments = 5
+rings = 1
+
+[sub_resource type="CylinderMesh" id="TwigLightMesh"]
+material = SubResource("TwigLight")
+top_radius = 0.002
+bottom_radius = 0.006
+height = 0.62
+radial_segments = 5
+rings = 1
+
+[sub_resource type="BoxMesh" id="LinkMesh"]
+material = SubResource("Chain")
+size = Vector3(0.012, 0.03, 0.006)
+
+[sub_resource type="BoxMesh" id="BowMesh"]
+material = SubResource("Ribbon")
+size = Vector3(0.06, 0.004, 0.02)
+
+[node name="RuteViewmodel" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Model" type="Node3D" parent="."]
+
+[node name="Grip" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, -0.02)
+cast_shadow = 0
+mesh = SubResource("GripMesh")
+
+[node name="Bow" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(0.9, 0, 0.44, 0, 1, 0, -0.44, 0, 0.9, 0, 0.026, -0.09)
+cast_shadow = 0
+mesh = SubResource("BowMesh")
+
+[node name="Link0" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.02, -0.030, 0.05)
+cast_shadow = 0
+mesh = SubResource("LinkMesh")
+
+[node name="Link1" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0.02, -0.055, 0.05)
+cast_shadow = 0
+mesh = SubResource("LinkMesh")
+
+[node name="Link2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.02, -0.080, 0.05)
+cast_shadow = 0
+mesh = SubResource("LinkMesh")
+
+[node name="Link3" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0.02, -0.105, 0.05)
+cast_shadow = 0
+mesh = SubResource("LinkMesh")
+
+[node name="Twig0" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(0.9963, 0.0854, 0.0000, -0.0000, 0.0000, 1.0000, 0.0854, -0.9963, 0.0000, 0.0300, 0.0000, -0.4500)
+cast_shadow = 0
+mesh = SubResource("TwigMesh")
+
+[node name="Twig1" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(0.9955, -0.0944, -0.0000, 0.0082, 0.0864, 0.9962, -0.0940, -0.9918, 0.0868, -0.0295, 0.0270, -0.4100)
+cast_shadow = 0
+mesh = SubResource("TwigLightMesh")
+
+[node name="Twig2" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(0.9999, 0.0124, 0.0000, 0.0017, -0.1409, 0.9900, 0.0123, -0.9899, -0.1409, 0.0044, -0.0498, -0.4500)
+cast_shadow = 0
+mesh = SubResource("TwigMesh")
+
+[node name="Twig3" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(0.9983, 0.0586, 0.0000, -0.0045, 0.0764, 0.9971, 0.0584, -0.9954, 0.0766, 0.0183, 0.0238, -0.4100)
+cast_shadow = 0
+mesh = SubResource("TwigLightMesh")
+
+[node name="Twig4" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(0.9937, -0.1118, -0.0000, -0.0022, -0.0198, 0.9998, -0.1118, -0.9935, -0.0199, -0.0394, -0.0070, -0.4500)
+cast_shadow = 0
+mesh = SubResource("TwigMesh")
+
+[node name="Twig5" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(0.9909, 0.1344, 0.0000, 0.0116, -0.0854, 0.9963, 0.1339, -0.9872, -0.0862, 0.0422, -0.0268, -0.4100)
+cast_shadow = 0
+mesh = SubResource("TwigLightMesh")
+
+[node name="Twig6" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(0.9998, -0.0222, 0.0000, 0.0018, 0.0825, 0.9966, -0.0221, -0.9963, 0.0825, -0.0078, 0.0290, -0.4500)
+cast_shadow = 0
+mesh = SubResource("TwigMesh")
+
+[node name="Twig7" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(0.9983, -0.0590, 0.0000, -0.0067, -0.1136, 0.9935, -0.0586, -0.9918, -0.1138, -0.0184, -0.0355, -0.4100)
+cast_shadow = 0
+mesh = SubResource("TwigLightMesh")
+
+[node name="Twig8" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(0.9911, 0.1328, 0.0000, -0.0065, 0.0486, 0.9988, 0.1327, -0.9899, 0.0490, 0.0470, 0.0172, -0.4500)
+cast_shadow = 0
+mesh = SubResource("TwigMesh")
+
+[node name="Twig9" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(0.9960, -0.0890, 0.0000, 0.0033, 0.0367, 0.9993, -0.0890, -0.9954, 0.0369, -0.0277, 0.0114, -0.4100)
+cast_shadow = 0
+mesh = SubResource("TwigLightMesh")

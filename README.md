@@ -232,6 +232,15 @@ and it and the crowd where it lands take 80, the others nothing; the Krampus too
 godot --headless --fixed-fps 60 res://tests/melee_arc.tscn
 ```
 
+```
+godot --headless --fixed-fps 60 res://tests/m5_krampusrute.tscn
+```
+
+The Krampus-Rute: dropped where the Krampus falls (announced) and taken with E onto V; the swat (150)
+sends the struck one and the one behind it running from the player for 3 s, attacking nobody, not one
+6 m off, not the Krampus; the Larve (V held) makes the one 6 m ahead flee for as long as it is held,
+not one behind; not in the chest.
+
 One shovel swing must hit every enemy in the arc in front of the player and none behind.
 
 ```

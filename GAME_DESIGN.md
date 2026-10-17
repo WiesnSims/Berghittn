@@ -179,7 +179,7 @@ effects, see section 6a), `secondary` (what right click does, see the rules belo
 | `schmarrnpfanne` | Schmarrnpfanne | melee | 90 | 1.0 | – | 400 (wall-buy, Küche) |
 | `goassl` | Goaßl | melee (whip) | 40 | 1.5 | – | chest only |
 | `mistgabel` | Mistgabel | melee (long reach) | 100 | 1.0 | – | chest only |
-| `krampusrute` | Krampus-Rute | melee | 150 | 1.4 | – | dropped by the Krampus boss |
+| `krampusrute` | Krampus-Rute | melee | 150 | 1.4 | – | dropped by the Krampus boss (where he falls, E to take) |
 
 Rules:
 - Ammo refill from wall-buys costs half the weapon price.
@@ -230,6 +230,9 @@ Rules:
     carried over the player's head (3 s at most; the player walks slowly); let go and it is hurled
     where the player looks (11 m/s, a little up). Where it comes down it bowls over everything within
     2 m, itself included: 80 and thrown back, "PLUMPS!". Bosses are too heavy to lift.
+  - `krampusrute`: the Larve (hold V): the rod raised high, rattling; every enemy within 8 m and 35°
+    either side of the aim (walls shield) flees for as long as it is held and a second after. Clears
+    a doorway to walk through, or turns a crowd round while a teammate shoots them in the back.
   - `schmarrnpfanne`: the pan as a shield (hold V): hits from the front (60° each side) are caught and
     the attacker is bonked back; you walk at 60 % and cannot shoot until you let go. Hits from the side
     or behind still land, so you keep turning to face them.
@@ -353,6 +356,11 @@ Alpine folk culture.
   100 each and a small push; once a second. "ZACK!" until the M6 sound.
 - **Krampus-Rute:** birch rod dropped by the Krampus boss. Hits cause enemies
   in a small radius to flee for 3 s.
+  Details (M5): when the Krampus falls he leaves the Rute on the floor there, turning over a red glow,
+  announced ("Da Krampus hat sei Rute verlorn!"); E takes it onto V in place of the shovel (or the
+  melee weapon carried); it stays until someone takes it. Swung sideways like the shovel (2 m, the
+  shovel's arc), 150 a blow, 1.4 a second, "ZWICK!"; every body it strikes, and every enemy within
+  2.5 m of one, runs away from the player for 3 s and attacks nobody. Bosses are not scared.
 
 **Equipment (1 slot, stackable, thrown or placed with G or the middle mouse button; one kind at a
 time, shown on the HUD above the gun name)**
