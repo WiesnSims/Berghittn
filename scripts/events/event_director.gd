@@ -9,6 +9,7 @@ extends Node
 @export var resi_scene: PackedScene
 @export var fassl_scene: PackedScene
 @export var murmel_scene: PackedScene
+@export var guest_scene: PackedScene
 ## Where the actors appear; defaults to the parent.
 @export var stage: Node3D
 ## Off: no random events are rolled (Resi still comes). For tests that start events themselves.
@@ -19,6 +20,7 @@ var _next_resi: int = Constants.RESI_FIRST_WAVE
 var _resi: Resi
 var _fassl: Bierfassl
 var _murmel: Murmeltier
+var _guest: TouristGuest
 var _last_random: StringName = &""
 
 
@@ -52,6 +54,9 @@ func available_random_events() -> Array[StringName]:
 	# Pops up anywhere players can walk to.
 	if not is_instance_valid(_murmel):
 		events.append(&"murmeltier")
+	# He gets off at the Seilbahn and must be able to walk to the Stube through open zones.
+	if not is_instance_valid(_guest) and zones.is_unlocked(&"seilbahn") and _guest_route_open():
+		events.append(&"guest")
 	if events.size() > 1:
 		events.erase(_last_random)
 	return events
@@ -69,6 +74,8 @@ func start_event(event: StringName) -> Node:
 			return send_fassl()
 		&"murmeltier":
 			return send_murmeltier()
+		&"guest":
+			return send_guest()
 	return null
 
 
@@ -120,6 +127,43 @@ func send_murmeltier() -> Murmeltier:
 	_stage().add_child(_murmel)
 	_murmel.start(spot, player.global_position)
 	return _murmel
+
+
+## Sends the Deitscha Tourist off the gondola (also used by tests).
+func send_guest() -> TouristGuest:
+	if is_instance_valid(_guest):
+		return _guest
+	var arrival := get_tree().get_first_node_in_group("guest_arrival") as Node3D
+	var goal := get_tree().get_first_node_in_group("guest_goal") as Node3D
+	if arrival == null or goal == null:
+		return null
+	_guest = guest_scene.instantiate() as TouristGuest
+	_stage().add_child(_guest)
+	_guest.start(arrival.global_position, goal.global_position)
+	return _guest
+
+
+func _guest_route_open() -> bool:
+	var arrival := get_tree().get_first_node_in_group("guest_arrival") as Node3D
+	var goal := get_tree().get_first_node_in_group("guest_goal") as Node3D
+	if arrival == null or goal == null:
+		return false
+	return walkable(arrival.get_world_3d(), arrival.global_position, goal.global_position)
+
+
+## True if a player could walk from `from` to `to`: a navmesh path without windows or player blockers.
+static func walkable(world: World3D, from: Vector3, to: Vector3) -> bool:
+	var query := NavigationPathQueryParameters3D.new()
+	query.map = world.navigation_map
+	query.start_position = from
+	query.target_position = to
+	var result := NavigationPathQueryResult3D.new()
+	NavigationServer3D.query_path(query, result)
+	var path: PackedVector3Array = result.path
+	var end: Vector3 = NavigationServer3D.map_get_closest_point(world.navigation_map, to)
+	if path.is_empty() or path[path.size() - 1].distance_to(end) > 0.5:
+		return false
+	return not result.path_types.has(NavigationPathQueryResult3D.PATH_SEGMENT_TYPE_LINK) and not _crosses_blocker(world, path)
 
 
 ## A random navmesh point `min_distance` to `max_distance` from `from` that can be walked to without

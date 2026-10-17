@@ -23,7 +23,8 @@ var health: int = 0
 ## Health at spawn, for the boss bar.
 var max_health: int = 0
 var _state: State = State.INACTIVE
-var _target: Player
+## A player or an escort (group "escorts"): anything with is_targetable() and take_damage(amount).
+var _target: Node3D
 var _model: Node3D
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var _repath_left: float = 0.0
@@ -624,16 +625,16 @@ func _find_lure() -> Node3D:
 	return best
 
 
-func _nearest_target() -> Player:
-	var best: Player = null
+func _nearest_target() -> Node3D:
+	var best: Node3D = null
 	var best_distance: float = INF
-	for node: Node in get_tree().get_nodes_in_group("player"):
-		var player := node as Player
-		if player == null or not player.is_targetable():
+	for node: Node in get_tree().get_nodes_in_group("player") + get_tree().get_nodes_in_group("escorts"):
+		var target := node as Node3D
+		if target == null or not target.is_targetable():
 			continue
-		var distance: float = global_position.distance_squared_to(player.global_position)
+		var distance: float = global_position.distance_squared_to(target.global_position)
 		if distance < best_distance:
-			best = player
+			best = target
 			best_distance = distance
 	return best
 

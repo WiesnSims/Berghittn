@@ -6,7 +6,7 @@ messages = {
 [&"", &"UI_TITLE"]: [&"Berghittn"],
 [&"", &"UI_TAGLINE"]: [&"Schneesturm. Untote. Oane Hüttn."],
 [&"", &"UI_CLICK_TO_PLAY"]: [&"Klick zum Spielen"],
-[&"", &"UI_CONTROLS"]: [&"WASD gehen  ·  Maus schauen  ·  LMT schießen  ·  RMT Waffenmodus  ·  V Nahkampf  ·  R nachladen  ·  1 / 2 / Mausrad Waffe wechseln  ·  E benutzen  ·  Leertaste springen  ·  Shift sprinten  ·  C ducken  ·  Esc Pause  ·  F3 Debug"],
+[&"", &"UI_CONTROLS"]: [&"WASD gehen  ·  Maus schauen  ·  LMT schießen  ·  RMT Waffenmodus  ·  V Nahkampf  ·  G / MMT werfen  ·  R nachladen  ·  1 / 2 / Mausrad Waffe wechseln  ·  E benutzen  ·  Leertaste springen  ·  Shift sprinten  ·  C ducken  ·  Esc Pause  ·  F3 Debug"],
 [&"", &"UI_PAUSE_TITLE"]: [&"Pause"],
 [&"", &"UI_PAUSE_HINT"]: [&"A kurze Jausn, dann geht's weida."],
 [&"", &"UI_RESUME"]: [&"Weiter"],
@@ -98,5 +98,15 @@ messages = {
 [&"", &"EVENT_MURMEL_APPEARS"]: [&"Da schreit a Murmeltier!"],
 [&"", &"MARKER_MURMEL"]: [&"Murmeltier"],
 [&"", &"EVENT_MURMEL_CAUGHT"]: [&"Murmeltier erwischt! +%d und volle Waffe"],
-[&"", &"EVENT_MURMEL_GONE"]: [&"Des Murmeltier is weg"]
+[&"", &"EVENT_MURMEL_GONE"]: [&"Des Murmeltier is weg"],
+[&"", &"EVENT_GUEST_ARRIVES"]: [&"A Deitscha Tourist hat si verlaufen!"],
+[&"", &"MARKER_GUEST"]: [&"Deitscha Tourist"],
+[&"", &"GUEST_URIG"]: [&"Das ist ja total urig hier!"],
+[&"", &"GUEST_LOST"]: [&"Wo geht es denn hier zur Hütte?"],
+[&"", &"GUEST_OUCH"]: [&"Aua! Hilfe!"],
+[&"", &"EQUIP_EISSTOCK"]: [&"Eisstock"],
+[&"", &"EVENT_GUEST_REWARD"]: [&"Er lasst da seine zwoa Eisstöck do! Werfen mit G oder der mittleren Maustaste"],
+[&"", &"EVENT_GUEST_DIED"]: [&"Der Tourist hat's ned gschafft"],
+[&"", &"EVENT_GUEST_GAVE_UP"]: [&"Der Tourist fahrt mit der nächsten Gondel hoam"],
+[&"", &"UI_EQUIPMENT"]: [&"%s ×%d   [G]"]
 }

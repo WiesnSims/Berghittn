@@ -253,13 +253,14 @@ Alpine folk culture.
 - **Krampus-Rute:** birch rod dropped by the Krampus boss. Hits cause enemies
   in a small radius to flee for 3 s.
 
-**Equipment (1 slot, stackable, thrown or placed with a key)**
+**Equipment (1 slot, stackable, thrown or placed with G or the middle mouse button; one kind at a
+time, shown on the HUD above the gun name)**
 
 | Id | Name | Effect | Cost | Max carried | Where |
 |---|---|---|---|---|---|
 | `kuhglocke` | Kuhglocke | Thrown decoy cowbell; rings for 10 s and attracts all enemies within 20 m | 300 | 2 | wall-buy, Stube |
 | `kuhfladen` | Kuhfladen-Mine | Placed on the floor; enemies stepping in it are slowed 60% for 5 s and take 40 damage | 250 | 3 | wall-buy, Schuppen |
-| `eisstock` | Eisstock | Thrown low, slides along the floor like a curling stone, bounces off walls up to 3 times and damages every enemy it slides through. Deliberately overpowered (user request, 2026-10-17) | – | 2 | only as an event reward (section 8a): no wall-buy, no refill |
+| `eisstock` | Eisstock | Thrown low, slides along the floor like a curling stone, bounces off walls up to 3 times and damages every enemy it slides through (5000, a boss 1500 and a shove; 16 m/s, slows down over about 30 m). Deliberately overpowered (user request, 2026-10-17) | – | 2 | only as an event reward (section 8a): no wall-buy, no refill |
 
 Balance notes: wonder weapons must feel exciting but not make the game trivial.
 Tune damage numbers by playtesting, and keep every number in the data
@@ -352,9 +353,13 @@ when another one could come.
   arms raised and screams the meme scream ("AAAAAAH!" on screen until the sound in M6), ducks away,
   and pops up again 2.5 to 7 m away, four times in all (about 13 s). Hit it while it is up (shot or
   shovel) for 500 points and a full refill of the gun in hand (magazine and reserve).
-- **"Deitscha Tourist"** A lost German tourist in sandals and socks gets off at the Seilbahn and
-  heads for the Stube. Enemies go for him too; escort him there alive and he hands over the only
-  Eisstöcke in the game ("Das ist ja total urig hier!").
+- **"Deitscha Tourist"** A lost German tourist (sunburnt, souvenir Tirolerhut, socks in sandals,
+  fanny pack, a big map) gets off the gondola at the Seilbahn and heads for the Stube. Only while
+  the Seilbahn is open and the way to the Stube through open zones. He walks (1.8 m/s) only while a
+  player is within 10 m ("Wo geht es denn hier zur Hütte?"), never climbs through windows, and
+  enemies go for him like for a player (300 health, shown over his head; players cannot hurt him).
+  Escort him to the Stube alive and he hands the nearest player two Eisstöcke, the only ones in
+  the game ("Das ist ja total urig hier!"). He gives up after 3 minutes.
 
 ## 9. Perks: the Schnaps shrine (Küche) and the Brettljause (Speis)
 

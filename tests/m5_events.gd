@@ -5,6 +5,8 @@ extends Node
 ## milking her heals fully and gives a free Brettljause helping. The Bierfassl rolls down off the alm
 ## into the garden, flattens what is in its way, stops at a wall or a player, and tapping it gives a Schnaps.
 ## The Murmeltier pops up near the player where players can walk, screams, hops, and pays out when hit.
+## The Deitscha Tourist waits without an escort, is hunted by enemies, and once escorted to the Stube
+## leaves two Eisstöcke, which slide through enemies and bounce off walls.
 
 var main: Node
 var player: Player
@@ -64,14 +66,17 @@ func _run() -> void:
 	await _fassl_stopped()
 	await _murmeltier_caught()
 	await _murmeltier_escapes()
+	await _guest_hunted()
+	await _guest_escorted()
+	await _eisstock()
 	print("RESULT: ", "PASS" if failures.is_empty() else "%d FAILED" % failures.size())
 	get_tree().quit(0 if failures.is_empty() else 1)
 
 
 func _random_events() -> void:
-	_check(director.available_random_events() == [&"fassl", &"murmeltier"], "random events with the Terrasse open: %s" % [director.available_random_events()])
+	_check(director.available_random_events() == [&"fassl", &"murmeltier", &"guest"], "random events with every zone open: %s" % [director.available_random_events()])
 	director._last_random = &"fassl"
-	_check(director.available_random_events() == [&"murmeltier"], "not the same one twice in a row: %s" % [director.available_random_events()])
+	_check(director.available_random_events() == [&"murmeltier", &"guest"], "not the same one twice in a row: %s" % [director.available_random_events()])
 	director._last_random = &""
 	# Never on a boss wave: not even Resi, who is due.
 	var due: int = director._next_resi
@@ -214,6 +219,83 @@ func _steady() -> void:
 	camera._target = Vector2.ZERO
 	camera._current = Vector2.ZERO
 	camera.rotation = Vector3.ZERO
+
+
+func _guest_hunted() -> void:
+	_check(director.available_random_events().has(&"guest"), "with the Seilbahn and the way to the Stube open he can come: %s" % [director.available_random_events()])
+	player.global_position = Vector3(-2.0, 0.0, 1.0)
+	var guest: TouristGuest = director.start_event(&"guest") as TouristGuest
+	_check(guest != null and _banners.back() == "A Deitscha Tourist hat si verlaufen!", "announced: %s" % _banners.back())
+	var start: Vector3 = guest.global_position
+	await _seconds(2.0)
+	_check(guest._state == TouristGuest.State.WAITING and guest.global_position.distance_to(start) < 0.3, "alone, he stands at the gondola with his map")
+	# An enemy in the station goes for him.
+	var enemy := waves._create_enemy()
+	enemy.activate(load("res://data/enemies/wanderer.tres"), 1, Transform3D(Basis.IDENTITY, start + Vector3(-2.5, 0.0, -1.0)))
+	enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
+	await _seconds(5.0)
+	_check(guest.health < Constants.GUEST_HEALTH, "enemies go for him too (health %d)" % guest.health)
+	enemy.receive_hit(100000, false, false, null)
+	guest.take_damage(10000)
+	_check(not guest.is_alive() and _banners.back() == tr("EVENT_GUEST_DIED"), "he can die: %s" % _banners.back())
+	await _seconds(5.5)
+	_check(not is_instance_valid(guest), "and is gone")
+
+
+func _guest_escorted() -> void:
+	var guest: TouristGuest = director.start_event(&"guest") as TouristGuest
+	var arrived: bool = false
+	for i: int in 60 * 90:
+		# Walk with him, a little behind.
+		var back: Vector3 = guest.global_basis.z * 1.6
+		player.global_position = guest.global_position + Vector3(back.x, 0.0, back.z)
+		player.velocity = Vector3.ZERO
+		await get_tree().physics_frame
+		if guest.has_arrived():
+			arrived = true
+			break
+	_check(arrived, "escorted, he finds the Stube (%s)" % guest.global_position.snapped(Vector3.ONE * 0.1))
+	_check(_banners.back() == "Das ist ja total urig hier!", "and says: %s" % _banners.back())
+	await _seconds(2.2)
+	_check(player.equipment.item != null and player.equipment.item.id == &"eisstock" and player.equipment.count == 2, "and leaves two Eisstöcke: %s" % _banners.back())
+	_check(hud._equipment_label.text.begins_with("Eisstock"), "HUD: %s" % hud._equipment_label.text)
+
+
+func _eisstock() -> void:
+	# Three in a row in the beer garden; one stone through all of them.
+	player.global_position = Vector3(-12.0, -0.3, 14.0)
+	player.velocity = Vector3.ZERO
+	var row: Array[Enemy] = []
+	for x: float in [-8.0, -6.0, -4.0]:
+		var enemy := waves._create_enemy()
+		enemy.activate(load("res://data/enemies/knappe.tres"), 10, Transform3D(Basis.IDENTITY, Vector3(x, -0.3, 14.0)))
+		enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
+		enemy.set_physics_process(false)
+		row.append(enemy)
+	await _frames(3)
+	_look_at(Vector3(0.0, 0.5, 14.0))
+	var points: int = player.points.total
+	_check(player.equipment.throw(), "thrown")
+	await _seconds(2.0)
+	_check(row.all(func(e: Enemy) -> bool: return not e.is_alive()), "it slides through three Bergknappen at wave 10 and flattens them all")
+	_check(player.points.total > points, "the kills pay (+%d)" % (player.points.total - points))
+	# Into the south fence: it bounces.
+	await _seconds(0.7)
+	player.global_position = Vector3(-2.0, -0.3, 19.0)
+	_look_at(Vector3(-0.5, 0.0, 24.0))
+	player.equipment.throw()
+	var stone: Eisstock = null
+	for node: Node in main.get_children():
+		if node is Eisstock and (node as Eisstock).is_sliding():
+			stone = node
+	await _seconds(1.0)
+	_check(stone != null and is_instance_valid(stone) and stone.bounces_left() < Constants.EISSTOCK_BOUNCES, "off the fence it bounces (%d bounces left)" % [stone.bounces_left() if is_instance_valid(stone) else -1])
+	_check(player.equipment.count == 0 and hud._equipment_label.text == "", "both thrown, the slot is empty; no refill anywhere")
+	_check(not player.equipment.throw(), "nothing more to throw")
+	for e: Enemy in row:
+		if e.is_alive():
+			e.receive_hit(100000, false, false, null)
+	await _seconds(4.0)
 
 
 func _schedule() -> void:

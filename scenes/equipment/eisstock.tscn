@@ -1,0 +1,87 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/equipment/eisstock.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="Base"]
+albedo_color = Color(0.12, 0.12, 0.13, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="Body"]
+albedo_color = Color(0.8, 0.12, 0.1, 1)
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Handle"]
+albedo_color = Color(0.85, 0.85, 0.82, 1)
+metallic = 0.5
+roughness = 0.3
+
+[sub_resource type="CylinderMesh" id="BaseMesh"]
+material = SubResource("Base")
+top_radius = 0.15
+bottom_radius = 0.16
+height = 0.04
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="BodyMesh"]
+material = SubResource("Body")
+top_radius = 0.12
+bottom_radius = 0.15
+height = 0.1
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="StemMesh"]
+material = SubResource("Handle")
+top_radius = 0.02
+bottom_radius = 0.025
+height = 0.22
+radial_segments = 8
+
+[sub_resource type="CylinderMesh" id="GripMesh"]
+material = SubResource("Handle")
+top_radius = 0.022
+bottom_radius = 0.022
+height = 0.2
+radial_segments = 8
+
+[sub_resource type="SphereMesh" id="KnobMesh"]
+material = SubResource("Handle")
+radius = 0.03
+height = 0.06
+radial_segments = 8
+rings = 4
+
+[sub_resource type="SphereMesh" id="GlintMesh"]
+material = SubResource("Handle")
+radius = 0.035
+height = 0.02
+radial_segments = 8
+rings = 2
+
+[node name="Eisstock" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Model" type="Node3D" parent="."]
+
+[node name="Base" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+mesh = SubResource("BaseMesh")
+
+[node name="Body" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.09, 0)
+mesh = SubResource("BodyMesh")
+
+[node name="Cap" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.14, 0)
+mesh = SubResource("GlintMesh")
+
+[node name="Stem" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+mesh = SubResource("StemMesh")
+
+[node name="Grip" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, 0.1, 0.36, 0)
+mesh = SubResource("GripMesh")
+
+[node name="Knob" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.36, 0)
+mesh = SubResource("KnobMesh")

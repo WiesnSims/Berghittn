@@ -64,6 +64,8 @@ func _ready() -> void:
 		await _fassl_tour(main)
 	elif mode == "murmel":
 		await _murmel_tour(main)
+	elif mode == "guest":
+		await _guest_tour(main)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -314,6 +316,39 @@ func _murmel_tour(main: Node) -> void:
 	camera.fov = 70.0
 	camera.look_at_from_position(Vector3(2.0, 1.7, -3.0), Vector3(-4.0, 0.4, 2.5))
 	await _save("murmel_far")
+
+
+## guest: the Deitscha Tourist at the gondola, close up and from behind with his marker, then an
+## Eisstock sliding across the beer garden with the HUD showing the slot.
+func _guest_tour(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	var player := main.get_node("Player") as Player
+	var zones := main.get_node("Zones") as ZoneMap
+	for id: StringName in [&"kueche", &"lager", &"terrasse", &"skiraum", &"seilbahn", &"schuppen"]:
+		zones.unlock(id, player)
+	(main.get_node("WaveManager") as Node).process_mode = Node.PROCESS_MODE_DISABLED
+	await get_tree().create_timer(1.0).timeout
+	var guest: TouristGuest = (main.get_node("EventDirector") as EventDirector).send_guest()
+	var camera := Camera3D.new()
+	camera.fov = 55.0
+	add_child(camera)
+	camera.current = true
+	(main.get_node("UI") as CanvasLayer).hide()
+	await get_tree().create_timer(1.0).timeout
+	camera.look_at_from_position(guest.to_global(Vector3(0.9, 1.7, -2.4)), guest.to_global(Vector3(0, 1.3, 0)))
+	await _save("guest_close")
+	camera.look_at_from_position(Vector3(6.0, 2.2, -4.0), guest.global_position + Vector3.UP)
+	await _save("guest_station")
+	# The Eisstock.
+	camera.current = false
+	(main.get_node("UI") as CanvasLayer).show()
+	player.equipment.give(load("res://data/equipment/eisstock.tres"), 2)
+	player.global_position = Vector3(-12.0, -0.3, 14.0)
+	player.rotation.y = -PI * 0.5
+	await get_tree().create_timer(0.4).timeout
+	player.equipment.throw()
+	await get_tree().create_timer(0.35).timeout
+	await _save("eisstock_slide")
 
 
 func _m5(main: Node) -> void:

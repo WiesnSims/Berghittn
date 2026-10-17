@@ -6,7 +6,7 @@ messages = {
 [&"", &"UI_TITLE"]: [&"Berghittn"],
 [&"", &"UI_TAGLINE"]: [&"Snowstorm. Undead. One hut."],
 [&"", &"UI_CLICK_TO_PLAY"]: [&"Click to play"],
-[&"", &"UI_CONTROLS"]: [&"WASD move  ·  Mouse look  ·  LMB shoot  ·  RMB weapon mode  ·  V melee  ·  R reload  ·  1 / 2 / wheel switch gun  ·  E use  ·  Space jump  ·  Shift sprint  ·  C crouch  ·  Esc pause  ·  F3 debug"],
+[&"", &"UI_CONTROLS"]: [&"WASD move  ·  Mouse look  ·  LMB shoot  ·  RMB weapon mode  ·  V melee  ·  G / MMB throw  ·  R reload  ·  1 / 2 / wheel switch gun  ·  E use  ·  Space jump  ·  Shift sprint  ·  C crouch  ·  Esc pause  ·  F3 debug"],
 [&"", &"UI_PAUSE_TITLE"]: [&"Paused"],
 [&"", &"UI_PAUSE_HINT"]: [&"A quick Jause, then back to it."],
 [&"", &"UI_RESUME"]: [&"Resume"],
@@ -98,5 +98,15 @@ messages = {
 [&"", &"EVENT_MURMEL_APPEARS"]: [&"Da schreit a Murmeltier!"],
 [&"", &"MARKER_MURMEL"]: [&"Murmeltier"],
 [&"", &"EVENT_MURMEL_CAUGHT"]: [&"Murmeltier erwischt! +%d and a full gun"],
-[&"", &"EVENT_MURMEL_GONE"]: [&"The Murmeltier is gone"]
+[&"", &"EVENT_MURMEL_GONE"]: [&"The Murmeltier is gone"],
+[&"", &"EVENT_GUEST_ARRIVES"]: [&"A Deitscha Tourist hat si verlaufen!"],
+[&"", &"MARKER_GUEST"]: [&"Deitscha Tourist"],
+[&"", &"GUEST_URIG"]: [&"Das ist ja total urig hier!"],
+[&"", &"GUEST_LOST"]: [&"Wo geht es denn hier zur Hütte?"],
+[&"", &"GUEST_OUCH"]: [&"Aua! Hilfe!"],
+[&"", &"EQUIP_EISSTOCK"]: [&"Eisstock"],
+[&"", &"EVENT_GUEST_REWARD"]: [&"He leaves you his two Eisstöcke! Throw them with G or the middle mouse button"],
+[&"", &"EVENT_GUEST_DIED"]: [&"The Tourist did not make it"],
+[&"", &"EVENT_GUEST_GAVE_UP"]: [&"The Tourist took the next gondola home"],
+[&"", &"UI_EQUIPMENT"]: [&"%s ×%d   [G]"]
 }

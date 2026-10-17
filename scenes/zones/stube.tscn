@@ -709,3 +709,6 @@ zone = &"stube"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, -0.3, 3)
 script = ExtResource("15")
 zone = &"stube"
+
+[node name="GuestGoal" type="Marker3D" parent="." groups=["guest_goal"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 3.5)

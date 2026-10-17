@@ -243,3 +243,6 @@ zone = &"seilbahn"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, -0.3, 7.7)
 script = ExtResource("10")
 zone = &"seilbahn"
+
+[node name="GuestArrival" type="Marker3D" parent="." groups=["guest_arrival"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.3, 1.0, 4.4)

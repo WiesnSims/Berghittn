@@ -241,11 +241,22 @@ func _check_shotgun_points() -> void:
 	player.rotation = Vector3.ZERO
 	(player.get_node("Head") as Node3D).rotation.x = -0.1
 	enemy.activate(load("res://data/enemies/wanderer.tres"), 1, Transform3D(Basis.IDENTITY, Vector3(-1, 0, -1)))
-	await _frames(2)
+	enemy.set_physics_process(false)
+	# Hurt boxes are areas: give the physics space a few steps to see where it stands.
+	await _frames(4)
 	var kills: Array[int] = [0]
 	Events.enemy_killed.connect(func(_e: Node3D, _h: bool, _m: bool, _s: Node3D) -> void: kills[0] += 1)
 	var before: int = player.points.total
+	# Every pellet on the chest (hip-fire spread is random), so the blast surely kills.
+	var flinte: WeaponData = weapons.weapon
+	var spread: float = flinte.spread
+	var bloom: float = flinte.bloom_per_shot
+	flinte.spread = 0.0
+	flinte.bloom_per_shot = 0.0
+	weapons.bloom = 0.0
 	weapons._fire()
+	flinte.spread = spread
+	flinte.bloom_per_shot = bloom
 	var gained: int = player.points.total - before
 	_check(not enemy.is_alive() and kills[0] == 1 and (gained == Constants.POINTS_KILL_BODY or gained == Constants.POINTS_KILL_HEADSHOT),
 		"one shotgun blast: %d kill(s), %d points (not one payout per pellet)" % [kills[0], gained])

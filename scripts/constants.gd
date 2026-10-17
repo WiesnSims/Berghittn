@@ -117,6 +117,27 @@ const MURMEL_HOP_MIN: float = 2.5
 const MURMEL_HOP_MAX: float = 7.0
 const MURMEL_POINTS: int = 500
 
+# Deitscha Tourist: health, walking speed, how near a player must be for him to walk on, how close
+# to the Stube counts as there, and how long he searches before giving up (s).
+const GUEST_HEALTH: int = 300
+const GUEST_SPEED: float = 1.8
+const GUEST_ESCORT_RANGE: float = 10.0
+const GUEST_ARRIVE_REACH: float = 1.5
+const GUEST_TIME: float = 180.0
+# Eisstock: throwing speed (m/s), friction (m/s per s), wall bounces, speed kept per bounce, how close
+# an enemy gets hit, and the damage (a boss takes less and is shoved).
+const EISSTOCK_SPEED: float = 16.0
+const EISSTOCK_FRICTION: float = 4.0
+const EISSTOCK_BOUNCES: int = 3
+const EISSTOCK_BOUNCE_KEEP: float = 0.85
+const EISSTOCK_HIT_REACH: float = 0.75
+const EISSTOCK_DAMAGE: int = 5000
+const EISSTOCK_BOSS_DAMAGE: int = 1500
+
+# HUD banner: its font size, and the smallest a long line shrinks to before it wraps.
+const BANNER_FONT_SIZE: int = 72
+const BANNER_MIN_FONT_SIZE: int = 40
+
 # Schnaps perks (section 9). Durchschlag: extra bodies per shot.
 const PERK_PIERCE_BONUS: int = 1
 # Böllerschuss: blast radius (m), damage at the centre (half at the edge), push, and the wait between blasts.
