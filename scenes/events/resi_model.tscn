@@ -1,0 +1,502 @@
+[gd_scene load_steps=61 format=3]
+
+[sub_resource type="StandardMaterial3D" id="Coat"]
+albedo_color = Color(0.5, 0.2, 0.09, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="White"]
+albedo_color = Color(0.93, 0.9, 0.84, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Pink"]
+albedo_color = Color(0.92, 0.62, 0.6, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Hoof"]
+albedo_color = Color(0.12, 0.1, 0.09, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Horn"]
+albedo_color = Color(0.9, 0.85, 0.7, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="Eye"]
+albedo_color = Color(0.05, 0.05, 0.06, 1)
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="Strap"]
+albedo_color = Color(0.32, 0.18, 0.08, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Bell"]
+albedo_color = Color(0.88, 0.68, 0.25, 1)
+metallic = 0.8
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="Red"]
+albedo_color = Color(0.85, 0.12, 0.12, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Yellow"]
+albedo_color = Color(0.98, 0.82, 0.15, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Blue"]
+albedo_color = Color(0.2, 0.35, 0.9, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Leaf"]
+albedo_color = Color(0.2, 0.5, 0.18, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="M0"]
+material = SubResource("Coat")
+size = Vector3(0.72, 0.72, 1.6)
+
+[sub_resource type="BoxMesh" id="M1"]
+material = SubResource("White")
+size = Vector3(0.34, 0.04, 1.62)
+
+[sub_resource type="BoxMesh" id="M2"]
+material = SubResource("White")
+size = Vector3(0.5, 0.06, 1.1)
+
+[sub_resource type="SphereMesh" id="M3"]
+material = SubResource("Pink")
+radius = 0.17
+height = 0.2
+radial_segments = 10
+rings = 6
+
+[sub_resource type="CylinderMesh" id="M4"]
+material = SubResource("Pink")
+top_radius = 0.018
+bottom_radius = 0.022
+height = 0.08
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M5"]
+material = SubResource("Pink")
+top_radius = 0.018
+bottom_radius = 0.022
+height = 0.08
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M6"]
+material = SubResource("Pink")
+top_radius = 0.018
+bottom_radius = 0.022
+height = 0.08
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M7"]
+material = SubResource("Pink")
+top_radius = 0.018
+bottom_radius = 0.022
+height = 0.08
+radial_segments = 10
+
+[sub_resource type="BoxMesh" id="M8"]
+material = SubResource("Coat")
+size = Vector3(0.15, 0.7, 0.16)
+
+[sub_resource type="BoxMesh" id="M9"]
+material = SubResource("Hoof")
+size = Vector3(0.16, 0.08, 0.18)
+
+[sub_resource type="BoxMesh" id="M10"]
+material = SubResource("Coat")
+size = Vector3(0.15, 0.7, 0.16)
+
+[sub_resource type="BoxMesh" id="M11"]
+material = SubResource("Hoof")
+size = Vector3(0.16, 0.08, 0.18)
+
+[sub_resource type="BoxMesh" id="M12"]
+material = SubResource("Coat")
+size = Vector3(0.15, 0.7, 0.16)
+
+[sub_resource type="BoxMesh" id="M13"]
+material = SubResource("Hoof")
+size = Vector3(0.16, 0.08, 0.18)
+
+[sub_resource type="BoxMesh" id="M14"]
+material = SubResource("Coat")
+size = Vector3(0.15, 0.7, 0.16)
+
+[sub_resource type="BoxMesh" id="M15"]
+material = SubResource("Hoof")
+size = Vector3(0.16, 0.08, 0.18)
+
+[sub_resource type="BoxMesh" id="M16"]
+material = SubResource("Coat")
+size = Vector3(0.42, 0.46, 0.4)
+
+[sub_resource type="BoxMesh" id="M17"]
+material = SubResource("Coat")
+size = Vector3(0.36, 0.38, 0.44)
+
+[sub_resource type="BoxMesh" id="M18"]
+material = SubResource("White")
+size = Vector3(0.14, 0.26, 0.02)
+
+[sub_resource type="BoxMesh" id="M19"]
+material = SubResource("Pink")
+size = Vector3(0.32, 0.2, 0.14)
+
+[sub_resource type="SphereMesh" id="M20"]
+material = SubResource("Eye")
+radius = 0.035
+height = 0.07
+radial_segments = 10
+rings = 6
+
+[sub_resource type="SphereMesh" id="M21"]
+material = SubResource("Eye")
+radius = 0.035
+height = 0.07
+radial_segments = 10
+rings = 6
+
+[sub_resource type="BoxMesh" id="M22"]
+material = SubResource("Coat")
+size = Vector3(0.16, 0.08, 0.1)
+
+[sub_resource type="BoxMesh" id="M23"]
+material = SubResource("Coat")
+size = Vector3(0.16, 0.08, 0.1)
+
+[sub_resource type="CylinderMesh" id="M24"]
+material = SubResource("Horn")
+top_radius = 0.035
+bottom_radius = 0.05
+height = 0.16
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M25"]
+material = SubResource("Horn")
+top_radius = 0.035
+bottom_radius = 0.05
+height = 0.16
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M26"]
+material = SubResource("Horn")
+top_radius = 0.012
+bottom_radius = 0.035
+height = 0.16
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M27"]
+material = SubResource("Horn")
+top_radius = 0.012
+bottom_radius = 0.035
+height = 0.16
+radial_segments = 10
+
+[sub_resource type="SphereMesh" id="M28"]
+material = SubResource("Red")
+radius = 0.045
+height = 0.09
+radial_segments = 10
+rings = 6
+
+[sub_resource type="BoxMesh" id="M29"]
+material = SubResource("Leaf")
+size = Vector3(0.06, 0.02, 0.04)
+
+[sub_resource type="SphereMesh" id="M30"]
+material = SubResource("Yellow")
+radius = 0.045
+height = 0.09
+radial_segments = 10
+rings = 6
+
+[sub_resource type="BoxMesh" id="M31"]
+material = SubResource("Leaf")
+size = Vector3(0.06, 0.02, 0.04)
+
+[sub_resource type="SphereMesh" id="M32"]
+material = SubResource("White")
+radius = 0.045
+height = 0.09
+radial_segments = 10
+rings = 6
+
+[sub_resource type="BoxMesh" id="M33"]
+material = SubResource("Leaf")
+size = Vector3(0.06, 0.02, 0.04)
+
+[sub_resource type="SphereMesh" id="M34"]
+material = SubResource("Blue")
+radius = 0.045
+height = 0.09
+radial_segments = 10
+rings = 6
+
+[sub_resource type="BoxMesh" id="M35"]
+material = SubResource("Leaf")
+size = Vector3(0.06, 0.02, 0.04)
+
+[sub_resource type="SphereMesh" id="M36"]
+material = SubResource("Red")
+radius = 0.045
+height = 0.09
+radial_segments = 10
+rings = 6
+
+[sub_resource type="BoxMesh" id="M37"]
+material = SubResource("Leaf")
+size = Vector3(0.06, 0.02, 0.04)
+
+[sub_resource type="SphereMesh" id="M38"]
+material = SubResource("Yellow")
+radius = 0.045
+height = 0.09
+radial_segments = 10
+rings = 6
+
+[sub_resource type="BoxMesh" id="M39"]
+material = SubResource("Leaf")
+size = Vector3(0.06, 0.02, 0.04)
+
+[sub_resource type="SphereMesh" id="M40"]
+material = SubResource("Blue")
+radius = 0.045
+height = 0.09
+radial_segments = 10
+rings = 6
+
+[sub_resource type="BoxMesh" id="M41"]
+material = SubResource("Leaf")
+size = Vector3(0.06, 0.02, 0.04)
+
+[sub_resource type="BoxMesh" id="M42"]
+material = SubResource("Strap")
+size = Vector3(0.46, 0.08, 0.44)
+
+[sub_resource type="BoxMesh" id="M43"]
+material = SubResource("Bell")
+size = Vector3(0.1, 0.1, 0.03)
+
+[sub_resource type="CylinderMesh" id="M44"]
+material = SubResource("Bell")
+top_radius = 0.09
+bottom_radius = 0.14
+height = 0.26
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M45"]
+material = SubResource("Bell")
+top_radius = 0.15
+bottom_radius = 0.15
+height = 0.03
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="M46"]
+material = SubResource("Coat")
+top_radius = 0.025
+bottom_radius = 0.03
+height = 0.7
+radial_segments = 10
+
+[sub_resource type="SphereMesh" id="M47"]
+material = SubResource("White")
+radius = 0.06
+height = 0.16
+radial_segments = 10
+rings = 6
+
+[node name="ResiModel" type="Node3D"]
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.08, 0.05)
+mesh = SubResource("M0")
+
+[node name="Stripe" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45, 0.05)
+mesh = SubResource("M1")
+
+[node name="Belly" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.71, 0.1)
+mesh = SubResource("M2")
+
+[node name="Udder" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.66, 0.5)
+mesh = SubResource("M3")
+
+[node name="Teat00" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, 0.55, 0.46)
+mesh = SubResource("M4")
+
+[node name="Teat01" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, 0.55, 0.56)
+mesh = SubResource("M5")
+
+[node name="Teat10" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06, 0.55, 0.46)
+mesh = SubResource("M6")
+
+[node name="Teat11" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06, 0.55, 0.56)
+mesh = SubResource("M7")
+
+[node name="LegFL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24, 0.43, -0.58)
+mesh = SubResource("M8")
+
+[node name="LegFLHoof" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24, 0.04, -0.58)
+mesh = SubResource("M9")
+
+[node name="LegFR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.43, -0.58)
+mesh = SubResource("M10")
+
+[node name="LegFRHoof" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.04, -0.58)
+mesh = SubResource("M11")
+
+[node name="LegBL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24, 0.43, 0.62)
+mesh = SubResource("M12")
+
+[node name="LegBLHoof" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24, 0.04, 0.62)
+mesh = SubResource("M13")
+
+[node name="LegBR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.43, 0.62)
+mesh = SubResource("M14")
+
+[node name="LegBRHoof" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.04, 0.62)
+mesh = SubResource("M15")
+
+[node name="HeadNeck" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, -0.86)
+mesh = SubResource("M16")
+
+[node name="HeadSkull" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.36, -1.12)
+mesh = SubResource("M17")
+
+[node name="HeadBlaze" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.38, -1.345)
+mesh = SubResource("M18")
+
+[node name="HeadMuzzle" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.22, -1.38)
+mesh = SubResource("M19")
+
+[node name="HeadEyeL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17, 1.44, -1.24)
+mesh = SubResource("M20")
+
+[node name="HeadEyeR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.17, 1.44, -1.24)
+mesh = SubResource("M21")
+
+[node name="HeadEarL" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9397, -0.342, 0, 0.342, 0.9397, 0, 0, 0, 1, -0.25, 1.48, -1.05)
+mesh = SubResource("M22")
+
+[node name="HeadEarR" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9397, 0.342, 0, -0.342, 0.9397, 0, 0, 0, 1, 0.25, 1.48, -1.05)
+mesh = SubResource("M23")
+
+[node name="HeadHornBaseL" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.5, -0.866, 0, 0.866, 0.5, 0, 0, 0, 1, -0.2, 1.6, -1.06)
+mesh = SubResource("M24")
+
+[node name="HeadHornBaseR" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.5, 0.866, 0, -0.866, 0.5, 0, 0, 0, 1, 0.2, 1.6, -1.06)
+mesh = SubResource("M25")
+
+[node name="HeadHornTipL" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9659, -0.2588, 0, 0.2588, 0.9659, 0, 0, 0, 1, -0.3, 1.72, -1.06)
+mesh = SubResource("M26")
+
+[node name="HeadHornTipR" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9659, 0.2588, 0, -0.2588, 0.9659, 0, 0, 0, 1, 0.3, 1.72, -1.06)
+mesh = SubResource("M27")
+
+[node name="HeadFlower0" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.159748, 1.61368, -1.0629)
+mesh = SubResource("M28")
+
+[node name="HeadLeaf0" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.140954, 1.57, -1.02)
+mesh = SubResource("M29")
+
+[node name="HeadFlower1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.123654, 1.62745, -1.04569)
+mesh = SubResource("M30")
+
+[node name="HeadLeaf1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.109106, 1.57, -1.02)
+mesh = SubResource("M31")
+
+[node name="HeadFlower2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0673336, 1.63673, -1.03409)
+mesh = SubResource("M32")
+
+[node name="HeadLeaf2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.059412, 1.57, -1.02)
+mesh = SubResource("M33")
+
+[node name="HeadFlower3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.64, -1.03)
+mesh = SubResource("M34")
+
+[node name="HeadLeaf3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.57, -1.02)
+mesh = SubResource("M35")
+
+[node name="HeadFlower4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0673336, 1.63673, -1.03409)
+mesh = SubResource("M36")
+
+[node name="HeadLeaf4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.059412, 1.57, -1.02)
+mesh = SubResource("M37")
+
+[node name="HeadFlower5" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.123654, 1.62745, -1.04569)
+mesh = SubResource("M38")
+
+[node name="HeadLeaf5" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.109106, 1.57, -1.02)
+mesh = SubResource("M39")
+
+[node name="HeadFlower6" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.159748, 1.61368, -1.0629)
+mesh = SubResource("M40")
+
+[node name="HeadLeaf6" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.140954, 1.57, -1.02)
+mesh = SubResource("M41")
+
+[node name="Strap" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.12, -0.86)
+mesh = SubResource("M42")
+
+[node name="BellBuckle" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -1.09)
+mesh = SubResource("M43")
+
+[node name="BellBody" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.82, -1.1)
+mesh = SubResource("M44")
+
+[node name="BellRim" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.69, -1.1)
+mesh = SubResource("M45")
+
+[node name="TailRope" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0.88)
+mesh = SubResource("M46")
+
+[node name="TailTuft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.66, 0.88)
+mesh = SubResource("M47")

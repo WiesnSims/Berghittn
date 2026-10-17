@@ -22,6 +22,7 @@ const SPENT_COLOR: Color = Color(0.9, 0.3, 0.25, 1)
 @onready var _boss_bar: ProgressBar = %BossBar
 @onready var _perk_icons: HBoxContainer = %PerkIcons
 @onready var _perk_glow: TextureRect = %PerkGlow
+@onready var _equipment_label: Label = %EquipmentLabel
 
 var _weapons: WeaponHolder
 var _dead: bool = false
@@ -42,6 +43,7 @@ func _ready() -> void:
 	Events.wave_started.connect(_on_wave_started)
 	Events.wave_cleared.connect(_on_wave_cleared)
 	Events.boss_spawned.connect(_on_boss_spawned)
+	Events.event_announced.connect(_show_banner)
 
 
 func _process(delta: float) -> void:
@@ -79,6 +81,8 @@ func bind_player(player: Player) -> void:
 	player.points.changed.connect(_on_points_changed)
 	player.interactor.prompt_changed.connect(_on_prompt_changed)
 	_perks = player.perks
+	player.equipment.changed.connect(_on_equipment_changed)
+	_on_equipment_changed(player.equipment.item, player.equipment.count)
 	player.perks.changed.connect(_on_perks_changed)
 	player.perks.triggered.connect(func(_id: StringName, text: String) -> void: _show_banner(tr(text)))
 	_points_label.text = str(player.points.total)
@@ -223,12 +227,26 @@ func _on_perks_changed(perks: Array[PerkData]) -> void:
 		_show_banner(tr(perks[-1].title) + "!")
 
 
+func _on_equipment_changed(item: EquipmentData, count: int) -> void:
+	_equipment_label.text = tr("UI_EQUIPMENT") % [tr(item.display_name), count] if item and count > 0 else ""
+
+
 func _on_wave_cleared(wave: int) -> void:
 	_show_banner(tr("UI_WAVE_CLEARED") % wave)
 
 
 func _show_banner(text: String) -> void:
 	_banner.text = text
+	# Long event lines shrink to fit the screen, and wrap if even that is not enough.
+	var font: Font = _banner.get_theme_font("font")
+	var room: float = maxf(_banner.size.x, 200.0)
+	var font_size: int = Constants.BANNER_FONT_SIZE
+	var width: float = font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+	if width > room:
+		font_size = maxi(Constants.BANNER_MIN_FONT_SIZE, floori(font_size * room / width))
+	_banner.add_theme_font_size_override("font_size", font_size)
+	var fits: bool = font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x <= room
+	_banner.autowrap_mode = TextServer.AUTOWRAP_OFF if fits else TextServer.AUTOWRAP_WORD_SMART
 	if _banner_tween:
 		_banner_tween.kill()
 	_banner.modulate.a = 0.0

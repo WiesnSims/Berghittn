@@ -43,6 +43,7 @@ var _noise: FastNoiseLite = FastNoiseLite.new()
 
 
 func _ready() -> void:
+	add_to_group("alm_terrain")
 	_noise.seed = noise_seed
 	_noise.frequency = 0.012
 	_noise.fractal_octaves = 3

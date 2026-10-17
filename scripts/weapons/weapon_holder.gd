@@ -133,6 +133,16 @@ func refill_ammo(data: WeaponData) -> void:
 		ammo_changed.emit(mag, reserve)
 
 
+## The gun in hand topped up completely, magazine and reserve (the Murmeltier's reward).
+func refill_current() -> void:
+	if weapon == null:
+		return
+	_cancel_reload()
+	mag = maxi(mag, weapon.mag_size)
+	refill_ammo(weapon)
+	ammo_changed.emit(mag, reserve)
+
+
 ## True when any carried gun is short of reserve ammo (the Lager's ammo crate).
 func needs_any_ammo() -> bool:
 	return _slots.any(func(slot: GunSlot) -> bool: return needs_ammo(slot.data))

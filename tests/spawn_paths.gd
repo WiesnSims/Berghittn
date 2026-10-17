@@ -1,7 +1,7 @@
 extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/spawn_paths.tscn
 ## From every spawn point that is active at the start (only the Stube open), one enemy must make it into the
-## Stube: around the hut, down into the beer garden and up to the deck, through a barricaded window.
+## Stube: around the hut, through the beer garden gates and up the deck ramp, through a barricaded window.
 ## Catches spots on the map where bodies get stuck that the navmesh thinks are fine.
 
 const STAND: Vector3 = Vector3(-2.0, 0.0, 1.0)

@@ -8,6 +8,7 @@ signal died
 @onready var health: PlayerHealth = $Health
 @onready var points: PlayerPoints = $Points
 @onready var perks: PlayerPerks = $Perks
+@onready var equipment: PlayerEquipment = $Equipment
 @onready var interactor: Interactor = $Interactor
 @onready var weapons: WeaponHolder = $Head/Camera3D/WeaponHolder
 @onready var _head: Node3D = $Head

@@ -74,6 +74,70 @@ const ENEMY_SIDESTEP_TIME: float = 0.5
 const ENEMY_KNOCKBACK_DECAY: float = 24.0
 const ENEMY_KNOCKBACK_HOP: float = 2.5
 
+# Lures (die Resi's bell, later the Kuhglocke): how close an enemy must get to count as there.
+const ENEMY_LURE_REACH: float = 1.6
+
+# Events (section 8a). Die Resi: first wave, waves between visits, seconds into the wave she arrives,
+# how long she stays, how far her bell carries, seconds of milking, and her walking and bolting speeds.
+const RESI_FIRST_WAVE: int = 3
+const RESI_EVERY_MIN: int = 3
+const RESI_EVERY_MAX: int = 5
+const RESI_DELAY: float = 12.0
+const RESI_STAY_TIME: float = 45.0
+const RESI_LURE_RADIUS: float = 20.0
+const RESI_MILK_TIME: float = 2.5
+const RESI_WALK_SPEED: float = 1.1
+const RESI_BOLT_SPEED: float = 6.0
+
+# Random events: from which wave, the chance per wave, and when in the wave (seconds).
+const RANDOM_EVENT_FIRST_WAVE: int = 2
+const RANDOM_EVENT_CHANCE: float = 0.3
+const RANDOM_EVENT_DELAY_MIN: float = 8.0
+const RANDOM_EVENT_DELAY_MAX: float = 35.0
+# Bierfassl: rolling speed (m/s), how close a player stops it and an enemy gets flattened, what a
+# boss takes instead, seconds of tapping, how long it waits to be tapped, and the points when the
+# tapper already has every Schnaps.
+const FASSL_SPEED: float = 8.0
+const FASSL_STOP_REACH: float = 1.2
+const FASSL_HIT_REACH: float = 1.0
+const FASSL_BOSS_DAMAGE: int = 500
+const FASSL_TAP_TIME: float = 2.0
+const FASSL_REST_TIME: float = 60.0
+const FASSL_POINTS_IF_FULL: int = 2000
+
+# Murmeltier: pops per visit, seconds rising/ducking, screaming and hidden between pops, how far from
+# the player the first pop is and from one pop to the next (m), and the points for catching it.
+const MURMEL_POPS: int = 4
+const MURMEL_RISE_TIME: float = 0.25
+const MURMEL_SCREAM_TIME: float = 1.8
+const MURMEL_HIDE_TIME: float = 1.2
+const MURMEL_FIRST_MIN: float = 6.0
+const MURMEL_FIRST_MAX: float = 22.0
+const MURMEL_HOP_MIN: float = 2.5
+const MURMEL_HOP_MAX: float = 7.0
+const MURMEL_POINTS: int = 500
+
+# Deitscha Tourist: health, walking speed, how near a player must be for him to walk on, how close
+# to the Stube counts as there, and how long he searches before giving up (s).
+const GUEST_HEALTH: int = 300
+const GUEST_SPEED: float = 1.8
+const GUEST_ESCORT_RANGE: float = 10.0
+const GUEST_ARRIVE_REACH: float = 1.5
+const GUEST_TIME: float = 180.0
+# Eisstock: throwing speed (m/s), friction (m/s per s), wall bounces, speed kept per bounce, how close
+# an enemy gets hit, and the damage (a boss takes less and is shoved).
+const EISSTOCK_SPEED: float = 16.0
+const EISSTOCK_FRICTION: float = 4.0
+const EISSTOCK_BOUNCES: int = 3
+const EISSTOCK_BOUNCE_KEEP: float = 0.85
+const EISSTOCK_HIT_REACH: float = 0.75
+const EISSTOCK_DAMAGE: int = 5000
+const EISSTOCK_BOSS_DAMAGE: int = 1500
+
+# HUD banner: its font size, and the smallest a long line shrinks to before it wraps.
+const BANNER_FONT_SIZE: int = 72
+const BANNER_MIN_FONT_SIZE: int = 40
+
 # Schnaps perks (section 9). Durchschlag: extra bodies per shot.
 const PERK_PIERCE_BONUS: int = 1
 # Böllerschuss: blast radius (m), damage at the centre (half at the edge), push, and the wait between blasts.

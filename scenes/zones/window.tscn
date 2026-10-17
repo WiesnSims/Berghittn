@@ -27,6 +27,7 @@ size = Vector3(1.2, 0.06, 0.06)
 material = ExtResource("3")
 
 [node name="Link" type="NavigationLink3D" parent="."]
+navigation_layers = 2
 bidirectional = false
 start_position = Vector3(0, -1.8, 0.75)
 end_position = Vector3(0, -1.5, -0.75)

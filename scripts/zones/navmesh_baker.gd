@@ -38,6 +38,17 @@ func _bake() -> void:
 		var csg: CSGShape3D = _shapes[i]
 		if is_instance_valid(csg) and csg.use_collision:
 			source.add_faces(_faces[i], csg.global_transform)
+	# Furniture in group "nav_blockers" is cut out of the navmesh, top included: without this the
+	# table tops were islands of navmesh, and a body shoved up onto one pathed in circles (play-test).
+	for node: Node in get_tree().get_nodes_in_group("nav_blockers"):
+		var blocker := node as GeometryInstance3D
+		if blocker == null or not blocker.is_inside_tree():
+			continue
+		var box: AABB = blocker.global_transform * blocker.get_aabb()
+		var outline := PackedVector3Array([box.position, box.position + Vector3(box.size.x, 0, 0),
+			box.position + Vector3(box.size.x, 0, box.size.z), box.position + Vector3(0, 0, box.size.z)])
+		# Not carved: the agent radius is kept clear around it like around any wall.
+		source.add_projected_obstruction(outline, box.position.y - 0.1, box.size.y + 0.2, false)
 	var baked: NavigationMesh = navigation_mesh.duplicate()
 	# Synchronous: the web build has no thread support.
 	NavigationServer3D.bake_from_source_geometry_data(baked, source)

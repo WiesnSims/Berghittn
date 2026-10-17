@@ -7,7 +7,7 @@ extends Node
 
 const CLIMBS: Array = [
 	["hall stairs to the gallery", Vector3(3, 0, 2), Vector3(-6.0, 3.5, -4.8)],
-	["garden steps to the deck", Vector3(-6, -1.5, 16.5), Vector3(-5.0, 0.0, 8.0)],
+	["garden ramp onto the deck", Vector3(-6, -0.3, 18.0), Vector3(-5.0, 0.0, 8.0)],
 	["ramp to the hay loft", Vector3(10, 0, 14), Vector3(18.5, 3.5, 14.0)],
 	["ramp onto the gondola platform", Vector3(8.5, 0, 0.5), Vector3(14.5, 1.0, 3.5)],
 ]

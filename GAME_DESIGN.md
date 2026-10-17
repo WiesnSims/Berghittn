@@ -101,7 +101,7 @@ Zones (each is a separate area scene joined at doors). Costs are in points.
 | `stube` | Gaststube (main room) | yes | – | Spawn point, first wall-buy, fireplace; two-storey hall with gallery, Erker and balcony |
 | `kueche` | Küche | no | 500 | Kitchen with a Speis (pantry); Schnaps shrine (perk machine) |
 | `lager` | Matratzenlager | no | 1250 | Upstairs dorm over the Küche, door on the Stube gallery; no windows enemies can climb (they come up the stairs); Munitionskiste |
-| `terrasse` | Terrasse | no | 750 | Open snowy terrace, long sight lines over the beer garden |
+| `terrasse` | Terrasse | no | 750 | Big open terrace, deck and beer garden on one level, long sight lines |
 | `skiraum` | Skiraum | no | 1000 | Narrow room, good chokepoint, wall-buy |
 | `schuppen` | Holzschuppen | no | 1250 | Woodshed, the mystery chest spawns here at fixed spot |
 | `seilbahn` | Seilbahn-Station | no | 1500 | Cable car station, the alphorn weapon location in later waves |
@@ -111,7 +111,9 @@ not plain boxes. The Stube is a two-storey hall (7 m) with a gallery along two w
 an Erker (bay) with the Herrgottswinkel, and a balcony over the Terrasse off the gallery. The Küche
 has a pantry, the Skiraum a boot corridor behind a partition (the chokepoint), the Seilbahn-Station a
 raised boarding platform with the gondola alongside, the Holzschuppen a hay loft up a ramp, and the
-Terrasse two levels: a deck along the hut and a lower beer garden dug into the slope. Every change of
+Terrasse a deck along the hut that runs out over a full-width gentle ramp onto a big, open beer
+garden at the level of the alm (play-test 2026-10-17: the sunken garden, down and up again, looked
+odd and was crowded), fenced with three 3.5 m gates enemies come in by, with few objects in it. Every change of
 level is a ramp (stairs are a ramp with steps on top) with curbs, since enemies cannot climb steps.
 
 Every room has a purpose (user request, 2026-10-17), something worth going there for:
@@ -121,7 +123,7 @@ Every room has a purpose (user request, 2026-10-17), something worth going there
 | `stube` | Start, Jagdflinte wall-buy, later the Kuhglocke wall-buy |
 | `kueche` | Schnaps shrine (perks) and the Brettljause in the Speis (stats), section 9; later the Schmarrnpfanne wall-buy |
 | `lager` | **Munitionskiste** (1000): refills the reserve of every carried gun at once; the only refill for chest guns. The safe-ish room: no climbable windows |
-| `terrasse` | Long sight lines over the sunken beer garden, and **die Resi**, the lost Almkuh (section 8a) who turns up in the garden. The Schneekanone trap was cut after play-testing (2026-10-17, "unfun and useless"); buyable traps or obstacles stay an idea for later |
+| `terrasse` | Long sight lines over the open beer garden, and **die Resi**, the lost Almkuh (section 8a) who turns up in the garden. The Schneekanone trap was cut after play-testing (2026-10-17, "unfun and useless"); buyable traps or obstacles stay an idea for later |
 | `skiraum` | Chokepoint, Stutzen wall-buy |
 | `schuppen` | Hüttentruhe (mystery chest), later the Kuhfladen-Mine wall-buy |
 | `seilbahn` | Handböller wall-buy and the Alphorn in later waves; arrive with the special weapons (section 6a) |
@@ -156,7 +158,7 @@ effects, see section 6a), `secondary` (what right click does, see the rules belo
 | `pistole` | Dienstpistole | semi-auto pistol | 25 | up to 10 (as fast as you click) | 8 / 64 | start weapon |
 | `jagdflinte` | Jagdflinte | double-barrel shotgun | 20 x 8 pellets | 1.5 | 2 / 24 | 500 (wall-buy, Stube) |
 | `stutzen` | Stutzen | bolt-action rifle | 120 | 0.8 | 5 / 40 | 750 (wall-buy, Skiraum) |
-| `repetierer` | Repetierer | lever/repeater rifle | 45 | 3 (5.5 fanned) | 10 / 80 | 1000 (chest only) |
+| `repetierer` | Repetierer | lever/repeater rifle | 90 (two shots for small enemies, play-test 2026-10-17) | 3 (5.5 fanned) | 10 / 80 | 1000 (chest only) |
 | `schaufel` | Schneeschaufel | melee | 70 | 1.2 | – | 0 (always equipped) |
 | `alphorn` | Alphorn | wonder weapon | 200 area | 0.5 | 6 / 18 | chest only, rare |
 | `knoedelwerfer` | Knödelwerfer | wonder weapon | 180 area | 1.0 | 12 / 36 | chest only, rare |
@@ -251,13 +253,14 @@ Alpine folk culture.
 - **Krampus-Rute:** birch rod dropped by the Krampus boss. Hits cause enemies
   in a small radius to flee for 3 s.
 
-**Equipment (1 slot, stackable, thrown or placed with a key)**
+**Equipment (1 slot, stackable, thrown or placed with G or the middle mouse button; one kind at a
+time, shown on the HUD above the gun name)**
 
 | Id | Name | Effect | Cost | Max carried | Where |
 |---|---|---|---|---|---|
 | `kuhglocke` | Kuhglocke | Thrown decoy cowbell; rings for 10 s and attracts all enemies within 20 m | 300 | 2 | wall-buy, Stube |
 | `kuhfladen` | Kuhfladen-Mine | Placed on the floor; enemies stepping in it are slowed 60% for 5 s and take 40 damage | 250 | 3 | wall-buy, Schuppen |
-| `eisstock` | Eisstock | Thrown low, slides along the floor like a curling stone, bounces off walls up to 3 times and damages every enemy it slides through. Deliberately overpowered (user request, 2026-10-17) | – | 2 | only as an event reward (section 8a): no wall-buy, no refill |
+| `eisstock` | Eisstock | Thrown low, slides along the floor like a curling stone, bounces off walls up to 3 times and damages every enemy it slides through (5000, a boss 1500 and a shove; 16 m/s, slows down over about 30 m). Deliberately overpowered (user request, 2026-10-17) | – | 2 | only as an event reward (section 8a): no wall-buy, no refill |
 
 Balance notes: wonder weapons must feel exciting but not make the game trivial.
 Tune damage numbers by playtesting, and keep every number in the data
@@ -301,7 +304,7 @@ Wave formulas (n = wave number, starting at 1):
 - Total enemies in wave: `6 + 2*n` (solo). Co-op: multiply by `1 + 0.5*(players - 1)`.
 - Max alive at once: 24.
 - Spawn interval: `max(0.6, 2.5 - 0.1*n)` seconds.
-- Between waves: 10 s break, a message "Welle N" appears, barricades can be repaired.
+- Between waves: 30 s break (play-test 2026-10-17, was 10 s), a message "Welle N" appears, barricades can be repaired.
 - Enemy type mix: determined by `wave_table.tres` (data resource), not hardcoded.
 
 Points:
@@ -329,23 +332,34 @@ take on the meme, not the clip itself.
 
 **Die Resi (main event, Terrasse).** "Die Resi hat si verlaufen!" A lost Almkuh with a flower wreath
 and a huge bell wanders into the beer garden. She only comes while the Terrasse is open, every 3 to 5
-waves from wave 3, and stays 45 s.
+waves from wave 3 (never on a boss wave: then she comes the wave after), arrives 12 s into the wave
+and stays 45 s.
 - Hold E next to her to milk her: fresh Almmilch heals fully and gives a free helping from the
   Brettljause (one not yet at five).
 - Her bell draws every enemy within 20 m to her, so getting the milk is a fight.
 - If enemies reach her, she bolts off mooing and the milk is gone.
 
-**Random events.** At most one per wave, with a chance each wave from wave 2 (not every wave, and
-never on a boss wave); the same one does not come twice in a row.
-- **"Bierfassl kert onzapft!"** A beer barrel breaks loose up on the alm and rolls down the slope
-  across the beer garden, bouncing, flattening every enemy in its way. Whoever stops it (walks into
-  it) and taps it (hold E) gets Freibier: a random Schnaps they do not own yet, for free.
-- **The Murmeltier.** A marmot pops out of the floor somewhere on the open part of the map, indoors
-  too, screams the meme scream and ducks away again, a few times in different spots close by. Hit it
-  (shot or melee) before it is gone for points and a full refill of the gun in hand.
-- **"Deitscha Tourist"** A lost German tourist in sandals and socks gets off at the Seilbahn and
-  heads for the Stube. Enemies go for him too; escort him there alive and he hands over the only
-  Eisstöcke in the game ("Das ist ja total urig hier!").
+**Random events.** At most one per wave, a 30 % chance each wave from wave 2, 8 to 35 s into it (not
+every wave, never on a boss wave or a wave Resi comes); the same one does not come twice in a row
+when another one could come.
+- **"Bierfassl kert onzapft!"** A beer barrel breaks loose up on the alm to the north-west and rolls
+  down the slope, in at the beer garden's west gate and across the garden (8 m/s), bouncing,
+  flattening every enemy in its way (a boss takes 500 and is shoved). It stops at the first wall,
+  fence or table, or when a player steps in its way. Tap it (hold E for 2 s) for Freibier: a random
+  Schnaps the tapper does not own yet, for free (2000 points if they have them all). Only while the
+  Terrasse is open; an untapped barrel is gone after 60 s.
+- **The Murmeltier.** A marmot pops out of a hole in the floor 6 to 22 m from a player, anywhere
+  players can walk (indoors too, never beyond a fence or outside a shut zone), stands up with its
+  arms raised and screams the meme scream ("AAAAAAH!" on screen until the sound in M6), ducks away,
+  and pops up again 2.5 to 7 m away, four times in all (about 13 s). Hit it while it is up (shot or
+  shovel) for 500 points and a full refill of the gun in hand (magazine and reserve).
+- **"Deitscha Tourist"** A lost German tourist (sunburnt, souvenir Tirolerhut, socks in sandals,
+  fanny pack, a big map) gets off the gondola at the Seilbahn and heads for the Stube. Only while
+  the Seilbahn is open and the way to the Stube through open zones. He walks (1.8 m/s) only while a
+  player is within 10 m ("Wo geht es denn hier zur Hütte?"), never climbs through windows, and
+  enemies go for him like for a player (300 health, shown over his head; players cannot hurt him).
+  Escort him to the Stube alive and he hands the nearest player two Eisstöcke, the only ones in
+  the game ("Das ist ja total urig hier!"). He gives up after 3 minutes.
 
 ## 9. Perks: the Schnaps shrine (Küche) and the Brettljause (Speis)
 
@@ -462,6 +476,9 @@ fix console errors, commit. Stop and report after each milestone.
 **M6 — Art and audio pass**
 - Replace greybox with low-poly assets, lighting, snow effects, sounds,
   German/English strings, settings menu (sensitivity, volume).
+- Ragdolls for dead enemies (user decision, 2026-10-17): skeletal ragdolls on the rigged M6 models,
+  capped to the last few corpses (older ones keep the fall animation), colliding with the world only;
+  check the browser frame rate with a crowd (Jolt if Godot Physics is too slow).
 - Acceptance: file sizes within budget, 60 FPS target met.
 
 **M7 — Co-op (decision gate)**

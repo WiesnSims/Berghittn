@@ -23,7 +23,8 @@ var health: int = 0
 ## Health at spawn, for the boss bar.
 var max_health: int = 0
 var _state: State = State.INACTIVE
-var _target: Player
+## A player or an escort (group "escorts"): anything with is_targetable() and take_damage(amount).
+var _target: Node3D
 var _model: Node3D
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var _repath_left: float = 0.0
@@ -58,6 +59,9 @@ var _sidestep_left: float = 0.0
 var _sidestep_side: float = 1.0
 # Thrown back (Böllerschuss): the push that is left, flat.
 var _knock: Vector3
+# Came in through a window: lures outside (die Resi) no longer pull it back out.
+var _inside: bool = false
+var _lure: Node3D
 
 
 func _ready() -> void:
@@ -94,6 +98,8 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 	_repath_left = 0.0
 	_reset_stuck()
 	_knock = Vector3.ZERO
+	_inside = false
+	_lure = null
 	_window = null
 	_kill_tween()
 	_reset_hit_reaction()
@@ -221,6 +227,17 @@ func _knocked(delta: float) -> void:
 
 
 func _chase(delta: float) -> void:
+	var lure: Node3D = _find_lure()
+	if lure != _lure:
+		_lure = lure
+		_repath_left = 0.0
+	if lure:
+		if _flat(lure.global_position - global_position).length() <= Constants.ENEMY_LURE_REACH:
+			lure.lure_reached(self)
+			_halt(delta)
+		else:
+			_walk_towards(lure.global_position, delta)
+		return
 	_target = _nearest_target()
 	if _target == null:
 		_halt(delta)
@@ -231,17 +248,21 @@ func _chase(delta: float) -> void:
 	if _can_lunge():
 		_start_lunge()
 		return
+	_walk_towards(_target.global_position, delta)
+
+
+func _walk_towards(goal: Vector3, delta: float) -> void:
 	_repath_left -= delta
 	if _repath_left <= 0.0:
 		_repath_left = Constants.ENEMY_REPATH_INTERVAL
-		_agent.target_position = _target.global_position
+		_agent.target_position = goal
 	# Must be polled every frame: it advances the path and fires link_reached.
 	var next: Vector3 = _agent.get_next_path_position()
 	if _near_window_link():
 		return
 	var direction: Vector3 = _flat(next - global_position)
 	if direction.length_squared() < 0.0001:
-		direction = _flat(_target.global_position - global_position)
+		direction = _flat(goal - global_position)
 	direction = _unstick(direction.normalized(), delta)
 	velocity.x = direction.x * data.speed * _slow_factor
 	velocity.z = direction.z * data.speed * _slow_factor
@@ -528,6 +549,7 @@ func _end_climb() -> void:
 	collision_mask = _movement_mask()
 	_repath_left = 0.0
 	_reset_stuck()
+	_inside = true
 	_leave_window()
 	_state = State.CHASING
 
@@ -585,16 +607,34 @@ func _movement_mask() -> int:
 	return Constants.LAYER_WORLD | Constants.LAYER_PLAYER | Constants.LAYER_ENEMY
 
 
-func _nearest_target() -> Player:
-	var best: Player = null
+## The nearest lure whose pull reaches this enemy (die Resi's bell), or null. Enemies already inside the
+## hut stay with the players.
+func _find_lure() -> Node3D:
+	if _inside:
+		return null
+	var best: Node3D = null
 	var best_distance: float = INF
-	for node: Node in get_tree().get_nodes_in_group("player"):
-		var player := node as Player
-		if player == null or not player.is_targetable():
+	for node: Node in get_tree().get_nodes_in_group("lures"):
+		var lure := node as Node3D
+		if lure == null or not lure.is_luring():
 			continue
-		var distance: float = global_position.distance_squared_to(player.global_position)
+		var distance: float = global_position.distance_to(lure.global_position)
+		if distance <= lure.lure_radius() and distance < best_distance:
+			best = lure
+			best_distance = distance
+	return best
+
+
+func _nearest_target() -> Node3D:
+	var best: Node3D = null
+	var best_distance: float = INF
+	for node: Node in get_tree().get_nodes_in_group("player") + get_tree().get_nodes_in_group("escorts"):
+		var target := node as Node3D
+		if target == null or not target.is_targetable():
+			continue
+		var distance: float = global_position.distance_squared_to(target.global_position)
 		if distance < best_distance:
-			best = player
+			best = target
 			best_distance = distance
 	return best
 

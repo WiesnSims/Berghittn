@@ -25,12 +25,12 @@ const VIEWS: Array = [
 	["schuppen", Vector3(8.0, 1.8, 10.3), Vector3(20.0, 2.0, 17.0)],
 	["schuppen_loft", Vector3(16.0, 5.2, 10.0), Vector3(9.0, 1.0, 18.0)],
 	["terrasse", Vector3(-10.0, 1.7, 7.0), Vector3(6.0, -1.0, 17.0)],
-	["terrasse_garden", Vector3(5.5, 0.2, 17.5), Vector3(-6.0, 0.5, 8.0)],
+	["terrasse_garden", Vector3(5.5, 1.4, 23.0), Vector3(-8.0, 0.5, 12.0)],
 	["outside", Vector3(-16.0, 9.0, 30.0), Vector3(6.0, 2.0, 2.0)],
 	["alm_valley", Vector3(0.0, 1.7, 10.0), Vector3(0.0, -6.0, 70.0)],
 	["alm_summit", Vector3(2.0, 1.7, -20.0), Vector3(2.0, 14.0, -80.0)],
 	["alm_cable", Vector3(23.0, 1.7, 8.0), Vector3(60.0, 14.0, 4.0)],
-	["alm_signpost", Vector3(-6.8, 1.7, 16.4), Vector3(-10.0, 1.7, 19.5)],
+	["alm_signpost", Vector3(-6.8, 1.7, 23.4), Vector3(-10.0, 1.7, 26.5)],
 	["alm_aerial", Vector3(-45.0, 28.0, 55.0), Vector3(7.0, 0.0, 0.0)],
 ]
 
@@ -58,6 +58,14 @@ func _ready() -> void:
 		await _m5(main)
 	elif mode == "perks":
 		await _perks_tour(main)
+	elif mode == "resi":
+		await _resi_tour(main)
+	elif mode == "fassl":
+		await _fassl_tour(main)
+	elif mode == "murmel":
+		await _murmel_tour(main)
+	elif mode == "guest":
+		await _guest_tour(main)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -218,6 +226,129 @@ func _perks_tour(main: Node) -> void:
 	player.take_damage(100)
 	await get_tree().create_timer(0.3).timeout
 	await _save("perks_hud_sturschaedl")
+
+
+## resi: die Resi close up in the beer garden (walking, grazing), her marker from inside the Stube, and
+## the HUD edge arrow when she is behind the player.
+func _resi_tour(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	var player := main.get_node("Player") as Player
+	var zones := main.get_node("Zones") as ZoneMap
+	for id: StringName in [&"kueche", &"lager", &"terrasse", &"skiraum", &"seilbahn", &"schuppen"]:
+		zones.unlock(id, player)
+	(main.get_node("WaveManager") as Node).process_mode = Node.PROCESS_MODE_DISABLED
+	await get_tree().create_timer(1.0).timeout
+	var resi: Resi = (main.get_node("EventDirector") as EventDirector).send_resi()
+	var camera := Camera3D.new()
+	camera.fov = 60.0
+	add_child(camera)
+	camera.current = true
+	(main.get_node("UI") as CanvasLayer).hide()
+	await get_tree().create_timer(4.0).timeout
+	camera.look_at_from_position(resi.to_global(Vector3(2.4, 1.6, -1.6)), resi.to_global(Vector3(0, 1.0, -0.2)))
+	await _save("resi_walk")
+	await get_tree().create_timer(12.0).timeout
+	camera.look_at_from_position(resi.to_global(Vector3(-2.2, 1.3, -1.8)), resi.to_global(Vector3(0, 0.9, -0.3)))
+	await _save("resi_graze")
+	camera.look_at_from_position(Vector3(-2.0, 1.7, -2.0), Vector3(-1.0, 1.0, 12.0))
+	await _save("resi_marker_inside")
+	camera.current = false
+	(main.get_node("UI") as CanvasLayer).show()
+	player.global_position = Vector3(-2.0, 0.0, -1.0)
+	player.rotation.y = 0.0
+	await get_tree().create_timer(0.3).timeout
+	await _save("resi_arrow")
+
+
+## fassl: the Bierfassl rolling down the alm, coming in at the garden gate, resting, and being tapped.
+func _fassl_tour(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	var player := main.get_node("Player") as Player
+	var zones := main.get_node("Zones") as ZoneMap
+	for id: StringName in [&"kueche", &"lager", &"terrasse", &"skiraum", &"seilbahn", &"schuppen"]:
+		zones.unlock(id, player)
+	(main.get_node("WaveManager") as Node).process_mode = Node.PROCESS_MODE_DISABLED
+	await get_tree().create_timer(1.0).timeout
+	var fassl: Bierfassl = (main.get_node("EventDirector") as EventDirector).send_fassl()
+	var camera := Camera3D.new()
+	camera.fov = 60.0
+	add_child(camera)
+	camera.current = true
+	(main.get_node("UI") as CanvasLayer).hide()
+	await get_tree().create_timer(2.5).timeout
+	camera.look_at_from_position(fassl.global_position + Vector3(4.0, 1.5, 4.0), fassl.global_position)
+	await _save("fassl_slope")
+	camera.look_at_from_position(Vector3(-12.0, 1.6, 14.0), Vector3(-17.0, 0.3, 17.0))
+	while fassl.global_position.x < -18.5:
+		await get_tree().physics_frame
+	await _save("fassl_gate")
+	while not fassl.is_resting():
+		await get_tree().physics_frame
+	camera.look_at_from_position(fassl.global_position + Vector3(-2.2, 1.3, 1.4), fassl.global_position)
+	await _save("fassl_rest")
+	player.global_position = fassl.global_position + Vector3(-1.2, -0.12, 0.0)
+	while fassl.is_resting():
+		fassl.interact(player)
+		await get_tree().create_timer(fassl.interact_repeat).timeout
+	await get_tree().create_timer(0.4).timeout
+	await _save("fassl_foam")
+
+
+## murmel: the Murmeltier rising out of its hole in the Stube and screaming, close up and from afar.
+func _murmel_tour(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	(main.get_node("WaveManager") as Node).process_mode = Node.PROCESS_MODE_DISABLED
+	await get_tree().create_timer(1.0).timeout
+	var murmel := (load("res://scenes/events/murmeltier.tscn") as PackedScene).instantiate() as Murmeltier
+	main.get_node("World").add_child(murmel)
+	murmel.start(Vector3(-4.0, 0.0, 2.5), Vector3(-4.0, 0.0, 0.0))
+	murmel._pops_left = 99
+	var camera := Camera3D.new()
+	camera.fov = 50.0
+	add_child(camera)
+	camera.current = true
+	(main.get_node("UI") as CanvasLayer).hide()
+	camera.look_at_from_position(Vector3(-3.2, 0.6, 1.0), Vector3(-4.0, 0.35, 2.5))
+	await get_tree().create_timer(0.12).timeout
+	await _save("murmel_rise")
+	await get_tree().create_timer(0.5).timeout
+	await _save("murmel_scream")
+	camera.fov = 70.0
+	camera.look_at_from_position(Vector3(2.0, 1.7, -3.0), Vector3(-4.0, 0.4, 2.5))
+	await _save("murmel_far")
+
+
+## guest: the Deitscha Tourist at the gondola, close up and from behind with his marker, then an
+## Eisstock sliding across the beer garden with the HUD showing the slot.
+func _guest_tour(main: Node) -> void:
+	(main.get_node("UI/StartScreen") as Control).hide()
+	var player := main.get_node("Player") as Player
+	var zones := main.get_node("Zones") as ZoneMap
+	for id: StringName in [&"kueche", &"lager", &"terrasse", &"skiraum", &"seilbahn", &"schuppen"]:
+		zones.unlock(id, player)
+	(main.get_node("WaveManager") as Node).process_mode = Node.PROCESS_MODE_DISABLED
+	await get_tree().create_timer(1.0).timeout
+	var guest: TouristGuest = (main.get_node("EventDirector") as EventDirector).send_guest()
+	var camera := Camera3D.new()
+	camera.fov = 55.0
+	add_child(camera)
+	camera.current = true
+	(main.get_node("UI") as CanvasLayer).hide()
+	await get_tree().create_timer(1.0).timeout
+	camera.look_at_from_position(guest.to_global(Vector3(0.9, 1.7, -2.4)), guest.to_global(Vector3(0, 1.3, 0)))
+	await _save("guest_close")
+	camera.look_at_from_position(Vector3(6.0, 2.2, -4.0), guest.global_position + Vector3.UP)
+	await _save("guest_station")
+	# The Eisstock.
+	camera.current = false
+	(main.get_node("UI") as CanvasLayer).show()
+	player.equipment.give(load("res://data/equipment/eisstock.tres"), 2)
+	player.global_position = Vector3(-12.0, -0.3, 14.0)
+	player.rotation.y = -PI * 0.5
+	await get_tree().create_timer(0.4).timeout
+	player.equipment.throw()
+	await get_tree().create_timer(0.35).timeout
+	await _save("eisstock_slide")
 
 
 func _m5(main: Node) -> void:
