@@ -1,0 +1,221 @@
+[gd_scene load_steps=19 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/alphorn_viewmodel.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="Wood"]
+albedo_color = Color(0.58, 0.4, 0.22, 1)
+roughness = 0.75
+cull_mode = 2
+
+[sub_resource type="StandardMaterial3D" id="Dark"]
+albedo_color = Color(0.22, 0.13, 0.07, 1)
+roughness = 0.85
+cull_mode = 2
+
+[sub_resource type="StandardMaterial3D" id="Red"]
+albedo_color = Color(0.62, 0.1, 0.08, 1)
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="Green"]
+albedo_color = Color(0.12, 0.36, 0.16, 1)
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="Flash"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+albedo_color = Color(1, 0.95, 0.8, 0.6)
+
+[sub_resource type="QuadMesh" id="FlashQuad"]
+material = SubResource("Flash")
+size = Vector2(0.35, 0.35)
+
+[sub_resource type="CylinderMesh" id="Mouthpiece"]
+material = SubResource("Dark")
+top_radius = 0.016
+bottom_radius = 0.011
+height = 0.07
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="Tube1"]
+material = SubResource("Wood")
+top_radius = 0.024
+bottom_radius = 0.016
+height = 0.55
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="Wrap"]
+material = SubResource("Dark")
+top_radius = 0.0265
+bottom_radius = 0.025
+height = 0.07
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="Tube2"]
+material = SubResource("Wood")
+top_radius = 0.034
+bottom_radius = 0.024
+height = 0.55
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="BandRed"]
+material = SubResource("Red")
+top_radius = 0.031
+bottom_radius = 0.03
+height = 0.03
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="BandGreen"]
+material = SubResource("Green")
+top_radius = 0.037
+bottom_radius = 0.036
+height = 0.025
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="Bend"]
+material = SubResource("Wood")
+top_radius = 0.045
+bottom_radius = 0.034
+height = 0.14
+radial_segments = 12
+rings = 1
+
+[sub_resource type="CylinderMesh" id="Flare"]
+material = SubResource("Wood")
+top_radius = 0.15
+bottom_radius = 0.045
+height = 0.2
+radial_segments = 16
+rings = 2
+cap_top = false
+cap_bottom = false
+
+[sub_resource type="CylinderMesh" id="Throat"]
+material = SubResource("Dark")
+top_radius = 0.138
+bottom_radius = 0.0
+height = 0.19
+radial_segments = 16
+rings = 1
+cap_top = false
+cap_bottom = false
+
+[sub_resource type="CylinderMesh" id="Rim"]
+material = SubResource("Red")
+top_radius = 0.156
+bottom_radius = 0.151
+height = 0.025
+radial_segments = 16
+rings = 1
+cap_top = false
+cap_bottom = false
+
+[sub_resource type="CylinderMesh" id="RimGreen"]
+material = SubResource("Green")
+top_radius = 0.118
+bottom_radius = 0.1
+height = 0.04
+radial_segments = 16
+rings = 1
+cap_top = false
+cap_bottom = false
+
+[node name="AlphornViewmodel" type="Node3D"]
+script = ExtResource("1")
+kick_distance = 0.03
+kick_angle = 3.0
+kick_time = 0.15
+reload_offset = Vector3(0, -0.05, 0.03)
+lower_drop = 0.4
+
+[node name="Model" type="Node3D" parent="."]
+position = Vector3(0.25, -0.22, -0.15)
+rotation = Vector3(-0.157, -0.06, 0)
+
+[node name="Mouthpiece" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0, -0.035)
+rotation = Vector3(-1.5708, 0, 0)
+cast_shadow = 0
+mesh = SubResource("Mouthpiece")
+
+[node name="Tube1" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0, -0.345)
+rotation = Vector3(-1.5708, 0, 0)
+cast_shadow = 0
+mesh = SubResource("Tube1")
+
+[node name="Wrap" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0, -0.14)
+rotation = Vector3(-1.5708, 0, 0)
+cast_shadow = 0
+mesh = SubResource("Wrap")
+
+[node name="Tube2" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0, -0.895)
+rotation = Vector3(-1.5708, 0, 0)
+cast_shadow = 0
+mesh = SubResource("Tube2")
+
+[node name="BandRed" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0, -0.62)
+rotation = Vector3(-1.5708, 0, 0)
+cast_shadow = 0
+mesh = SubResource("BandRed")
+
+[node name="BandGreen" type="MeshInstance3D" parent="Model"]
+position = Vector3(0, 0, -1.08)
+rotation = Vector3(-1.5708, 0, 0)
+cast_shadow = 0
+mesh = SubResource("BandGreen")
+
+[node name="Bell" type="Node3D" parent="Model"]
+position = Vector3(0, 0, -1.17)
+rotation = Vector3(0.7, 0, 0)
+
+[node name="Bend" type="MeshInstance3D" parent="Model/Bell"]
+position = Vector3(0, 0, -0.07)
+rotation = Vector3(-1.5708, 0, 0)
+cast_shadow = 0
+mesh = SubResource("Bend")
+
+[node name="Flare" type="MeshInstance3D" parent="Model/Bell"]
+position = Vector3(0, 0, -0.24)
+rotation = Vector3(-1.5708, 0, 0)
+cast_shadow = 0
+mesh = SubResource("Flare")
+
+[node name="Throat" type="MeshInstance3D" parent="Model/Bell"]
+position = Vector3(0, 0, -0.245)
+rotation = Vector3(-1.5708, 0, 0)
+cast_shadow = 0
+mesh = SubResource("Throat")
+
+[node name="Rim" type="MeshInstance3D" parent="Model/Bell"]
+position = Vector3(0, 0, -0.33)
+rotation = Vector3(-1.5708, 0, 0)
+cast_shadow = 0
+mesh = SubResource("Rim")
+
+[node name="RimGreen" type="MeshInstance3D" parent="Model/Bell"]
+position = Vector3(0, 0, -0.27)
+rotation = Vector3(-1.5708, 0, 0)
+cast_shadow = 0
+mesh = SubResource("RimGreen")
+
+[node name="MuzzleFlash" type="Node3D" parent="Model"]
+position = Vector3(0, 0.22, -1.43)
+
+[node name="Quad" type="MeshInstance3D" parent="Model/MuzzleFlash"]
+cast_shadow = 0
+mesh = SubResource("FlashQuad")
+
+[node name="Light" type="OmniLight3D" parent="Model/MuzzleFlash"]
+light_color = Color(1, 0.92, 0.75, 1)
+light_energy = 0.8
+omni_range = 5.0

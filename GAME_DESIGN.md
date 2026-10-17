@@ -190,6 +190,9 @@ Rules:
     shell; the gun is then empty.
   - `repetierer`: fan the lever (hold): fires from the hip on its own as fast as the lever can be
     worked (5.5 shots/s instead of 3), +4° spread and harder kick.
+  - `alphorn`: the Echo (press): the bell swings up to the sky and the note comes down all around
+    the player, 200 damage within 6 m in every direction and a harder shove; uses two notes. The
+    panic button when surrounded.
 - Semi-auto guns fire once per click, as fast as the player clicks, up to `fire_rate` (user request,
   2026-10-17); holding the button does not auto-fire. A click during the cycle is remembered for a
   moment and fires as soon as the gun is ready, so fast clicking is never swallowed.
@@ -213,9 +216,14 @@ Rules:
   Details (M5): the pool lives in `data/chest_pool.tres`; it never offers a gun the buyer already
   carries. The guns cycle for 2.5 s, slowing down, before one settles. Taking it fills a free slot or
   swaps out the gun in hand; not taken in 4 s, it sinks back and the points are gone.
-  Until the special weapons exist the pool is Repetierer, Jagdflinte and Stutzen.
+  The pool is Repetierer, Jagdflinte and Stutzen, plus each wonder weapon as it is built (Alphorn).
 - **Alphorn:** fires a cone-shaped sound wave that damages and knocks back
   all enemies in a 12 m cone; funny low horn sound, screen shake.
+  Details (M5): the cone is 30° each side of the aim; 200 damage to every body in it with a clear
+  line from the horn (walls stop it, no headshots), and survivors are thrown back (16 m/s at the bell,
+  half at 12 m; heavy enemies by the root of their flinch, so a Knappe slides about a metre and the
+  Krampus barely moves). Pale rings of sound roll out along the cone. 6 notes, 18 spare; the reload is
+  catching your breath (2.5 s). In the chest at weight 1.
 
 ### 6a. Absurd weapons: behaviors and equipment
 

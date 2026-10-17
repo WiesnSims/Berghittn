@@ -19,6 +19,8 @@ class GunSlot:
 	var mag: int
 	var reserve: int
 	var viewmodel: Viewmodel
+	## What a shot does for a special weapon (section 6a); null for plain hitscan.
+	var behavior: WeaponBehavior
 
 @export var starting_weapon: WeaponData
 ## Always carried (section 6: the shovel until the melee slot gets replaced).
@@ -56,6 +58,7 @@ var _aiming: bool = false
 # Right click held on a gun that fans its action (FAN secondary).
 var _fanning: bool = false
 var _viewmodel: Viewmodel
+var _behavior: WeaponBehavior
 var _melee_viewmodel: MeleeViewmodel
 # Seconds left of the current swing, and until its blow lands (negative once it has).
 var _melee_left: float = 0.0
@@ -98,6 +101,7 @@ func give_weapon(data: WeaponData) -> void:
 		slot.viewmodel = data.viewmodel.instantiate() as Viewmodel
 		slot.viewmodel.visible = false
 		_motion.add_child(slot.viewmodel)
+	slot.behavior = WeaponBehavior.create(data, self)
 	if _slots.size() < Constants.GUN_SLOTS:
 		_slots.append(slot)
 		_select(_slots.size() - 1)
@@ -258,6 +262,12 @@ func _physics_process(delta: float) -> void:
 		else:
 			start_reload()
 		return
+	if weapon.secondary == WeaponData.Secondary.BEHAVIOR and Input.is_action_just_pressed("secondary") and _cooldown <= 0.0:
+		if mag >= weapon.secondary_rounds:
+			fire_secondary()
+		else:
+			start_reload()
+		return
 	if Input.is_action_just_pressed("fire"):
 		_fire_buffer_left = Constants.FIRE_BUFFER_TIME
 	else:
@@ -340,6 +350,7 @@ func _select(index: int) -> void:
 	mag = slot.mag
 	reserve = slot.reserve
 	_viewmodel = slot.viewmodel
+	_behavior = slot.behavior
 	_cooldown = 0.0
 	_switch_left = Constants.WEAPON_SWITCH_TIME
 	if _viewmodel:
@@ -352,6 +363,82 @@ func _select(index: int) -> void:
 ## Both barrels (ALL_BARRELS secondary): every loaded round in one blast.
 func fire_all() -> void:
 	_fire(mag)
+
+
+## A special weapon's own second shot (BEHAVIOR secondary), using secondary_rounds at once.
+func fire_secondary() -> void:
+	var rounds: int = weapon.secondary_rounds
+	if _behavior == null or mag < rounds:
+		return
+	mag -= rounds
+	_cooldown = 1.0 / weapon.fire_rate
+	_behavior.fire_secondary()
+	fired.emit(rounds)
+	ammo_changed.emit(mag, reserve)
+	if _viewmodel:
+		_viewmodel.play_secondary(rounds)
+
+
+## Area hit for behaviors (section 6a): every enemy (or other hit receiver) whose body is within
+## `reach` metres and `half_angle` degrees of the aim, with a clear line from the muzzle, takes `amount`
+## (before perks), and enemies that survive are thrown back; 180 degrees is all around. Returns how
+## many were hit.
+func blast(half_angle: float, reach: float, amount: int, push: float) -> int:
+	var sphere := SphereShape3D.new()
+	sphere.radius = reach + Constants.AREA_BODY_MARGIN
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = sphere
+	query.transform = Transform3D(Basis.IDENTITY, global_position)
+	query.collision_mask = Constants.LAYER_HITBOX
+	query.collide_with_areas = true
+	query.collide_with_bodies = false
+	var forward: Vector3 = -global_basis.z
+	var min_dot: float = cos(deg_to_rad(half_angle))
+	var struck: Dictionary = {}
+	for found: Dictionary in get_world_3d().direct_space_state.intersect_shape(query, Constants.AREA_MAX_TARGETS):
+		var hurtbox := found.collider as Hurtbox
+		# Body boxes: one hit per receiver, and a sound wave has no headshots.
+		if hurtbox == null or hurtbox.is_head or struck.has(hurtbox.receiver):
+			continue
+		var target: Vector3 = hurtbox.global_position + Vector3.UP * Constants.AREA_AIM_HEIGHT * hurtbox.scale.y
+		var to_target: Vector3 = target - global_position
+		var distance: float = to_target.length()
+		if distance > reach + Constants.AREA_BODY_MARGIN:
+			continue
+		# A body right next to the muzzle counts even if its middle is just outside the cone.
+		var off_axis: float = (to_target - forward * to_target.dot(forward)).length()
+		if half_angle < 180.0 and to_target.normalized().dot(forward) < min_dot and not (to_target.dot(forward) > 0.0 and off_axis < Constants.AREA_BODY_MARGIN):
+			continue
+		# Walls stop it; the window openings themselves do not.
+		if _cast(to_target, Constants.LAYER_WORLD).collider != null:
+			continue
+		struck[hurtbox.receiver] = true
+		var result: Hurtbox.Result = hurtbox.take_hit(_damage(amount), 1.0, false, _shooter)
+		if result == Hurtbox.Result.IGNORED:
+			continue
+		_hit_puffs.play(target, -to_target.normalized())
+		hit_confirmed.emit(false, result == Hurtbox.Result.KILLED)
+		var enemy := hurtbox.receiver as Enemy
+		if enemy and enemy.is_alive():
+			var flat := Vector3(to_target.x, 0.0, to_target.z)
+			var away: Vector3 = flat.normalized() if flat.length() > 0.05 else Vector3(forward.x, 0.0, forward.z).normalized()
+			var falloff: float = lerpf(1.0, 0.5, clampf(distance / reach, 0.0, 1.0))
+			# Heavy bodies are shoved less, but still visibly: by the root of how much they flinch.
+			enemy.apply_knockback(away * push * falloff * sqrt(enemy.data.flinch_multiplier))
+	return struck.size()
+
+
+## A jolt of the shooter's view that is not recoil (a blast going off).
+func shake_view(degrees: float) -> void:
+	var player := _shooter as Player
+	if player and degrees > 0.0:
+		player.shake_view(degrees)
+
+
+## Puts a short-lived effect into the world where the camera is, looking along the aim.
+func add_effect(effect: Node3D) -> void:
+	effect.transform = global_transform
+	_shooter.get_parent().add_child(effect)
 
 
 func _update_aim(delta: float, held: bool) -> void:
@@ -371,6 +458,10 @@ func _fire(rounds: int = 1) -> void:
 	_cooldown = 1.0 / (weapon.rapid_fire_rate if _fanning else weapon.fire_rate)
 	# Pellets that hit the same enemy land as one hit: one flinch, one hit marker and one set of
 	# points per shot, not one per pellet.
+	if _behavior:
+		_behavior.fire(rounds)
+		_after_shot(rounds)
+		return
 	var hits: Dictionary = {}
 	for i: int in weapon.pellets * rounds:
 		_fire_ray(hits)
@@ -380,6 +471,10 @@ func _fire(rounds: int = 1) -> void:
 		if result != Hurtbox.Result.IGNORED:
 			_hit_puffs.play(hit.position, hit.normal)
 			hit_confirmed.emit(hit.head, result == Hurtbox.Result.KILLED)
+	_after_shot(rounds)
+
+
+func _after_shot(rounds: int) -> void:
 	fired.emit(rounds)
 	ammo_changed.emit(mag, reserve)
 	if _viewmodel:

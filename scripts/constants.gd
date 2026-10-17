@@ -245,3 +245,14 @@ const MELEE_HIT_FRACTION: float = 0.3
 const MELEE_ARC_DEGREES: float = 110.0
 const MELEE_MAX_TARGETS: int = 32
 const MELEE_AIM_HEIGHT: float = 1.3
+# Longest a weapon may be shown floating over the Hüttentruhe (metres); longer ones are shrunk.
+const CHEST_DISPLAY_MAX_LENGTH: float = 1.2
+# Area weapons (Alphorn, section 6a): the most hit boxes one blast checks (two per enemy), where on a
+# body box it aims (metres above its origin at the feet, times the model scale), and how far beyond
+# the reach or off the cone a body still counts, since bodies have width.
+const AREA_MAX_TARGETS: int = 64
+const AREA_AIM_HEIGHT: float = 1.1
+const AREA_BODY_MARGIN: float = 0.5
+# Screen shake from blasts: seconds it lasts and how fast it trembles (cycles per second).
+const SHAKE_TIME: float = 0.45
+const SHAKE_FREQUENCY: float = 18.0

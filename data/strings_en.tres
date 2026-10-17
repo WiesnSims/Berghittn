@@ -44,6 +44,7 @@ messages = {
 [&"", &"ENEMY_PERCHTE"]: [&"Perchte"],
 [&"", &"ENEMY_KRAMPUS"]: [&"Krampus"],
 [&"", &"WEAPON_REPETIERER"]: [&"Repetierer"],
+[&"", &"WEAPON_ALPHORN"]: [&"Alphorn"],
 [&"", &"PERK_ENZIAN"]: [&"Enzian"],
 [&"", &"PERK_MARILLENBRAND"]: [&"Marillenbrand"],
 [&"", &"PERK_JAGERTEE"]: [&"Jagertee"],
