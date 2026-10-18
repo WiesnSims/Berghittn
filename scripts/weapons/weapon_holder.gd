@@ -34,6 +34,9 @@ var _starting_melee: WeaponData
 var _before_down: int = -1
 var _borrowed: bool = false
 var _was_captured: bool = false
+# Seconds after taking the mouse in which clicks do not fire: a quick click can press and release
+# within one frame, so "locked while held" alone lets it through.
+var _capture_grace: float = 0.0
 
 @onready var _impact_marks: ImpactMarks = $ImpactMarks
 @onready var _impact_puffs: EffectPool = $ImpactPuffs
@@ -206,6 +209,7 @@ func reset_loadout() -> void:
 func lock_trigger() -> void:
 	_fire_locked = true
 	_fire_buffer_left = 0.0
+	_capture_grace = Constants.CAPTURE_FIRE_GRACE
 
 
 func _stop_playing_if_needed() -> void:
@@ -397,6 +401,7 @@ func _physics_process(delta: float) -> void:
 	if captured and not _was_captured:
 		lock_trigger()
 	_was_captured = captured
+	_capture_grace = maxf(_capture_grace - delta, 0.0)
 	_update_aim(delta, force_aim or (captured and Input.is_action_pressed("secondary")))
 	if _blocking:
 		if not _melee_held() or (_melee_behavior and melee_weapon.secondary == WeaponData.Secondary.BEHAVIOR and not _melee_behavior.hold(delta)):
@@ -456,6 +461,9 @@ func _physics_process(delta: float) -> void:
 			fire_secondary()
 		else:
 			start_reload()
+		return
+	if _capture_grace > 0.0:
+		_fire_buffer_left = 0.0
 		return
 	if Input.is_action_just_pressed("fire"):
 		_fire_buffer_left = Constants.FIRE_BUFFER_TIME

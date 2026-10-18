@@ -481,3 +481,5 @@ const COOP_DOWNED_HEIGHT: float = 0.8
 const COOP_SPECTATE_OFFSET: Vector3 = Vector3(0.0, 2.2, 3.4)
 ## Co-op: the first wave waits this long after the host starts, so every guest can click in (s).
 const COOP_FIRST_WAVE_DELAY: float = 15.0
+## Clicks right after the mouse is taken (a menu click) do not fire for this long (s).
+const CAPTURE_FIRE_GRACE: float = 0.25
