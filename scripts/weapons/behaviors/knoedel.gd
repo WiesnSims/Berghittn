@@ -15,6 +15,7 @@ func _ready() -> void:
 	var dough := StandardMaterial3D.new()
 	dough.albedo_color = Color(0.93, 0.85, 0.66)
 	dough.roughness = 0.95
+	SharedLook.adopt(dough)
 	var sphere := SphereMesh.new()
 	sphere.radius = RADIUS
 	sphere.height = RADIUS * 2.0
@@ -30,6 +31,8 @@ func _ready() -> void:
 	crust.albedo_color = Color(0.62, 0.42, 0.2)
 	var herb := StandardMaterial3D.new()
 	herb.albedo_color = Color(0.22, 0.4, 0.15)
+	SharedLook.adopt(crust)
+	SharedLook.adopt(herb)
 	var fleck := BoxMesh.new()
 	fleck.size = Vector3(0.06, 0.06, 0.03)
 	for i: int in 7:

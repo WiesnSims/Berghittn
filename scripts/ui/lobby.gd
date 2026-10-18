@@ -216,7 +216,7 @@ func _build_stage() -> SubViewportContainer:
 	plane.size = Vector2(12, 8)
 	var snow := StandardMaterial3D.new()
 	snow.albedo_color = Color(0.75, 0.78, 0.84)
-	plane.material = snow
+	plane.material = SharedLook.adopt(snow)
 	floor_mesh.mesh = plane
 	_stage_root.add_child(floor_mesh)
 	var camera := Camera3D.new()

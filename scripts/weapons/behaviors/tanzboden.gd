@@ -25,6 +25,7 @@ func _ready() -> void:
 	var wood := StandardMaterial3D.new()
 	wood.albedo_color = Color(0.55, 0.36, 0.2)
 	wood.roughness = 0.8
+	SharedLook.adopt(wood)
 	var disc := CylinderMesh.new()
 	disc.top_radius = 1.0
 	disc.bottom_radius = 1.0

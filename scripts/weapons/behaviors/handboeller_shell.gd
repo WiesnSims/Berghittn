@@ -16,6 +16,7 @@ func _ready() -> void:
 	iron.albedo_color = Color(0.1, 0.1, 0.11)
 	iron.metallic = 0.6
 	iron.roughness = 0.5
+	SharedLook.adopt(iron)
 	var sphere := SphereMesh.new()
 	sphere.radius = RADIUS
 	sphere.height = RADIUS * 2.0

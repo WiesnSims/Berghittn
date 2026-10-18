@@ -4,8 +4,6 @@
 locale = "en"
 messages = {
 [&"", &"UI_TITLE"]: [&"Berghittn"],
-[&"", &"UI_TAGLINE"]: [&"Snowstorm. Undead. One hut."],
-[&"", &"UI_CLICK_TO_PLAY"]: [&"Click to play"],
 [&"", &"UI_CONTROLS"]: [&"WASD move  ·  Mouse look  ·  LMB shoot  ·  RMB weapon mode  ·  V melee  ·  G / MMB throw  ·  R reload  ·  1 / 2 / wheel switch gun  ·  E use  ·  Space jump  ·  Shift sprint  ·  C crouch  ·  Esc pause  ·  F3 debug"],
 [&"", &"UI_PAUSE_TITLE"]: [&"Paused"],
 [&"", &"UI_PAUSE_HINT"]: [&"A quick Jause, then back to it."],
@@ -167,7 +165,6 @@ messages = {
 [&"", &"UI_NET_VERSION"]: [&"Your game is out of date. Reload the page (Ctrl+F5) and join again."],
 [&"", &"UI_NET_NO_ROOM"]: [&"There is no room with that code."],
 [&"", &"UI_NET_LOST"]: [&"Lost the connection to the room."],
-[&"", &"UI_CLICK_TO_JOIN"]: [&"The match has started. Click to join."],
 [&"", &"UI_LEAVE_MATCH"]: [&"Leave match"],
 [&"", &"UI_PLAYER_N"]: [&"Player %d"],
 [&"", &"UI_HEAD_BUA"]: [&"Bua"],
@@ -192,5 +189,8 @@ messages = {
 [&"", &"UI_COOP_OUT"]: [&"Bled out. You are back when the next wave starts."],
 [&"", &"UI_COOP_TEAM_DOWN"]: [&"%s  DOWN"],
 [&"", &"UI_COOP_TEAM_OUT"]: [&"%s  out"],
-[&"", &"UI_BACK_TO_LOBBY"]: [&"Back to the lobby"]
+[&"", &"UI_BACK_TO_LOBBY"]: [&"Back to the lobby"],
+[&"", &"UI_SOLO"]: [&"Solo"],
+[&"", &"UI_JOIN_MATCH"]: [&"Join the match"],
+[&"", &"UI_PREPARING"]: [&"Preparing the hut ..."]
 }

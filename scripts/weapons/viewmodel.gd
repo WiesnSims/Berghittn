@@ -62,7 +62,7 @@ func _ready() -> void:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = casing_color
 	material.metallic = 0.7
-	mesh.material = material
+	mesh.material = SharedLook.adopt(material)
 	for i: int in Constants.CASING_POOL_SIZE:
 		var casing := MeshInstance3D.new()
 		casing.mesh = mesh

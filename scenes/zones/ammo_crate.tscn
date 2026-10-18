@@ -5,10 +5,14 @@
 [ext_resource type="Material" path="res://assets/materials/metal.tres" id="3"]
 [ext_resource type="Texture2D" path="res://assets/textures/painted_wood.png" id="4_f4711"]
 [ext_resource type="Texture2D" path="res://assets/textures/gun_steel.png" id="5_32vqo"]
+[ext_resource type="Texture2D" path="res://assets/textures/white.png" id="white_look"]
 
 [sub_resource type="StandardMaterial3D" id="Green"]
 albedo_color = Color(0.27, 0.32, 0.18, 1)
 roughness = 0.9
+albedo_texture = ExtResource("white_look")
+uv1_triplanar = true
+texture_filter = 5
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_f4711"]
 _surfaces = [{

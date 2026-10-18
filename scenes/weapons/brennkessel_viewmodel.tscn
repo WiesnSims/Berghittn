@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/weapons/brennkessel_viewmodel.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/textures/gun_steel.png" id="2_eindm"]
 [ext_resource type="Texture2D" path="res://assets/textures/gun_wood.png" id="3_v5i05"]
+[ext_resource type="Texture2D" path="res://assets/textures/white.png" id="white_look"]
 
 [sub_resource type="StandardMaterial3D" id="Brass"]
 albedo_color = Color(0.78, 0.6, 0.28, 1)
@@ -255,6 +256,9 @@ metadata/source = SubResource("GaugeMesh")
 [sub_resource type="StandardMaterial3D" id="Dial"]
 albedo_color = Color(0.95, 0.93, 0.85, 1)
 roughness = 0.5
+albedo_texture = ExtResource("white_look")
+uv1_triplanar = true
+texture_filter = 5
 
 [sub_resource type="CylinderMesh" id="DialMesh"]
 material = SubResource("Dial")

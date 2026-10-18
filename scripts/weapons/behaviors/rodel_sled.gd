@@ -230,6 +230,8 @@ func _build() -> void:
 	var iron := StandardMaterial3D.new()
 	iron.albedo_color = Color(0.25, 0.25, 0.27)
 	iron.metallic = 0.6
+	for material: StandardMaterial3D in [wood, dark, iron]:
+		SharedLook.adopt(material)
 	for x: float in [-WIDTH * 0.5, WIDTH * 0.5]:
 		# The runner, its iron shoe, and the tip curling up at the front.
 		_box(Vector3(0.045, 0.07, LENGTH), Vector3(x, 0.07, 0.0), Vector3.ZERO, dark)
@@ -242,6 +244,7 @@ func _build() -> void:
 	# A rope to steer by, looped from tip to tip.
 	var rope := StandardMaterial3D.new()
 	rope.albedo_color = Color(0.85, 0.15, 0.12)
+	SharedLook.adopt(rope)
 	_box(Vector3(WIDTH, 0.025, 0.025), Vector3(0.0, 0.26, -LENGTH * 0.5 - 0.14), Vector3.ZERO, rope)
 	_spray = CPUParticles3D.new()
 	_spray.amount = 30

@@ -1,6 +1,10 @@
 [gd_resource type="StandardMaterial3D" format=3]
 
+[ext_resource type="Texture2D" path="res://assets/textures/white.png" id="white_look"]
+
 [resource]
 vertex_color_use_as_albedo = true
 vertex_color_is_srgb = true
 roughness = 0.9
+albedo_texture = ExtResource("white_look")
+texture_filter = 5

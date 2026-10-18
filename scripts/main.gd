@@ -12,6 +12,7 @@ enum State { MENU, CAPTURING, PLAYING, DEAD }
 @onready var _settings_menu: SettingsMenu = $UI/SettingsMenu
 @onready var _waves: WaveManager = $WaveManager
 @onready var _lobby: Lobby = $UI/Lobby
+@onready var _warmup: ShaderWarmup = $ShaderWarmup
 
 var _state: State = State.MENU
 # This scene runs (or ran) a co-op match: Net.in_match() turns false the moment the session ends.
@@ -22,6 +23,7 @@ func _ready() -> void:
 	var spawn := get_tree().get_first_node_in_group("player_spawn") as Node3D
 	_player.spawn_at(spawn.global_transform)
 	_hud.bind_player(_player)
+	_warmup.progress.connect(_start_screen.set_ready)
 	_player.died.connect(_on_player_died)
 	_start_screen.play_requested.connect(_request_play)
 	_pause_menu.resume_requested.connect(_request_play)
@@ -49,8 +51,7 @@ func _ready() -> void:
 		GameState.invite_used = true
 		var room: String = Net.room_from_url()
 		if room != "":
-			_open_lobby()
-			_lobby.join(room)
+			_join_from_invite(room)
 
 
 func _process(_delta: float) -> void:
@@ -75,6 +76,9 @@ func _request_play() -> void:
 
 func _enter_playing() -> void:
 	_state = State.PLAYING
+	# Into the game before the shaders are all built (a co-op start): the rest in one go now.
+	if is_instance_valid(_warmup):
+		_warmup.finish_now()
 	GameState.has_started = true
 	_start_screen.hide()
 	_pause_menu.hide()
@@ -87,6 +91,14 @@ func _enter_menu() -> void:
 	get_tree().paused = not _coop
 	_start_screen.visible = not GameState.has_started
 	_pause_menu.visible = GameState.has_started
+
+
+## The lobby (and the game) only once the shaders are built: the title shows how far that is.
+func _join_from_invite(room: String) -> void:
+	if is_instance_valid(_warmup) and not _start_screen.is_revealed():
+		await _warmup.finished
+	_open_lobby()
+	_lobby.join(room)
 
 
 func _open_lobby() -> void:

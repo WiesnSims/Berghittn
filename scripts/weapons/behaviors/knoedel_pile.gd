@@ -35,6 +35,7 @@ func _ready() -> void:
 	_mound.add_child(body)
 	var crust := StandardMaterial3D.new()
 	crust.albedo_color = Color(0.62, 0.42, 0.2)
+	SharedLook.adopt(crust)
 	var lump := BoxMesh.new()
 	lump.size = Vector3(0.14, 0.08, 0.12)
 	lump.material = crust

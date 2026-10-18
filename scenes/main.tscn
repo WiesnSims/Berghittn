@@ -118,8 +118,9 @@ draw_pass_1 = SubResource("SnowFlake")
 script = ExtResource("33")
 roof_map = NodePath("../RoofMap")
 
-[node name="ShaderWarmup" type="Node3D" parent="."]
+[node name="ShaderWarmup" type="Node3D" parent="." node_paths=PackedStringArray("world")]
 script = ExtResource("35")
+world = NodePath("../World")
 
 [node name="Ambience" type="Node" parent="." node_paths=PackedStringArray("atmosphere")]
 script = ExtResource("36")

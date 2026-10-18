@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" path="res://assets/textures/painted_wood.png" id="2_bgirp"]
 [ext_resource type="Texture2D" path="res://assets/textures/gun_wood.png" id="3_jnher"]
 [ext_resource type="Texture2D" path="res://assets/textures/gun_steel.png" id="4_prxu5"]
+[ext_resource type="Texture2D" path="res://assets/textures/white.png" id="white_look"]
 
 [sub_resource type="StandardMaterial3D" id="Lacquer"]
 albedo_color = Color(0.12, 0.28, 0.18, 1)
@@ -124,6 +125,9 @@ metadata/source = SubResource("TrimMesh")
 [sub_resource type="StandardMaterial3D" id="Pearl"]
 albedo_color = Color(0.93, 0.9, 0.82, 1)
 roughness = 0.3
+albedo_texture = ExtResource("white_look")
+uv1_triplanar = true
+texture_filter = 5
 
 [sub_resource type="CylinderMesh" id="ButtonMesh"]
 material = SubResource("Pearl")

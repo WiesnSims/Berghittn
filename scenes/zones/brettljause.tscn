@@ -7,6 +7,7 @@
 [ext_resource type="Resource" path="res://data/jause/speck.tres" id="4"]
 [ext_resource type="Resource" path="res://data/jause/germknedl.tres" id="5"]
 [ext_resource type="Resource" path="res://data/jause/kasnockn.tres" id="6"]
+[ext_resource type="Texture2D" path="res://assets/textures/white.png" id="white_look"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_icvim"]
 _surfaces = [{
@@ -82,6 +83,9 @@ metadata/source = SubResource("SlabMeat")
 [sub_resource type="StandardMaterial3D" id="Fat"]
 albedo_color = Color(0.95, 0.9, 0.82, 1)
 roughness = 0.8
+albedo_texture = ExtResource("white_look")
+uv1_triplanar = true
+texture_filter = 5
 
 [sub_resource type="BoxMesh" id="SlabFat"]
 material = SubResource("Fat")
@@ -179,6 +183,9 @@ metadata/source = SubResource("Sauce")
 [sub_resource type="StandardMaterial3D" id="Dough"]
 albedo_color = Color(0.96, 0.93, 0.86, 1)
 roughness = 0.8
+albedo_texture = ExtResource("white_look")
+uv1_triplanar = true
+texture_filter = 5
 
 [sub_resource type="SphereMesh" id="Knedl"]
 material = SubResource("Dough")
