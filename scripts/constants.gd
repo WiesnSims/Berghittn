@@ -55,6 +55,17 @@ const ENEMY_REPATH_INTERVAL: float = 0.25
 const ENEMY_TURN_SPEED: float = 8.0
 const ENEMY_CORPSE_TIME: float = 5.0
 const ENEMY_DEATH_FALL_TIME: float = 0.6
+# Ragdolls (M6 part 4, #39): at most this many corpses are simulated at once; each is frozen in the
+# pose it came to rest in after RAGDOLL_TIME seconds, or sooner (but not before RAGDOLL_MIN_TIME) to
+# make room for a new one; with no room the corpse falls like before. The killing hit pushes it
+# away from the shooter at RAGDOLL_PUSH m/s (scaled by the damage, within the RAGDOLL_PUSH_SCALE
+# range per 100 damage), a little upward.
+const RAGDOLL_MAX: int = 6
+const RAGDOLL_TIME: float = 3.0
+const RAGDOLL_MIN_TIME: float = 0.8
+const RAGDOLL_PUSH: float = 2.5
+const RAGDOLL_PUSH_SCALE: Vector2 = Vector2(0.6, 2.0)
+const RAGDOLL_LIFT: float = 1.0
 # Window entry: height of the window centre above the inside floor (sill 0.9 m + half of the 1.2 m
 # opening), how far from the wall centre the enemy stands to start its dive and lands inside,
 # and the root height that puts a body lying face down on the floor.

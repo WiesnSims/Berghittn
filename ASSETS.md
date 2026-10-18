@@ -28,3 +28,10 @@ average colour of the greybox material it replaced (normal maps as they are, Ope
 | `hay`: hay bales | [thatch_roof_angled](https://polyhaven.com/a/thatch_roof_angled) | Rob Tuytel, Dimitrios Savva | CC0 |
 | `wool`: Lager blankets | [poly_wool_herringbone](https://polyhaven.com/a/poly_wool_herringbone) | colormass, Rico Cilliers | CC0 |
 | `linen`: Lager mattresses | [hessian_230](https://polyhaven.com/a/hessian_230) | colormass, Rico Cilliers | CC0 |
+| `leather` (M6 part 4, neutral): boots, belts, breeches | [brown_leather](https://polyhaven.com/a/brown_leather) | Rob Tuytel | CC0 |
+| `fur` (M6 part 4, neutral): the Perchte, the Krampus, beards | [curly_teddy_natural](https://polyhaven.com/a/curly_teddy_natural) | colormass, Rico Cilliers | CC0 |
+| `skin` (M6 part 4, neutral): enemy skin and faces | [grey_plaster_02](https://polyhaven.com/a/grey_plaster_02) | Rob Tuytel | CC0 |
+
+The enemy models (M6 part 4) are self-made: built from tubes, balls and boxes by
+`tools/models/build_enemies.gd`, tinted by vertex colour over the neutral textures above (and `wool`,
+`linen`, `painted_wood`, `metal`).

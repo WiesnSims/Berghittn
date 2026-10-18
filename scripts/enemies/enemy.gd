@@ -26,11 +26,12 @@ var _state: State = State.INACTIVE
 ## A player or an escort (group "escorts"): anything with is_targetable() and take_damage(amount, attacker).
 var _target: Node3D
 var _model: Node3D
+# The model's skeleton (M6 part 4): limb poses and the ragdoll.
+var _rig: EnemyRig
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var _repath_left: float = 0.0
 var _attack_time: float = 0.0
 var _has_swung: bool = false
-var _walk_phase: float = 0.0
 var _tween: Tween
 # Hit reaction runs on the model, not on Visual, so it never fights the climb, attack or death tweens.
 var _flinch_tween: Tween
@@ -86,6 +87,10 @@ var _inside: bool = false
 var _lure: Node3D
 # Seconds until the next groan.
 var _groan_left: float = 0.0
+# Seconds its corpse has been a ragdoll.
+var _ragdoll_time: float = 0.0
+## The corpses being simulated now, oldest first (at most Constants.RAGDOLL_MAX).
+static var _ragdolls: Array[Enemy] = []
 
 
 func _ready() -> void:
@@ -105,7 +110,8 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 			_model.queue_free()
 		_model = enemy_data.model.instantiate() as Node3D
 		_visual.add_child(_model)
-		_model.scale = Vector3.ONE * enemy_data.model_scale
+		# Built at its size (tools/models): physics bodies are never scaled.
+		_rig = _model as EnemyRig
 		for hurtbox: Hurtbox in _hurtboxes:
 			hurtbox.scale = Vector3.ONE * enemy_data.model_scale
 		_meshes.assign(_model.find_children("*", "MeshInstance3D", true, false))
@@ -140,6 +146,9 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 	_window = null
 	_kill_tween()
 	_reset_hit_reaction()
+	_ragdolls.erase(self)
+	if _rig:
+		_rig.reset()
 	for part: Node3D in _head_parts:
 		part.visible = true
 	_set_active(true)
@@ -199,7 +208,7 @@ func _take_hit(amount: int, is_headshot: bool, is_melee: bool, source: Node3D, p
 		return Hurtbox.Result.HIT
 	if is_headshot and amount >= data.head_pop_damage:
 		_pop_head()
-	_die(is_headshot, is_melee, source)
+	_die(is_headshot, is_melee, source, amount)
 	return Hurtbox.Result.KILLED
 
 
@@ -224,11 +233,9 @@ func dance(duration: float, dps: int, source: Node3D) -> void:
 		return
 	if _dance_left <= 0.0:
 		_dance_phase = 0.0
+		_pose(EnemyRig.Action.DANCE)
 	_dance_left = maxf(_dance_left, duration)
-	if _state == State.ATTACKING:
-		_kill_tween()
-		_visual.rotation.x = 0.0
-		_state = State.CHASING
+	_drop_swing()
 
 
 ## The Goaßl's crack: dazed on the spot for `duration` (no walking, no attacks; a swing in progress
@@ -238,6 +245,7 @@ func stun(duration: float) -> void:
 		return
 	_stun_left = maxf(_stun_left, duration)
 	_drop_swing()
+	_pose(EnemyRig.Action.DAZED)
 
 
 func is_stunned() -> bool:
@@ -272,6 +280,7 @@ func lift() -> bool:
 	collision_layer = 0
 	collision_mask = 0
 	velocity = Vector3.ZERO
+	_pose(EnemyRig.Action.CARRIED)
 	return true
 
 
@@ -313,6 +322,7 @@ func _hurling(delta: float) -> void:
 		velocity = Vector3.ZERO
 		collision_layer = _body_layer
 		collision_mask = _body_mask
+		_pose(EnemyRig.Action.NONE)
 		if _on_land.is_valid():
 			_on_land.call(self)
 
@@ -322,6 +332,7 @@ func _drop_swing() -> void:
 		_kill_tween()
 		_visual.rotation.x = 0.0
 		_state = State.CHASING
+		_pose(EnemyRig.Action.NONE)
 
 
 func is_dancing() -> bool:
@@ -375,6 +386,18 @@ func _pop_head() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_step(delta)
+	if _rig == null:
+		return
+	if is_alive():
+		_rig.update(delta, Vector2(velocity.x, velocity.z).length())
+		# You hit what you see: the head hurtbox stays on the head as it hunches, swings and dives.
+		_head_shape.global_position = _rig.head_position()
+	elif _rig.is_ragdoll():
+		_ragdoll_time += delta
+
+
+func _step(delta: float) -> void:
 	_lunge_cooldown_left -= delta
 	if is_alive():
 		_groan_left -= delta
@@ -402,6 +425,7 @@ func _physics_process(delta: float) -> void:
 			if _dance_left <= 0.0:
 				_visual.rotation.z = 0.0
 				_visual.position.y = 0.0
+				_pose(EnemyRig.Action.NONE)
 			return
 	if _stun_left > 0.0:
 		_stun_left -= delta
@@ -411,6 +435,7 @@ func _physics_process(delta: float) -> void:
 			_visual.rotation.z = sin(_stun_left * 9.0) * 0.12
 			if _stun_left <= 0.0:
 				_visual.rotation.z = 0.0
+				_pose(EnemyRig.Action.NONE)
 			return
 	if _flee_left > 0.0:
 		_flee_left -= delta
@@ -553,7 +578,6 @@ func _walk_towards(goal: Vector3, delta: float) -> void:
 	_apply_gravity(delta)
 	_face(direction, delta)
 	move_and_slide()
-	_animate_walk(delta)
 
 
 ## Steering while chasing: the path direction, or a sidestep when the body has stopped making headway.
@@ -636,10 +660,12 @@ func _start_attack() -> void:
 	_attack_time = 0.0
 	_has_swung = false
 	_voice(&"enemy_attack")
+	# Arms up through the windup and down as the hit lands (the rig's swing peaks at 65 %).
+	_pose(EnemyRig.Action.STRIKE, data.attack_windup / 0.65)
 	_kill_tween()
 	_tween = create_tween()
 	# Lean in during the windup, snap back as the hit lands.
-	_tween.tween_property(_visual, "rotation:x", -0.45, data.attack_windup).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_tween.tween_property(_visual, "rotation:x", -0.2, data.attack_windup).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	_tween.tween_property(_visual, "rotation:x", 0.0, 0.25)
 
 
@@ -655,6 +681,7 @@ func _start_lunge() -> void:
 	_lunge_time = 0.0
 	_voice(&"enemy_attack")
 	_lunge_struck = false
+	_pose(EnemyRig.Action.CROUCH, data.lunge_windup)
 	_kill_tween()
 	_visual.transform = Transform3D.IDENTITY
 	_tween = create_tween()
@@ -676,6 +703,8 @@ func _lunge(delta: float) -> void:
 			_lunge_direction = _flat(_target.global_position - global_position).normalized()
 			_face(_lunge_direction, delta)
 		return
+	if _lunge_time - delta < data.lunge_windup:
+		_pose(EnemyRig.Action.LEAP, data.lunge_time)
 	velocity.x = _lunge_direction.x * data.lunge_speed
 	velocity.z = _lunge_direction.z * data.lunge_speed
 	_apply_gravity(delta)
@@ -689,6 +718,7 @@ func _lunge(delta: float) -> void:
 
 func _end_lunge() -> void:
 	_lunge_cooldown_left = data.lunge_cooldown
+	_pose(EnemyRig.Action.NONE)
 	# Recover like after a swing: no second hit straight away.
 	_state = State.ATTACKING
 	_attack_time = data.attack_windup
@@ -764,10 +794,11 @@ func _break_window(delta: float) -> void:
 
 func _pull_board() -> void:
 	var time: float = data.board_break_time
+	_pose(EnemyRig.Action.PULL, time)
 	_kill_tween()
 	_tween = create_tween()
 	# Reach in, rip the board out, stagger back with it.
-	_tween.tween_property(_visual, "rotation:x", -0.5, time * 0.55).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_tween.tween_property(_visual, "rotation:x", -0.3, time * 0.55).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	_tween.tween_callback(_window.remove_board)
 	_tween.tween_property(_visual, "rotation:x", 0.2, time * 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_tween.tween_property(_visual, "rotation:x", 0.0, time * 0.25)
@@ -785,6 +816,7 @@ func _start_climb() -> void:
 	# The opening is smaller than the body, so the enemy goes through lying flat, head first,
 	# with collision off; every pose keeps the body inside the opening.
 	_state = State.CLIMBING
+	_pose(EnemyRig.Action.CLIMB)
 	Sound.play_at(&"window_climb", global_position)
 	var forward: Vector3 = _window_forward
 	var wall: Vector3 = _window_wall
@@ -833,6 +865,7 @@ func _end_climb() -> void:
 	if _state != State.CLIMBING:
 		return
 	_visual.transform = Transform3D.IDENTITY
+	_pose(EnemyRig.Action.NONE)
 	collision_mask = _movement_mask()
 	_repath_left = 0.0
 	_reset_stuck()
@@ -847,7 +880,7 @@ func _leave_window() -> void:
 		_window = null
 
 
-func _die(is_headshot: bool, is_melee: bool, source: Node3D) -> void:
+func _die(is_headshot: bool, is_melee: bool, source: Node3D, amount: int = 100) -> void:
 	_state = State.DEAD
 	_voice(data.death_sound)
 	if _lifted or _hurled:
@@ -867,16 +900,54 @@ func _die(is_headshot: bool, is_melee: bool, source: Node3D) -> void:
 	Events.enemy_killed.emit(self, is_headshot, is_melee, source)
 	died.emit(self)
 	_kill_tween()
+	_tween = create_tween()
+	if _start_ragdoll(source, amount):
+		_tween.tween_interval(Constants.RAGDOLL_TIME)
+		_tween.tween_callback(_freeze_ragdoll)
+		_tween.tween_interval(Constants.ENEMY_CORPSE_TIME + Constants.ENEMY_DEATH_FALL_TIME - Constants.RAGDOLL_TIME)
+		_tween.tween_callback(_despawn)
+		return
 	_visual.rotation.z = 0.0
 	# Fall backwards, unless already lying face down in a window: then just stay down.
 	var fall_to: float = -PI * 0.5 if _visual.rotation.x < -PI * 0.25 else PI * 0.5
-	_tween = create_tween()
 	_tween.tween_property(_visual, "rotation:x", fall_to, Constants.ENEMY_DEATH_FALL_TIME).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 	_tween.tween_interval(Constants.ENEMY_CORPSE_TIME)
 	_tween.tween_callback(_despawn)
 
 
+## Goes limp (M6 part 4, #39), thrown away from whoever killed it, if a ragdoll is free: the oldest
+## one that has had time to fall is frozen to make room. False: it falls the old way.
+func _start_ragdoll(source: Node3D, amount: int) -> bool:
+	if _rig == null:
+		return false
+	if _ragdolls.size() >= Constants.RAGDOLL_MAX:
+		var oldest: Enemy = _ragdolls[0]
+		if oldest._ragdoll_time < Constants.RAGDOLL_MIN_TIME:
+			return false
+		oldest._freeze_ragdoll()
+	var away: Vector3 = _flat(global_position - source.global_position) if source else global_basis.z
+	if away.length_squared() < 0.0001:
+		away = global_basis.z
+	var push: Vector3 = away.normalized() * Constants.RAGDOLL_PUSH * clampf(amount / 100.0, Constants.RAGDOLL_PUSH_SCALE.x, Constants.RAGDOLL_PUSH_SCALE.y)
+	push += _knock + Vector3.UP * Constants.RAGDOLL_LIFT
+	_knock = Vector3.ZERO
+	if not _rig.start_ragdoll(push):
+		return false
+	_ragdoll_time = 0.0
+	_ragdolls.append(self)
+	return true
+
+
+func _freeze_ragdoll() -> void:
+	_ragdolls.erase(self)
+	if _rig:
+		_rig.freeze()
+
+
 func _fall(delta: float) -> void:
+	# A ragdoll lies where physics put it; the body would only carry its frozen pose off.
+	if _rig and _rig.is_down():
+		return
 	velocity.x = 0.0
 	velocity.z = 0.0
 	_apply_gravity(delta)
@@ -884,6 +955,9 @@ func _fall(delta: float) -> void:
 
 
 func _despawn() -> void:
+	_ragdolls.erase(self)
+	if _rig:
+		_rig.reset()
 	_state = State.INACTIVE
 	_set_active(false)
 	despawned.emit(self)
@@ -974,13 +1048,6 @@ func _face(direction: Vector3, delta: float) -> void:
 	rotation.y = lerp_angle(rotation.y, _yaw_towards(direction), minf(Constants.ENEMY_TURN_SPEED * delta, 1.0))
 
 
-func _animate_walk(delta: float) -> void:
-	# Shambling bob and sway; enough to read as "walking" on a greybox model.
-	_walk_phase += delta * data.speed * _slow_factor * 2.2
-	_visual.position.y = absf(sin(_walk_phase)) * 0.06
-	_visual.rotation.z = sin(_walk_phase) * 0.06
-
-
 func _groan() -> void:
 	_groan_left = randf_range(Constants.GROAN_MIN, Constants.GROAN_MAX)
 	if not data.groan_sounds.is_empty():
@@ -994,6 +1061,12 @@ func _voice(id: StringName) -> void:
 
 func _mouth() -> Vector3:
 	return global_position + Vector3.UP * Constants.ENEMY_MOUTH_HEIGHT * data.model_scale
+
+
+## Hands an action to the rig (models without one, if any, just skip it).
+func _pose(action: EnemyRig.Action, length: float = 1.0) -> void:
+	if _rig:
+		_rig.play(action, length)
 
 
 func _kill_tween() -> void:
