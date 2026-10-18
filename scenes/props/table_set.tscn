@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3]
 
-[ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="1"]
-[ext_resource type="Material" path="res://assets/materials/greybox_wood_wall.tres" id="2"]
+[ext_resource type="Material" path="res://assets/materials/wood_dark.tres" id="1"]
+[ext_resource type="Material" path="res://assets/materials/wood_wall.tres" id="2"]
 
 [node name="TableSet" type="CSGCombiner3D" groups=["nav_blockers"]]
 use_collision = true

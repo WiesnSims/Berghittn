@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/zones/barricade.gd" id="1"]
-[ext_resource type="Material" path="res://assets/materials/greybox_board.tres" id="2"]
-[ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="3"]
+[ext_resource type="Material" path="res://assets/materials/board.tres" id="2"]
+[ext_resource type="Material" path="res://assets/materials/wood_dark.tres" id="3"]
 
 [sub_resource type="BoxShape3D" id="BoxShape1"]
 size = Vector3(1.2, 1.2, 0.3)

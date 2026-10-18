@@ -1,17 +1,17 @@
 [gd_scene load_steps=13 format=3]
 
-[ext_resource type="Material" path="res://assets/materials/greybox_wood_floor.tres" id="1"]
-[ext_resource type="Material" path="res://assets/materials/greybox_wood_wall.tres" id="2"]
-[ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="3"]
+[ext_resource type="Material" path="res://assets/materials/wood_floor.tres" id="1"]
+[ext_resource type="Material" path="res://assets/materials/wood_wall.tres" id="2"]
+[ext_resource type="Material" path="res://assets/materials/wood_dark.tres" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/zones/window.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/zones/window_upper.tscn" id="5"]
-[ext_resource type="Material" path="res://assets/materials/greybox_board.tres" id="6"]
-[ext_resource type="Material" path="res://assets/materials/greybox_sign.tres" id="7"]
-[ext_resource type="Material" path="res://assets/materials/greybox_lamp.tres" id="8"]
-[ext_resource type="Material" path="res://assets/materials/greybox_snow.tres" id="9"]
+[ext_resource type="Material" path="res://assets/materials/board.tres" id="6"]
+[ext_resource type="Material" path="res://assets/materials/lamp.tres" id="8"]
+[ext_resource type="Material" path="res://assets/materials/snow.tres" id="9"]
 [ext_resource type="Script" path="res://scripts/zones/spawn_point.gd" id="10"]
 [ext_resource type="PackedScene" path="res://scenes/zones/huettentruhe.tscn" id="11"]
 [ext_resource type="PackedScene" path="res://scenes/zones/wallbuy_kuhfladen.tscn" id="12"]
+[ext_resource type="Material" path="res://assets/materials/hay.tres" id="tex_hay"]
 
 [node name="Schuppen" type="Node3D"]
 
@@ -206,27 +206,27 @@ use_collision = true
 [node name="Bale0" type="CSGBox3D" parent="Hay"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 4, 11)
 size = Vector3(1.6, 1, 1.1)
-material = ExtResource("7")
+material = ExtResource("tex_hay")
 
 [node name="Bale1" type="CSGBox3D" parent="Hay"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.5, 4.2, 10.5)
 size = Vector3(1.6, 1.4, 1.1)
-material = ExtResource("7")
+material = ExtResource("tex_hay")
 
 [node name="Bale2" type="CSGBox3D" parent="Hay"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.2, 4, 13)
 size = Vector3(1.6, 1, 1.1)
-material = ExtResource("7")
+material = ExtResource("tex_hay")
 
 [node name="Bale3" type="CSGBox3D" parent="Hay"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 4.1, 16.5)
 size = Vector3(1.6, 1.2, 1.1)
-material = ExtResource("7")
+material = ExtResource("tex_hay")
 
 [node name="Bale4" type="CSGBox3D" parent="Hay"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.2, 3.9, 15)
 size = Vector3(1.6, 0.8, 1.1)
-material = ExtResource("7")
+material = ExtResource("tex_hay")
 
 [node name="Woodpiles" type="CSGCombiner3D" parent="."]
 use_collision = true
