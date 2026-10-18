@@ -38,4 +38,6 @@ The enemy models (M6 part 4) are self-made: built from tubes, balls and boxes by
 `tools/models/build_enemies.gd`, tinted by vertex colour over the neutral textures above (and `wool`,
 `linen`, `painted_wood`, `metal`). The weapon models (M6 part 4b) are the greybox parts reshaped by
 `tools/models/build_weapons.tscn` (tubes, chamfers, stock profiles), textured with `gun_wood`,
-`gun_steel` and `painted_wood`.
+`gun_steel` and `painted_wood`. The props (M6 part 4c) are reshaped the same way by
+`tools/models/build_props.tscn`, with the textures above (the animals in `fur`); the Deitscha Tourist
+is built like the enemies. No external models anywhere.

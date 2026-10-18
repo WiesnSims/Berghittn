@@ -1,87 +1,102 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene format=4]
 
 [ext_resource type="Script" path="res://scripts/zones/wall_buy.gd" id="1"]
 [ext_resource type="Resource" path="res://data/weapons/repetierer.tres" id="2"]
 [ext_resource type="Material" path="res://assets/materials/wood_dark.tres" id="3"]
 [ext_resource type="Material" path="res://assets/materials/chalk.tres" id="4"]
 
-[node name="WallBuyRepetierer" type="Node3D"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_81l50"]
+_surfaces = [{
+"aabb": AABB(-0.875, -0.225, -0.015, 1.75, 0.45, 0.03),
+"format": 34359738375,
+"material": ExtResource("3"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 132,
+"vertex_data": PackedByteArray("AABgvxt8Yb7mHSe8AABgvxt8YT7mHSe8AABgvxt8YT7mHSc8AABgvxt8Yb7mHSe8AABgvxt8YT7mHSc8AABgvxt8Yb7mHSc8AABgvxt8Yb7mHSe8bcVev2ZmZr7mHSc8bcVev2ZmZr7mHSe8AABgvxt8Yb7mHSe8AABgvxt8Yb7mHSc8bcVev2ZmZr7mHSc8AABgvxt8YT7mHSe8bcVev2ZmZj7mHSe8bcVev2ZmZj7mHSc8AABgvxt8YT7mHSe8bcVev2ZmZj7mHSc8AABgvxt8YT7mHSc8AABgPxt8Yb7mHSe8AABgPxt8YT7mHSc8AABgPxt8YT7mHSe8AABgPxt8Yb7mHSe8AABgPxt8Yb7mHSc8AABgPxt8YT7mHSc8AABgPxt8Yb7mHSe8bcVeP2ZmZr7mHSe8bcVeP2ZmZr7mHSc8AABgPxt8Yb7mHSe8bcVeP2ZmZr7mHSc8AABgPxt8Yb7mHSc8AABgPxt8YT7mHSe8bcVeP2ZmZj7mHSc8bcVeP2ZmZj7mHSe8AABgPxt8YT7mHSe8AABgPxt8YT7mHSc8bcVeP2ZmZj7mHSc8bcVev2ZmZr7mHSe8bcVev2ZmZr7mHSc8bcVeP2ZmZr7mHSc8bcVev2ZmZr7mHSe8bcVeP2ZmZr7mHSc8bcVeP2ZmZr7mHSe8bcVev2ZmZr7mHSe8bcVePxt8Yb6PwnW8bcVevxt8Yb6PwnW8bcVev2ZmZr7mHSe8bcVeP2ZmZr7mHSe8bcVePxt8Yb6PwnW8bcVev2ZmZr7mHSc8bcVevxt8Yb6PwnU8bcVePxt8Yb6PwnU8bcVev2ZmZr7mHSc8bcVePxt8Yb6PwnU8bcVeP2ZmZr7mHSc8bcVev2ZmZj7mHSe8bcVeP2ZmZj7mHSc8bcVev2ZmZj7mHSc8bcVev2ZmZj7mHSe8bcVeP2ZmZj7mHSe8bcVeP2ZmZj7mHSc8bcVev2ZmZj7mHSe8bcVevxt8YT6PwnW8bcVePxt8YT6PwnW8bcVev2ZmZj7mHSe8bcVePxt8YT6PwnW8bcVeP2ZmZj7mHSe8bcVev2ZmZj7mHSc8bcVePxt8YT6PwnU8bcVevxt8YT6PwnU8bcVev2ZmZj7mHSc8bcVeP2ZmZj7mHSc8bcVePxt8YT6PwnU8bcVevxt8Yb6PwnW8bcVePxt8Yb6PwnW8bcVePxt8YT6PwnW8bcVevxt8Yb6PwnW8bcVePxt8YT6PwnW8bcVevxt8YT6PwnW8bcVevxt8Yb6PwnW8AABgvxt8YT7mHSe8AABgvxt8Yb7mHSe8bcVevxt8Yb6PwnW8bcVevxt8YT6PwnW8AABgvxt8YT7mHSe8bcVePxt8Yb6PwnW8AABgPxt8Yb7mHSe8AABgPxt8YT7mHSe8bcVePxt8Yb6PwnW8AABgPxt8YT7mHSe8bcVePxt8YT6PwnW8bcVevxt8Yb6PwnU8bcVePxt8YT6PwnU8bcVePxt8Yb6PwnU8bcVevxt8Yb6PwnU8bcVevxt8YT6PwnU8bcVePxt8YT6PwnU8bcVevxt8Yb6PwnU8AABgvxt8Yb7mHSc8AABgvxt8YT7mHSc8bcVevxt8Yb6PwnU8AABgvxt8YT7mHSc8bcVevxt8YT6PwnU8bcVePxt8Yb6PwnU8AABgPxt8YT7mHSc8AABgPxt8Yb7mHSc8bcVePxt8Yb6PwnU8bcVePxt8YT6PwnU8AABgPxt8YT7mHSc8AABgvxt8Yb7mHSe8bcVev2ZmZr7mHSe8bcVevxt8Yb6PwnW8AABgvxt8Yb7mHSc8bcVevxt8Yb6PwnU8bcVev2ZmZr7mHSc8AABgvxt8YT7mHSe8bcVevxt8YT6PwnW8bcVev2ZmZj7mHSe8AABgvxt8YT7mHSc8bcVev2ZmZj7mHSc8bcVevxt8YT6PwnU8AABgPxt8Yb7mHSe8bcVePxt8Yb6PwnW8bcVeP2ZmZr7mHSe8AABgPxt8Yb7mHSc8bcVeP2ZmZr7mHSc8bcVePxt8Yb6PwnU8AABgPxt8YT7mHSe8bcVeP2ZmZj7mHSe8bcVePxt8YT6PwnW8AABgPxt8YT7mHSc8bcVePxt8YT6PwnU8bcVeP2ZmZj7mHSc8AAAAgP9//78AAACA/3//vwAAAID/f/+/AAAAgP9//78AAACA/3//vwAAAID/f/+//z//P1RVVNX/P/8/VFVU1f8//z9UVVTV/z//P1RVVNX/P/8/VFVU1f8//z9UVVTV/z//v1NVqqr/P/+/U1Wqqv8//79TVaqq/z//v1NVqqr/P/+/U1Wqqv8//79TVaqq//8AgP9//7///wCA/3//v///AID/f/+///8AgP9//7///wCA/3//v///AID/f/+//7//P1NVqqr/v/8/U1Wqqv+//z9TVaqq/7//P1NVqqr/v/8/U1Wqqv+//z9TVaqq/7//v1RVVNX/v/+/VFVU1f+//79UVVTV/7//v1RVVNX/v/+/VFVU1f+//79UVVTVAIAAAAAA/78AgAAAAAD/vwCAAAAAAP+/AIAAAAAA/78AgAAAAAD/vwCAAAAAAP+//78AAFVVqar/vwAAVVWpqv+/AABVVamq/78AAFVVqar/vwAAVVWpqv+/AABVVamq/3//P6oqVJX/f/8/qipUlf9//z+qKlSV/3//P6oqVJX/f/8/qipUlf9//z+qKlSVAID//wAA/78AgP//AAD/vwCA//8AAP+/AID//wAA/78AgP//AAD/vwCA//8AAP+//7///6oqVJX/v///qipUlf+///+qKlSV/7///6oqVJX/v///qipUlf+///+qKlSV/3//v1VVqar/f/+/VVWpqv9//79VVamq/3//v1VVqar/f/+/VVWpqv9//79VVamq//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCAAAD/v1RVqaoAAP+/VFWpqgAA/79UVamqAAD/v1RVqaoAAP+/VFWpqgAA/79UVamq////v6qqqar///+/qqqpqv///7+qqqmq////v6qqqar///+/qqqpqv///7+qqqmq/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA/z//f6qqqar/P/9/qqqpqv8//3+qqqmq/z//f6qqqar/P/9/qqqpqv8//3+qqqmq/7//f1RVqar/v/9/VFWpqv+//39UVamq/7//f1RVqar/v/9/VFWpqv+//39UVamqqiqqKv8//7+qKqoq/z//v6oqqir/P/+/VVVUVTkxkodVVVRVOTGSh1VVVFU5MZKHqipU1f8//5+qKlTV/z//n6oqVNX/P/+fVVWqqv9//59VVaqq/3//n1VVqqr/f/+fVNWqKv9//59U1aoq/3//n1TVqir/f/+fqapUVf8//5+pqlRV/z//n6mqVFX/P/+fVNVU1TkxkodU1VTVOTGSh1TVVNU5MZKHqaqqqv8//7+pqqqq/z//v6mqqqr/P/+/")
+}]
+
+[node name="WallBuyRepetierer" type="Node3D" unique_id=1273812103]
 script = ExtResource("1")
 weapon = ExtResource("2")
 
-[node name="Board" type="CSGBox3D" parent="."]
+[node name="Board" type="CSGBox3D" parent="." unique_id=393959492]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.015)
+layers = 0
 size = Vector3(1.75, 0.45, 0.03)
 material = ExtResource("3")
 
-[node name="Outline" type="Node3D" parent="."]
+[node name="Look" type="MeshInstance3D" parent="Board" unique_id=62132562]
+mesh = SubResource("ArrayMesh_81l50")
 
-[node name="Line0" type="CSGBox3D" parent="Outline"]
+[node name="Outline" type="Node3D" parent="." unique_id=2100048578]
+
+[node name="Line0" type="CSGBox3D" parent="Outline" unique_id=2001747058]
 transform = Transform3D(0.9993, -0.0384, 0, 0.0384, 0.9993, 0, 0, 0, 1, -0.46, 0.04, -0.035)
 size = Vector3(0.5344, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="Line1" type="CSGBox3D" parent="Outline"]
+[node name="Line1" type="CSGBox3D" parent="Outline" unique_id=1872294275]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.16, 0.05, -0.035)
 size = Vector3(0.094, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="Line2" type="CSGBox3D" parent="Outline"]
+[node name="Line2" type="CSGBox3D" parent="Outline" unique_id=1005536057]
 transform = Transform3D(0.3714, -0.9285, 0, 0.9285, 0.3714, 0, 0, 0, 1, -0.11, 0.075, -0.035)
 size = Vector3(0.0679, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="Line3" type="CSGBox3D" parent="Outline"]
+[node name="Line3" type="CSGBox3D" parent="Outline" unique_id=1389955647]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.08, 0.1, -0.035)
 size = Vector3(0.054, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="Line4" type="CSGBox3D" parent="Outline"]
+[node name="Line4" type="CSGBox3D" parent="Outline" unique_id=450968089]
 transform = Transform3D(-0.1961, 0.9806, 0, -0.9806, -0.1961, 0, 0, 0, 1, -0.065, 0.075, -0.035)
 size = Vector3(0.065, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="Line5" type="CSGBox3D" parent="Outline"]
+[node name="Line5" type="CSGBox3D" parent="Outline" unique_id=1491624154]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.355, 0.05, -0.035)
 size = Vector3(0.864, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="Line6" type="CSGBox3D" parent="Outline"]
+[node name="Line6" type="CSGBox3D" parent="Outline" unique_id=1971994611]
 transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0.78, 0.04, -0.035)
 size = Vector3(0.034, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="Line7" type="CSGBox3D" parent="Outline"]
+[node name="Line7" type="CSGBox3D" parent="Outline" unique_id=267065363]
 transform = Transform3D(-1, 0, 0, 0, -1, 0, 0, 0, 1, 0.565, 0.03, -0.035)
 size = Vector3(0.444, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="Line8" type="CSGBox3D" parent="Outline"]
+[node name="Line8" type="CSGBox3D" parent="Outline" unique_id=2104563284]
 transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0.35, 0.015, -0.035)
 size = Vector3(0.044, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="Line9" type="CSGBox3D" parent="Outline"]
+[node name="Line9" type="CSGBox3D" parent="Outline" unique_id=1959733723]
 transform = Transform3D(-0.9993, 0.0363, 0, -0.0363, -0.9993, 0, 0, 0, 1, 0.075, -0.01, -0.035)
 size = Vector3(0.5644, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="Line10" type="CSGBox3D" parent="Outline"]
+[node name="Line10" type="CSGBox3D" parent="Outline" unique_id=899241393]
 transform = Transform3D(-0.8575, 0.5145, 0, -0.5145, -0.8575, 0, 0, 0, 1, -0.225, -0.035, -0.035)
 size = Vector3(0.0723, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="Line11" type="CSGBox3D" parent="Outline"]
+[node name="Line11" type="CSGBox3D" parent="Outline" unique_id=1017995645]
 transform = Transform3D(-0.9891, 0.1473, 0, -0.1473, -0.9891, 0, 0, 0, 1, -0.485, -0.085, -0.035)
 size = Vector3(0.4892, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="Line12" type="CSGBox3D" parent="Outline"]
+[node name="Line12" type="CSGBox3D" parent="Outline" unique_id=1334382050]
 transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, -0.72, -0.045, -0.035)
 size = Vector3(0.164, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="Light" type="OmniLight3D" parent="."]
+[node name="Light" type="OmniLight3D" parent="." unique_id=1889059829]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.5)
 light_color = Color(1, 0.9, 0.7, 1)
 light_energy = 0.6

@@ -3,12 +3,15 @@ extends Node
 ## Headless check of the weapon models (M6 part 4b): in every viewmodel no part is a greybox box any
 ## more (each is a reshaped mesh that remembers its box), every lit colour is a textured material
 ## projected in the part's own space (so it rides along with a moving bolt or magazine), only
-## near-white and near-black parts stay plain, and the weapons and the enemy models together stay
-## inside the 3 MB model budget. The Handböller's big hammer falls on the shot and is cocked again in
+## near-white and near-black parts stay plain, and all the models (enemies, weapons, and the prop,
+## event and equipment scenes that hold the props' meshes, counted whole) stay inside the 3 MB model
+## budget. The Handböller's big hammer falls on the shot and is cocked again in
 ## the reload (play-test 2026-10-18).
 
 const WEAPONS_DIR: String = "res://scenes/weapons"
 const ENEMY_MODELS_DIR: String = "res://assets/models"
+## Scenes that carry the props' meshes (M6 part 4c), counted whole.
+const PROP_DIRS: Array[String] = ["res://scenes/zones", "res://scenes/props", "res://scenes/events", "res://scenes/equipment"]
 const MODEL_BUDGET: int = 3 * 1024 * 1024
 
 var failures: Array[String] = []
@@ -16,13 +19,15 @@ var failures: Array[String] = []
 
 func _ready() -> void:
 	var total: int = _size(ENEMY_MODELS_DIR)
+	for dir: String in PROP_DIRS:
+		total += _size(dir)
 	for file: String in DirAccess.get_files_at(WEAPONS_DIR):
 		if not file.ends_with(".tscn"):
 			continue
 		var path: String = WEAPONS_DIR.path_join(file)
 		total += FileAccess.get_file_as_bytes(path).size()
 		_weapon(path)
-	_check(total < MODEL_BUDGET, "weapon and enemy models take %.2f MiB of the 3 MB budget" % (total / 1048576.0))
+	_check(total < MODEL_BUDGET, "all models take %.2f MiB of the 3 MB budget" % (total / 1048576.0))
 	await _hammer()
 	print("RESULT: %s" % ("PASS" if failures.is_empty() else "%d FAILED" % failures.size()))
 	get_tree().quit(1 if failures.size() > 0 else 0)

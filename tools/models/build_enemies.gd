@@ -1,6 +1,7 @@
 extends SceneTree
 ## Builds the five enemy models (M6 part 4) into assets/models/enemies, each at its EnemyData
-## model_scale, with the stance and swing its EnemyRig plays:
+## model_scale, with the stance and swing its EnemyRig plays, and the living Deitscha Tourist
+## (assets/models/guest.tscn, part 4c):
 ##
 ##     godot --headless --script res://tools/models/build_enemies.gd
 ##
@@ -33,6 +34,7 @@ func _init() -> void:
 	_knappe()
 	_perchte()
 	_krampus()
+	_guest()
 	print("enemy models built")
 	quit()
 
@@ -101,7 +103,7 @@ func _boots(b: Builder, color: Color, size: Vector3 = Vector3(0.12, 0.11, 0.27),
 
 ## A human head: skull, nose, brow, ears, mouth, glowing eyes and a neck. `face_z` is the front.
 func _face(b: Builder, skin: Color, eye: Color = EYE, centre: Vector3 = Vector3(0.0, 1.63, -0.02),
-		radii: Vector3 = Vector3(0.115, 0.14, 0.125)) -> void:
+		radii: Vector3 = Vector3(0.115, 0.14, 0.125), alive: bool = false) -> void:
 	var front: float = centre.z - radii.z
 	b.tube([Vector3(0.0, 1.46, 0.0), Vector3(0.0, 1.56, -0.01)], [Vector2(0.055, 0.055), Vector2(0.05, 0.05)], &"skin", skin, [[&"chest", &"head", 0.5], &"head"], 6, false)
 	b.head(true)
@@ -109,8 +111,13 @@ func _face(b: Builder, skin: Color, eye: Color = EYE, centre: Vector3 = Vector3(
 	b.box(Vector3(0.0, centre.y - 0.01, front - 0.015), Vector3(0.035, 0.06, 0.05), &"skin", skin.darkened(0.08), &"head", Basis.IDENTITY, Vector2(0.4, 0.3))
 	b.box(Vector3(0.0, centre.y + 0.045, front + 0.012), Vector3(0.19, 0.03, 0.04), &"skin", skin.darkened(0.25), &"head")
 	for x: float in [-1.0, 1.0]:
-		b.box(Vector3(0.048 * x, centre.y + 0.022, front + 0.012), Vector3(0.05, 0.03, 0.02), &"plain", Color(0.06, 0.05, 0.05), &"head")
-		b.box(Vector3(0.048 * x, centre.y + 0.022, front + 0.004), Vector3(0.03, 0.016, 0.01), &"glow", eye, &"head")
+		if alive:
+			# The living: white eyes with dark pupils, no glow.
+			b.box(Vector3(0.048 * x, centre.y + 0.022, front + 0.008), Vector3(0.04, 0.022, 0.012), &"plain", Color(0.92, 0.9, 0.86), &"head")
+			b.box(Vector3(0.048 * x, centre.y + 0.022, front + 0.002), Vector3(0.016, 0.016, 0.006), &"plain", Color(0.12, 0.2, 0.3), &"head")
+		else:
+			b.box(Vector3(0.048 * x, centre.y + 0.022, front + 0.012), Vector3(0.05, 0.03, 0.02), &"plain", Color(0.06, 0.05, 0.05), &"head")
+			b.box(Vector3(0.048 * x, centre.y + 0.022, front + 0.004), Vector3(0.03, 0.016, 0.01), &"glow", eye, &"head")
 		b.ball(Vector3(radii.x * x, centre.y, centre.z + 0.01), Vector3(0.02, 0.04, 0.03), &"skin", skin.darkened(0.1), &"head", 5, 3)
 	b.box(Vector3(0.0, centre.y - 0.07, front + 0.018), Vector3(0.075, 0.018, 0.02), &"plain", MOUTH, &"head")
 	b.head(false)
@@ -370,3 +377,66 @@ func _krampus() -> void:
 				&"forearm_r": Vector3(25, 0, 0), &"chest": Vector3(-14, 0, 0), &"head": Vector3(10, 0, 0),
 				&"thigh_l": Vector3(8, 0, -6), &"thigh_r": Vector3(8, 0, 6), &"shin_l": Vector3(-14, 0, 0), &"shin_r": Vector3(-14, 0, 0)},
 		"stride": 22.0, "arm_swing": 12.0, "cadence": 1.1})
+
+
+## The Deitscha Tourist (section 8a), alive (M6 part 4c): sunburnt, a striped shirt over his belly, a
+## rucksack, khaki shorts, socks in sandals, glasses, a souvenir Tyrolean hat, and the map he holds
+## out in front of him. Same skeleton and rig as the enemies; he walks, he never fights.
+func _guest() -> void:
+	var b := Builder.new(1.0)
+	_standard(b)
+	var skin := Color(0.86, 0.62, 0.52)
+	var shirt := Color(0.85, 0.85, 0.82)
+	var stripe := Color(0.2, 0.35, 0.65)
+	var khaki := Color(0.95, 0.88, 0.7)
+	_torso(b, [[0.86, 0.17, 0.13], [1.0, 0.2, 0.19, -0.04], [WAIST.y, 0.205, 0.19, -0.05], [1.25, 0.21, 0.16, -0.02], [1.4, 0.22, 0.13], [1.47, 0.16, 0.1], [1.5, 0.07, 0.06]], &"linen", shirt)
+	# Stripes round the shirt (rings just proud of it).
+	for y: float in [1.02, 1.18, 1.34]:
+		var r: Vector2 = Vector2(0.204, 0.195) if y < 1.1 else Vector2(0.214, 0.17) if y < 1.3 else Vector2(0.224, 0.138)
+		var z: float = -0.045 if y < 1.1 else -0.03 if y < 1.3 else -0.005
+		b.tube([Vector3(0.0, y - 0.025, z), Vector3(0.0, y + 0.025, z)], [r, r], &"linen", stripe, &"chest" if y > WAIST.y else &"hips", 8, false)
+	_torso(b, [[0.74, 0.18, 0.13], [0.9, 0.185, 0.14]], &"linen", khaki)
+	b.tube([Vector3(0.0, 0.88, -0.01), Vector3(0.0, 0.92, -0.015)], [Vector2(0.19, 0.15), Vector2(0.19, 0.15)], &"leather", Color(0.25, 0.15, 0.08), &"hips", 8, false)
+	_both(func(m: Vector3, s: String) -> void:
+		var thigh := StringName("thigh" + s)
+		var shin := StringName("shin" + s)
+		var foot := StringName("foot" + s)
+		b.tube([(HIP + Vector3(0, 0.05, 0)) * m, Vector3(-0.115, 0.66, 0.0) * m], [Vector2(0.095, 0.1), Vector2(0.09, 0.095)], &"linen", khaki, [[&"hips", thigh, 0.5], thigh], 7)
+		b.tube([Vector3(-0.112, 0.68, 0.0) * m, KNEE * m], [Vector2(0.062, 0.066), Vector2(0.056, 0.06)], &"skin", skin, thigh, 6, false)
+		b.tube([(KNEE + Vector3(0, 0.02, 0)) * m, Vector3(-0.11, 0.3, 0.0) * m], [Vector2(0.056, 0.06), Vector2(0.05, 0.053)], &"skin", skin, [[thigh, shin, 0.5], shin], 6, false)
+		b.tube([Vector3(-0.11, 0.32, 0.0) * m, (ANKLE + Vector3(0, -0.02, 0)) * m], [Vector2(0.057, 0.059), Vector2(0.05, 0.052)], &"wool", Color(0.95, 0.95, 0.92), shin, 6)
+		b.box(Vector3(-0.11, 0.06, -0.06) * m, Vector3(0.1, 0.07, 0.22), &"wool", Color(0.95, 0.95, 0.92), foot, Basis.IDENTITY, Vector2(0.8, 0.8))
+		b.box(Vector3(-0.11, 0.015, -0.06) * m, Vector3(0.12, 0.03, 0.27), &"leather", Color(0.35, 0.22, 0.12), foot)
+		b.box(Vector3(-0.11, 0.07, -0.1) * m, Vector3(0.125, 0.02, 0.04), &"leather", Color(0.35, 0.22, 0.12), foot))
+	_arms(b, Vector2(0.066, 0.066), Vector2(0.046, 0.046), &"linen", shirt)
+	# Short sleeves: the forearms are bare.
+	_both(func(m: Vector3, s: String) -> void:
+		var own := StringName("forearm" + s)
+		b.tube([(ELBOW + Vector3(0, -0.02, 0)) * m, WRIST * m], [Vector2(0.05, 0.05), Vector2(0.042, 0.042)], &"skin", skin, own, 6))
+	_hands(b, skin)
+	# Rucksack, and the map held open in front of him (on the right hand, the left holding its edge).
+	b.box(Vector3(0.0, 1.2, 0.2), Vector3(0.32, 0.4, 0.16), &"wool", Color(0.75, 0.3, 0.1), &"chest", Basis.IDENTITY, Vector2(0.9, 0.85))
+	_both(func(m: Vector3, _s: String) -> void:
+		b.box(Vector3(-0.11, 1.26, -0.13) * m, Vector3(0.045, 0.4, 0.02), &"plain", Color(0.15, 0.15, 0.15), &"chest"))
+	var hand_r := Vector3(-WRIST.x, WRIST.y - 0.08, -0.02)
+	b.box(hand_r + Vector3(-0.2, 0.0, -0.04), Vector3(0.36, 0.005, 0.26), &"plain", Color(0.92, 0.88, 0.72), &"hand_r", Basis(Vector3.RIGHT, -0.4))
+	b.box(hand_r + Vector3(-0.17, 0.004, -0.06), Vector3(0.2, 0.004, 0.008), &"plain", Color(0.8, 0.2, 0.15), &"hand_r", Basis(Vector3.RIGHT, -0.4) * Basis(Vector3.UP, 0.4))
+	_face(b, skin, EYE, Vector3(0.0, 1.63, -0.02), Vector3(0.115, 0.14, 0.125), true)
+	b.head(true)
+	# Glasses, a moustache, the souvenir hat.
+	b.box(Vector3(0.0, 1.652, -0.15), Vector3(0.17, 0.035, 0.008), &"plain", Color(0.3, 0.25, 0.2), &"head")
+	b.box(Vector3(0.0, 1.585, -0.148), Vector3(0.08, 0.018, 0.02), &"fur", Color(0.4, 0.3, 0.2), &"head")
+	var felt := Color(0.2, 0.32, 0.2)
+	b.tube([Vector3(0.0, 1.735, -0.02), Vector3(0.0, 1.75, -0.02)], [Vector2(0.2, 0.2), Vector2(0.19, 0.19)], &"wool", felt, &"head", 10)
+	b.tube([Vector3(0.0, 1.74, -0.02), Vector3(0.0, 1.8, -0.02), Vector3(0.0, 1.87, -0.025)], [Vector2(0.125, 0.13), Vector2(0.115, 0.12), Vector2(0.085, 0.095)], &"wool", felt, &"head", 9)
+	b.tube([Vector3(0.0, 1.75, -0.02), Vector3(0.0, 1.78, -0.02)], [Vector2(0.127, 0.132), Vector2(0.124, 0.13)], &"plain", Color(0.7, 0.15, 0.12), &"head", 9, false)
+	b.box(Vector3(0.12, 1.86, 0.03), Vector3(0.015, 0.17, 0.045), &"plain", Color(0.95, 0.85, 0.3), &"head", Basis(Vector3.RIGHT, -0.35), Vector2(0.4, 0.4))
+	b.head(false)
+	b.ragdoll({&"arm_l": 0.066, &"forearm_l": 0.046, &"arm_r": 0.066, &"forearm_r": 0.046,
+			&"thigh_l": 0.09, &"shin_l": 0.055, &"thigh_r": 0.09, &"shin_r": 0.055},
+			Vector3(0.34, 0.22, 0.28), Vector3(0.42, 0.38, 0.34), 0.13)
+	b.save("res://assets/models/guest.tscn", "GuestModel", RIG, {
+		"build_scale": b.scale,
+		"stance": {&"arm_l": Vector3(55, 0, 8), &"arm_r": Vector3(50, 0, -6), &"forearm_l": Vector3(45, 0, 0),
+				&"forearm_r": Vector3(50, 0, 0), &"head": Vector3(-14, 0, 0)},
+		"stride": 26.0, "arm_swing": 0.0, "cadence": 1.6})

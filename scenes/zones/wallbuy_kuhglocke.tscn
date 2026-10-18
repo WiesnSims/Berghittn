@@ -1,62 +1,73 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene format=4]
 
 [ext_resource type="Script" path="res://scripts/zones/wall_buy.gd" id="1"]
 [ext_resource type="Resource" path="res://data/equipment/kuhglocke.tres" id="2"]
 [ext_resource type="Material" path="res://assets/materials/wood_dark.tres" id="3"]
 [ext_resource type="Material" path="res://assets/materials/chalk.tres" id="4"]
 
-[node name="WallBuyKuhglocke" type="Node3D"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_10ppd"]
+_surfaces = [{
+"aabb": AABB(-0.35, -0.4, -0.015, 0.7, 0.8, 0.03),
+"format": 34359738375,
+"material": ExtResource("3"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 132,
+"vertex_data": PackedByteArray("MzOzvqhXyr7mHSe8MzOzvqhXyj7mHSe8MzOzvqhXyj7mHSc8MzOzvqhXyr7mHSe8MzOzvqhXyj7mHSc8MzOzvqhXyr7mHSc8MzOzvqhXyr7mHSe8Dr6wvs3MzL7mHSc8Dr6wvs3MzL7mHSe8MzOzvqhXyr7mHSe8MzOzvqhXyr7mHSc8Dr6wvs3MzL7mHSc8MzOzvqhXyj7mHSe8Dr6wvs3MzD7mHSe8Dr6wvs3MzD7mHSc8MzOzvqhXyj7mHSe8Dr6wvs3MzD7mHSc8MzOzvqhXyj7mHSc8MzOzPqhXyr7mHSe8MzOzPqhXyj7mHSc8MzOzPqhXyj7mHSe8MzOzPqhXyr7mHSe8MzOzPqhXyr7mHSc8MzOzPqhXyj7mHSc8MzOzPqhXyr7mHSe8Dr6wPs3MzL7mHSe8Dr6wPs3MzL7mHSc8MzOzPqhXyr7mHSe8Dr6wPs3MzL7mHSc8MzOzPqhXyr7mHSc8MzOzPqhXyj7mHSe8Dr6wPs3MzD7mHSc8Dr6wPs3MzD7mHSe8MzOzPqhXyj7mHSe8MzOzPqhXyj7mHSc8Dr6wPs3MzD7mHSc8Dr6wvs3MzL7mHSe8Dr6wvs3MzL7mHSc8Dr6wPs3MzL7mHSc8Dr6wvs3MzL7mHSe8Dr6wPs3MzL7mHSc8Dr6wPs3MzL7mHSe8Dr6wvs3MzL7mHSe8Dr6wPqhXyr6PwnW8Dr6wvqhXyr6PwnW8Dr6wvs3MzL7mHSe8Dr6wPs3MzL7mHSe8Dr6wPqhXyr6PwnW8Dr6wvs3MzL7mHSc8Dr6wvqhXyr6PwnU8Dr6wPqhXyr6PwnU8Dr6wvs3MzL7mHSc8Dr6wPqhXyr6PwnU8Dr6wPs3MzL7mHSc8Dr6wvs3MzD7mHSe8Dr6wPs3MzD7mHSc8Dr6wvs3MzD7mHSc8Dr6wvs3MzD7mHSe8Dr6wPs3MzD7mHSe8Dr6wPs3MzD7mHSc8Dr6wvs3MzD7mHSe8Dr6wvqhXyj6PwnW8Dr6wPqhXyj6PwnW8Dr6wvs3MzD7mHSe8Dr6wPqhXyj6PwnW8Dr6wPs3MzD7mHSe8Dr6wvs3MzD7mHSc8Dr6wPqhXyj6PwnU8Dr6wvqhXyj6PwnU8Dr6wvs3MzD7mHSc8Dr6wPs3MzD7mHSc8Dr6wPqhXyj6PwnU8Dr6wvqhXyr6PwnW8Dr6wPqhXyr6PwnW8Dr6wPqhXyj6PwnW8Dr6wvqhXyr6PwnW8Dr6wPqhXyj6PwnW8Dr6wvqhXyj6PwnW8Dr6wvqhXyr6PwnW8MzOzvqhXyj7mHSe8MzOzvqhXyr7mHSe8Dr6wvqhXyr6PwnW8Dr6wvqhXyj6PwnW8MzOzvqhXyj7mHSe8Dr6wPqhXyr6PwnW8MzOzPqhXyr7mHSe8MzOzPqhXyj7mHSe8Dr6wPqhXyr6PwnW8MzOzPqhXyj7mHSe8Dr6wPqhXyj6PwnW8Dr6wvqhXyr6PwnU8Dr6wPqhXyj6PwnU8Dr6wPqhXyr6PwnU8Dr6wvqhXyr6PwnU8Dr6wvqhXyj6PwnU8Dr6wPqhXyj6PwnU8Dr6wvqhXyr6PwnU8MzOzvqhXyr7mHSc8MzOzvqhXyj7mHSc8Dr6wvqhXyr6PwnU8MzOzvqhXyj7mHSc8Dr6wvqhXyj6PwnU8Dr6wPqhXyr6PwnU8MzOzPqhXyj7mHSc8MzOzPqhXyr7mHSc8Dr6wPqhXyr6PwnU8Dr6wPqhXyj6PwnU8MzOzPqhXyj7mHSc8MzOzvqhXyr7mHSe8Dr6wvs3MzL7mHSe8Dr6wvqhXyr6PwnW8MzOzvqhXyr7mHSc8Dr6wvqhXyr6PwnU8Dr6wvs3MzL7mHSc8MzOzvqhXyj7mHSe8Dr6wvqhXyj6PwnW8Dr6wvs3MzD7mHSe8MzOzvqhXyj7mHSc8Dr6wvs3MzD7mHSc8Dr6wvqhXyj6PwnU8MzOzPqhXyr7mHSe8Dr6wPqhXyr6PwnW8Dr6wPs3MzL7mHSe8MzOzPqhXyr7mHSc8Dr6wPs3MzL7mHSc8Dr6wPqhXyr6PwnU8MzOzPqhXyj7mHSe8Dr6wPs3MzD7mHSe8Dr6wPqhXyj6PwnW8MzOzPqhXyj7mHSc8Dr6wPqhXyj6PwnU8Dr6wPs3MzD7mHSc8AAAAgP9//78AAACA/3//vwAAAID/f/+/AAAAgP9//78AAACA/3//vwAAAID/f/+//z//P1RVVNX/P/8/VFVU1f8//z9UVVTV/z//P1RVVNX/P/8/VFVU1f8//z9UVVTV/z//v1RVqar/P/+/VFWpqv8//79UVamq/z//v1RVqar/P/+/VFWpqv8//79UVamq//8AgP9//7///wCA/3//v///AID/f/+///8AgP9//7///wCA/3//v///AID/f/+//7//P1RVqar/v/8/VFWpqv+//z9UVamq/7//P1RVqar/v/8/VFWpqv+//z9UVamq/7//v1RVVNX/v/+/VFVU1f+//79UVVTV/7//v1RVVNX/v/+/VFVU1f+//79UVVTVAIAAAAAA/78AgAAAAAD/vwCAAAAAAP+/AIAAAAAA/78AgAAAAAD/vwCAAAAAAP+//78AAFNVqqr/vwAAU1Wqqv+/AABTVaqq/78AAFNVqqr/vwAAU1Wqqv+/AABTVaqq/3//P6oqVJX/f/8/qipUlf9//z+qKlSV/3//P6oqVJX/f/8/qipUlf9//z+qKlSVAID//wAA/78AgP//AAD/vwCA//8AAP+/AID//wAA/78AgP//AAD/vwCA//8AAP+//7///6oqVJX/v///qipUlf+///+qKlSV/7///6oqVJX/v///qipUlf+///+qKlSV/3//v1NVqqr/f/+/U1Wqqv9//79TVaqq/3//v1NVqqr/f/+/U1Wqqv9//79TVaqq//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCAAAD/v1VVqqoAAP+/VVWqqgAA/79VVaqqAAD/v1VVqqoAAP+/VVWqqgAA/79VVaqq////v6mqqqr///+/qaqqqv///7+pqqqq////v6mqqqr///+/qaqqqv///7+pqqqq/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA/z//f6mqqqr/P/9/qaqqqv8//3+pqqqq/z//f6mqqqr/P/9/qaqqqv8//3+pqqqq/7//f1VVqqr/v/9/VVWqqv+//39VVaqq/7//f1VVqqr/v/9/VVWqqv+//39VVaqqqiqqKv8//7+qKqoq/z//v6oqqir/P/+/VFVUVZdfl99UVVRVl1+X31RVVFWXX5ffqipU1f8//5+qKlTV/z//n6oqVNX/P/+fVFWqqv9//59UVaqq/3//n1RVqqr/f/+fVNWqKv9//59U1aoq/3//n1TVqir/f/+fqqpUVf8//5+qqlRV/z//n6qqVFX/P/+fVNVU1Zdfl99U1VTVl1+X31TVVNWXX5ffqqqqqv8//7+qqqqq/z//v6qqqqr/P/+/")
+}]
+
+[node name="WallBuyKuhglocke" type="Node3D" unique_id=535089401]
 script = ExtResource("1")
 equipment = ExtResource("2")
 
-[node name="Board" type="CSGBox3D" parent="."]
-position = Vector3(0, 0, -0.015)
+[node name="Board" type="CSGBox3D" parent="." unique_id=37518308]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.015)
+layers = 0
 size = Vector3(0.7, 0.8, 0.03)
 material = ExtResource("3")
 
-[node name="Outline" type="Node3D" parent="."]
+[node name="Look" type="MeshInstance3D" parent="Board" unique_id=1422178102]
+mesh = SubResource("ArrayMesh_10ppd")
 
-[node name="Left" type="CSGBox3D" parent="Outline"]
-position = Vector3(-0.13, -0.08, -0.035)
-rotation = Vector3(0, 0, -0.2)
+[node name="Outline" type="Node3D" parent="." unique_id=2074780427]
+
+[node name="Left" type="CSGBox3D" parent="Outline" unique_id=495871154]
+transform = Transform3D(0.9800666, 0.19866933, 0, -0.19866933, 0.9800666, 0, 0, 0, 1, -0.13, -0.08, -0.035)
 size = Vector3(0.014, 0.4, 0.006)
 material = ExtResource("4")
 
-[node name="Right" type="CSGBox3D" parent="Outline"]
-position = Vector3(0.13, -0.08, -0.035)
-rotation = Vector3(0, 0, 0.2)
+[node name="Right" type="CSGBox3D" parent="Outline" unique_id=602664418]
+transform = Transform3D(0.9800666, -0.19866933, 0, 0.19866933, 0.9800666, 0, 0, 0, 1, 0.13, -0.08, -0.035)
 size = Vector3(0.014, 0.4, 0.006)
 material = ExtResource("4")
 
-[node name="Top" type="CSGBox3D" parent="Outline"]
-position = Vector3(0, 0.115, -0.035)
+[node name="Top" type="CSGBox3D" parent="Outline" unique_id=1301435876]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.115, -0.035)
 size = Vector3(0.18, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="Mouth" type="CSGBox3D" parent="Outline"]
-position = Vector3(0, -0.275, -0.035)
+[node name="Mouth" type="CSGBox3D" parent="Outline" unique_id=455435170]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.275, -0.035)
 size = Vector3(0.34, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="StrapLeft" type="CSGBox3D" parent="Outline"]
-position = Vector3(-0.05, 0.22, -0.035)
-rotation = Vector3(0, 0, 0.35)
+[node name="StrapLeft" type="CSGBox3D" parent="Outline" unique_id=698624386]
+transform = Transform3D(0.9393727, -0.3428978, 0, 0.3428978, 0.9393727, 0, 0, 0, 1, -0.05, 0.22, -0.035)
 size = Vector3(0.014, 0.22, 0.006)
 material = ExtResource("4")
 
-[node name="StrapRight" type="CSGBox3D" parent="Outline"]
-position = Vector3(0.05, 0.22, -0.035)
-rotation = Vector3(0, 0, -0.35)
+[node name="StrapRight" type="CSGBox3D" parent="Outline" unique_id=873219233]
+transform = Transform3D(0.9393727, 0.3428978, 0, -0.3428978, 0.9393727, 0, 0, 0, 1, 0.05, 0.22, -0.035)
 size = Vector3(0.014, 0.22, 0.006)
 material = ExtResource("4")
 
-[node name="Clapper" type="CSGBox3D" parent="Outline"]
-position = Vector3(0, -0.33, -0.035)
+[node name="Clapper" type="CSGBox3D" parent="Outline" unique_id=308412036]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.33, -0.035)
 size = Vector3(0.05, 0.05, 0.006)
 material = ExtResource("4")
 
-[node name="Light" type="OmniLight3D" parent="."]
-position = Vector3(0, 0.5, -0.5)
+[node name="Light" type="OmniLight3D" parent="." unique_id=1687636415]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.5)
 light_color = Color(1, 0.9, 0.7, 1)
 light_energy = 0.6
 omni_range = 2.5

@@ -1,60 +1,70 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene format=4]
 
 [ext_resource type="Script" path="res://scripts/zones/wall_buy.gd" id="1"]
 [ext_resource type="Resource" path="res://data/weapons/alphorn.tres" id="2"]
 [ext_resource type="Material" path="res://assets/materials/wood_dark.tres" id="3"]
 [ext_resource type="Material" path="res://assets/materials/chalk.tres" id="4"]
 
-[node name="WallBuyAlphorn" type="Node3D"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_ckhs4"]
+_surfaces = [{
+"aabb": AABB(-1, -0.35, -0.015, 2, 0.7, 0.03),
+"format": 34359738375,
+"material": ExtResource("3"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 132,
+"vertex_data": PackedByteArray("AACAvw6+sL7mHSe8AACAvw6+sD7mHSe8AACAvw6+sD7mHSc8AACAvw6+sL7mHSe8AACAvw6+sD7mHSc8AACAvw6+sL7mHSc8AACAvw6+sL7mHSe8bcV+vzMzs77mHSc8bcV+vzMzs77mHSe8AACAvw6+sL7mHSe8AACAvw6+sL7mHSc8bcV+vzMzs77mHSc8AACAvw6+sD7mHSe8bcV+vzMzsz7mHSe8bcV+vzMzsz7mHSc8AACAvw6+sD7mHSe8bcV+vzMzsz7mHSc8AACAvw6+sD7mHSc8AACAPw6+sL7mHSe8AACAPw6+sD7mHSc8AACAPw6+sD7mHSe8AACAPw6+sL7mHSe8AACAPw6+sL7mHSc8AACAPw6+sD7mHSc8AACAPw6+sL7mHSe8bcV+PzMzs77mHSe8bcV+PzMzs77mHSc8AACAPw6+sL7mHSe8bcV+PzMzs77mHSc8AACAPw6+sL7mHSc8AACAPw6+sD7mHSe8bcV+PzMzsz7mHSc8bcV+PzMzsz7mHSe8AACAPw6+sD7mHSe8AACAPw6+sD7mHSc8bcV+PzMzsz7mHSc8bcV+vzMzs77mHSe8bcV+vzMzs77mHSc8bcV+PzMzs77mHSc8bcV+vzMzs77mHSe8bcV+PzMzs77mHSc8bcV+PzMzs77mHSe8bcV+vzMzs77mHSe8bcV+Pw6+sL6PwnW8bcV+vw6+sL6PwnW8bcV+vzMzs77mHSe8bcV+PzMzs77mHSe8bcV+Pw6+sL6PwnW8bcV+vzMzs77mHSc8bcV+vw6+sL6PwnU8bcV+Pw6+sL6PwnU8bcV+vzMzs77mHSc8bcV+Pw6+sL6PwnU8bcV+PzMzs77mHSc8bcV+vzMzsz7mHSe8bcV+PzMzsz7mHSc8bcV+vzMzsz7mHSc8bcV+vzMzsz7mHSe8bcV+PzMzsz7mHSe8bcV+PzMzsz7mHSc8bcV+vzMzsz7mHSe8bcV+vw6+sD6PwnW8bcV+Pw6+sD6PwnW8bcV+vzMzsz7mHSe8bcV+Pw6+sD6PwnW8bcV+PzMzsz7mHSe8bcV+vzMzsz7mHSc8bcV+Pw6+sD6PwnU8bcV+vw6+sD6PwnU8bcV+vzMzsz7mHSc8bcV+PzMzsz7mHSc8bcV+Pw6+sD6PwnU8bcV+vw6+sL6PwnW8bcV+Pw6+sL6PwnW8bcV+Pw6+sD6PwnW8bcV+vw6+sL6PwnW8bcV+Pw6+sD6PwnW8bcV+vw6+sD6PwnW8bcV+vw6+sL6PwnW8AACAvw6+sD7mHSe8AACAvw6+sL7mHSe8bcV+vw6+sL6PwnW8bcV+vw6+sD6PwnW8AACAvw6+sD7mHSe8bcV+Pw6+sL6PwnW8AACAPw6+sL7mHSe8AACAPw6+sD7mHSe8bcV+Pw6+sL6PwnW8AACAPw6+sD7mHSe8bcV+Pw6+sD6PwnW8bcV+vw6+sL6PwnU8bcV+Pw6+sD6PwnU8bcV+Pw6+sL6PwnU8bcV+vw6+sL6PwnU8bcV+vw6+sD6PwnU8bcV+Pw6+sD6PwnU8bcV+vw6+sL6PwnU8AACAvw6+sL7mHSc8AACAvw6+sD7mHSc8bcV+vw6+sL6PwnU8AACAvw6+sD7mHSc8bcV+vw6+sD6PwnU8bcV+Pw6+sL6PwnU8AACAPw6+sD7mHSc8AACAPw6+sL7mHSc8bcV+Pw6+sL6PwnU8bcV+Pw6+sD6PwnU8AACAPw6+sD7mHSc8AACAvw6+sL7mHSe8bcV+vzMzs77mHSe8bcV+vw6+sL6PwnW8AACAvw6+sL7mHSc8bcV+vw6+sL6PwnU8bcV+vzMzs77mHSc8AACAvw6+sD7mHSe8bcV+vw6+sD6PwnW8bcV+vzMzsz7mHSe8AACAvw6+sD7mHSc8bcV+vzMzsz7mHSc8bcV+vw6+sD6PwnU8AACAPw6+sL7mHSe8bcV+Pw6+sL6PwnW8bcV+PzMzs77mHSe8AACAPw6+sL7mHSc8bcV+PzMzs77mHSc8bcV+Pw6+sL6PwnU8AACAPw6+sD7mHSe8bcV+PzMzsz7mHSe8bcV+Pw6+sD6PwnW8AACAPw6+sD7mHSc8bcV+Pw6+sD6PwnU8bcV+PzMzsz7mHSc8AAAAgP9//78AAACA/3//vwAAAID/f/+/AAAAgP9//78AAACA/3//vwAAAID/f/+//z//P1RVVNX/P/8/VFVU1f8//z9UVVTV/z//P1RVVNX/P/8/VFVU1f8//z9UVVTV/z//v1NVqqr/P/+/U1Wqqv8//79TVaqq/z//v1NVqqr/P/+/U1Wqqv8//79TVaqq//8AgP9//7///wCA/3//v///AID/f/+///8AgP9//7///wCA/3//v///AID/f/+//7//P1NVqqr/v/8/U1Wqqv+//z9TVaqq/7//P1NVqqr/v/8/U1Wqqv+//z9TVaqq/7//v1RVVNX/v/+/VFVU1f+//79UVVTV/7//v1RVVNX/v/+/VFVU1f+//79UVVTVAIAAAAAA/78AgAAAAAD/vwCAAAAAAP+/AIAAAAAA/78AgAAAAAD/vwCAAAAAAP+//78AAFNVqqr/vwAAU1Wqqv+/AABTVaqq/78AAFNVqqr/vwAAU1Wqqv+/AABTVaqq/3//P6oqVJX/f/8/qipUlf9//z+qKlSV/3//P6oqVJX/f/8/qipUlf9//z+qKlSVAID//wAA/78AgP//AAD/vwCA//8AAP+/AID//wAA/78AgP//AAD/vwCA//8AAP+//7///6oqVJX/v///qipUlf+///+qKlSV/7///6oqVJX/v///qipUlf+///+qKlSV/3//v1NVqqr/f/+/U1Wqqv9//79TVaqq/3//v1NVqqr/f/+/U1Wqqv9//79TVaqq//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCAAAD/v1VVqaoAAP+/VVWpqgAA/79VVamqAAD/v1VVqaoAAP+/VVWpqgAA/79VVamq////v6mqqar///+/qaqpqv///7+pqqmq////v6mqqar///+/qaqpqv///7+pqqmq/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA/z//f6mqqar/P/9/qaqpqv8//3+pqqmq/z//f6mqqar/P/9/qaqpqv8//3+pqqmq/7//f1VVqar/v/9/VVWpqv+//39VVamq/7//f1VVqar/v/9/VVWpqv+//39VVamqqiqqKv8//7+qKqoq/z//v6oqqir/P/+/VVVUVVQQs5dVVVRVVBCzl1VVVFVUELOXqipU1f8//5+qKlTV/z//n6oqVNX/P/+fVVWqqv9//59VVaqq/3//n1VVqqr/f/+fVNWqKv9//59U1aoq/3//n1TVqir/f/+fqapUVf8//5+pqlRV/z//n6mqVFX/P/+fVNVU1VQQs5dU1VTVVBCzl1TVVNVUELOXqaqqqv8//7+pqqqq/z//v6mqqqr/P/+/")
+}]
+
+[node name="WallBuyAlphorn" type="Node3D" unique_id=344771034]
 script = ExtResource("1")
 weapon = ExtResource("2")
 from_wave = 10
 arrival_text = "EVENT_ALPHORN_READY"
 
-[node name="Board" type="CSGBox3D" parent="."]
-position = Vector3(0, 0, -0.015)
-size = Vector3(2.0, 0.7, 0.03)
+[node name="Board" type="CSGBox3D" parent="." unique_id=914929796]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.015)
+layers = 0
+size = Vector3(2, 0.7, 0.03)
 material = ExtResource("3")
 
-[node name="Outline" type="Node3D" parent="."]
+[node name="Look" type="MeshInstance3D" parent="Board" unique_id=373867265]
+mesh = SubResource("ArrayMesh_ckhs4")
 
-[node name="TubeTop" type="CSGBox3D" parent="Outline"]
-position = Vector3(-0.2, -0.05, -0.035)
-rotation = Vector3(0, 0, -0.06)
+[node name="Outline" type="Node3D" parent="." unique_id=427262896]
+
+[node name="TubeTop" type="CSGBox3D" parent="Outline" unique_id=277609045]
+transform = Transform3D(0.99820054, 0.059964005, 0, -0.059964005, 0.99820054, 0, 0, 0, 1, -0.2, -0.05, -0.035)
 size = Vector3(1.3, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="TubeBottom" type="CSGBox3D" parent="Outline"]
-position = Vector3(-0.2, -0.12, -0.035)
-rotation = Vector3(0, 0, -0.03)
+[node name="TubeBottom" type="CSGBox3D" parent="Outline" unique_id=1470922454]
+transform = Transform3D(0.99955004, 0.0299955, 0, -0.0299955, 0.99955004, 0, 0, 0, 1, -0.2, -0.12, -0.035)
 size = Vector3(1.3, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="BellTop" type="CSGBox3D" parent="Outline"]
-position = Vector3(0.535, 0.0655, -0.035)
-rotation = Vector3(0, 0, 1.068)
+[node name="BellTop" type="CSGBox3D" parent="Outline" unique_id=1066342115]
+transform = Transform3D(0.4818777, -0.87623847, 0, 0.87623847, 0.4818777, 0, 0, 0, 1, 0.535, 0.0655, -0.035)
 size = Vector3(0.353, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="BellBottom" type="CSGBox3D" parent="Outline"]
-position = Vector3(0.625, -0.02, -0.035)
-rotation = Vector3(0, 0, 0.601)
+[node name="BellBottom" type="CSGBox3D" parent="Outline" unique_id=1294222463]
+transform = Transform3D(0.82477057, -0.56546754, 0, 0.56546754, 0.82477057, 0, 0, 0, 1, 0.625, -0.02, -0.035)
 size = Vector3(0.424, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="BellMouth" type="CSGBox3D" parent="Outline"]
-position = Vector3(0.71, 0.16, -0.035)
-rotation = Vector3(0, 0, -0.588)
+[node name="BellMouth" type="CSGBox3D" parent="Outline" unique_id=1019978249]
+transform = Transform3D(0.83205175, 0.55469805, 0, -0.55469805, 0.83205175, 0, 0, 0, 1, 0.71, 0.16, -0.035)
 size = Vector3(0.216, 0.014, 0.006)
 material = ExtResource("4")
 
-[node name="Mouthpiece" type="CSGBox3D" parent="Outline"]
-position = Vector3(-0.86, -0.06, -0.035)
+[node name="Mouthpiece" type="CSGBox3D" parent="Outline" unique_id=1747137790]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.86, -0.06, -0.035)
 size = Vector3(0.014, 0.1, 0.006)
 material = ExtResource("4")
 
-[node name="Light" type="OmniLight3D" parent="."]
-position = Vector3(0, 0.5, -0.5)
+[node name="Light" type="OmniLight3D" parent="." unique_id=1376749969]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.5)
 light_color = Color(1, 0.9, 0.7, 1)
 light_energy = 0.8
 omni_range = 3.0

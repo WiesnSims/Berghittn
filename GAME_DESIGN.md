@@ -666,7 +666,14 @@ fix console errors, commit. Stop and report after each milestone.
      4b: the weapons keep their parts and animations; every greybox box is reshaped (barrels and
      handles round, stocks with a real profile, everything else chamfered) and every colour is a
      texture: walnut for wood, worn steel for metal and brass, painted wood for the rest (two CC0
-     textures at 512, allowed for weapons as hero assets).
+     textures at 512, allowed for weapons as hero assets). The Handböller was redone after the
+     play-test: its bronze barrel bedded in a short wooden stock with a band round both, a short
+     handle, and a big hammer that falls on the shot and is cocked again in the reload.
+     4c: the props get the same: the chest, shrine, crate, Jause, the Bierfassl, Resi and the
+     Murmeltier (in fur), and the equipment are reshaped and textured; every piece of CSG furniture
+     (tables, benches, stairs, posts, racks, the gondola) is drawn as chamfered meshes while its CSG
+     keeps the collision and the navmesh; the Deitscha Tourist is a character model like the
+     enemies; the Handböller's chalk outline shows its new shape.
 
 **M7 — Co-op (decision gate)**
 - Before coding, write `NETWORKING.md`: chosen transport, relay approach on

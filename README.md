@@ -220,7 +220,23 @@ godot --headless res://tools/models/build_weapons.tscn
   moves with a bolt or magazine.
 - Each new mesh and material keeps its greybox original as metadata (`source`), so the script can be
   rerun after changing a rule. It runs as a scene, not with `--script`: the viewmodel scripts need the
-  autoloads to compile.
+  autoloads to compile. The rules live in `tools/models/reshape.gd`, shared with the props.
+
+## Prop models (M6)
+
+```
+godot --headless res://tools/models/build_props.tscn
+```
+
+- The prop, event and equipment scenes (the Hüttentruhe, Schnaps shrine, ammo crate, Brettljause,
+  Bierfassl, Resi, the Murmeltier, Eisstock, Kuhfladen, Kuhglocke) get the weapons' treatment: tubes,
+  chamfers and textures (the animals in fur).
+- Furniture is CSG (its collision and the navmesh come from it), so it stays: every CSG shape made
+  only of union boxes and cylinders, none wall-sized (over 3.2 m) or unshaded, is no longer drawn
+  (render layers 0) and each part gets a child `Look`, a chamfered (or round) mesh with the same
+  material. Walls with holes, floors and chalk outlines stay as they are.
+- The Deitscha Tourist is a character model like the enemies (`assets/models/guest.tscn`, built by
+  `build_enemies.gd`); `TouristGuest` walks him with the rig.
 
 ## Tests
 
@@ -266,6 +282,14 @@ godot --headless --fixed-fps 60 res://tests/m6_weapons.tscn
 The weapon models: no greybox box left in any viewmodel, every lit colour textured and projected in
 its part's own space (only near-white and near-black plain), weapons and enemies inside the 3 MB
 model budget.
+
+```
+godot --headless --fixed-fps 60 res://tests/m6_props.tscn
+```
+
+The prop models: no greybox box left in a prop, event or equipment scene, every hidden CSG part
+with its look and no look over a CSG still drawn, the Stube's tables still colliding at their tops,
+and the Deitscha Tourist a character rig.
 
 ```
 godot --headless --fixed-fps 60 res://tests/m5_core.tscn
@@ -464,6 +488,13 @@ godot res://tests/weapon_view.tscn -- <out_dir> [weapon id ...]
 ```
 
 Needs a window: every weapon model in a plain studio from the side and at an angle, and as held.
+
+```
+godot res://tests/prop_view.tscn -- <out_dir>
+```
+
+Needs a window: the prop models (chest, shrine, crate, Jause, table set, door, window, equipment,
+event models) in a plain studio, from the front and at an angle.
 
 ```
 godot res://tests/crowd_bench.tscn

@@ -84,6 +84,8 @@ func _run() -> void:
 	# The checks below emit wave_started themselves; a random event it set off (a Murmeltier's
 	# banner) used to land on the boss wave's banner check now and then.
 	main.get_node("EventDirector").process_mode = Node.PROCESS_MODE_DISABLED
+	# Switched off it still hears wave_started (signals reach disabled nodes): no random events either.
+	main.get_node("EventDirector").set("random_events", false)
 	Events.boss_spawned.connect(func(e: Node3D) -> void: _boss_seen = e)
 	for zone: StringName in ALL_ZONES:
 		zones.unlock(zone, player)

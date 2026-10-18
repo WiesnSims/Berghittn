@@ -1,25 +1,23 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene format=4]
 
 [ext_resource type="Script" path="res://scripts/events/bierfassl.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/events/map_marker.gd" id="2"]
+[ext_resource type="Texture2D" path="res://assets/textures/gun_wood.png" id="2_0bfvg"]
+[ext_resource type="Texture2D" path="res://assets/textures/gun_steel.png" id="3_pmj44"]
 
 [sub_resource type="StandardMaterial3D" id="Wood"]
 albedo_color = Color(0.55, 0.33, 0.16, 1)
 roughness = 0.85
 
-[sub_resource type="StandardMaterial3D" id="Iron"]
-albedo_color = Color(0.22, 0.22, 0.24, 1)
-metallic = 0.6
-roughness = 0.5
-
-[sub_resource type="StandardMaterial3D" id="Brass"]
-albedo_color = Color(0.85, 0.66, 0.28, 1)
-metallic = 0.7
-roughness = 0.4
-
-[sub_resource type="StandardMaterial3D" id="FoamMat"]
-shading_mode = 0
-albedo_color = Color(1, 0.97, 0.88, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0bfvg"]
+albedo_color = Color(0.6875, 0.41250002, 0.19999999, 1)
+albedo_texture = ExtResource("2_0bfvg")
+roughness = 0.7
+uv1_scale = Vector3(2.857143, 2.857143, 2.857143)
+uv1_triplanar = true
+uv1_triplanar_sharpness = 4.0
+texture_filter = 5
+metadata/source = SubResource("Wood")
 
 [sub_resource type="CylinderMesh" id="Belly"]
 material = SubResource("Wood")
@@ -28,12 +26,28 @@ bottom_radius = 0.42
 height = 0.46
 radial_segments = 16
 
+[sub_resource type="CylinderMesh" id="CylinderMesh_pmj44"]
+material = SubResource("StandardMaterial3D_0bfvg")
+top_radius = 0.42
+bottom_radius = 0.42
+height = 0.46
+radial_segments = 16
+metadata/source = SubResource("Belly")
+
 [sub_resource type="CylinderMesh" id="EndA"]
 material = SubResource("Wood")
 top_radius = 0.35
 bottom_radius = 0.42
 height = 0.22
 radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_nwpys"]
+material = SubResource("StandardMaterial3D_0bfvg")
+top_radius = 0.35
+bottom_radius = 0.42
+height = 0.22
+radial_segments = 16
+metadata/source = SubResource("EndA")
 
 [sub_resource type="CylinderMesh" id="EndB"]
 material = SubResource("Wood")
@@ -42,12 +56,52 @@ bottom_radius = 0.35
 height = 0.22
 radial_segments = 16
 
+[sub_resource type="CylinderMesh" id="CylinderMesh_v61w0"]
+material = SubResource("StandardMaterial3D_0bfvg")
+top_radius = 0.42
+bottom_radius = 0.35
+height = 0.22
+radial_segments = 16
+metadata/source = SubResource("EndB")
+
+[sub_resource type="StandardMaterial3D" id="Iron"]
+albedo_color = Color(0.22, 0.22, 0.24, 1)
+metallic = 0.6
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_81wux"]
+albedo_color = Color(0.275, 0.275, 0.29999998, 1)
+albedo_texture = ExtResource("3_pmj44")
+metallic = 0.55
+roughness = 0.45
+uv1_scale = Vector3(3.3333333, 3.3333333, 3.3333333)
+uv1_triplanar = true
+uv1_triplanar_sharpness = 4.0
+texture_filter = 5
+metadata/source = SubResource("Iron")
+
 [sub_resource type="CylinderMesh" id="Hoop"]
 material = SubResource("Iron")
 top_radius = 0.43
 bottom_radius = 0.43
 height = 0.04
 radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_i7615"]
+material = SubResource("StandardMaterial3D_81wux")
+top_radius = 0.43
+bottom_radius = 0.43
+height = 0.04
+radial_segments = 16
+metadata/source = SubResource("Hoop")
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_xao43"]
+material = SubResource("StandardMaterial3D_81wux")
+top_radius = 0.43
+bottom_radius = 0.43
+height = 0.04
+radial_segments = 16
+metadata/source = SubResource("Hoop")
 
 [sub_resource type="CylinderMesh" id="HoopEnd"]
 material = SubResource("Iron")
@@ -56,9 +110,57 @@ bottom_radius = 0.37
 height = 0.04
 radial_segments = 16
 
+[sub_resource type="CylinderMesh" id="CylinderMesh_o44vh"]
+material = SubResource("StandardMaterial3D_81wux")
+top_radius = 0.37
+bottom_radius = 0.37
+height = 0.04
+radial_segments = 16
+metadata/source = SubResource("HoopEnd")
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_2yfke"]
+material = SubResource("StandardMaterial3D_81wux")
+top_radius = 0.37
+bottom_radius = 0.37
+height = 0.04
+radial_segments = 16
+metadata/source = SubResource("HoopEnd")
+
+[sub_resource type="StandardMaterial3D" id="Brass"]
+albedo_color = Color(0.85, 0.66, 0.28, 1)
+metallic = 0.7
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hjrf2"]
+albedo_color = Color(1.0625, 0.82500005, 0.35, 1)
+albedo_texture = ExtResource("3_pmj44")
+metallic = 0.75
+roughness = 0.35
+uv1_scale = Vector3(3.3333333, 3.3333333, 3.3333333)
+uv1_triplanar = true
+uv1_triplanar_sharpness = 4.0
+texture_filter = 5
+metadata/source = SubResource("Brass")
+
 [sub_resource type="BoxMesh" id="Tap"]
 material = SubResource("Brass")
 size = Vector3(0.06, 0.08, 0.12)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_ihxfy"]
+_surfaces = [{
+"aabb": AABB(-0.03, -0.04, -0.06, 0.06, 0.08, 0.12),
+"format": 34359738375,
+"material": SubResource("StandardMaterial3D_hjrf2"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 132,
+"vertex_data": PackedByteArray("j8L1vGwJ+bw7cE69j8L1vGwJ+Tw7cE69j8L1vGwJ+Tw7cE49j8L1vGwJ+bw7cE69j8L1vGwJ+Tw7cE49j8L1vGwJ+bw7cE49j8L1vGwJ+bw7cE695h2nvArXI707cE495h2nvArXI707cE69j8L1vGwJ+bw7cE69j8L1vGwJ+bw7cE495h2nvArXI707cE49j8L1vGwJ+Tw7cE695h2nvArXIz07cE695h2nvArXIz07cE49j8L1vGwJ+Tw7cE695h2nvArXIz07cE49j8L1vGwJ+Tw7cE49j8L1PGwJ+bw7cE69j8L1PGwJ+Tw7cE49j8L1PGwJ+Tw7cE69j8L1PGwJ+bw7cE69j8L1PGwJ+bw7cE49j8L1PGwJ+Tw7cE49j8L1PGwJ+bw7cE695h2nPArXI707cE695h2nPArXI707cE49j8L1PGwJ+bw7cE695h2nPArXI707cE49j8L1PGwJ+bw7cE49j8L1PGwJ+Tw7cE695h2nPArXIz07cE495h2nPArXIz07cE69j8L1PGwJ+Tw7cE69j8L1PGwJ+Tw7cE495h2nPArXIz07cE495h2nvArXI707cE695h2nvArXI707cE495h2nPArXI707cE495h2nvArXI707cE695h2nPArXI707cE495h2nPArXI707cE695h2nvArXI707cE695h2nPGwJ+byPwnW95h2nvGwJ+byPwnW95h2nvArXI707cE695h2nPArXI707cE695h2nPGwJ+byPwnW95h2nvArXI707cE495h2nvGwJ+byPwnU95h2nPGwJ+byPwnU95h2nvArXI707cE495h2nPGwJ+byPwnU95h2nPArXI707cE495h2nvArXIz07cE695h2nPArXIz07cE495h2nvArXIz07cE495h2nvArXIz07cE695h2nPArXIz07cE695h2nPArXIz07cE495h2nvArXIz07cE695h2nvGwJ+TyPwnW95h2nPGwJ+TyPwnW95h2nvArXIz07cE695h2nPGwJ+TyPwnW95h2nPArXIz07cE695h2nvArXIz07cE495h2nPGwJ+TyPwnU95h2nvGwJ+TyPwnU95h2nvArXIz07cE495h2nPArXIz07cE495h2nPGwJ+TyPwnU95h2nvGwJ+byPwnW95h2nPGwJ+byPwnW95h2nPGwJ+TyPwnW95h2nvGwJ+byPwnW95h2nPGwJ+TyPwnW95h2nvGwJ+TyPwnW95h2nvGwJ+byPwnW9j8L1vGwJ+Tw7cE69j8L1vGwJ+bw7cE695h2nvGwJ+byPwnW95h2nvGwJ+TyPwnW9j8L1vGwJ+Tw7cE695h2nPGwJ+byPwnW9j8L1PGwJ+bw7cE69j8L1PGwJ+Tw7cE695h2nPGwJ+byPwnW9j8L1PGwJ+Tw7cE695h2nPGwJ+TyPwnW95h2nvGwJ+byPwnU95h2nPGwJ+TyPwnU95h2nPGwJ+byPwnU95h2nvGwJ+byPwnU95h2nvGwJ+TyPwnU95h2nPGwJ+TyPwnU95h2nvGwJ+byPwnU9j8L1vGwJ+bw7cE49j8L1vGwJ+Tw7cE495h2nvGwJ+byPwnU9j8L1vGwJ+Tw7cE495h2nvGwJ+TyPwnU95h2nPGwJ+byPwnU9j8L1PGwJ+Tw7cE49j8L1PGwJ+bw7cE495h2nPGwJ+byPwnU95h2nPGwJ+TyPwnU9j8L1PGwJ+Tw7cE49j8L1vGwJ+bw7cE695h2nvArXI707cE695h2nvGwJ+byPwnW9j8L1vGwJ+bw7cE495h2nvGwJ+byPwnU95h2nvArXI707cE49j8L1vGwJ+Tw7cE695h2nvGwJ+TyPwnW95h2nvArXIz07cE69j8L1vGwJ+Tw7cE495h2nvArXIz07cE495h2nvGwJ+TyPwnU9j8L1PGwJ+bw7cE695h2nPGwJ+byPwnW95h2nPArXI707cE69j8L1PGwJ+bw7cE495h2nPArXI707cE495h2nPGwJ+byPwnU9j8L1PGwJ+Tw7cE695h2nPArXIz07cE695h2nPGwJ+TyPwnW9j8L1PGwJ+Tw7cE495h2nPGwJ+TyPwnU95h2nPArXIz07cE49AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//z//P1RVVNX/P/8/VFVU1f8//z9UVVTV/z//P1RVVNX/P/8/VFVU1f8//z9UVVTV/z//v1RVqqr/P/+/VFWqqv8//79UVaqq/z//v1RVqqr/P/+/VFWqqv8//79UVaqq////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+//7//P1RVqqr/v/8/VFWqqv+//z9UVaqq/7//P1RVqqr/v/8/VFWqqv+//z9UVaqq/7//v1RVVNX/v/+/VFVU1f+//79UVVTV/7//v1RVVNX/v/+/VFVU1f+//79UVVTV/38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//78AAFRVqar/vwAAVFWpqv+/AABUVamq/78AAFRVqar/vwAAVFWpqv+/AABUVamq/3//P6oqVJX/f/8/qipUlf9//z+qKlSV/3//P6oqVJX/f/8/qipUlf9//z+qKlSV/3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//7///6oqVJX/v///qipUlf+///+qKlSV/7///6oqVJX/v///qipUlf+///+qKlSV/3//v1RVqar/f/+/VFWpqv9//79UVamq/3//v1RVqar/f/+/VFWpqv9//79UVamq//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCAAAD/v1VVqaoAAP+/VVWpqgAA/79VVamqAAD/v1VVqaoAAP+/VVWpqgAA/79VVamq////v6mqqar///+/qaqpqv///7+pqqmq////v6mqqar///+/qaqpqv///7+pqqmq/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA/z//f6mqqar/P/9/qaqpqv8//3+pqqmq/z//f6mqqar/P/9/qaqpqv8//3+pqqmq/7//f1VVqar/v/9/VVWpqv+//39VVamq/7//f1VVqar/v/9/VVWpqv+//39VVamqqiqqKv8//7+qKqoq/z//v6oqqir/P/+/VVVUVegic5FVVVRV6CJzkVVVVFXoInORqipU1f8//5+qKlTV/z//n6oqVNX/P/+fVVWqqv9//59VVaqq/3//n1VVqqr/f/+fVNWqKv9//59U1aoq/3//n1TVqir/f/+fqapUVf8//5+pqlRV/z//n6mqVFX/P/+fVNVU1egic5FU1VTV6CJzkVTVVNXoInORqaqqqv8//7+pqqqq/z//v6mqqqr/P/+/")
+}]
+metadata/source = SubResource("Tap")
+
+[sub_resource type="StandardMaterial3D" id="FoamMat"]
+shading_mode = 0
+albedo_color = Color(1, 0.97, 0.88, 1)
 
 [sub_resource type="SphereMesh" id="Bubble"]
 material = SubResource("FoamMat")
@@ -67,44 +169,44 @@ height = 0.09
 radial_segments = 6
 rings = 3
 
-[node name="Bierfassl" type="Node3D"]
+[node name="Bierfassl" type="Node3D" unique_id=924735761]
 script = ExtResource("1")
 
-[node name="Roll" type="Node3D" parent="."]
+[node name="Roll" type="Node3D" parent="." unique_id=81694776]
 
-[node name="Belly" type="MeshInstance3D" parent="Roll"]
+[node name="Belly" type="MeshInstance3D" parent="Roll" unique_id=19214110]
 transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0)
-mesh = SubResource("Belly")
+mesh = SubResource("CylinderMesh_pmj44")
 
-[node name="EndLeft" type="MeshInstance3D" parent="Roll"]
+[node name="EndLeft" type="MeshInstance3D" parent="Roll" unique_id=1958891622]
 transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, -0.34, 0, 0)
-mesh = SubResource("EndA")
+mesh = SubResource("CylinderMesh_nwpys")
 
-[node name="EndRight" type="MeshInstance3D" parent="Roll"]
+[node name="EndRight" type="MeshInstance3D" parent="Roll" unique_id=1460160024]
 transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, 0.34, 0, 0)
-mesh = SubResource("EndB")
+mesh = SubResource("CylinderMesh_v61w0")
 
-[node name="Hoop0" type="MeshInstance3D" parent="Roll"]
+[node name="Hoop0" type="MeshInstance3D" parent="Roll" unique_id=1136459918]
 transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, -0.17, 0, 0)
-mesh = SubResource("Hoop")
+mesh = SubResource("CylinderMesh_i7615")
 
-[node name="Hoop1" type="MeshInstance3D" parent="Roll"]
+[node name="Hoop1" type="MeshInstance3D" parent="Roll" unique_id=1317700964]
 transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, 0.17, 0, 0)
-mesh = SubResource("Hoop")
+mesh = SubResource("CylinderMesh_xao43")
 
-[node name="Hoop2" type="MeshInstance3D" parent="Roll"]
+[node name="Hoop2" type="MeshInstance3D" parent="Roll" unique_id=2069478262]
 transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, -0.4, 0, 0)
-mesh = SubResource("HoopEnd")
+mesh = SubResource("CylinderMesh_o44vh")
 
-[node name="Hoop3" type="MeshInstance3D" parent="Roll"]
+[node name="Hoop3" type="MeshInstance3D" parent="Roll" unique_id=1759178476]
 transform = Transform3D(0, -1, 0, 1, 0, 0, 0, 0, 1, 0.4, 0, 0)
-mesh = SubResource("HoopEnd")
+mesh = SubResource("CylinderMesh_2yfke")
 
-[node name="Tap" type="MeshInstance3D" parent="Roll"]
+[node name="Tap" type="MeshInstance3D" parent="Roll" unique_id=1798196725]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.46, 0, -0.18)
-mesh = SubResource("Tap")
+mesh = SubResource("ArrayMesh_ihxfy")
 
-[node name="Foam" type="CPUParticles3D" parent="."]
+[node name="Foam" type="CPUParticles3D" parent="." unique_id=1363577197]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 emitting = false
 amount = 60
@@ -120,7 +222,7 @@ initial_velocity_max = 4.0
 scale_amount_min = 0.6
 scale_amount_max = 1.6
 
-[node name="Marker" type="Node3D" parent="."]
+[node name="Marker" type="Node3D" parent="." unique_id=1665395190]
 script = ExtResource("2")
 text = "MARKER_FASSL"
 color = Color(1, 0.75, 0.25, 1)
