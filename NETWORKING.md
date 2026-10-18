@@ -92,12 +92,12 @@ The Durable Object does not understand the game. It knows sockets, peer ids and 
 | Enemies (AI, pathing, attacks, window breaking, ragdoll start) | host | packed snapshot of all alive enemies at 20 Hz; deaths and attacks as events |
 | Ragdolls, particles, impact marks, sounds, screen effects | everyone locally | started by the death/fire events, never synced frame by frame |
 | Waves, spawns, break timer, boss wave | host | wave events (`Events.wave_*` are re-emitted on clients) |
-| Points (per player), purchases | host | each player's points; purchases are requests the host accepts or refuses |
+| Points (per player), purchases | each player's own game, earned on the host's word (the host passes on every hit, kill and board with who did it) | shared things (doors, the chest) are requests: the buyer pays, the host accepts or pays back |
 | Doors / zones (anyone opens, opener pays) | host | zone unlocked |
 | Barricades (repairing, boards pulled) | host | board count per window |
-| Wall-buys, Munitionskiste, Schnaps, Brettljause | host decides, the buyer's own game equips | result per player |
-| Hüttentruhe (opener pays, the gun is for the opener) | host (rolls the result) | the roll animation and the result |
-| Player health, damage taken | host (enemies hit on the host) | health per player |
+| Wall-buys, Munitionskiste, Schnaps, Brettljause | the buyer's own game (they change only the buyer) | nothing |
+| Hüttentruhe (opener pays, the gun is for the opener) | the opener's game picks the gun (it knows what they carry), the host lets the roll happen or pays back | the roll animation and the result |
+| Player health, damage taken | the player's own game, hit by the host's enemies (the host hands every hit on a hiker to its player) | health per player, alive / downed / out |
 | Downed, bleed-out, revive (section 10) | host | state per player |
 | Events: Resi, Bierfassl, Murmeltier, Deitscha Tourist | host | positions + state, banners via `Events.event_announced` |
 | Special weapons and equipment | see section 5 | |
@@ -119,6 +119,9 @@ So I propose the standard co-op shortcut:
 - **Hits**: the shooter checks hits against the enemies on their own screen and sends
   `hit(enemy id, part, damage, flags)`. The host checks only that the enemy is alive and the claim is
   plausible (in range of that weapon), then applies it. The shot feels instant for every player.
+- **Built 2026-10-18 (part 2)**: each player's own game also keeps their health, perks and points, so
+  Sturschädl, Gmiatlichkeit and the Pfanne's guard work as in solo; the host decides what hits them and
+  who earned what. Purchases that change only the buyer (wall-buys, Schnaps, Jause, ammo) stay local.
 - **Everything with consequences for others stays on the host**: enemy health and death, points, money,
   purchases, doors, waves, chest rolls, events. Players send *requests* ("buy door 3"), the host answers.
 

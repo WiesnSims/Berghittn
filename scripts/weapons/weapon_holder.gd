@@ -28,6 +28,11 @@ class GunSlot:
 @export var starting_weapon: WeaponData
 ## Always carried (section 6: the shovel until the melee slot gets replaced).
 @export var melee_weapon: WeaponData
+## Co-op (M7): downed, only the pistol is in hand; no switching, no melee (set_downed).
+var downed: bool = false
+var _starting_melee: WeaponData
+var _before_down: int = -1
+var _borrowed: bool = false
 
 @onready var _impact_marks: ImpactMarks = $ImpactMarks
 @onready var _impact_puffs: EffectPool = $ImpactPuffs
@@ -93,6 +98,7 @@ var _fire_loop_left: float = 0.0
 
 func _ready() -> void:
 	_rng.randomize()
+	_starting_melee = melee_weapon
 	if starting_weapon:
 		give_weapon(starting_weapon)
 		# Already in hand at the start, not drawn.
@@ -123,16 +129,7 @@ func give_weapon(data: WeaponData) -> void:
 	if owned >= 0:
 		_select(owned)
 		return
-	var slot := GunSlot.new()
-	slot.data = data
-	slot.mag = data.loaded_capacity(true)
-	slot.reserve = data.reserve_ammo
-	if data.viewmodel:
-		# Built once per gun and kept: instancing on every switch would hitch in the middle of a fight.
-		slot.viewmodel = data.viewmodel.instantiate() as Viewmodel
-		slot.viewmodel.visible = false
-		_motion.add_child(slot.viewmodel)
-	slot.behavior = WeaponBehavior.create(data, self)
+	var slot: GunSlot = _new_slot(data)
 	if _slots.size() < Constants.GUN_SLOTS:
 		_slots.append(slot)
 		_select(_slots.size() - 1)
@@ -143,6 +140,77 @@ func give_weapon(data: WeaponData) -> void:
 	_slots[_current] = slot
 	_current = -1
 	_select(_slots.find(slot))
+
+
+func _new_slot(data: WeaponData) -> GunSlot:
+	var slot := GunSlot.new()
+	slot.data = data
+	slot.mag = data.loaded_capacity(true)
+	slot.reserve = data.reserve_ammo
+	if data.viewmodel:
+		# Built once per gun and kept: instancing on every switch would hitch in the middle of a fight.
+		slot.viewmodel = data.viewmodel.instantiate() as Viewmodel
+		slot.viewmodel.visible = false
+		_motion.add_child(slot.viewmodel)
+	slot.behavior = WeaponBehavior.create(data, self)
+	return slot
+
+
+## Co-op (M7, section 10): downed, only `pistol` is in hand, one lent for the time if none is
+## carried; no switching, no melee. Up again, the gun from before comes back (the lent one is gone).
+func set_downed(on: bool, pistol: WeaponData) -> void:
+	if on == downed:
+		return
+	downed = on
+	_end_block()
+	_melee_left = 0.0
+	_melee_hit_in = -1.0
+	_stop_playing_if_needed()
+	if on:
+		_before_down = _current
+		var index: int = _slot_of(pistol)
+		if index < 0:
+			_slots.append(_new_slot(pistol))
+			_borrowed = true
+			index = _slots.size() - 1
+		_select(index)
+		return
+	if _borrowed:
+		var lent: GunSlot = _slots.pop_back()
+		if lent.viewmodel:
+			lent.viewmodel.queue_free()
+		_borrowed = false
+		if _current >= _slots.size():
+			_current = -1
+	_select(_before_down)
+
+
+## Co-op (M7): back from bleeding out with what a new game starts with (Brettljause and herbs stay).
+func reset_loadout() -> void:
+	set_downed(false, null)
+	_cancel_reload()
+	for slot: GunSlot in _slots:
+		if slot.viewmodel:
+			slot.viewmodel.queue_free()
+	_slots.clear()
+	_current = -1
+	weapon = null
+	if starting_weapon:
+		give_weapon(starting_weapon)
+	if _starting_melee and melee_weapon != _starting_melee:
+		set_melee(_starting_melee)
+
+
+## The trigger counts as held until it is let go (a menu click that took the mouse).
+func lock_trigger() -> void:
+	_fire_locked = true
+	_fire_buffer_left = 0.0
+
+
+func _stop_playing_if_needed() -> void:
+	if _playing:
+		_playing = false
+		_stop_playing()
 
 
 func has_weapon(data: WeaponData) -> bool:
@@ -294,7 +362,7 @@ func aim_eased() -> float:
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Here and not in _physics_process: wheel "presses" are released in the same frame and would be missed.
-	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED or _melee_left > 0.0 or _slots.size() < 2:
+	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED or _melee_left > 0.0 or _slots.size() < 2 or downed:
 		return
 	if event.is_action_pressed("weapon_next") or event.is_action_pressed("weapon_previous"):
 		_select((_current + 1) % _slots.size())
@@ -332,7 +400,7 @@ func _physics_process(delta: float) -> void:
 	if _melee_left > 0.0:
 		_update_melee(delta)
 		return
-	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Input.is_action_just_pressed("melee") and melee_weapon:
+	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Input.is_action_just_pressed("melee") and melee_weapon and not downed:
 		_start_melee()
 		return
 	if _switch_left > 0.0:

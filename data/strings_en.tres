@@ -169,7 +169,6 @@ messages = {
 [&"", &"UI_NET_LOST"]: [&"Lost the connection to the room."],
 [&"", &"UI_CLICK_TO_JOIN"]: [&"The match has started. Click to join."],
 [&"", &"UI_LEAVE_MATCH"]: [&"Leave match"],
-[&"", &"UI_COOP_PREVIEW"]: [&"Co-op test: no enemies yet, they come in the next update."],
 [&"", &"UI_PLAYER_N"]: [&"Player %d"],
 [&"", &"UI_HEAD_BUA"]: [&"Bua"],
 [&"", &"UI_HEAD_BART"]: [&"Bartl"],
@@ -181,5 +180,17 @@ messages = {
 [&"", &"UI_HAT_STIRNBAND"]: [&"Stirnband"],
 [&"", &"UI_HAT_HELM"]: [&"Skihelm"],
 [&"", &"UI_HAT_KAPPE"]: [&"Kappl"],
-[&"", &"UI_HAT_NONE"]: [&"No hat"]
+[&"", &"UI_HAT_NONE"]: [&"No hat"],
+[&"", &"UI_COOP_REVIVE"]: [&"Hold E to revive %s"],
+[&"", &"UI_COOP_REVIVING"]: [&"Reviving %s ... %d %%"],
+[&"", &"UI_COOP_DOWN"]: [&"%s is down!"],
+[&"", &"UI_COOP_BLED_OUT"]: [&"%s bled out. Back next wave."],
+[&"", &"UI_COOP_REVIVED"]: [&"%s is back up, thanks to %s!"],
+[&"", &"UI_COOP_MARKER_DOWN"]: [&"Down!"],
+[&"", &"UI_COOP_DOWNED"]: [&"You are down! %d s\nA teammate can revive you (hold E)."],
+[&"", &"UI_COOP_BEING_REVIVED"]: [&"Being revived ... %d %%"],
+[&"", &"UI_COOP_OUT"]: [&"Bled out. You are back when the next wave starts."],
+[&"", &"UI_COOP_TEAM_DOWN"]: [&"%s  DOWN"],
+[&"", &"UI_COOP_TEAM_OUT"]: [&"%s  out"],
+[&"", &"UI_BACK_TO_LOBBY"]: [&"Back to the lobby"]
 }

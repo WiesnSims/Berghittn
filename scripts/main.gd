@@ -14,10 +14,8 @@ enum State { MENU, CAPTURING, PLAYING, DEAD }
 @onready var _lobby: Lobby = $UI/Lobby
 
 var _state: State = State.MENU
-# This scene runs a co-op match (Net.in_match() turns false the moment the session ends).
+# This scene runs (or ran) a co-op match: Net.in_match() turns false the moment the session ends.
 var _coop: bool = false
-# The co-op test banner (part 1 has no enemies yet) is shown once, when the match is first entered.
-var _coop_announced: bool = false
 
 
 func _ready() -> void:
@@ -36,7 +34,14 @@ func _ready() -> void:
 	Net.match_started.connect(_on_match_started)
 	Net.ended.connect(_on_net_ended)
 	_enter_menu()
-	if GameState.has_started:
+	if GameState.pending_match and Net.in_match():
+		# The host started again while this browser still showed the last match's end.
+		GameState.pending_match = false
+		_on_match_started.call_deferred()
+	elif GameState.open_lobby and Net.in_lobby():
+		GameState.open_lobby = false
+		_open_lobby()
+	elif GameState.has_started:
 		# A restart already asked for pointer lock; go straight in once the browser grants it.
 		_state = State.CAPTURING
 	elif not GameState.invite_used:
@@ -74,19 +79,14 @@ func _enter_playing() -> void:
 	_start_screen.hide()
 	_pause_menu.hide()
 	get_tree().paused = false
-	_player.process_mode = Node.PROCESS_MODE_INHERIT
-	if _coop and not _coop_announced:
-		_coop_announced = true
-		Events.event_announced.emit(tr("UI_COOP_PREVIEW"))
+	# The click that took the mouse is still held: it must not fire as well.
+	_player.weapons.lock_trigger()
 
 
 func _enter_menu() -> void:
 	_state = State.MENU
-	# One player's menu must not freeze the world for everyone else, but their own player waits, so
-	# the click that closes a menu does not also fire.
+	# One player's menu must not freeze the world for everyone else.
 	get_tree().paused = not _coop
-	if _coop:
-		_player.process_mode = Node.PROCESS_MODE_DISABLED
 	_start_screen.visible = not GameState.has_started
 	_pause_menu.visible = GameState.has_started
 
@@ -97,8 +97,15 @@ func _open_lobby() -> void:
 
 
 func _on_match_started() -> void:
+	if _coop:
+		# This scene already ran a match; the new one starts in a fresh one.
+		GameState.pending_match = true
+		get_tree().paused = false
+		get_tree().reload_current_scene.call_deferred()
+		return
 	_coop = true
 	_lobby.hide()
+	_death_screen.hide()
 	_setup_coop()
 	# The world runs for everyone from now on, whether or not this browser has its pointer lock yet.
 	get_tree().paused = false
@@ -110,19 +117,40 @@ func _on_match_started() -> void:
 		_enter_menu()
 
 
-## M7 part 1: everyone walks the hut together; the waves and events (host-run) follow in part 2.
+## The host runs the waves; guests play the host's world back (CoopEnemies, CoopWorld). The events
+## (section 8a) come to co-op with M7 part 3.
 func _setup_coop() -> void:
-	_waves.process_mode = Node.PROCESS_MODE_DISABLED
+	if not Net.is_host():
+		_waves.process_mode = Node.PROCESS_MODE_DISABLED
 	($EventDirector as Node).process_mode = Node.PROCESS_MODE_DISABLED
 	var peers: Array = Net.roster.keys()
 	peers.sort()
 	var spawn := get_tree().get_first_node_in_group("player_spawn") as Node3D
 	var slot: float = float(peers.find(Net.my_id())) - float(peers.size() - 1) * 0.5
 	_player.spawn_at(spawn.global_transform.translated_local(Vector3.RIGHT * slot * Constants.NET_SPAWN_SPACING))
-	var others := CoopPlayers.new()
-	others.name = "CoopPlayers"
-	add_child(others)
-	others.setup(_player)
+	var players := CoopPlayers.new()
+	players.name = "CoopPlayers"
+	add_child(players)
+	players.setup(_player)
+	var enemies := CoopEnemies.new()
+	enemies.name = "CoopEnemies"
+	add_child(enemies)
+	enemies.setup(_waves)
+	var world := CoopWorld.new()
+	world.name = "CoopWorld"
+	add_child(world)
+	world.setup(self, _waves, $Zones as ZoneMap)
+	world.game_over.connect(_on_coop_over)
+
+
+## Everyone is down or out: the match is over; all go back to the same room's lobby from here.
+func _on_coop_over(wave: int) -> void:
+	_state = State.DEAD
+	await get_tree().create_timer(Constants.DEATH_SCREEN_DELAY).timeout
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	_pause_menu.hide()
+	_death_screen.present(wave, _player.points.total, true)
+	Net.back_to_lobby()
 
 
 func _on_net_ended(reason: String) -> void:
@@ -146,6 +174,13 @@ func _on_player_died() -> void:
 
 
 func _restart() -> void:
+	if _coop:
+		# Co-op: back to the room's lobby, in a fresh scene.
+		GameState.has_started = false
+		GameState.open_lobby = true
+		get_tree().paused = false
+		get_tree().reload_current_scene()
+		return
 	# Request the lock inside the click so the reloaded scene can skip the menus.
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	get_tree().reload_current_scene()

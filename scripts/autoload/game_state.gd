@@ -7,3 +7,7 @@ var has_started: bool = false
 var notice: String = ""
 ## The ?room= invite link only opens the lobby on the first load, not after every reload.
 var invite_used: bool = false
+## Co-op: after a match, the reloaded scene opens the room's lobby, or (the host already started the
+## next one) goes straight into the new match.
+var open_lobby: bool = false
+var pending_match: bool = false

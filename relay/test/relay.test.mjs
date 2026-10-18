@@ -153,6 +153,11 @@ test('wrong build, unknown room and a started match are refused', async () => {
 	await new Promise((r) => setTimeout(r, 200));
 	const late = open(code);
 	assert.equal((await late.text('closed')).reason, 'started');
+	// Back in the lobby after a game over, joining is open again.
+	host.ws.send(JSON.stringify({ t: 'lobby' }));
+	await new Promise((r) => setTimeout(r, 200));
+	const again = open(code);
+	assert.equal((await again.text('welcome')).id, 2);
 	host.ws.close();
 	await new Promise((r) => setTimeout(r, 200));
 	const ghost = open(code);

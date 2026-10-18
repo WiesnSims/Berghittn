@@ -257,9 +257,21 @@ Plan and decisions: `NETWORKING.md`. Part 1 (relay, lobby, walking the hut toget
   trouser colour (`HikerStyle`), saved with the settings; create a room or join by code; the invite
   link `?room=<code>` opens the lobby straight into that room. The host sees everyone on the stage,
   can remove players and starts with at least 2.
-- **Match** (part 1): `CoopPlayers` (`/root/Main/CoopPlayers` on every peer) sends our pose 20 times a
-  second and draws the others as `Hiker`s 100 ms in the past. Waves and events are off in co-op until
-  part 2. In co-op the world never pauses; a menu only switches our own player off.
+- **Match**: main adds three nodes on every peer (the same paths, so RPCs match):
+  - `CoopPlayers`: our pose, life (alive / downed / out) and health 20 times a second; the others as
+    `Hiker`s 100 ms in the past (`PoseBuffer`). On the host the hikers are in group `player`, so enemies
+    go for them; a hit is sent to that player (`take_damage` there, with the attacking puppet for the
+    Pfanne's guard). Downed teammates get a `ReviveSpot` (hold E, 4 s) and a `MapMarker`; out players
+    watch a teammate from behind and come back on the next `wave_started`.
+  - `CoopEnemies`: on the host it numbers the WaveManager's enemies and sends spawns, 13-byte
+    snapshots at 20 Hz, actions (`Enemy.posed`), damage and kills with the hitting peer. Guests keep
+    puppets (`Enemy.puppet`) under it; a hit on a puppet goes to the host through `Enemy.hit_relay`
+    (receive_hit, scorch, ignite, dance, slows, stuns, flee, knockback) and flashes at once.
+  - `CoopWorld`: waves, doors (`request_unlock`, refunds), barricades (board counts, `request_board`),
+    the Hüttentruhe (`rolled` / `roll_for` / `taken`), and game over (`Net.back_to_lobby`, relay `lobby`).
+  - `Coop` (static) says where they are and `is_guest()`; `Player.life`, `WeaponHolder.set_downed` /
+    `reset_loadout` carry downed and bled out. The events stay off in co-op until part 3. In co-op the
+    world never pauses; the click that takes the mouse locks the trigger until it is let go.
 - **Build id**: `tools/build_web.mjs` writes `build_id.txt` (gitignored, packed via the preset's
   include filter); the relay turns away a browser whose build differs from the host's.
 - **Hiker**: `godot --headless --script res://tools/models/build_hiker.gd` builds
@@ -273,6 +285,7 @@ Tests (the relay runs locally in `wrangler dev`, or set `RELAY_URL=wss://<previe
 node --test relay/test/relay.test.mjs           # ids, cap of 4, routing, kick, refusals
 node tools/net_test.mjs                         # tests/net_lobby: roster, hiker change, start, late joiner refused
 node tools/net_test.mjs res://tests/net_match.tscn   # two main scenes: invite join, each sees the other's hiker
+node tools/net_test.mjs res://tests/net_core.tscn    # enemies + kill points, door, board, chest, down/revive, out/back, game over
 ```
 
 ## Tests

@@ -6,6 +6,8 @@ extends CharacterBody3D
 signal died(enemy: Enemy)
 ## Corpse gone; the enemy can go back to the pool.
 signal despawned(enemy: Enemy)
+## Co-op (M7): it started an action (a swing, a board pulled, a climb), for the host to pass on.
+signal posed(enemy: Enemy, action: EnemyRig.Action, length: float)
 
 ## QUEUED: waiting at a window another enemy is working. BREAKING: tearing boards off a barricade.
 ## LUNGING: crouching for and then flying through a leap at the player (Perchte).
@@ -22,6 +24,15 @@ var data: EnemyData
 var health: int = 0
 ## Health at spawn, for the boss bar.
 var max_health: int = 0
+## Co-op (M7): on a guest this enemy is a copy of the host's (a puppet). CoopEnemies moves it, and
+## what hits it goes to the host through hit_relay instead of being applied here.
+var puppet: bool = false
+## Co-op: the id host and guests know it by while it lives (0: none).
+var net_id: int = 0
+## The last hit's damage, so the host can tell guests how hard the killing blow was (ragdoll, head).
+var last_damage: int = 0
+## Co-op guests: (enemy, method, args) -> void, sends a hit on a puppet to the host.
+static var hit_relay: Callable
 var _state: State = State.INACTIVE
 ## A player or an escort (group "escorts"): anything with is_targetable() and take_damage(amount, attacker).
 var _target: Node3D
@@ -164,6 +175,8 @@ func is_alive() -> bool:
 
 
 func receive_hit(amount: int, is_headshot: bool, is_melee: bool, source: Node3D) -> Hurtbox.Result:
+	if puppet:
+		return _relay(&"receive_hit", [amount, is_headshot, is_melee], amount, is_headshot)
 	# A dancer has its guard down: every other hit lands harder.
 	if is_dancing():
 		amount *= Constants.DANCE_DAMAGE_MULTIPLIER
@@ -173,6 +186,8 @@ func receive_hit(amount: int, is_headshot: bool, is_melee: bool, source: Node3D)
 ## A tick of the Brennkessel's flame: like a hit (twice as hard on a dancer), but it pays hit points
 ## only once per SCORCH_PAY_INTERVAL, not eight times a second.
 func scorch(amount: int, source: Node3D) -> Hurtbox.Result:
+	if puppet:
+		return _relay(&"scorch", [amount], amount, false)
 	if is_dancing():
 		amount *= Constants.DANCE_DAMAGE_MULTIPLIER
 	var pays: bool = _scorch_paid_left <= 0.0
@@ -185,6 +200,9 @@ func scorch(amount: int, source: Node3D) -> Hurtbox.Result:
 ## burning starts the time over), with flames on the body. Bosses burn too.
 func ignite(duration: float, dps: int, source: Node3D) -> void:
 	if not is_alive():
+		return
+	if puppet:
+		_relay(&"ignite", [duration, dps])
 		return
 	_add_dot(&"burn", duration, dps, source)
 	if _burn_fx == null:
@@ -199,6 +217,7 @@ func is_burning() -> bool:
 func _take_hit(amount: int, is_headshot: bool, is_melee: bool, source: Node3D, pays: bool = true) -> Hurtbox.Result:
 	if not is_alive():
 		return Hurtbox.Result.IGNORED
+	last_damage = amount
 	health -= amount
 	_hit_flash()
 	if health > 0:
@@ -217,6 +236,9 @@ func _take_hit(amount: int, is_headshot: bool, is_melee: bool, source: Node3D, p
 func apply_slow(factor: float, duration: float) -> void:
 	if data.is_boss:
 		return
+	if puppet:
+		_relay(&"apply_slow", [factor, duration])
+		return
 	if _slow_left <= 0.0 or factor <= _slow_factor:
 		_slow_factor = factor
 	_slow_left = maxf(_slow_left, duration)
@@ -227,6 +249,9 @@ func apply_slow(factor: float, duration: float) -> void:
 ## damage but do not dance (immune to crowd control, section 6a).
 func dance(duration: float, dps: int, source: Node3D) -> void:
 	if not is_alive():
+		return
+	if puppet:
+		_relay(&"dance", [duration, dps])
 		return
 	_add_dot(&"polka", duration, dps, source)
 	if data.is_boss:
@@ -243,6 +268,9 @@ func dance(duration: float, dps: int, source: Node3D) -> void:
 func stun(duration: float) -> void:
 	if not is_alive() or data.is_boss:
 		return
+	if puppet:
+		_relay(&"stun", [duration])
+		return
 	_stun_left = maxf(_stun_left, duration)
 	_drop_swing()
 	_pose(EnemyRig.Action.DAZED)
@@ -255,6 +283,9 @@ func is_stunned() -> bool:
 ## The Krampus-Rute: runs away from `from` for `duration`, attacking nobody. Bosses shrug it off.
 func flee(from: Vector3, duration: float) -> void:
 	if not is_alive() or data.is_boss:
+		return
+	if puppet:
+		_relay(&"flee", [from, duration])
 		return
 	_flee_from = from
 	if _flee_left <= 0.0:
@@ -270,7 +301,8 @@ func is_fleeing() -> bool:
 ## The Mistgabel: lifted up on the fork. Its holder moves it (carry_to) until it is hurled or let go.
 ## Bosses are too heavy: false.
 func lift() -> bool:
-	if not is_alive() or data.is_boss or _lifted or _hurled or not _can_dance():
+	# Co-op: carrying the host's enemy around comes with the special weapons (M7 part 3).
+	if puppet or not is_alive() or data.is_boss or _lifted or _hurled or not _can_dance():
 		return false
 	_lifted = true
 	_knock = Vector3.ZERO
@@ -386,7 +418,10 @@ func _pop_head() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	_step(delta)
+	if puppet and is_alive():
+		_puppet_step(delta)
+	else:
+		_step(delta)
 	if _rig == null:
 		return
 	if is_alive():
@@ -515,6 +550,9 @@ func _dancing(delta: float) -> void:
 func apply_knockback(push: Vector3) -> void:
 	# On the fork or flying off it, the Mistgabel moves it.
 	if not is_alive() or _lifted or _hurled:
+		return
+	if puppet:
+		_relay(&"apply_knockback", [push])
 		return
 	_knock = _flat(push)
 	if is_on_floor():
@@ -1067,6 +1105,79 @@ func _mouth() -> Vector3:
 func _pose(action: EnemyRig.Action, length: float = 1.0) -> void:
 	if _rig:
 		_rig.play(action, length)
+	posed.emit(self, action, length)
+
+
+# --- Co-op (M7): a puppet on a guest ------------------------------------------------------------
+
+## Sends a hit on this puppet to the host. A damaging hit flashes and flinches here at once and is
+## guessed against the health we know of, so the hit marker answers without waiting for the host.
+func _relay(method: StringName, args: Array, damage: int = 0, is_headshot: bool = false) -> Hurtbox.Result:
+	if not is_alive():
+		return Hurtbox.Result.IGNORED
+	if hit_relay.is_valid():
+		hit_relay.call(self, method, args)
+	if damage <= 0:
+		return Hurtbox.Result.HIT
+	_hit_flash()
+	_flinch(is_headshot)
+	health -= damage
+	return Hurtbox.Result.KILLED if health <= 0 else Hurtbox.Result.HIT
+
+
+## Where the host's enemy is now (interpolated by CoopEnemies): its feet, facing, and the lean,
+## twist and hop of its Visual (x, z rotation, y offset), which carry the swings, climbs and leaps.
+func puppet_move(at: Vector3, yaw: float, lean: Vector3, delta: float) -> void:
+	var moved: Vector3 = _flat(at - global_position)
+	velocity = moved / maxf(delta, 0.001)
+	global_position = at
+	rotation.y = yaw
+	_visual.rotation.x = lean.x
+	_visual.rotation.z = lean.y
+	_visual.position.y = lean.z
+
+
+## The lean, twist and hop of the Visual (x, z rotation, y offset) for the host's snapshots.
+func puppet_lean() -> Vector3:
+	return Vector3(_visual.rotation.x, _visual.rotation.z, _visual.position.y)
+
+
+## The host's enemy started an action: the same pose here, with its sound.
+func puppet_pose(action: EnemyRig.Action, length: float) -> void:
+	_pose(action, length)
+	match action:
+		EnemyRig.Action.STRIKE, EnemyRig.Action.CROUCH:
+			_voice(&"enemy_attack")
+		EnemyRig.Action.CLIMB:
+			Sound.play_at(&"window_climb", global_position)
+
+
+## The host's enemy was hurt by `source` (our Player, another player's hiker, or null). We already
+## flashed for our own hits.
+func puppet_damaged(amount: int, is_headshot: bool, source: Node3D, health_left: int, ours: bool) -> void:
+	if not is_alive():
+		return
+	health = health_left
+	if not ours:
+		_hit_flash()
+		_flinch(is_headshot)
+	Events.enemy_damaged.emit(self, amount, is_headshot, source)
+
+
+## The host's enemy died: the same death here (ragdoll thrown away from `source`, the points event).
+func puppet_killed(is_headshot: bool, is_melee: bool, source: Node3D, amount: int) -> void:
+	if not is_alive():
+		return
+	health = 0
+	if is_headshot and amount >= data.head_pop_damage:
+		_pop_head()
+	_die(is_headshot, is_melee, source, amount)
+
+
+func _puppet_step(delta: float) -> void:
+	_groan_left -= delta
+	if _groan_left <= 0.0:
+		_groan()
 
 
 func _kill_tween() -> void:

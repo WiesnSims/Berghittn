@@ -17,7 +17,9 @@ func _ready() -> void:
 	_enable_timer.timeout.connect(_on_enable_timeout)
 
 
-func present(wave: int, points: int) -> void:
+## `coop`: the button leads back to the room's lobby instead of a new game.
+func present(wave: int, points: int, coop: bool = false) -> void:
+	_restart_button.text = "UI_BACK_TO_LOBBY" if coop else "UI_RESTART"
 	_quip.text = tr(QUIP_KEYS.pick_random())
 	_stats.text = tr("UI_DEATH_STATS") % [wave, points]
 	# Players are usually still clicking when they die; do not let that click restart instantly.

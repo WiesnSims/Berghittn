@@ -3,6 +3,8 @@ extends Control
 ## In-game overlay for the local player: health, ammo, points, wave, interact prompt, crosshair and damage feedback.
 
 const SPENT_COLOR: Color = Color(0.9, 0.3, 0.25, 1)
+const DOWN_COLOR: Color = Color(1.0, 0.35, 0.3)
+const TEAM_COLOR: Color = Color(0.96, 0.92, 0.84)
 
 @onready var _ammo_label: Label = %AmmoLabel
 @onready var _weapon_label: Label = %WeaponLabel
@@ -37,9 +39,21 @@ var _boss: Enemy
 var _perks: PlayerPerks
 # Perk tiles: the PerkData, its panel and the status label under the initial.
 var _perk_tiles: Array[Dictionary] = []
+var _player: Player
+# Co-op (M7): what happens to us when down or out (centre), and how the team is doing (top left).
+var _coop_label: Label
+var _team_label: Label
 
 
 func _ready() -> void:
+	_coop_label = _make_label(DOWN_COLOR, 34, HORIZONTAL_ALIGNMENT_CENTER)
+	_coop_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+	_coop_label.offset_top = -260.0
+	_coop_label.offset_bottom = -180.0
+	_coop_label.offset_left = -500.0
+	_coop_label.offset_right = 500.0
+	_team_label = _make_label(TEAM_COLOR, 18, HORIZONTAL_ALIGNMENT_LEFT)
+	_team_label.position = Vector2(24.0, 80.0)
 	Events.wave_break_started.connect(_on_wave_break_started)
 	Events.wave_started.connect(_on_wave_started)
 	Events.wave_cleared.connect(_on_wave_cleared)
@@ -54,7 +68,8 @@ func _process(delta: float) -> void:
 			_boss = null
 			_boss_box.hide()
 	_update_perks()
-	if _weapons and not _dead:
+	_update_coop()
+	if _weapons and not _dead and (_player == null or _player.life != Player.Life.OUT):
 		# Down the sights the gun's own sights are the crosshair; through the scope the reticle is.
 		_scope.visible = _weapons.is_scoped()
 		_crosshair.visible = _weapons.aim_amount < 0.5
@@ -71,6 +86,7 @@ func _process(delta: float) -> void:
 
 
 func bind_player(player: Player) -> void:
+	_player = player
 	_weapons = player.weapons
 	_weapons.ammo_changed.connect(_on_ammo_changed)
 	_weapons.weapon_changed.connect(_on_weapon_changed)
@@ -265,6 +281,55 @@ func _show_banner(text: String) -> void:
 	_banner_tween.tween_property(_banner, "modulate:a", 1.0, 0.3)
 	_banner_tween.tween_interval(Constants.WAVE_BANNER_TIME)
 	_banner_tween.tween_property(_banner, "modulate:a", 0.0, 0.6)
+
+
+func _make_label(color: Color, font_size: int, align: HorizontalAlignment) -> Label:
+	var label := Label.new()
+	label.horizontal_alignment = align
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.add_theme_color_override("font_color", color)
+	label.add_theme_color_override("font_outline_color", Color.BLACK)
+	label.add_theme_constant_override("outline_size", 6)
+	label.add_theme_font_size_override("font_size", font_size)
+	add_child(label)
+	return label
+
+
+## Co-op: our own downed or out state in the middle, and every teammate's state and health.
+func _update_coop() -> void:
+	if _player == null or Coop.players == null:
+		_coop_label.text = ""
+		_team_label.text = ""
+		return
+	match _player.life:
+		Player.Life.DOWNED:
+			var text: String = tr("UI_COOP_DOWNED") % ceili(_player.bleed_left)
+			if _player.revive_progress > 0.0:
+				text += "\n" + tr("UI_COOP_BEING_REVIVED") % roundi(_player.revive_progress * 100.0)
+			_coop_label.text = text
+		Player.Life.OUT:
+			_coop_label.text = tr("UI_COOP_OUT")
+			_crosshair.hide()
+			_scope.hide()
+		_:
+			_coop_label.text = ""
+	var lines: PackedStringArray = []
+	var lives: Dictionary = Coop.players.lives()
+	var peers: Array = lives.keys()
+	peers.sort()
+	for peer: int in peers:
+		if peer == Net.my_id():
+			continue
+		var name: String = HikerStyle.display_name(Net.roster.get(peer, {}), peer)
+		match lives[peer]:
+			Player.Life.DOWNED:
+				lines.append(tr("UI_COOP_TEAM_DOWN") % name)
+			Player.Life.OUT:
+				lines.append(tr("UI_COOP_TEAM_OUT") % name)
+			_:
+				lines.append("%s  %d %%" % [name, roundi(Coop.players.health_share(peer) * 100.0)])
+	_team_label.text = "\n".join(lines)
 
 
 func _on_player_died() -> void:
