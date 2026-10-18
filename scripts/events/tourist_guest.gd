@@ -1,8 +1,8 @@
 class_name TouristGuest
 extends CharacterBody3D
 ## "Deitscha Tourist" (section 8a): a lost, living German tourist gets off the gondola at the Seilbahn
-## and heads for the Stube on the navmesh. He only walks while a player is near him (he would never find
-## the way alone), and enemies go for him like for a player (group "escorts", see Enemy). Escorted there
+## and heads for the Stube on the navmesh, the long way round through the Schuppen and over the Terrasse
+## when those are open. He only walks while a player is near him (he would never find the way alone), and enemies go for him like for a player (group "escorts", see Enemy). Escorted there
 ## alive, he hands the nearest player the Eisstöcke, the only ones in the game.
 
 enum State { WAITING, WALKING, ARRIVED, DEAD, GONE }
@@ -12,6 +12,8 @@ const EISSTOCK: EquipmentData = preload("res://data/equipment/eisstock.tres")
 var health: int = 0
 var _state: State = State.WAITING
 var _goal: Vector3
+# Points he walks by on the way to the goal, in order (see EventDirector.guest_way).
+var _way: Array[Vector3] = []
 var _time_left: float = 0.0
 var _leave_left: float = 0.0
 var _moving: float = 0.0
@@ -28,10 +30,11 @@ func _ready() -> void:
 	add_to_group("escorts")
 
 
-func start(at: Vector3, goal: Vector3) -> void:
+func start(at: Vector3, goal: Vector3, way: Array[Vector3] = []) -> void:
 	global_position = at
 	_goal = goal
-	_agent.target_position = goal
+	_way = way.duplicate()
+	_agent.target_position = _way[0] if not _way.is_empty() else goal
 	health = Constants.GUEST_HEALTH
 	_time_left = Constants.GUEST_TIME
 	_state = State.WAITING
@@ -92,10 +95,13 @@ func _physics_process(delta: float) -> void:
 
 
 func _walk(delta: float) -> void:
+	if not _way.is_empty() and _flat(_way[0] - global_position).length() < Constants.GUEST_ARRIVE_REACH:
+		_way.pop_front()
+		_agent.target_position = _way[0] if not _way.is_empty() else _goal
 	var next: Vector3 = _agent.get_next_path_position()
 	var direction: Vector3 = _flat(next - global_position)
 	if direction.length_squared() < 0.0001:
-		direction = _flat(_goal - global_position)
+		direction = _flat(_agent.target_position - global_position)
 	direction = direction.normalized()
 	velocity.x = direction.x * Constants.GUEST_SPEED
 	velocity.z = direction.z * Constants.GUEST_SPEED

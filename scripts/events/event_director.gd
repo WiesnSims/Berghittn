@@ -142,9 +142,27 @@ func send_guest() -> TouristGuest:
 		return null
 	_guest = guest_scene.instantiate() as TouristGuest
 	_stage().add_child(_guest)
-	_guest.start(arrival.global_position, goal.global_position)
+	_guest.start(arrival.global_position, goal.global_position, guest_way(arrival.global_position, goal.global_position))
 	Sound.play(&"event_call")
 	return _guest
+
+
+## The Tourist's long way round the door ring (Seilbahn, Schuppen, Terrasse, Stube): the GuestWay
+## markers in name order, or none (the direct way) while a zone on it is still shut.
+func guest_way(from: Vector3, to: Vector3) -> Array[Vector3]:
+	var markers: Array[Node] = get_tree().get_nodes_in_group("guest_waypoints")
+	markers.sort_custom(func(a: Node, b: Node) -> bool: return String(a.name) < String(b.name))
+	var way: Array[Vector3] = []
+	for marker: Node in markers:
+		way.append((marker as Node3D).global_position)
+	var legs: Array[Vector3] = [from]
+	legs.append_array(way)
+	legs.append(to)
+	var world: World3D = get_viewport().world_3d
+	for i: int in legs.size() - 1:
+		if not walkable(world, legs[i], legs[i + 1]):
+			return []
+	return way
 
 
 func _guest_route_open() -> bool:

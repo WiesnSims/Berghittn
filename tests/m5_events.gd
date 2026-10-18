@@ -1,11 +1,13 @@
 extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/m5_events.tscn
 ## Section 8a events on the real main scene. Die Resi: only with the Terrasse open, walks into the
-## beer garden, is marked map-wide, her bell pulls outside enemies to her (they make her bolt), and
+## beer garden, is marked map-wide, once a player comes near her bell pulls outside enemies to her (they
+## make her bolt; before that they leave her alone), and
 ## milking her heals fully and gives a free Brettljause helping. The Bierfassl rolls down off the alm
 ## into the garden, flattens what is in its way, stops at a wall or a player, and tapping it gives a Schnaps.
 ## The Murmeltier pops up near the player where players can walk, screams, hops, and pays out when hit.
-## The Deitscha Tourist waits without an escort, is hunted by enemies, and once escorted to the Stube
+## The Deitscha Tourist waits without an escort, is hunted by enemies, walks the long way round through the
+## Schuppen and over the Terrasse (the direct way while one is shut), and once escorted to the Stube
 ## leaves two Eisstöcke, which slide through enemies and bounce off walls.
 
 var main: Node
@@ -53,6 +55,7 @@ func _run() -> void:
 	director.random_events = false
 	player.global_position = Vector3(-2.0, 0.0, 1.0)
 	await _schedule()
+	await _guest_way_shut()
 	for zone: ZoneData in zones.table.zones:
 		zones.unlock(zone.id, null)
 	await _frames(30)
@@ -242,10 +245,28 @@ func _guest_hunted() -> void:
 	_check(not is_instance_valid(guest), "and is gone")
 
 
+func _guest_way_shut() -> void:
+	# Only the Seilbahn (and the Terrasse) open: the Schuppen on the long way is shut.
+	zones.unlock(&"seilbahn", null)
+	await _frames(30)
+	var arrival := get_tree().get_first_node_in_group("guest_arrival") as Node3D
+	var goal := get_tree().get_first_node_in_group("guest_goal") as Node3D
+	_check(director._guest_route_open() and director.guest_way(arrival.global_position, goal.global_position).is_empty(),
+		"with the Schuppen shut, the Tourist takes the direct way from the Seilbahn")
+
+
 func _guest_escorted() -> void:
 	var guest: TouristGuest = director.start_event(&"guest") as TouristGuest
+	_check(guest._way.size() == 2, "with every zone open, he walks the long way round (%d waypoints)" % guest._way.size())
+	var schuppen: bool = false
+	var terrasse: bool = false
 	var arrived: bool = false
-	for i: int in 60 * 90:
+	var frames: int = 0
+	for i: int in 60 * 120:
+		frames = i
+		var p: Vector3 = guest.global_position
+		schuppen = schuppen or (p.x > 7.5 and p.x < 21.0 and p.z > 9.5 and p.z < 19.0)
+		terrasse = terrasse or (p.x < 6.5 and p.z > 6.5)
 		# Walk with him, a little behind.
 		var back: Vector3 = guest.global_basis.z * 1.6
 		player.global_position = guest.global_position + Vector3(back.x, 0.0, back.z)
@@ -255,6 +276,7 @@ func _guest_escorted() -> void:
 			arrived = true
 			break
 	_check(arrived, "escorted, he finds the Stube (%s)" % guest.global_position.snapped(Vector3.ONE * 0.1))
+	_check(schuppen and terrasse, "through the Schuppen (%s) and over the Terrasse (%s), %.0f s" % [schuppen, terrasse, frames / 60.0])
 	_check(_banners.back() == "Das ist ja total urig hier!", "and says: %s" % _banners.back())
 	await _seconds(2.2)
 	_check(player.equipment.item != null and player.equipment.item.id == &"eisstock" and player.equipment.count == 2, "and leaves two Eisstöcke: %s" % _banners.back())
@@ -340,6 +362,18 @@ func _resi_lures() -> void:
 	enemy.activate(load("res://data/enemies/tourist.tres"), 1, Transform3D(Basis.IDENTITY, at))
 	enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
 	var start: float = enemy.global_position.distance_to(resi.global_position)
+	# Nobody near her yet (the player is in the Stube): the enemies leave her alone. The enemy holds
+	# still meanwhile, or it is in through a window (and past her pull) before the player gets out.
+	enemy.set_physics_process(false)
+	var left_alone: bool = true
+	for i: int in 60 * 5:
+		await get_tree().physics_frame
+		left_alone = left_alone and enemy._find_lure() == null and resi._state != Resi.State.BOLTING
+	_check(left_alone and not resi._noticed, "with no player near, her bell lures nobody and she stays")
+	enemy.set_physics_process(true)
+	# A player walks out to her: from now on the bell pulls.
+	player.global_position = resi.global_position + Vector3(0.0, 0.3, -Constants.RESI_NOTICE_RADIUS + 2.0)
+	player.velocity = Vector3.ZERO
 	var bolted: bool = false
 	for i: int in 60 * 20:
 		await get_tree().physics_frame
@@ -354,6 +388,8 @@ func _resi_lures() -> void:
 	enemy.receive_hit(100000, false, false, null)
 	if is_instance_valid(resi):
 		resi.queue_free()
+	player.global_position = Vector3(-2.0, 0.0, 1.0)
+	player.velocity = Vector3.ZERO
 	await _seconds(0.5)
 
 

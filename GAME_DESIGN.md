@@ -474,7 +474,9 @@ waves from wave 3 (never on a boss wave: then she comes the wave after), arrives
 and stays 45 s.
 - Hold E next to her to milk her: fresh Almmilch heals fully and gives a free helping from the
   Brettljause (one not yet at five).
-- Her bell draws every enemy within 20 m to her, so getting the milk is a fight.
+- Once a player has come within 10 m of her, her bell draws every enemy within 20 m to her, so
+  getting the milk is a fight. Until then the enemies leave her alone, so she is never chased off
+  before anyone got to her (play-test #70).
 - If enemies reach her, she bolts off mooing and the milk is gone.
 
 **Random events.** At most one per wave, a 30 % chance each wave from wave 2, 8 to 35 s into it (not
@@ -492,8 +494,10 @@ when another one could come.
   and pops up again 2.5 to 7 m away, four times in all (about 13 s). Hit it while it is up (shot or
   shovel) for 500 points and a full refill of the gun in hand (magazine and reserve).
 - **"Deitscha Tourist"** A lost German tourist (sunburnt, souvenir Tirolerhut, socks in sandals,
-  fanny pack, a big map) gets off the gondola at the Seilbahn and heads for the Stube. Only while
-  the Seilbahn is open and the way to the Stube through open zones. He walks (1.8 m/s) only while a
+  fanny pack, a big map) gets off the gondola at the Seilbahn and heads for the Stube the long way
+  round the door ring, through the Schuppen and over the Terrasse (play-test #71), or the direct
+  way while one of those is shut. Only while the Seilbahn is open and the way to the Stube through
+  open zones. He walks (1.8 m/s) only while a
   player is within 10 m ("Wo geht es denn hier zur Hütte?"), never climbs through windows, and
   enemies go for him like for a player (300 health, shown over his head; players cannot hurt him).
   Escort him to the Stube alive and he hands the nearest player two Eisstöcke, the only ones in
