@@ -684,6 +684,13 @@ fix console errors, commit. Stop and report after each milestone.
   Cloudflare, authority model, expected costs. The user approves first.
 - Then implement lobby, 2-player sync, then 4 players.
 - Acceptance: two browsers can play the same match for 10 waves.
+- `NETWORKING.md` approved 2026-10-18 (PR #75): WebSocket relay in a Durable Object behind a Pages
+  Function on berghittn.pages.dev, Workers Free plan only; each player owns their movement and hits,
+  the host runs the world. Lobby with a 4-digit room code and an invite link, joining only in the
+  lobby; each player names and dresses their hiker there (head, hats, jacket and trouser colours).
+  Bled-out players come back at the start of the next wave. Done in four PRs, play-tested each:
+  1 relay and lobby with the character editor, 2 two players and the core loop with downed/revive,
+  3 special weapons, equipment and events, 4 four players and the acceptance.
 
 ## 13. Project structure
 
@@ -748,4 +755,5 @@ more than one map, more than four players, procedural levels.
   `workers.dev` URL. Co-op relay must be reachable through this domain.
 - ~~Preferred language for the default UI (German or English).~~ Answered: English
   is the default; German stays available via `strings_de.tres`.
-- Whether co-op should use a lobby with room codes or direct invite links.
+- ~~Whether co-op should use a lobby with room codes or direct invite links.~~ Answered: both, the
+  code is 4 digits.

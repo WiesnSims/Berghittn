@@ -1,7 +1,6 @@
 # Berghittn — Networking plan (M7)
 
-Status: **proposal, waiting for approval** (GAME_DESIGN.md section 12, M7 decision gate).
-Nothing in here is built yet. Numbers are from the Cloudflare docs as of 2026-10-18.
+Status: **approved 2026-10-18** with the answers in section 11 (GAME_DESIGN.md section 12, M7 decision gate). Numbers are from the Cloudflare docs as of 2026-10-18.
 
 ## 1. Summary
 
@@ -11,8 +10,8 @@ Nothing in here is built yet. Numbers are from the Cloudflare docs as of 2026-10
 | Relay | A Cloudflare **Durable Object** (one per room) that only forwards bytes. It lives in a helper Worker `berghittn-relay` with **no public route** (`workers_dev = false`). Players reach it only through a **Pages Function** on `berghittn.pages.dev/api/...`, which hands the WebSocket upgrade to the room's Durable Object |
 | Godot side | A small GDScript `RelayPeer` (`MultiplayerPeerExtension`) on top of `WebSocketPeer`, so the game uses Godot's normal multiplayer API (`@rpc`, `multiplayer.get_unique_id()`, peer 1 = host) |
 | Authority | **Host-authoritative world**: the host's game runs enemies, waves, points, doors, purchases, chest, perks, events. **Each player owns their own movement, aim and hit detection** and tells the host what they hit (section 4 explains why this deviates from "clients send inputs") |
-| Lobby | Create a room, get a 4-letter **room code**; join by typing it or by an **invite link** `berghittn.pages.dev/?room=KNDL`. Up to 4 players. The host starts the match |
-| Cost | **0 €** on the Workers Free plan for normal play among friends (about 7 hours of 4-player play or 14 hours of 2-player play per day before the daily quota is used up; section 7). Workers Paid (5 $/month) only if that is ever too little |
+| Lobby | Create a room, get a 4-digit **room code** (numbers only); join by typing it or by an **invite link** `berghittn.pages.dev/?room=4711`. Up to 4 players. Each player picks a name and dresses their hiker. The host starts the match |
+| Cost | **0 €**: stays on the Workers **Free plan** (user decision). About 7 hours of 4-player or 14 hours of 2-player play per day before the daily quota is used up (section 7) |
 | Solo | Unchanged: solo still runs entirely offline in the browser, no relay involved |
 
 ## 2. Why this transport and relay
@@ -41,8 +40,9 @@ Nothing in here is built yet. Numbers are from the Cloudflare docs as of 2026-10
 - `functions/api/room/[code].js` (Pages Function): checks the code format, the `Upgrade: websocket`
   header and the build version, then `env.ROOMS.get(env.ROOMS.idFromName(code)).fetch(request)`.
   Invalid requests are refused here, before they cost a Durable Object request.
-- `POST /api/room` creates a room: picks a free code (letters without look-alikes: no I, O, L, Q) and
-  returns it.
+- `POST /api/room` creates a room: picks a free 4-digit code (1000–9999, user decision: numbers only)
+  and returns it. A code is free again once its room closed. Codes are easy to guess, so anyone can
+  walk into an open lobby; the host sees every name and can kick before starting.
 - `relay/` (new folder, own `wrangler.toml`, deployed with `wrangler deploy` as `berghittn-relay`,
   `workers_dev = false`, `preview_urls = false`): the `Room` Durable Object class, SQLite backend (the
   only kind on the Free plan; we store nothing in it).
@@ -59,7 +59,7 @@ The Durable Object does not understand the game. It knows sockets, peer ids and 
 
 - The first socket of a room is the host and gets peer id 1; others get 2, 3, 4 (Godot's convention).
   A 5th socket is refused ("room full"). Joining after the host started the match is refused
-  ("already running"), see question Q4.
+  ("already running"; user decision Q4: joining only in the lobby).
 - Binary frames: `[type u8][peer id u8][payload…]`.
   - Client → relay: `peer id` is the target (0 = everyone, 1 = host, n = that peer).
   - Relay → client: `peer id` is the sender. The relay always rewrites it, so nobody can pretend to be the host.
@@ -148,15 +148,18 @@ From section 10, plus what has to be decided now:
 - **Revive**: a teammate holds `E` within 2 m for 4 s.
 - **Game over** when every player is down or dead.
 - **Bled out**: the player watches a teammate (spectator) and comes back at the start of the next
-  wave with the Dienstpistole and 0 extra points? **Question Q3.**
+  wave (user decision Q3) with the Dienstpistole, keeping their points, the Brettljause and the
+  Jagamoasta bonus; Schnaps were already lost on going down.
 - **Pause**: in co-op, Esc opens the menu but the world keeps running (one player cannot freeze it for
   everyone). Solo still pauses.
 - **Points and prices**: unchanged per player; enemy count per wave already scales with players;
   the 24-enemies-alive cap is total, not per player (section 3).
-- **Look of other players**: there is no player body yet (only first person). I would add a
-  low-poly hiker like the Deitscha Tourist rig, each player with their own jacket colour, holding a
-  simplified copy of their current gun, and a name above the head. Players type a name in the lobby
-  (saved with the settings).
+- **Look of other players** (user decision Q5): a low-poly hiker on the same rig as the enemies and
+  the Deitscha Tourist, holding a simplified copy of their current gun, with their name above the
+  head. In the lobby each player types a name and dresses their hiker on a turning preview: a few
+  heads (faces, beards), a few hats (none, felt hat, Bommelmütze, Stirnband, helmet ...) and a colour
+  for the jacket and one for the trousers from a small palette. Saved with the settings; the defaults
+  give each of the 4 players a different jacket.
 - **Version check**: the host's build id is sent on join; a mismatched browser (old cache) is told to reload.
 
 ## 7. Costs
@@ -177,14 +180,13 @@ Duration (the object is awake the whole match, 128 MB) is about 450 GB-s per hou
 allows ~28 room-hours a day; the request count is the limit that bites first. Storage: none.
 
 If the quota runs out, new connections fail until midnight UTC (the game says "co-op is busy, try
-later"; solo keeps working). The fallback is the **Workers Paid plan at 5 $/month**: 1 million
-requests and 400,000 GB-s included, after that 0.15 $ per million requests, so one 4-player hour would
-cost about 0.002 $. I do not expect this to be needed; I would ask before any plan change.
+later"; solo keeps working). **We stay on the Free plan** (user decision Q6); the Workers Paid plan
+(5 $/month) is not used.
 
 ## 8. Out of scope for M7
 
 - Host migration (the host leaving ends the match for everyone; a banner says so).
-- Joining a match that is already running (only in the lobby; see Q4).
+- Joining a match that is already running (only in the lobby; Q4).
 - Voice chat, accounts, matchmaking with strangers, more than 4 players (section 15).
 - Anti-cheat beyond the plausibility check in section 4.
 
@@ -204,7 +206,9 @@ cost about 0.002 $. I do not expect this to be needed; I would ask before any pl
 ## 10. Proposed order (one PR each, play-test after each, like M6)
 
 1. **Relay and lobby**: Durable Object, Pages Function, `RelayPeer`, lobby screen (name, create,
-   join by code or link, player list, host starts). Acceptance: two browsers in one room see each other.
+   join by code or link, player list with each hiker, host starts), the player hiker model and the
+   character editor (head, hat, jacket and trouser colours). Acceptance: two browsers in one room see
+   each other's names and hikers, and the host's start takes both into the map.
 2. **Two players, core loop**: other player's body, movement and shooting synced; enemies, hitscan
    hits, points, waves, doors, barricades, wall-buys, ammo, Schnaps, Jause, Hüttentruhe; downed and
    revive; co-op game over. Acceptance: two browsers play waves 1–5 together.
@@ -213,15 +217,12 @@ cost about 0.002 $. I do not expect this to be needed; I would ask before any pl
 4. **Four players and acceptance**: 4-player tests, bandwidth and frame rate, polish.
    Acceptance: two browsers play the same match for 10 waves (M7 acceptance), and 4 players join one match.
 
-## 11. Questions for you
+## 11. Decisions (user, 2026-10-18)
 
-- **Q1 Authority**: OK that each player owns their own movement and hit detection (section 4),
-  instead of sending raw inputs to the host?
-- **Q2 Lobby**: room code **and** invite link (my recommendation), or only one of them? (Open question
-  in GAME_DESIGN.md section 16.)
-- **Q3 Bled out**: does a bled-out player come back at the start of the next wave (classic zombies mode,
-  my recommendation), or stay a spectator until game over?
-- **Q4 Late join**: only in the lobby (my recommendation for M7), or also during a break between waves?
-- **Q5 Other players' look**: a low-poly hiker with a colour per player and a name tag, OK?
-- **Q6 Cost**: OK to run on the Workers Free plan and to deploy the helper Worker `berghittn-relay`
-  (no public URL; only reachable through berghittn.pages.dev)?
+- **Q1 Authority**: each player owns their own movement and hit detection (section 4). Approved.
+- **Q2 Lobby**: room code **and** invite link; the code is simple, numbers only (4 digits).
+- **Q3 Bled out**: the player comes back at the start of the next wave.
+- **Q4 Late join**: only in the lobby.
+- **Q5 Look**: a low-poly hiker with a name tag; each player can dress it in the lobby (head, a few
+  hats, jacket and trouser colours).
+- **Q6 Cost**: stay on the Workers Free plan; the helper Worker `berghittn-relay` (no public URL) is deployed.
