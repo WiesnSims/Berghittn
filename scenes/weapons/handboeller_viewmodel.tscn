@@ -1,23 +1,180 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene format=4]
 
 [ext_resource type="Script" path="res://scripts/weapons/handboeller_viewmodel.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/textures/gun_wood.png" id="2_tnkyd"]
+[ext_resource type="Texture2D" path="res://assets/textures/gun_steel.png" id="3_ip30i"]
+
+[sub_resource type="StandardMaterial3D" id="Wood"]
+albedo_color = Color(0.5, 0.31, 0.16, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tnkyd"]
+albedo_color = Color(0.625, 0.3875, 0.19999999, 1)
+albedo_texture = ExtResource("2_tnkyd")
+roughness = 0.7
+uv1_scale = Vector3(2.857143, 2.857143, 2.857143)
+uv1_triplanar = true
+uv1_triplanar_sharpness = 4.0
+texture_filter = 5
+metadata/source = SubResource("Wood")
+
+[sub_resource type="BoxMesh" id="StockMesh"]
+material = SubResource("Wood")
+size = Vector3(0.05, 0.075, 0.3)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_ip30i"]
+_surfaces = [{
+"aabb": AABB(-0.025, -0.0375, -0.15, 0.05, 0.075, 0.3),
+"format": 34359738375,
+"material": SubResource("StandardMaterial3D_tnkyd"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 84,
+"vertex_data": PackedByteArray("mpmZvAAAAACamRm+exSuvL10E7yPwvW85tCivKmbxLumm8S9exSuvL10E7yPwvW8zczMvJqZGb2amRk+g8DKvJqZGb3fTw0+zczMvJqZGb2amRk+kMK1vE9iED2UwnU8zczMvI/C9TyamRk+kMK1vE9iED2UwnU8mpmZvAAAAACamRm+mpmZvJqZGT2amRm+exSuvL10E7yPwvW8kMK1vE9iED2UwnU8zczMvJqZGb2amRk+kMK1vE9iED2UwnU8exSuvL10E7yPwvW8mpmZvAAAAACamRm+mpmZPAAAAACamRm+5tCiPKmbxLumm8S9exSuPL10E7yPwvW8exSuPL10E7yPwvW8g8DKPJqZGb3fTw0+zczMPJqZGb2amRk+zczMPJqZGb2amRk+zczMPI/C9TyamRk+kMK1PE9iED2UwnU8kMK1PE9iED2UwnU8mpmZPJqZGT2amRm+mpmZPAAAAACamRm+exSuPL10E7yPwvW8zczMPJqZGb2amRk+kMK1PE9iED2UwnU8kMK1PE9iED2UwnU8mpmZPAAAAACamRm+exSuPL10E7yPwvW8mpmZvAAAAACamRm+mpmZPAAAAACamRm+mpmZPJqZGT2amRm+mpmZvAAAAACamRm+mpmZPJqZGT2amRm+mpmZvJqZGT2amRm+mpmZvJqZGT2amRm+mpmZPJqZGT2amRm+kMK1PE9iED2UwnU8mpmZvJqZGT2amRm+kMK1PE9iED2UwnU8kMK1vE9iED2UwnU8kMK1vE9iED2UwnU8kMK1PE9iED2UwnU8zczMPI/C9TyamRk+kMK1vE9iED2UwnU8zczMPI/C9TyamRk+zczMvI/C9TyamRk+zczMvI/C9TyamRk+zczMPI/C9TyamRk+zczMPJqZGb2amRk+zczMvI/C9TyamRk+zczMPJqZGb2amRk+zczMvJqZGb2amRk+zczMvJqZGb2amRk+zczMPJqZGb2amRk+g8DKPJqZGb3fTw0+zczMvJqZGb2amRk+g8DKPJqZGb3fTw0+g8DKvJqZGb3fTw0+g8DKvJqZGb3fTw0+g8DKPJqZGb3fTw0+exSuPL10E7yPwvW8g8DKvJqZGb3fTw0+exSuPL10E7yPwvW8exSuvL10E7yPwvW8exSuvL10E7yPwvW8exSuPL10E7yPwvW85tCiPKmbxLumm8S9exSuvL10E7yPwvW85tCiPKmbxLumm8S95tCivKmbxLumm8S95tCivKmbxLumm8S95tCiPKmbxLumm8S9mpmZPAAAAACamRm+5tCivKmbxLumm8S9mpmZPAAAAACamRm+mpmZvAAAAACamRm+AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+///////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA/39G/r4B/L//f0b+vgH8v/9/Rv6+Afy//39G/r4B/L//f0b+vgH8v/9/Rv6+Afy//380+/gE57//fzT7+ATnv/9/NPv4BOe//380+/gE57//fzT7+ATnv/9/NPv4BOe//3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA/38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+/kJIAADEVdb6QkgAAMRV1vpCSAAAxFXW+kJIAADEVdb6QkgAAMRV1vpCSAAAxFXW+kIUAAM4F3r+QhQAAzgXev5CFAADOBd6/kIUAAM4F3r+QhQAAzgXev5CFAADOBd6/zIwAABAOS7/MjAAAEA5Lv8yMAAAQDku/zIwAABAOS7/MjAAAEA5Lv8yMAAAQDku/")
+}]
+metadata/source = SubResource("StockMesh")
+
+[sub_resource type="BoxMesh" id="GripMesh"]
+material = SubResource("Wood")
+size = Vector3(0.04, 0.12, 0.05)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_f0khn"]
+_surfaces = [{
+"aabb": AABB(-0.02, -0.06, -0.025, 0.04, 0.12, 0.05),
+"format": 34359738375,
+"material": SubResource("StandardMaterial3D_tnkyd"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 132,
+"vertex_data": PackedByteArray("CtejvKyLW70HX5i8CtejvKyLWz0HX5i8CtejvKyLWz0HX5g8CtejvKyLW70HX5i8CtejvKyLWz0HX5g8CtejvKyLW70HX5g8CtejvKyLW70HX5i8iNJevI/Cdb0HX5g8iNJevI/Cdb0HX5i8CtejvKyLW70HX5i8CtejvKyLW70HX5g8iNJevI/Cdb0HX5g8CtejvKyLWz0HX5i8iNJevI/CdT0HX5i8iNJevI/CdT0HX5g8CtejvKyLWz0HX5i8iNJevI/CdT0HX5g8CtejvKyLWz0HX5g8CtejPKyLW70HX5i8CtejPKyLWz0HX5g8CtejPKyLWz0HX5i8CtejPKyLW70HX5i8CtejPKyLW70HX5g8CtejPKyLWz0HX5g8CtejPKyLW70HX5i8iNJePI/Cdb0HX5i8iNJePI/Cdb0HX5g8CtejPKyLW70HX5i8iNJePI/Cdb0HX5g8CtejPKyLW70HX5g8CtejPKyLWz0HX5i8iNJePI/CdT0HX5g8iNJePI/CdT0HX5i8CtejPKyLWz0HX5i8CtejPKyLWz0HX5g8iNJePI/CdT0HX5g8iNJevI/Cdb0HX5i8iNJevI/Cdb0HX5g8iNJePI/Cdb0HX5g8iNJevI/Cdb0HX5i8iNJePI/Cdb0HX5g8iNJePI/Cdb0HX5i8iNJevI/Cdb0HX5i8iNJePKyLW73NzMy8iNJevKyLW73NzMy8iNJevI/Cdb0HX5i8iNJePI/Cdb0HX5i8iNJePKyLW73NzMy8iNJevI/Cdb0HX5g8iNJevKyLW73NzMw8iNJePKyLW73NzMw8iNJevI/Cdb0HX5g8iNJePKyLW73NzMw8iNJePI/Cdb0HX5g8iNJevI/CdT0HX5i8iNJePI/CdT0HX5g8iNJevI/CdT0HX5g8iNJevI/CdT0HX5i8iNJePI/CdT0HX5i8iNJePI/CdT0HX5g8iNJevI/CdT0HX5i8iNJevKyLWz3NzMy8iNJePKyLWz3NzMy8iNJevI/CdT0HX5i8iNJePKyLWz3NzMy8iNJePI/CdT0HX5i8iNJevI/CdT0HX5g8iNJePKyLWz3NzMw8iNJevKyLWz3NzMw8iNJevI/CdT0HX5g8iNJePI/CdT0HX5g8iNJePKyLWz3NzMw8iNJevKyLW73NzMy8iNJePKyLW73NzMy8iNJePKyLWz3NzMy8iNJevKyLW73NzMy8iNJePKyLWz3NzMy8iNJevKyLWz3NzMy8iNJevKyLW73NzMy8CtejvKyLWz0HX5i8CtejvKyLW70HX5i8iNJevKyLW73NzMy8iNJevKyLWz3NzMy8CtejvKyLWz0HX5i8iNJePKyLW73NzMy8CtejPKyLW70HX5i8CtejPKyLWz0HX5i8iNJePKyLW73NzMy8CtejPKyLWz0HX5i8iNJePKyLWz3NzMy8iNJevKyLW73NzMw8iNJePKyLWz3NzMw8iNJePKyLW73NzMw8iNJevKyLW73NzMw8iNJevKyLWz3NzMw8iNJePKyLWz3NzMw8iNJevKyLW73NzMw8CtejvKyLW70HX5g8CtejvKyLWz0HX5g8iNJevKyLW73NzMw8CtejvKyLWz0HX5g8iNJevKyLWz3NzMw8iNJePKyLW73NzMw8CtejPKyLWz0HX5g8CtejPKyLW70HX5g8iNJePKyLW73NzMw8iNJePKyLWz3NzMw8CtejPKyLWz0HX5g8CtejvKyLW70HX5i8iNJevI/Cdb0HX5i8iNJevKyLW73NzMy8CtejvKyLW70HX5g8iNJevKyLW73NzMw8iNJevI/Cdb0HX5g8CtejvKyLWz0HX5i8iNJevKyLWz3NzMy8iNJevI/CdT0HX5i8CtejvKyLWz0HX5g8iNJevI/CdT0HX5g8iNJevKyLWz3NzMw8CtejPKyLW70HX5i8iNJePKyLW73NzMy8iNJePI/Cdb0HX5i8CtejPKyLW70HX5g8iNJePI/Cdb0HX5g8iNJePKyLW73NzMw8CtejPKyLWz0HX5i8iNJePI/CdT0HX5i8iNJePKyLWz3NzMy8CtejPKyLWz0HX5g8iNJePKyLWz3NzMw8iNJePI/CdT0HX5g8AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//z//P1RVVNX/P/8/VFVU1f8//z9UVVTV/z//P1RVVNX/P/8/VFVU1f8//z9UVVTV/z//v1RVqar/P/+/VFWpqv8//79UVamq/z//v1RVqar/P/+/VFWpqv8//79UVamq////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+//7//P1RVqar/v/8/VFWpqv+//z9UVamq/7//P1RVqar/v/8/VFWpqv+//z9UVamq/7//v1RVVNX/v/+/VFVU1f+//79UVVTV/7//v1RVVNX/v/+/VFVU1f+//79UVVTV/38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//78AAFRVqar/vwAAVFWpqv+/AABUVamq/78AAFRVqar/vwAAVFWpqv+/AABUVamq/3//P6oqVJX/f/8/qipUlf9//z+qKlSV/3//P6oqVJX/f/8/qipUlf9//z+qKlSV/3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//7///6oqVJX/v///qipUlf+///+qKlSV/7///6oqVJX/v///qipUlf+///+qKlSV/3//v1RVqar/f/+/VFWpqv9//79UVamq/3//v1RVqar/f/+/VFWpqv9//79UVamq//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCAAAD/v1RVqaoAAP+/VFWpqgAA/79UVamqAAD/v1RVqaoAAP+/VFWpqgAA/79UVamq////v6qqqar///+/qqqpqv///7+qqqmq////v6qqqar///+/qqqpqv///7+qqqmq/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA/z//f6qqqar/P/9/qqqpqv8//3+qqqmq/z//f6qqqar/P/9/qqqpqv8//3+qqqmq/7//f1RVqar/v/9/VFWpqv+//39UVamq/7//f1RVqar/v/9/VFWpqv+//39UVamqqiqqKv8//7+qKqoq/z//v6oqqir/P/+/VFVUVQAAAIBUVVRVAAAAgFRVVFUAAACAqipU1f8//5+qKlTV/z//n6oqVNX/P/+fVFWqqv9//59UVaqq/3//n1RVqqr/f/+fVNWqKv9//59U1aoq/3//n1TVqir/f/+fqqpUVf8//5+qqlRV/z//n6qqVFX/P/+fVNVU1QAAAIBU1VTVAAAAgFTVVNUAAACAqqqqqv8//7+qqqqq/z//v6qqqqr/P/+/")
+}]
+metadata/source = SubResource("GripMesh")
 
 [sub_resource type="StandardMaterial3D" id="Bronze"]
 albedo_color = Color(0.8, 0.58, 0.28, 1)
 metallic = 0.3
 roughness = 0.45
 
-[sub_resource type="StandardMaterial3D" id="Wood"]
-albedo_color = Color(0.5, 0.31, 0.16, 1)
-roughness = 0.8
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y6ib5"]
+albedo_color = Color(1, 0.72499996, 0.35, 1)
+albedo_texture = ExtResource("3_ip30i")
+metallic = 0.75
+roughness = 0.35
+uv1_scale = Vector3(3.3333333, 3.3333333, 3.3333333)
+uv1_triplanar = true
+uv1_triplanar_sharpness = 4.0
+texture_filter = 5
+metadata/source = SubResource("Bronze")
+
+[sub_resource type="SphereMesh" id="BreechMesh"]
+material = SubResource("Bronze")
+radius = 0.052
+height = 0.104
+radial_segments = 10
+rings = 5
+
+[sub_resource type="SphereMesh" id="SphereMesh_j3njs"]
+material = SubResource("StandardMaterial3D_y6ib5")
+radius = 0.052
+height = 0.104
+radial_segments = 10
+rings = 5
+metadata/source = SubResource("BreechMesh")
+
+[sub_resource type="CylinderMesh" id="TubeMesh"]
+material = SubResource("Bronze")
+top_radius = 0.06
+bottom_radius = 0.045
+height = 0.26
+radial_segments = 12
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_mkd6i"]
+material = SubResource("StandardMaterial3D_y6ib5")
+top_radius = 0.06
+bottom_radius = 0.045
+height = 0.26
+radial_segments = 12
+rings = 1
+metadata/source = SubResource("TubeMesh")
+
+[sub_resource type="CylinderMesh" id="RingMesh"]
+material = SubResource("Bronze")
+top_radius = 0.072
+bottom_radius = 0.066
+height = 0.035
+radial_segments = 12
+rings = 1
+cap_top = false
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_pejvn"]
+material = SubResource("StandardMaterial3D_y6ib5")
+top_radius = 0.072
+bottom_radius = 0.066
+height = 0.035
+radial_segments = 12
+rings = 1
+cap_top = false
+metadata/source = SubResource("RingMesh")
 
 [sub_resource type="StandardMaterial3D" id="Dark"]
 albedo_color = Color(0.05, 0.05, 0.05, 1)
+
+[sub_resource type="CylinderMesh" id="BoreMesh"]
+material = SubResource("Dark")
+top_radius = 0.048
+bottom_radius = 0.048
+height = 0.02
+radial_segments = 12
+rings = 1
 
 [sub_resource type="StandardMaterial3D" id="Iron"]
 albedo_color = Color(0.1, 0.1, 0.11, 1)
 metallic = 0.6
 roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8e40s"]
+albedo_color = Color(0.125, 0.125, 0.1375, 1)
+albedo_texture = ExtResource("3_ip30i")
+metallic = 0.55
+roughness = 0.45
+uv1_scale = Vector3(3.3333333, 3.3333333, 3.3333333)
+uv1_triplanar = true
+uv1_triplanar_sharpness = 4.0
+texture_filter = 5
+metadata/source = SubResource("Iron")
+
+[sub_resource type="SphereMesh" id="BallMesh"]
+material = SubResource("Iron")
+radius = 0.04
+height = 0.08
+radial_segments = 8
+rings = 4
+
+[sub_resource type="SphereMesh" id="SphereMesh_bpfa4"]
+material = SubResource("StandardMaterial3D_8e40s")
+radius = 0.04
+height = 0.08
+radial_segments = 8
+rings = 4
+metadata/source = SubResource("BallMesh")
+
+[sub_resource type="CylinderMesh" id="RodMesh"]
+material = SubResource("Wood")
+top_radius = 0.008
+bottom_radius = 0.008
+height = 0.35
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_osxq4"]
+material = SubResource("StandardMaterial3D_tnkyd")
+top_radius = 0.008
+bottom_radius = 0.008
+height = 0.35
+radial_segments = 6
+rings = 1
+metadata/source = SubResource("RodMesh")
 
 [sub_resource type="StandardMaterial3D" id="Flash"]
 transparency = 1
@@ -29,125 +186,67 @@ albedo_color = Color(1, 0.7, 0.35, 1)
 material = SubResource("Flash")
 size = Vector2(0.5, 0.5)
 
-[sub_resource type="CylinderMesh" id="TubeMesh"]
-material = SubResource("Bronze")
-top_radius = 0.06
-bottom_radius = 0.045
-height = 0.26
-radial_segments = 12
-rings = 1
-
-[sub_resource type="CylinderMesh" id="RingMesh"]
-material = SubResource("Bronze")
-top_radius = 0.072
-bottom_radius = 0.066
-height = 0.035
-radial_segments = 12
-rings = 1
-cap_top = false
-
-[sub_resource type="CylinderMesh" id="BoreMesh"]
-material = SubResource("Dark")
-top_radius = 0.048
-bottom_radius = 0.048
-height = 0.02
-radial_segments = 12
-rings = 1
-
-[sub_resource type="SphereMesh" id="BreechMesh"]
-material = SubResource("Bronze")
-radius = 0.052
-height = 0.104
-radial_segments = 10
-rings = 5
-
-[sub_resource type="SphereMesh" id="BallMesh"]
-material = SubResource("Iron")
-radius = 0.04
-height = 0.08
-radial_segments = 8
-rings = 4
-
-[sub_resource type="CylinderMesh" id="RodMesh"]
-material = SubResource("Wood")
-top_radius = 0.008
-bottom_radius = 0.008
-height = 0.35
-radial_segments = 6
-rings = 1
-
-[sub_resource type="BoxMesh" id="StockMesh"]
-material = SubResource("Wood")
-size = Vector3(0.05, 0.075, 0.3)
-
-[sub_resource type="BoxMesh" id="GripMesh"]
-material = SubResource("Wood")
-size = Vector3(0.04, 0.12, 0.05)
-
-[node name="HandboellerViewmodel" type="Node3D"]
+[node name="HandboellerViewmodel" type="Node3D" unique_id=1556665962]
 script = ExtResource("1")
 kick_distance = 0.12
 kick_angle = 18.0
 kick_time = 0.35
-reload_offset = Vector3(-0.02, 0.0, 0.02)
+reload_offset = Vector3(-0.02, 0, 0.02)
 lower_drop = 0.35
 
-[node name="Model" type="Node3D" parent="."]
-position = Vector3(0.24, -0.27, -0.4)
-rotation = Vector3(0.15, 0.35, 0)
+[node name="Model" type="Node3D" parent="." unique_id=421950612]
+transform = Transform3D(0.9393727, 0.051242013, 0.33904743, 0, 0.9887711, -0.14943814, -0.3428978, 0.14037812, 0.9288246, 0.24, -0.27, -0.4)
 
-[node name="Stock" type="MeshInstance3D" parent="Model"]
-position = Vector3(0, -0.03, 0.1)
+[node name="Stock" type="MeshInstance3D" parent="Model" unique_id=1442206636]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.03, 0.1)
 cast_shadow = 0
-mesh = SubResource("StockMesh")
+mesh = SubResource("ArrayMesh_ip30i")
 
-[node name="Grip" type="MeshInstance3D" parent="Model"]
-position = Vector3(0, -0.1, 0.1)
-rotation = Vector3(0.3, 0, 0)
+[node name="Grip" type="MeshInstance3D" parent="Model" unique_id=462724012]
+transform = Transform3D(1, 0, 0, 0, 0.9553365, -0.29552022, 0, 0.29552022, 0.9553365, 0, -0.1, 0.1)
 cast_shadow = 0
-mesh = SubResource("GripMesh")
+mesh = SubResource("ArrayMesh_f0khn")
 
-[node name="Barrel" type="Node3D" parent="Model"]
-position = Vector3(0, 0.02, -0.12)
-rotation = Vector3(-1.5708, 0, 0)
+[node name="Barrel" type="Node3D" parent="Model" unique_id=217669117]
+transform = Transform3D(1, 0, 0, 0, -3.6199901e-06, 1, 0, -1, -3.6199901e-06, 0, 0.02, -0.12)
 
-[node name="Breech" type="MeshInstance3D" parent="Model/Barrel"]
+[node name="Breech" type="MeshInstance3D" parent="Model/Barrel" unique_id=259471240]
 cast_shadow = 0
-mesh = SubResource("BreechMesh")
+mesh = SubResource("SphereMesh_j3njs")
 
-[node name="Tube" type="MeshInstance3D" parent="Model/Barrel"]
-position = Vector3(0, 0.13, 0)
+[node name="Tube" type="MeshInstance3D" parent="Model/Barrel" unique_id=992353971]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, 0)
 cast_shadow = 0
-mesh = SubResource("TubeMesh")
+mesh = SubResource("CylinderMesh_mkd6i")
 
-[node name="Ring" type="MeshInstance3D" parent="Model/Barrel"]
-position = Vector3(0, 0.255, 0)
+[node name="Ring" type="MeshInstance3D" parent="Model/Barrel" unique_id=886214544]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.255, 0)
 cast_shadow = 0
-mesh = SubResource("RingMesh")
+mesh = SubResource("CylinderMesh_pejvn")
 
-[node name="Bore" type="MeshInstance3D" parent="Model/Barrel"]
-position = Vector3(0, 0.255, 0)
+[node name="Bore" type="MeshInstance3D" parent="Model/Barrel" unique_id=1430290553]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.255, 0)
 cast_shadow = 0
 mesh = SubResource("BoreMesh")
 
-[node name="Ball" type="MeshInstance3D" parent="Model/Barrel"]
-position = Vector3(0, 0.22, 0)
+[node name="Ball" type="MeshInstance3D" parent="Model/Barrel" unique_id=524969472]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 0)
 cast_shadow = 0
-mesh = SubResource("BallMesh")
+mesh = SubResource("SphereMesh_bpfa4")
 
-[node name="Ramrod" type="MeshInstance3D" parent="Model/Barrel"]
-position = Vector3(0, 0.3, 0)
+[node name="Ramrod" type="MeshInstance3D" parent="Model/Barrel" unique_id=94751374]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
 cast_shadow = 0
-mesh = SubResource("RodMesh")
+mesh = SubResource("CylinderMesh_osxq4")
 
-[node name="MuzzleFlash" type="Node3D" parent="Model"]
-position = Vector3(0, 0.02, -0.42)
+[node name="MuzzleFlash" type="Node3D" parent="Model" unique_id=365337753]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -0.42)
 
-[node name="Quad" type="MeshInstance3D" parent="Model/MuzzleFlash"]
+[node name="Quad" type="MeshInstance3D" parent="Model/MuzzleFlash" unique_id=970237699]
 cast_shadow = 0
 mesh = SubResource("FlashQuad")
 
-[node name="Light" type="OmniLight3D" parent="Model/MuzzleFlash"]
+[node name="Light" type="OmniLight3D" parent="Model/MuzzleFlash" unique_id=849767073]
 light_color = Color(1, 0.7, 0.35, 1)
 light_energy = 7.0
 omni_range = 9.0

@@ -30,6 +30,7 @@ SIZE = 256
 #   contrast: scales the detail around the average (below 1 = calmer)
 #   dark: scales only the detail darker than the average (below 1 = fewer dark specks)
 #   turn: a quarter turn, so the grain runs across (barricade boards are long and flat)
+#   size: pixels, for the hero assets section 3 allows 512 for (the weapons)
 TEXTURES = {
     "wood_wall": ("planks_brown_10", (0.58, 0.42, 0.27), {"normal": True, "sat": 0.6}),
     "wood_floor": ("wood_floor_worn", (0.36, 0.24, 0.15), {"normal": True}),
@@ -51,6 +52,9 @@ TEXTURES = {
     "leather": ("brown_leather", (0.8, 0.8, 0.8), {"sat": 0.0, "contrast": 1.4}),
     "fur": ("curly_teddy_natural", (0.8, 0.8, 0.8), {"sat": 0.0, "contrast": 2.2}),
     "skin": ("grey_plaster_02", (0.8, 0.8, 0.8), {"sat": 0.0, "contrast": 0.5}),
+    # The weapons (M6 part 4b, hero assets at 512): neutral, tinted per part.
+    "gun_wood": ("european_walnut_veneer_04", (0.8, 0.8, 0.8), {"sat": 0.0, "contrast": 3.0, "size": 512}),
+    "gun_steel": ("rust_coarse_01", (0.8, 0.8, 0.8), {"sat": 0.0, "contrast": 0.7, "size": 512}),
 }
 
 
@@ -77,15 +81,15 @@ def info(asset):
     return json.loads(path.read_text(encoding="utf8"))
 
 
-def shrink(img):
-    """Down to SIZE, seamless: resampled as a 3x3 tiling so the edges see their wrapped neighbours."""
+def shrink(img, size=SIZE):
+    """Down to `size`, seamless: resampled as a 3x3 tiling so the edges see their wrapped neighbours."""
     w, h = img.size
     tiled = Image.new("RGB", (w * 3, h * 3))
     for x in range(3):
         for y in range(3):
             tiled.paste(img, (x * w, y * h))
-    tiled = tiled.resize((SIZE * 3, SIZE * 3), Image.LANCZOS)
-    return tiled.crop((SIZE, SIZE, SIZE * 2, SIZE * 2))
+    tiled = tiled.resize((size * 3, size * 3), Image.LANCZOS)
+    return tiled.crop((size, size, size * 2, size * 2))
 
 
 def to_linear(c):
@@ -124,13 +128,14 @@ def build(name):
     asset, target, opts = TEXTURES[name]
     OUT.mkdir(parents=True, exist_ok=True)
     turn = opts.get("turn", False)
-    img = albedo(shrink(source(asset, "Diffuse")), target, opts.get("sat", 1.0), opts.get("contrast", 1.0),
+    size = opts.get("size", SIZE)
+    img = albedo(shrink(source(asset, "Diffuse"), size), target, opts.get("sat", 1.0), opts.get("contrast", 1.0),
                  opts.get("dark", 1.0))
     if turn:
         img = img.transpose(Image.Transpose.ROTATE_90)
     img.save(OUT / f"{name}.png", optimize=True)
     if opts.get("normal"):
-        normal(shrink(source(asset, "nor_gl")), turn).save(OUT / f"{name}_normal.png", optimize=True)
+        normal(shrink(source(asset, "nor_gl"), size), turn).save(OUT / f"{name}_normal.png", optimize=True)
 
 
 def main():
