@@ -34,3 +34,6 @@ secondary_damage = 200
 secondary_range = 6.0
 secondary_knockback = 18.0
 secondary_shake = 2.0
+fire_sound = &"alphorn_blast"
+secondary_sound = &"alphorn_echo"
+reload_sound = &"alphorn_load"

@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3]
+[gd_scene load_steps=33 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/zones/stube.tscn" id="2"]
@@ -34,6 +34,8 @@
 [ext_resource type="Script" path="res://scripts/effects/atmosphere.gd" id="32"]
 [ext_resource type="Script" path="res://scripts/effects/snowfall.gd" id="33"]
 [ext_resource type="Script" path="res://scripts/effects/shader_warmup.gd" id="35"]
+[ext_resource type="Script" path="res://scripts/audio/ambience.gd" id="36"]
+[ext_resource type="Script" path="res://scripts/audio/band_director.gd" id="37"]
 
 [sub_resource type="NavigationMesh" id="NavMesh"]
 geometry_collision_mask = 1
@@ -117,6 +119,13 @@ roof_map = NodePath("../RoofMap")
 
 [node name="ShaderWarmup" type="Node3D" parent="."]
 script = ExtResource("35")
+
+[node name="Ambience" type="Node" parent="." node_paths=PackedStringArray("atmosphere")]
+script = ExtResource("36")
+atmosphere = NodePath("../Atmosphere")
+
+[node name="BandDirector" type="Node" parent="."]
+script = ExtResource("37")
 
 [node name="PostFX" type="CanvasLayer" parent="."]
 layer = 0

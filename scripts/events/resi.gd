@@ -32,6 +32,9 @@ var _moving: float = 0.0
 var _head_down: float = 0.0
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var _rng := RandomNumberGenerator.new()
+# Her bell, ringing for as long as she is about, and seconds until she moos again.
+var _bell: AudioStreamPlayer3D
+var _moo_left: float = 0.0
 var _rest: Dictionary = {}
 @onready var _model: Node3D = $Model
 @onready var _marker: MapMarker = $Marker
@@ -57,6 +60,8 @@ func start(gate: Vector3, ramp: Vector3, hub: Vector3, spots: Array[Vector3]) ->
 	_state = State.ARRIVING
 	_stay_left = Constants.RESI_STAY_TIME
 	Events.event_announced.emit(tr("EVENT_RESI_ARRIVES"))
+	_bell = Sound.attach(&"resi_bell", self)
+	_moo()
 
 
 func is_milkable() -> bool:
@@ -99,6 +104,8 @@ func get_interact_prompt(_player: Node3D) -> String:
 func interact(player: Node3D) -> void:
 	if not is_milkable():
 		return
+	if _milk <= 0.0:
+		Sound.play_at(&"milk", global_position + Vector3.UP * 0.5)
 	_milk += interact_repeat
 	_milk_since = 0.0
 	if _milk >= Constants.RESI_MILK_TIME:
@@ -107,6 +114,9 @@ func interact(player: Node3D) -> void:
 
 func _physics_process(delta: float) -> void:
 	_milk_since += delta
+	_moo_left -= delta
+	if _moo_left <= 0.0:
+		_moo()
 	# Let go of E and the pail tips over: start again.
 	if _milk_since > interact_repeat * 3.0:
 		_milk = 0.0
@@ -148,6 +158,7 @@ func _reward(player: Player) -> void:
 		player.perks.eat(jause)
 		text = tr("EVENT_RESI_MILKED") % tr(jause.display_name)
 	Events.event_announced.emit(text)
+	_moo()
 	_milk = 0.0
 	_state = State.MILKED
 	_wait_left = 1.5
@@ -159,7 +170,13 @@ func _leave(bolt: bool) -> void:
 	_route = [_hub, _ramp, _gate, _gate + (_gate - _ramp).normalized() * 8.0]
 	if bolt:
 		Events.event_announced.emit(tr("EVENT_RESI_BOLTED"))
+		_moo()
 	_drop_marker()
+
+
+func _moo() -> void:
+	_moo_left = _rng.randf_range(Constants.RESI_MOO_MIN, Constants.RESI_MOO_MAX)
+	Sound.play_at(&"resi_moo", global_position + Vector3.UP * 1.3)
 
 
 func _drop_marker() -> void:

@@ -39,6 +39,7 @@ func interact(player: Node3D) -> void:
 	if level >= jause.max_level or not buyer.points.spend(jause.cost_at(level)):
 		return
 	buyer.perks.eat(jause)
+	Sound.play(&"jause_eat")
 	_update_label(level + 1)
 	# A little hop, like a plate set down hard.
 	if _tween:

@@ -1,13 +1,13 @@
 extends Node3D
 ## The Harmonika's tune made visible: a ring rolling out over the floor to the edge of its reach, and
-## golden notes rising and swaying all around the player. Placed at the camera; built in code, gone
-## after a moment. The polka itself comes with the M6 sounds.
+## golden notes rising and swaying all around the player. Placed at the camera (or above a Tanzboden);
+## built in code, gone after a moment.
 
 const LIFETIME: float = 1.6
 const RING_TIME: float = 0.5
 const COLOR := Color(1.0, 0.85, 0.45, 0.85)
 const RING_COLOR := Color(1.0, 0.85, 0.45, 0.2)
-# Notes for a full polka; the Landler's puffs show a share of them (amount).
+# Notes for a full polka; the Tanzboden's puffs show a share of them (amount).
 const NOTES: int = 16
 const RISE: float = 1.3
 # Below the eye: the floor, and where the notes start.

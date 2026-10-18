@@ -24,6 +24,7 @@ var _tap: float = 0.0
 var _tap_since: float = INF
 var _rest_left: float = 0.0
 var _terrain: AlmTerrain
+var _rumble: AudioStreamPlayer3D
 @onready var _roll: Node3D = $Roll
 @onready var _marker: MapMarker = $Marker
 @onready var _foam: CPUParticles3D = $Foam
@@ -43,6 +44,7 @@ func start(route: Array[Vector3]) -> void:
 		_direction = _flat(_route[0] - global_position).normalized()
 	_speed = Constants.FASSL_SPEED
 	_state = State.ROLLING
+	_rumble = Sound.attach(&"fassl_roll", self)
 	Events.event_announced.emit(tr("EVENT_FASSL_LOOSE"))
 
 
@@ -147,6 +149,10 @@ func _flatten() -> void:
 
 func _come_to_rest() -> void:
 	_state = State.RESTING
+	if _rumble:
+		_rumble.queue_free()
+		_rumble = null
+	Sound.play_at(&"eisstock_hit", global_position)
 	_rest_left = Constants.FASSL_REST_TIME
 	global_position.y = _ground_height(global_position.x, global_position.z) + RADIUS
 
@@ -155,6 +161,7 @@ func _freibier(player: Player) -> void:
 	_state = State.TAPPED
 	_rest_left = 4.0
 	_foam.emitting = true
+	Sound.play_at(&"fassl_tap", global_position)
 	if is_instance_valid(_marker):
 		_marker.queue_free()
 	var missing: Array[PerkData] = []

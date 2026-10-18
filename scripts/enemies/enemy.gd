@@ -84,6 +84,8 @@ var _burn_fx: CPUParticles3D
 # Came in through a window: lures outside (die Resi) no longer pull it back out.
 var _inside: bool = false
 var _lure: Node3D
+# Seconds until the next groan.
+var _groan_left: float = 0.0
 
 
 func _ready() -> void:
@@ -142,6 +144,8 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 		part.visible = true
 	_set_active(true)
 	_state = State.CHASING
+	# A boss roars as it arrives; the rest start groaning a while after they appear.
+	_groan_left = 0.3 if data.is_boss else randf_range(0.5, Constants.GROAN_MAX)
 	if data.is_boss:
 		Events.boss_spawned.emit(self)
 
@@ -372,6 +376,10 @@ func _pop_head() -> void:
 
 func _physics_process(delta: float) -> void:
 	_lunge_cooldown_left -= delta
+	if is_alive():
+		_groan_left -= delta
+		if _groan_left <= 0.0:
+			_groan()
 	if _slow_left > 0.0:
 		_slow_left -= delta
 		if _slow_left <= 0.0:
@@ -627,6 +635,7 @@ func _start_attack() -> void:
 	_state = State.ATTACKING
 	_attack_time = 0.0
 	_has_swung = false
+	_voice(&"enemy_attack")
 	_kill_tween()
 	_tween = create_tween()
 	# Lean in during the windup, snap back as the hit lands.
@@ -644,6 +653,7 @@ func _can_lunge() -> bool:
 func _start_lunge() -> void:
 	_state = State.LUNGING
 	_lunge_time = 0.0
+	_voice(&"enemy_attack")
 	_lunge_struck = false
 	_kill_tween()
 	_visual.transform = Transform3D.IDENTITY
@@ -775,6 +785,7 @@ func _start_climb() -> void:
 	# The opening is smaller than the body, so the enemy goes through lying flat, head first,
 	# with collision off; every pose keeps the body inside the opening.
 	_state = State.CLIMBING
+	Sound.play_at(&"window_climb", global_position)
 	var forward: Vector3 = _window_forward
 	var wall: Vector3 = _window_wall
 	var exit: Vector3 = _window_exit
@@ -838,6 +849,7 @@ func _leave_window() -> void:
 
 func _die(is_headshot: bool, is_melee: bool, source: Node3D) -> void:
 	_state = State.DEAD
+	_voice(data.death_sound)
 	if _lifted or _hurled:
 		_lifted = false
 		_hurled = false
@@ -967,6 +979,21 @@ func _animate_walk(delta: float) -> void:
 	_walk_phase += delta * data.speed * _slow_factor * 2.2
 	_visual.position.y = absf(sin(_walk_phase)) * 0.06
 	_visual.rotation.z = sin(_walk_phase) * 0.06
+
+
+func _groan() -> void:
+	_groan_left = randf_range(Constants.GROAN_MIN, Constants.GROAN_MAX)
+	if not data.groan_sounds.is_empty():
+		Sound.play_at(data.groan_sounds.pick_random(), _mouth())
+
+
+## A sound from its mouth, at its voice's pitch.
+func _voice(id: StringName) -> void:
+	Sound.play_at(id, _mouth(), 0.0, data.voice_pitch)
+
+
+func _mouth() -> Vector3:
+	return global_position + Vector3.UP * Constants.ENEMY_MOUTH_HEIGHT * data.model_scale
 
 
 func _kill_tween() -> void:

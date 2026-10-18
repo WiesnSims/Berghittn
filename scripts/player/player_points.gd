@@ -24,12 +24,15 @@ func can_afford(cost: int) -> bool:
 	return total >= cost
 
 
-## Takes the points if there are enough; false (and nothing taken) otherwise.
+## Takes the points if there are enough; false (and nothing taken) otherwise. Every purchase comes
+## through here, so this is where the till rings (or the buyer hears they are short).
 func spend(cost: int) -> bool:
 	if not can_afford(cost):
+		Sound.play(&"deny")
 		return false
 	total -= cost
 	changed.emit(total, -cost)
+	Sound.play(&"buy")
 	return true
 
 

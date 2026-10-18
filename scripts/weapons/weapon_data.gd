@@ -77,9 +77,19 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR, BLOCK, PLAY }
 ## long gaps, the Alphorn's and the Rodelkanone's; other guns show it in their animation, and fire
 ## again as it ends).
 @export var cycle_ring: bool = false
-## Translation key of a comic word that pops up where a melee blow lands (the pan's "BONK!"), until
-## the M6 sounds; empty = none.
-@export var hit_text: String = ""
+## Sounds (Sound ids, M6 part 2; empty = none). fire_sound goes with every shot, or, with a
+## fire_loop_sound (the flame), only as the stream starts while the loop runs on under held fire.
+## secondary_sound is a BEHAVIOR secondary's shot, play_sound the loop of a held PLAY secondary.
+## reload_sound starts a reload and reload_end_sound finishes it. Melee: swing_sound with every swing,
+## and hit_sound where a blow lands (special weapons play hit_sound where their shot lands).
+@export var fire_sound: StringName
+@export var fire_loop_sound: StringName
+@export var secondary_sound: StringName
+@export var play_sound: StringName
+@export var reload_sound: StringName
+@export var reload_end_sound: StringName
+@export var swing_sound: StringName
+@export var hit_sound: StringName
 @export var viewmodel: PackedScene
 @export var secondary: Secondary = Secondary.NONE
 ## Aiming (AIM and SCOPE): field of view when fully aimed (degrees), seconds to get there, and the

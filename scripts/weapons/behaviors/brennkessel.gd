@@ -37,7 +37,7 @@ func burst(at: Vector3, _damage: int, radius: float, _size: float) -> void:
 		return
 	var lacke: Node3D = _pooled(_lacken, Constants.LACKE_POOL, LACKE, false)
 	lacke.call("lay", self, floor_hit.position, radius)
-	holder.show_word(floor_hit.position + Vector3.UP * 0.8, data.hit_text)
+	Sound.play_at(data.hit_sound, floor_hit.position)
 
 
 ## Called by a burning puddle every LACKE_INTERVAL: whoever stands in it catches fire.

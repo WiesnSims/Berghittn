@@ -10,6 +10,11 @@ var _noise: FastNoiseLite = FastNoiseLite.new()
 var _time: float = 0.0
 
 
+func _ready() -> void:
+	# The fire crackles where it burns (Ambience bus).
+	Sound.attach(&"fire_crackle", self)
+
+
 func _process(delta: float) -> void:
 	_time += delta * flicker_speed
 	# get_noise_1d returns roughly -0.5..0.5, so double it for a -1..1 swing.

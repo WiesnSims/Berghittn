@@ -31,6 +31,12 @@ var _last_camera: Vector3 = Vector3.ZERO
 var _frost: float = 0.0
 
 
+## How far indoors the camera is right now, eased (0 = out in the storm, 1 = under a roof); the
+## ambience follows it.
+func inside() -> float:
+	return smoothstep(0.0, 1.0, _inside)
+
+
 func _process(delta: float) -> void:
 	var camera: Camera3D = get_viewport().get_camera_3d()
 	if camera == null or environment == null:

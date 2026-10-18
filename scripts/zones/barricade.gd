@@ -77,6 +77,7 @@ func remove_board() -> void:
 	if boards <= 0:
 		return
 	boards -= 1
+	Sound.play_at(&"board_pull", global_position)
 	var board: MeshInstance3D = _board_nodes[boards]
 	# Yanked out through the opening and dropped outside.
 	var gone: Transform3D = _rests[boards].translated(Vector3(0.0, -1.2, 1.1)).rotated_local(Vector3.RIGHT, 1.2)
@@ -89,6 +90,7 @@ func add_board() -> bool:
 		return false
 	var index: int = boards
 	boards += 1
+	Sound.play_at(&"board_nail", global_position)
 	var board: MeshInstance3D = _board_nodes[index]
 	# Swung in from the player's side and slammed onto the frame.
 	board.transform = _rests[index].translated(Vector3(0.0, 0.0, -0.45)).rotated_local(Vector3.UP, 0.5)

@@ -153,12 +153,13 @@ func _walls() -> void:
 	for d: Vector3 in [Vector3(1, 0, 0), Vector3(-1, 0, 0), Vector3(0, 0, 1), Vector3(0, 0, -1)]:
 		var query := PhysicsRayQueryParameters3D.create(eye, eye + d * 12.0, Constants.LAYER_WORLD)
 		var hit: Dictionary = player.get_world_3d().direct_space_state.intersect_ray(query)
-		if not hit.is_empty() and eye.distance_to(hit.position) > 3.0 and eye.distance_to(hit.position) < 9.0:
+		# Within the horn's 12 m with the enemy 1.2 m behind it (the Stube grew in the layout pass, #53).
+		if not hit.is_empty() and eye.distance_to(hit.position) > 3.0 and eye.distance_to(hit.position) < 10.0:
 			wall = hit
 			direction = d
 			break
 	if wall.is_empty():
-		_check(false, "found a wall 3 to 9 m away to test against")
+		_check(false, "found a wall 3 to 10 m away to test against")
 		return
 	_look_flat(direction)
 	await _frames(2)
@@ -256,4 +257,4 @@ func _cycles() -> void:
 		var animation: float = model.fire_animation_time()
 		model.free()
 		_check(absf(1.0 / gun.fire_rate - animation) < 0.01, "%s fires again as its animation ends (%.2f s / %.2f s)" % [id, 1.0 / gun.fire_rate, animation])
-	_check(horn.cycle_ring and not (load("res://data/weapons/stutzen.tres") as WeaponData).cycle_ring, "only the Alphorn shows the ring between shots")
+	_check(horn.cycle_ring and not (load("res://data/weapons/stutzen.tres") as WeaponData).cycle_ring, "the Alphorn shows the ring between shots, the guns do not")

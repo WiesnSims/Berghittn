@@ -18,3 +18,4 @@ climb_time = 2.2
 board_break_time = 0.5
 head_pop_damage = 50
 model = ExtResource("2")
+groan_sounds = Array[StringName]([&"groan_wanderer"])

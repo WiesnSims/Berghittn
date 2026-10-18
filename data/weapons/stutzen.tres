@@ -34,3 +34,6 @@ aim_fov = 22.0
 aim_time = 0.28
 aim_spread_multiplier = 0.02
 aim_move_multiplier = 0.45
+fire_sound = &"shot_stutzen"
+reload_sound = &"bolt_open"
+reload_end_sound = &"bolt_close"

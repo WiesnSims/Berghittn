@@ -1,7 +1,7 @@
 extends WeaponBehavior
 ## Rodelkanone (section 6a): shoots a wooden Rodel in an arc where the player aims; where it comes
 ## down it races along the ground in a straight line for 15 m, over steps and down slopes, knocking every enemy
-## in its lane aside for 300. At the end, or at the first wall, it breaks apart with a "KRACH!".
+## in its lane aside for 300. At the end, or at the first wall, it breaks apart with a crash.
 ## Right click, the Kehre: a sled shot with more powder (two rounds) that banks off walls up to
 ## three times and runs 25 m, for rooms and corridors where a straight 15 m never fit.
 
@@ -46,12 +46,12 @@ func _launch(damage: int, distance: float, banks: int) -> void:
 ## Called by a sled for every body it runs into.
 func strike(hurtbox: Hurtbox, damage: int, push: Vector3) -> void:
 	if holder.strike(hurtbox, damage, push) != Hurtbox.Result.IGNORED:
-		holder.show_word(hurtbox.global_position + Vector3.UP * 1.6, data.hit_text)
+		Sound.play_at(data.hit_sound, hurtbox.global_position)
 
 
 ## Called by a sled where it breaks apart.
 func crash(at: Vector3) -> void:
-	holder.show_word(at + Vector3.UP * 0.6, "HIT_KRACH")
+	Sound.play_at(data.hit_sound, at, Constants.SLED_CRASH_LOUDER)
 
 
 func _free_sled() -> Node3D:

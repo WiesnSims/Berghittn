@@ -25,6 +25,11 @@ var _sprinting: bool = false
 # Field of view without aiming; aiming zooms from here to the gun's aim_fov.
 var _base_fov: float = 75.0
 var _time: float = 0.0
+# Metres left until the next footstep, and seconds until another hurt grunt may come.
+var _step_left: float = Constants.STEP_DISTANCE
+var _hurt_gap: float = 0.0
+# Tells boards (under a roof) from snow for the footsteps; found on first use.
+var _roof: RoofMap
 
 
 func _ready() -> void:
@@ -34,6 +39,7 @@ func _ready() -> void:
 	weapons.set_owner_body(self)
 	weapons.fired.connect(_on_fired)
 	health.died.connect(_on_died)
+	health.damaged.connect(_on_damaged)
 
 
 func spawn_at(spawn: Transform3D) -> void:
@@ -103,9 +109,32 @@ func _physics_process(delta: float) -> void:
 	elif Input.is_action_just_pressed("jump") and not _is_crouching():
 		velocity.y = Constants.PLAYER_JUMP_VELOCITY
 	_update_horizontal_velocity(delta)
+	var was_on_floor: bool = is_on_floor()
+	var fall_speed: float = -velocity.y
 	move_and_slide()
+	_hurt_gap -= delta
+	_footsteps(delta, was_on_floor, fall_speed)
 	if global_position.y < Constants.PLAYER_FALL_RESPAWN_Y:
 		_respawn()
+
+
+func _footsteps(delta: float, was_on_floor: bool, fall_speed: float) -> void:
+	if not is_on_floor():
+		return
+	if not was_on_floor:
+		if fall_speed > Constants.LAND_SOUND_SPEED:
+			Sound.play(&"land")
+		_step_left = Constants.STEP_DISTANCE * 0.5
+		return
+	_step_left -= Vector2(velocity.x, velocity.z).length() * delta
+	if _step_left > 0.0:
+		return
+	_step_left = Constants.STEP_DISTANCE_SPRINT if _sprinting else Constants.STEP_DISTANCE
+	if _roof == null:
+		_roof = get_tree().get_first_node_in_group("roof_map") as RoofMap
+	var indoors: bool = _roof != null and _roof.is_covered(global_position + Vector3.UP)
+	var loudness: float = -6.0 if _is_crouching() else (Constants.STEP_SPRINT_LOUDER if _sprinting else 0.0)
+	Sound.play(&"step_wood" if indoors else &"step_snow", loudness)
 
 
 func _look(relative: Vector2) -> void:
@@ -177,7 +206,14 @@ func _respawn() -> void:
 	velocity = Vector3.ZERO
 
 
+func _on_damaged(amount: int) -> void:
+	if amount > 0 and _hurt_gap <= 0.0 and not health.is_dead():
+		_hurt_gap = Constants.HURT_SOUND_GAP
+		Sound.play(&"player_hurt")
+
+
 func _on_died() -> void:
+	Sound.play(&"player_death")
 	weapons.process_mode = Node.PROCESS_MODE_DISABLED
 	weapons.visible = false
 	# Drop to the floor and roll onto one side, so the death reads before the screen appears.

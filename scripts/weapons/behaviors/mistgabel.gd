@@ -58,7 +58,7 @@ func hold_end() -> void:
 func _landed(enemy: Enemy) -> void:
 	var at: Vector3 = enemy.global_position + Vector3.UP * 0.5
 	holder.area_hit(at, Vector3.FORWARD, 180.0, data.secondary_range, data.secondary_damage, data.secondary_knockback)
-	holder.show_word(at + Vector3.UP * 0.5, "HIT_PLUMPS")
+	Sound.play_at(&"land", at)
 
 
 func _flat_forward() -> Vector3:

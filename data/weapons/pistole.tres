@@ -32,3 +32,6 @@ aim_fov = 58.0
 aim_time = 0.16
 aim_spread_multiplier = 0.25
 aim_move_multiplier = 0.65
+fire_sound = &"shot_pistole"
+reload_sound = &"mag_out"
+reload_end_sound = &"mag_in"

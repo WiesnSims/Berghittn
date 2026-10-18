@@ -126,6 +126,8 @@ func _arrive() -> void:
 	_leave_left = 4.0
 	_bubble.text = tr("GUEST_URIG")
 	_bubble.visible = true
+	# A souvenir photo of the Stube.
+	Sound.play_at(&"camera", global_position + Vector3.UP * 1.5)
 	Events.event_announced.emit(tr("GUEST_URIG"))
 	_drop_marker()
 	var player := _nearest_player(INF)

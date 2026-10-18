@@ -2,8 +2,8 @@ class_name Murmeltier
 extends Node3D
 ## Das Murmeltier (section 8a): pops out of the floor somewhere on the open part of the map, indoors too,
 ## stands up and screams, ducks away, and pops up again close by a few times. Hit it (shot or shovel)
-## while it is up: points and a full refill of the gun in hand. Its scream sound comes with M6; until
-## then a big "AAAAH!" shows it.
+## while it is up: points and a full refill of the gun in hand. Its scream is our own take on the
+## meme (synthesised, tools/audio).
 
 enum State { RISING, SCREAMING, DUCKING, HIDDEN, CAUGHT }
 
@@ -15,9 +15,10 @@ var _state: State = State.HIDDEN
 var _time: float = 0.0
 var _pops_left: int = 0
 var _rest: Dictionary = {}
+# The scream of the current pop, cut short when it is caught.
+var _scream: AudioStreamPlayer3D
 @onready var _model: Node3D = $Model
 @onready var _hurtbox: Hurtbox = $Hurtbox
-@onready var _shout: Label3D = $Shout
 @onready var _hole: Node3D = $Hole
 @onready var _marker: MapMarker = $Marker
 
@@ -45,6 +46,9 @@ func receive_hit(_amount: int, _is_headshot: bool, _is_melee: bool, source: Node
 		return Hurtbox.Result.IGNORED
 	_state = State.CAUGHT
 	_set_up(false)
+	if is_instance_valid(_scream):
+		_scream.queue_free()
+	Sound.play_at(&"murmeltier_hit", global_position + Vector3.UP * 0.4)
 	var player := source as Player
 	if player:
 		player.points.add(Constants.MURMEL_POINTS)
@@ -68,13 +72,11 @@ func _process(delta: float) -> void:
 			_model.position.y = lerpf(-0.7, 0.0, minf(_time / Constants.MURMEL_RISE_TIME, 1.0))
 			if _time >= Constants.MURMEL_RISE_TIME:
 				_enter(State.SCREAMING)
+				_scream = Sound.attach(&"murmeltier_scream", self, 0.0, Constants.MURMEL_SCREAM_REACH)
 		State.SCREAMING:
 			var scream: float = clampf(_time / 0.25, 0.0, 1.0)
 			_pose(scream)
-			_shout.visible = true
-			_shout.scale = Vector3.ONE * (0.8 + 0.2 * sin(_time * 30.0)) * scream
 			if _time >= Constants.MURMEL_SCREAM_TIME:
-				_shout.visible = false
 				_enter(State.DUCKING)
 		State.DUCKING:
 			_pose(1.0 - minf(_time / Constants.MURMEL_RISE_TIME, 1.0))
@@ -102,6 +104,7 @@ func _pop_at(spot: Vector3, look_at_point: Vector3) -> void:
 	_pose(0.0)
 	_set_up(true)
 	_enter(State.RISING)
+	Sound.play_at(&"murmeltier_pop", spot)
 
 
 func _enter(state: State) -> void:

@@ -13,6 +13,7 @@ var _hit: Dictionary = {}
 var _resting: bool = false
 var _rest_left: float = 0.0
 var _fall_speed: float = 0.0
+var _slide: AudioStreamPlayer3D
 @onready var _model: Node3D = $Model
 
 
@@ -20,6 +21,7 @@ func launch(from: Vector3, direction: Vector3, thrower: Node3D) -> void:
 	global_position = from
 	velocity = direction * Constants.EISSTOCK_SPEED
 	_thrower = thrower
+	_slide = Sound.attach(&"eisstock_slide", self)
 
 
 func is_sliding() -> bool:
@@ -54,6 +56,7 @@ func _physics_process(delta: float) -> void:
 			_stop()
 			return
 		_bounces_left -= 1
+		Sound.play_at(&"eisstock_hit", global_position)
 		velocity = velocity.bounce(normal.normalized()) * Constants.EISSTOCK_BOUNCE_KEEP
 		global_position = Vector3(wall.position.x, global_position.y, wall.position.z) + normal.normalized() * (RADIUS + 0.02)
 		return
@@ -90,6 +93,7 @@ func _strike() -> void:
 		if now - _hit.get(id, -10.0) < 0.4:
 			continue
 		_hit[id] = now
+		Sound.play_at(&"eisstock_hit", global_position)
 		if enemy.data.is_boss:
 			enemy.receive_hit(Constants.EISSTOCK_BOSS_DAMAGE, false, false, _thrower)
 			if enemy.is_alive():
@@ -102,4 +106,7 @@ func _strike() -> void:
 
 func _stop() -> void:
 	_resting = true
+	if _slide:
+		_slide.queue_free()
+		_slide = null
 	_rest_left = 3.0

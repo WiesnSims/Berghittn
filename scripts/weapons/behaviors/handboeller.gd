@@ -40,7 +40,7 @@ func _launch(speed: float, damage: int, radius: float) -> void:
 ## Called by a shell where it bursts.
 func burst(at: Vector3, damage: int, radius: float, _size: float) -> void:
 	holder.area_hit(at + Vector3.UP * 0.5, Vector3.FORWARD, 180.0, radius, damage, _push)
-	holder.show_word(at + Vector3.UP * 0.8, data.hit_text)
+	Sound.play_at(data.hit_sound, at)
 	var blast := Node3D.new()
 	blast.set_script(BLAST)
 	blast.set("radius", radius)

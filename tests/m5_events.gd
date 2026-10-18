@@ -147,7 +147,7 @@ func _murmeltier_caught() -> void:
 	while not murmel.is_up() or murmel._state != Murmeltier.State.SCREAMING:
 		await get_tree().physics_frame
 	await _frames(2)
-	_check(murmel._shout.visible, "it screams (AAAAAAH! until the sound comes in M6)")
+	_check(is_instance_valid(murmel._scream) and murmel._scream.stream != null and murmel._scream.playing, "it screams (our own synthesised scream)")
 	# Shoot it with an almost empty pistol from 3 m.
 	var spot: Vector3 = murmel.global_position
 	murmel._pops_left = 99

@@ -94,6 +94,7 @@ func send_resi() -> Resi:
 	_stage().add_child(_resi)
 	_resi.start((spots.get_node("Gate") as Node3D).global_position, (spots.get_node("Ramp") as Node3D).global_position,
 		(spots.get_node("Hub") as Node3D).global_position, wander)
+	Sound.play(&"event_call")
 	return _resi
 
 
@@ -110,6 +111,7 @@ func send_fassl() -> Bierfassl:
 	_fassl = fassl_scene.instantiate() as Bierfassl
 	_stage().add_child(_fassl)
 	_fassl.start(route)
+	Sound.play(&"event_call")
 	return _fassl
 
 
@@ -126,6 +128,7 @@ func send_murmeltier() -> Murmeltier:
 	_murmel = murmel_scene.instantiate() as Murmeltier
 	_stage().add_child(_murmel)
 	_murmel.start(spot, player.global_position)
+	Sound.play(&"event_call")
 	return _murmel
 
 
@@ -140,6 +143,7 @@ func send_guest() -> TouristGuest:
 	_guest = guest_scene.instantiate() as TouristGuest
 	_stage().add_child(_guest)
 	_guest.start(arrival.global_position, goal.global_position)
+	Sound.play(&"event_call")
 	return _guest
 
 

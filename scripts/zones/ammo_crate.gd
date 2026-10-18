@@ -34,6 +34,7 @@ func interact(player: Node3D) -> void:
 	if not buyer.weapons.needs_any_ammo() or not buyer.points.spend(cost):
 		return
 	buyer.weapons.refill_all()
+	Sound.play_at(&"ammo_crate", global_position)
 	# The lid pops up and drops shut again.
 	if _tween:
 		_tween.kill()

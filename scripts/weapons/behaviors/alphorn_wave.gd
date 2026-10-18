@@ -1,8 +1,7 @@
 extends Node3D
 ## The Alphorn's note made visible: pale rings of sound that roll out from the bell along the cone,
 ## growing to its width as they go, or, for the Echo, rings rolling out flat around the player and
-## one rising to the sky. Placed at the camera, -Z along the aim. Built in code, gone after a moment;
-## the horn sound itself comes with M6.
+## one rising to the sky. Placed at the camera, -Z along the aim. Built in code, gone after a moment.
 
 const RINGS: int = 4
 const RING_GAP: float = 0.07

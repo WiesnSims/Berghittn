@@ -24,3 +24,6 @@ flinch_multiplier = 0.1
 lunge_range = 0.0
 is_boss = true
 drop = ExtResource("3")
+groan_sounds = Array[StringName]([&"krampus_roar", &"chains"])
+death_sound = &"krampus_roar"
+voice_pitch = 0.7

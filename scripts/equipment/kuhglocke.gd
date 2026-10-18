@@ -3,8 +3,7 @@ extends Node3D
 ## A thrown Kuhglocke (section 6a): flies in an arc where the player looks, bounces off walls, and once
 ## it lies still it rings for KUHGLOCKE_RING_TIME: every enemy within KUHGLOCKE_LURE_RADIUS walks to it
 ## and stands around it instead of chasing players (group "lures", see Enemy). A ring pulses out on
-## the floor with each swing and a comic "BIMM!" floats up until the M6 sounds. Then it goes quiet and
-## sinks away.
+## the floor with each swing and the bell clanks. Then it goes quiet and sinks away.
 
 const RADIUS: float = 0.2
 const SINK_TIME: float = 0.6
@@ -13,7 +12,7 @@ var velocity: Vector3
 var _thrower: Node3D
 var _flying: bool = true
 var _ring_left: float = 0.0
-var _word_left: float = 0.0
+var _ringing: AudioStreamPlayer3D
 var _swing: float = 0.0
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @onready var _model: Node3D = $Model
@@ -91,7 +90,7 @@ func _fly(delta: float) -> void:
 		_flying = false
 		_model.rotation = Vector3(0.0, randf() * TAU, 0.0)
 		_ring_left = Constants.KUHGLOCKE_RING_TIME
-		_word_left = 0.0
+		_ringing = Sound.attach(&"kuhglocke_ring", self)
 		return
 	# A wall or a ceiling: it bounces off, losing most of its speed.
 	global_position = hit.position + normal * (RADIUS + 0.02)
@@ -107,29 +106,9 @@ func _ring(delta: float) -> void:
 	_pulse.visible = true
 	_pulse.scale = Vector3.ONE * lerpf(0.3, 3.0, pulse_phase)
 	(_pulse.material_override as StandardMaterial3D).albedo_color.a = 0.45 * (1.0 - pulse_phase)
-	_word_left -= delta
-	if _word_left <= 0.0:
-		_word_left = Constants.KUHGLOCKE_WORD_EVERY
-		_float_word()
 	if _ring_left <= 0.0:
 		_pulse.visible = false
 		_model.rotation.z = 0.0
-
-
-func _float_word() -> void:
-	var label := Label3D.new()
-	label.text = tr("HIT_BIMM")
-	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	label.no_depth_test = true
-	label.fixed_size = true
-	label.pixel_size = 0.001
-	label.font_size = 56
-	label.outline_size = 10
-	label.modulate = Color(1.0, 0.9, 0.45)
-	label.outline_modulate = Color(0.3, 0.18, 0.05)
-	add_child(label)
-	label.position = Vector3(randf_range(-0.2, 0.2), 0.6, randf_range(-0.2, 0.2))
-	var tween := label.create_tween().set_parallel()
-	tween.tween_property(label, "position:y", 1.4, 0.9).set_ease(Tween.EASE_OUT)
-	tween.tween_property(label, "modulate:a", 0.0, 0.9).set_ease(Tween.EASE_IN)
-	tween.chain().tween_callback(label.queue_free)
+		if _ringing:
+			_ringing.queue_free()
+			_ringing = null

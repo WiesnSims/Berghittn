@@ -68,6 +68,118 @@ polygon = PackedVector2Array(0, 3.5, 5.46, -0.32, 5.46, 0.28, 0, 4.1)
 depth = 0.1
 material = ExtResource("3")
 
+[node name="AussenstiegeSteps" type="CSGCombiner3D" parent="."]
+
+[node name="Step0" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, -0.2332, 13.94)
+size = Vector3(2.58, 0.1736, 0.2482)
+material = ExtResource("1")
+
+[node name="Step1" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, -0.1464, 13.69)
+size = Vector3(2.58, 0.3473, 0.2482)
+material = ExtResource("1")
+
+[node name="Step2" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, -0.05955, 13.44)
+size = Vector3(2.58, 0.5209, 0.2482)
+material = ExtResource("1")
+
+[node name="Step3" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 0.02727, 13.19)
+size = Vector3(2.58, 0.6945, 0.2482)
+material = ExtResource("1")
+
+[node name="Step4" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 0.1141, 12.94)
+size = Vector3(2.58, 0.8682, 0.2482)
+material = ExtResource("1")
+
+[node name="Step5" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 0.2009, 12.7)
+size = Vector3(2.58, 1.042, 0.2482)
+material = ExtResource("1")
+
+[node name="Step6" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 0.2877, 12.45)
+size = Vector3(2.58, 1.215, 0.2482)
+material = ExtResource("1")
+
+[node name="Step7" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 0.3745, 12.2)
+size = Vector3(2.58, 1.389, 0.2482)
+material = ExtResource("1")
+
+[node name="Step8" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 0.4614, 11.95)
+size = Vector3(2.58, 1.563, 0.2482)
+material = ExtResource("1")
+
+[node name="Step9" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 0.5482, 11.7)
+size = Vector3(2.58, 1.736, 0.2482)
+material = ExtResource("1")
+
+[node name="Step10" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 0.635, 11.45)
+size = Vector3(2.58, 1.91, 0.2482)
+material = ExtResource("1")
+
+[node name="Step11" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 0.7218, 11.21)
+size = Vector3(2.58, 2.084, 0.2482)
+material = ExtResource("1")
+
+[node name="Step12" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 0.8086, 10.96)
+size = Vector3(2.58, 2.257, 0.2482)
+material = ExtResource("1")
+
+[node name="Step13" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 0.8955, 10.71)
+size = Vector3(2.58, 2.431, 0.2482)
+material = ExtResource("1")
+
+[node name="Step14" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 0.9823, 10.46)
+size = Vector3(2.58, 2.605, 0.2482)
+material = ExtResource("1")
+
+[node name="Step15" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 1.069, 10.21)
+size = Vector3(2.58, 2.778, 0.2482)
+material = ExtResource("1")
+
+[node name="Step16" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 1.156, 9.965)
+size = Vector3(2.58, 2.952, 0.2482)
+material = ExtResource("1")
+
+[node name="Step17" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 1.243, 9.717)
+size = Vector3(2.58, 3.125, 0.2482)
+material = ExtResource("1")
+
+[node name="Step18" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 1.33, 9.469)
+size = Vector3(2.58, 3.299, 0.2482)
+material = ExtResource("1")
+
+[node name="Step19" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 1.416, 9.22)
+size = Vector3(2.58, 3.473, 0.2482)
+material = ExtResource("1")
+
+[node name="Step20" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 1.503, 8.972)
+size = Vector3(2.58, 3.646, 0.2482)
+material = ExtResource("1")
+
+[node name="Step21" type="CSGBox3D" parent="AussenstiegeSteps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.6, 1.59, 8.724)
+size = Vector3(2.58, 3.82, 0.2482)
+material = ExtResource("1")
+
 [node name="Fence" type="CSGCombiner3D" parent="."]
 use_collision = true
 
