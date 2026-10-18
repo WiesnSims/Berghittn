@@ -311,10 +311,17 @@ const RODEL_STEP: float = 0.4
 const RODEL_MAX_DROP: float = 4.0
 const RODEL_SIDE_PUSH: float = 1.2
 # Steirische Harmonika: seconds a polka makes enemies dance, how much harder other hits land on a
-# dancer, and how long the held Landler's dance lingers once the playing stops.
+# dancer, and how long a dancer keeps dancing after stepping off a Tanzboden.
 const DANCE_TIME: float = 4.0
 const DANCE_DAMAGE_MULTIPLIER: int = 2
 const DANCE_LINGER: float = 1.0
+# The Tanzboden (Harmonika right click): seconds it lies, the farthest it can be laid (m), how often
+# it looks for dancers (s), the Landler's bar for its pulsing rim (s), and how many can lie at once.
+const TANZBODEN_TIME: float = 10.0
+const TANZBODEN_REACH: float = 15.0
+const TANZBODEN_SCAN: float = 0.1
+const TANZBODEN_BEAT: float = 1.5
+const TANZBODEN_POOL: int = 3
 # How a dancer turns (radians per second), hops (metres) and how many hops a second.
 const DANCE_SPIN: float = 5.0
 const DANCE_HOP: float = 0.18
@@ -386,6 +393,8 @@ const SOUND_UNIT_SIZE: float = 3.0
 const SOUND_MAX_DISTANCE: float = 50.0
 const SOUND_DISTANCE_CUTOFF: float = 5000.0
 const SOUND_PITCH_JITTER: float = 0.05
+# Seconds within which the same sound started again is dropped instead of stacking up.
+const SOUND_STACK_TIME: float = 0.06
 # A far-reaching sound (Sound.attach with a reach) stays at full level out to this share of its reach.
 const SOUND_FAR_UNIT_SHARE: float = 0.12
 # The Murmeltier's scream carries over the whole map (play-test 2026-10-18).

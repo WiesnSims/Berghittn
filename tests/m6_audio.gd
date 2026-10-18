@@ -72,6 +72,7 @@ func _run() -> void:
 	await _weapons()
 	await _footsteps()
 	await _enemies()
+	await _stacking()
 	await _purchases()
 	await _wind()
 
@@ -224,6 +225,22 @@ func _enemies() -> void:
 	_quiet()
 	enemy.receive_hit(100000, false, false, player)
 	_check(_sounding(&"enemy_death"), "and cries out as it falls")
+
+
+func _stacking() -> void:
+	_quiet()
+	Sound._started.clear()
+	# One shovel blow striking four enemies at once.
+	for i: int in 4:
+		Sound.play_at(&"schaufel_hit", FIELD + Vector3(i, 0, 0))
+	var playing: int = 0
+	for p: AudioStreamPlayer3D in Sound._pool_3d:
+		if p.playing and p.get_meta(&"id", &"") == &"schaufel_hit":
+			playing += 1
+	_check(playing == 1, "four hits at once play one hit sound, not four stacked up (%d)" % playing)
+	await _seconds(0.2)
+	_check(Sound.play_at(&"schaufel_hit", FIELD) != null, "and the next blow a moment later sounds again")
+	_quiet()
 
 
 func _purchases() -> void:

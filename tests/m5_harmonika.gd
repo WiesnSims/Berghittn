@@ -3,9 +3,9 @@ extends Node
 ## Headless check of the Steirische Harmonika (section 6a) on the real main scene: 3 / 9, a polka that
 ## makes every enemy within 8 m dance for 4 s (not past 8 m, not behind a wall): dancers stay on the
 ## spot, do not attack, take 20 a second and twice the damage from other hits; a boss takes the
-## damage but does not dance. The Landler (hold right click) plays one round per 1.5 s, slows the
-## player, keeps everyone in reach dancing while it plays (newcomers too) and stops when the rounds
-## run out, and the gun then reloads. The polka animation ends as the next can start, and the
+## damage but does not dance. The Tanzboden (right click) takes two rounds and lies where the player
+## aims for 10 s: whoever is on it dances (newcomers too), whoever is beside it does not, and the
+## dance ends with it. The polka animation ends as the next can start, and the
 ## Hüttentruhe has it at weight 1.
 
 # Open pasture in front of the hut, clear of furniture.
@@ -108,7 +108,7 @@ func _run() -> void:
 
 	await _polka()
 	await _boss()
-	await _landler()
+	await _tanzboden()
 	_extras()
 
 	print("RESULT: %s" % ("PASS" if failures.is_empty() else "%d FAILED" % failures.size()))
@@ -186,45 +186,48 @@ func _boss() -> void:
 	await _clear([krampus])
 
 
-func _landler() -> void:
+func _tanzboden() -> void:
 	var wanderer: EnemyData = load("res://data/enemies/wanderer.tres")
 	var holder: WeaponHolder = player.weapons
 	player.global_position = _ground(Vector3.ZERO)
+	_look_flat(Vector3(1, 0, 0))
+	# Looking a little down: the aim meets the pasture about 8 m ahead.
+	(player.get_node("Head") as Node3D).rotation.x = -0.2
 	await _frames(5)
 	holder.mag = 3
 	holder.reserve = 9
 	holder._cooldown = 0.0
-	var dancer: Enemy = _spawn(wanderer, Vector3(5, 0, 0))
-	await _frames(5)
-	holder.force_aim = true
-	await _frames(3)
-	_check(holder.is_playing() and holder.mag == 2, "right click held plays the Landler, the first round on the press (%d left)" % holder.mag)
-	_check(is_equal_approx(player._base_speed(Vector2(0, -1)), Constants.PLAYER_WALK_SPEED * gun.aim_move_multiplier), "walking at %.0f %% while playing" % (gun.aim_move_multiplier * 100.0))
-	await _seconds(0.3)
-	_check(dancer.is_dancing(), "whoever is in reach dances")
-	# Someone walking into reach while it plays starts dancing too.
-	var newcomer: Enemy = _spawn(wanderer, Vector3(-6, 0, 0))
-	await _seconds(0.3)
-	_check(newcomer.is_dancing(), "a newcomer in reach starts dancing")
-	await _seconds(1.2)
-	_check(holder.mag == 1, "a round every %.1f s (%d left)" % [gun.secondary_round_time, holder.mag])
-	# Past the polka's 4 s: still dancing for as long as the music plays.
-	await _seconds(2.6)
-	_check(holder.is_playing() and dancer.is_dancing(), "still dancing after 4.5 s of playing")
+	holder.fire_secondary()
+	await _frames(2)
+	_check(holder.mag == 1, "right click lays a Tanzboden for two rounds (%d left)" % holder.mag)
+	var floor: Node3D = holder._behavior._floors[0] if not holder._behavior._floors.is_empty() else null
+	var ahead: float = (floor.global_position - player.global_position).dot(Vector3(1, 0, 0)) if floor else -1.0
+	_check(floor != null and floor.visible and ahead > 5.0 and ahead < 11.0, "it lies where the player aims, %.1f m ahead" % ahead)
+	if floor == null:
+		return
+	var on_it: Vector3 = floor.global_position - FIELD
+	var dancer: Enemy = _spawn(wanderer, on_it + Vector3(0.8, 0, 0))
+	var outsider: Enemy = _spawn(wanderer, on_it + Vector3(0, 0, gun.secondary_range + 2.5))
+	outsider.set_physics_process(false)
 	await _seconds(0.4)
-	_check(not holder.is_playing() and holder.mag == 0 and holder.is_reloading(), "out of rounds the music stops and the gun reloads")
-	holder.force_aim = false
-	await _seconds(1.3)
-	_check(not dancer.is_dancing(), "and the dance ends a moment after")
-	_check(dancer.health < 10000 - 4 * gun.secondary_damage, "the Landler hurt for as long as it played (%d)" % (10000 - dancer.health))
-	await _clear([dancer, newcomer])
+	_check(dancer.is_dancing(), "whoever is on it dances")
+	_check(not outsider.is_dancing(), "whoever is beside it does not")
+	await _seconds(3.0)
+	var newcomer: Enemy = _spawn(wanderer, on_it + Vector3(-0.8, 0, 0.5))
+	await _seconds(0.4)
+	_check(newcomer.is_dancing(), "one that steps on later starts dancing")
+	_check(dancer.is_dancing(), "still dancing past the polka's 4 s")
+	await _seconds(Constants.TANZBODEN_TIME - 3.8 + Constants.DANCE_LINGER + 0.6)
+	_check(not dancer.is_dancing() and not floor.visible, "after %.0f s the music stops, the floor is gone and so is the dance" % Constants.TANZBODEN_TIME)
+	_check(dancer.health < 10000 - 8 * gun.secondary_damage, "dancing on it hurt all along (%d)" % (10000 - dancer.health))
+	await _clear([dancer, outsider, newcomer])
 
 
 func _extras() -> void:
 	var model := gun.viewmodel.instantiate() as Viewmodel
 	_check(absf(model.fire_animation_time() - 1.0 / gun.fire_rate) < 0.01, "the polka animation ends as the next can start (%.2f s)" % model.fire_animation_time())
 	model.free()
-	_check(gun.secondary == WeaponData.Secondary.PLAY and gun.cycle_ring, "right click is the held Landler; the ready ring shows between polkas")
+	_check(gun.secondary == WeaponData.Secondary.BEHAVIOR and gun.cycle_ring, "right click lays the Tanzboden; the ready ring shows between polkas")
 	var chest := main.find_children("*", "Huettentruhe", true, false)[0] as Huettentruhe
 	var entry: Array = chest.pool.entries.filter(func(e: ChestEntry) -> bool: return e.weapon == gun)
 	_check(entry.size() == 1 and is_equal_approx(entry[0].weight, 1.0), "the Hüttentruhe has the Harmonika, weight 1")

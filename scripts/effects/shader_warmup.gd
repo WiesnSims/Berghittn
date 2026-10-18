@@ -18,6 +18,7 @@ const EFFECTS: Array[Script] = [
 	preload("res://scripts/weapons/behaviors/handboeller_shell.gd"),
 	preload("res://scripts/weapons/behaviors/alphorn_wave.gd"),
 	preload("res://scripts/weapons/behaviors/harmonika_notes.gd"),
+	preload("res://scripts/weapons/behaviors/tanzboden.gd"),
 	preload("res://scripts/perks/boeller_blast.gd"),
 ]
 

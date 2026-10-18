@@ -263,7 +263,7 @@ func is_fanning() -> bool:
 	return _fanning
 
 
-## Right click held on a PLAY weapon (the Harmonika's Landler): walking slows, no sprinting.
+## Right click held on a PLAY weapon (a held tune): walking slows, no sprinting.
 func is_playing() -> bool:
 	return _playing
 
@@ -574,8 +574,13 @@ func area_hit(center: Vector3, forward: Vector3, half_angle: float, reach: float
 ## Every body within `reach` of the shooter, walls shielding (the Harmonika's polka): it dances for
 ## `duration` and takes `dps` (before perks) a second. Returns how many it reached.
 func dance_around(reach: float, duration: float, dps: int) -> int:
+	return dance_at(global_position, reach, duration, dps)
+
+
+## The same around any spot (the Harmonika's Tanzboden), walls shielding from there.
+func dance_at(center: Vector3, reach: float, duration: float, dps: int) -> int:
 	var reached: int = 0
-	for body: Dictionary in _bodies_in(global_position, -global_basis.z, 180.0, reach):
+	for body: Dictionary in _bodies_in(center, -global_basis.z, 180.0, reach):
 		var enemy := (body.hurtbox as Hurtbox).receiver as Enemy
 		if enemy and enemy.is_alive():
 			enemy.dance(duration, _damage(dps), _shooter)

@@ -26,7 +26,7 @@ const MIX: Dictionary = {
 	&"mistgabel_stab": -2.0, &"rute_hit": 0.0, &"block_hit": -3.0,
 	&"alphorn_blast": -1.0, &"alphorn_echo": -1.0, &"knoedel_launch": -5.0, &"knoedel_splat": -4.0, &"knoedel_ready": -8.0,
 	&"rodel_launch": -4.0, &"rodel_hit": -3.0, &"flame_loop": -8.0, &"flame_start": -5.0,
-	&"boeller_launch": 1.0, &"boeller_bang": 4.0, &"harmonika_polka": -3.0, &"harmonika_play": -4.0,
+	&"boeller_launch": 1.0, &"boeller_bang": 4.0, &"harmonika_polka": -3.0, &"harmonika_play": -4.0, &"harmonika_chord": -4.0,
 	&"kuhglocke_ring": -5.0, &"resi_bell": -3.0, &"eisstock_slide": -6.0, &"eisstock_hit": -2.0,
 	&"kuhfladen_splat": -4.0, &"kuhfladen_squelch": -4.0,
 	&"groan_wanderer": -6.0, &"groan_knappe": -6.0, &"groan_perchte": -7.0, &"groan_tourist": -8.0,
@@ -55,6 +55,10 @@ const VOICES: Dictionary = {
 var _streams: Dictionary = {}
 var _bus: Dictionary = {}
 var _last_variant: Dictionary = {}
+# When each sound last started (on _clock), so one that is triggered several times at once plays once.
+var _started: Dictionary = {}
+# Seconds of game time (frame deltas, so tests at a fixed frame rate count the same as play).
+var _clock: float = 0.0
 var _pool_2d: Array[AudioStreamPlayer] = []
 var _pool_3d: Array[AudioStreamPlayer3D] = []
 # Menu sounds keep playing while the game is paused under them.
@@ -104,8 +108,9 @@ func level(id: StringName) -> float:
 
 
 ## The player's own sound, no position. `ui` ones also play while the game is paused (menus).
+## Like play_at, a sound already started a moment ago is not started again (see _stacked).
 func play(id: StringName, volume_db: float = 0.0, pitch: float = 1.0, ui: bool = false) -> AudioStreamPlayer:
-	if id == &"" or not has(id):
+	if id == &"" or not has(id) or _stacked(id):
 		return null
 	var player := _take(_pool_ui if ui else _pool_2d, id) as AudioStreamPlayer
 	_start(player, id, volume_db, pitch)
@@ -114,7 +119,7 @@ func play(id: StringName, volume_db: float = 0.0, pitch: float = 1.0, ui: bool =
 
 ## A sound out in the world at `at`.
 func play_at(id: StringName, at: Vector3, volume_db: float = 0.0, pitch: float = 1.0) -> AudioStreamPlayer3D:
-	if id == &"" or not has(id):
+	if id == &"" or not has(id) or _stacked(id):
 		return null
 	var player := _take(_pool_3d, id) as AudioStreamPlayer3D
 	player.global_position = at
@@ -139,6 +144,19 @@ func attach(id: StringName, node: Node3D, volume_db: float = 0.0, reach: float =
 	node.add_child(player)
 	player.play()
 	return player
+
+
+# The same sound triggered again within SOUND_STACK_TIME (one blow striking four enemies, a barrel
+# flattening a crowd) is one sound, not four piled up and four times as loud (play-test 2026-10-18).
+func _stacked(id: StringName) -> bool:
+	if _clock - _started.get(id, -1000.0) < Constants.SOUND_STACK_TIME:
+		return true
+	_started[id] = _clock
+	return false
+
+
+func _process(delta: float) -> void:
+	_clock += delta
 
 
 func _on_node_added(node: Node) -> void:

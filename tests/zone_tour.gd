@@ -18,8 +18,8 @@ extends Node
 ## pfanne: the Küche wall-buy, the pan swung into a wanderer (BONK!), and held up as a guard.
 ## rodel: the Rodelkanone in hand, a sled run through a line of wanderers on the pasture, the
 ## reload, then the Kehre banking round the Stube.
-## harmonika: the Harmonika in hand, a polka making a ring of wanderers dance on the pasture (notes,
-## JUCHHE!), the held Landler, the reload.
+## harmonika: the Harmonika in hand, a polka making a ring of wanderers dance on the pasture (notes),
+## a Tanzboden laid among them, the reload.
 ## brennkessel: the lance in hand, the flame poured into a crowd on the pasture (burning bodies),
 ## the stream stopping at the hut wall, the Brennlacke, the reload with the gauge climbing.
 ## goassl / mistgabel / rute: the melee weapon on V: a blow into wanderers on the pasture, then V held
@@ -763,9 +763,10 @@ func _harmonika_tour(main: Node) -> void:
 	weapons._fire()
 	await _save_series("harmonika_polka", 16, 0.15)
 	await get_tree().create_timer(2.0).timeout
-	weapons.force_aim = true
-	await _save_series("harmonika_landler", 10, 0.2)
-	weapons.force_aim = false
+	weapons._cooldown = 0.0
+	weapons.mag = 3
+	weapons.fire_secondary()
+	await _save_series("harmonika_tanzboden", 10, 0.3)
 	await get_tree().create_timer(1.6).timeout
 	weapons.mag = 0
 	weapons.start_reload()

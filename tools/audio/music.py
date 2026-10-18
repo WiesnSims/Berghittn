@@ -289,7 +289,7 @@ def harmonika_polka(_v):
     return d.normalize(d.fade(d.reverb(d.drive(d.normalize(sc.buf), 1.4), 0.8, 0.18)), 0.85)
 
 
-# The Landler (right click held): a slow tune in three, four bars of um-pa-pa (6 s, looped).
+# The Landler (played from the Tanzboden): a slow tune in three, four bars of um-pa-pa (6 s, looped).
 LANDLER = [
     [(77, 2), (74, 1), (77, 1), (82, 2)],
     [(81, 3), (79, 1), (75, 2)],
@@ -300,7 +300,7 @@ LANDLER_CHORDS = [I, V, V, I]
 
 
 def harmonika_play(_v):
-    """Right click held: the Landler plays on, slow and swaying."""
+    """The Landler the Tanzboden plays, slow and swaying."""
     sc = Score(120, 12, 1.5)
     for b in range(4):
         root, fifth, pah = LANDLER_CHORDS[b]
@@ -323,5 +323,14 @@ for _i in range(len(TIERS)):
 MUSIC_LOOPS = {"band_menu"}
 
 # Played by weapons and events on the Effects bus, but written here because they are music.
-MUSICAL_SFX = {"event_call": event_call, "harmonika_polka": harmonika_polka, "harmonika_play": harmonika_play}
+def harmonika_chord(_v):
+    """Right click: a big B-flat chord swelling out of the bellows as the Tanzboden goes down."""
+    s = 1.2
+    x = sum(reed(m, s - 0.1, 0.3, s) for m in (58, 62, 65, 70, 74))
+    x = x * d.env_points(len(x) / d.SR, [(0, 0.2), (0.25, 1.0), (0.9, 0.8), (len(x) / d.SR, 0)])
+    return d.normalize(d.fade(d.reverb(d.drive(d.normalize(x), 1.3), 0.8, 0.18)), 0.85)
+
+
+MUSICAL_SFX = {"event_call": event_call, "harmonika_polka": harmonika_polka, "harmonika_play": harmonika_play,
+               "harmonika_chord": harmonika_chord}
 MUSICAL_LOOPS = {"harmonika_play"}

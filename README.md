@@ -248,8 +248,8 @@ godot --headless --fixed-fps 60 res://tests/m5_harmonika.tscn
 The Steirische Harmonika: a polka making everyone within 8 m dance all around (not 11 m out, not
 behind a wall): dancers stay on the spot, the one right next to the player never swings, a hit on a
 dancer lands twice as hard, 20 a second for 4 s; the Krampus takes the damage but does not dance;
-the held Landler (a round per 1.5 s, half walking speed, newcomers dancing too, dancing past 4 s for
-as long as it plays, stopping and reloading when the rounds run out); the polka animation length
+the Tanzboden (two rounds, laid where the player aims, everyone on it dancing, newcomers too, not
+beside it, gone with the dance after 10 s); the polka animation length
 and the chest weight.
 
 ```

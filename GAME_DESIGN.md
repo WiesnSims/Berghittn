@@ -220,12 +220,12 @@ Rules:
   - `handboeller`: the Doppelladung (press): a second measure of powder poured in, the loaded round
     plus one from the reserve; the shell flies 1.5 times as fast and flatter, bursts for 260 within
     4.5 m, and the kick shoves the shooter back.
-  - `harmonika`: the Landler (hold): a slow tune played on for as long as right click is held, one
-    round every 1.5 s (the first on the press). Everyone within 8 m keeps dancing while it plays,
-    and a second after (newcomers too), taking 20 a second; the player walks at half speed and
-    cannot shoot. Out of rounds the music stops and the gun reloads. Holds a doorway or buys time
-    to walk out of a crowd; the polka is the setup for switching to a gun and hitting dancers twice
-    as hard.
+  - `harmonika`: the Tanzboden (press, 2 rounds; play-test 2026-10-18, replacing the held Landler,
+    which felt useless): a round wooden dance floor 5 m across is laid where the player aims (up to
+    15 m away, on the floor below the aim). For 10 s the Landler plays from it and everyone on it
+    dances like at a polka (walls shield; newcomers too, and a second after stepping off), taking 20
+    a second and twice the damage from other hits; bosses take the damage only. Up to three lie at
+    once. Turns a doorway or a window into a trap while the player fights elsewhere.
   - `brennkessel`: the Brennlacke (press): a gulp of 20 fuel squirted in an arc; where it comes down
     it spreads into a burning puddle 4 m across that sets alight whoever walks through it for 6 s
     (10 a second, 3 s after leaving it). Covers a doorway or a window while the flame works elsewhere.
@@ -340,7 +340,7 @@ Alpine folk culture.
   the usual hit points to the player who played), and is not doubled itself. A fiery 4-bar polka
   plays on the musette accordion (M6) while golden notes rise all around (3D shapes, user decision
   2026-10-17: quarters, eighths, sixteenths, beamed pairs and hollow half notes, mixed), with a ring
-  rolling out to the 8 m edge; the held Landler plays a slow tune in three. The bellows pump through the polka and close as the next can start (3.3 s, with the white
+  rolling out to the 8 m edge; the Tanzboden plays the Landler, a slow tune in three. The bellows pump through the polka and close as the next can start (3.3 s, with the white
   ready ring). 3 / 9, reload 3 s (the air button: bellows pulled wide open and pressed shut). In the
   chest at weight 1.
 
