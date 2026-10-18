@@ -91,7 +91,8 @@ export class Room extends DurableObject {
 		}
 	}
 
-	// From the host only: {"t":"start"} (the match began, nobody else may join), {"t":"kick","id":n}.
+	// From the host only: {"t":"start"} (the match began, nobody else may join), {"t":"lobby"} (back in
+	// the lobby after a game over: joining is open again), {"t":"kick","id":n}.
 	control(ws, meta, text) {
 		let msg;
 		try {
@@ -102,8 +103,8 @@ export class Room extends DurableObject {
 		if (meta.id !== HOST) {
 			return;
 		}
-		if (msg.t === 'start') {
-			meta.started = true;
+		if (msg.t === 'start' || msg.t === 'lobby') {
+			meta.started = msg.t === 'start';
 			ws.serializeAttachment(meta);
 		} else if (msg.t === 'kick' && msg.id !== HOST) {
 			const p = this.players().find((q) => q.meta.id === msg.id);

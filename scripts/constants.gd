@@ -465,3 +465,21 @@ const NET_INTERPOLATION_DELAY: float = 0.1
 const NET_SPAWN_SPACING: float = 1.2
 ## How often a player sends where they are (s).
 const NET_POSE_INTERVAL: float = 0.05
+## Section 10: bleeding out takes this long (s) unless a teammate holds E within reach for the time.
+const COOP_BLEED_OUT_TIME: float = 30.0
+const COOP_REVIVE_TIME: float = 4.0
+const COOP_REVIVE_RANGE: float = 2.0
+## Seconds between revive ticks while E is held; a gap longer than COOP_REVIVE_HEARD_TIME starts over.
+const COOP_REVIVE_TICK: float = 0.1
+const COOP_REVIVE_HEARD_TIME: float = 0.35
+## Revived with this share of the maximum health.
+const COOP_REVIVE_HEALTH: float = 0.5
+const COOP_CRAWL_SPEED: float = 1.2
+## Height of a downed player's capsule (m); the eyes sit near the floor.
+const COOP_DOWNED_HEIGHT: float = 0.8
+## A spectator watches a teammate from behind and above (m).
+const COOP_SPECTATE_OFFSET: Vector3 = Vector3(0.0, 2.2, 3.4)
+## Co-op: the first wave waits this long after the host starts, so every guest can click in (s).
+const COOP_FIRST_WAVE_DELAY: float = 15.0
+## Clicks right after the mouse is taken (a menu click) do not fire for this long (s).
+const CAPTURE_FIRE_GRACE: float = 0.25

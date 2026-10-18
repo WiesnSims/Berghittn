@@ -65,7 +65,11 @@ func get_interact_prompt(player: Node3D) -> String:
 func interact(player: Node3D) -> void:
 	var zone: ZoneData = _zone_behind()
 	if zone and (player as Player).points.spend(zone.cost):
-		_zones().unlock(zone.id, player)
+		# Co-op: the host opens it (and pays back if someone else was quicker).
+		if Coop.is_guest():
+			Coop.world.request_unlock(zone.id, zone.cost)
+		else:
+			_zones().unlock(zone.id, player)
 
 
 func _zones() -> ZoneMap:

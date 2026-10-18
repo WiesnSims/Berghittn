@@ -4,6 +4,13 @@ extends CharacterBody3D
 ## interaction live in child nodes.
 
 signal died
+## Co-op (M7): went down, got up again, bled out, came back.
+signal life_changed(life: Life)
+
+## Co-op (M7, section 10): at 0 HP a player goes DOWNED (crawling, pistol only) until a teammate
+## revives them or they bleed out; then OUT until the next wave starts. Solo never leaves ALIVE:
+## 0 HP is game over there.
+enum Life { ALIVE, DOWNED, OUT }
 
 @onready var health: PlayerHealth = $Health
 @onready var points: PlayerPoints = $Points
@@ -30,6 +37,12 @@ var _step_left: float = Constants.STEP_DISTANCE
 var _hurt_gap: float = 0.0
 # Tells boards (under a roof) from snow for the footsteps; found on first use.
 var _roof: RoofMap
+var life: Life = Life.ALIVE
+## Seconds left to bleed out while DOWNED.
+var bleed_left: float = 0.0
+## How far a teammate's revive has got (0..1) and seconds since we last heard of it.
+var revive_progress: float = 0.0
+var _revive_heard: float = INF
 
 
 func _ready() -> void:
@@ -53,7 +66,41 @@ func is_sprinting() -> bool:
 
 
 func is_targetable() -> bool:
-	return not health.is_dead()
+	return life == Life.ALIVE and not health.is_dead()
+
+
+## Co-op: a teammate is holding E over us; while they keep at it we do not bleed.
+func hear_revive(progress: float) -> void:
+	if life != Life.DOWNED:
+		return
+	revive_progress = progress
+	_revive_heard = 0.0
+
+
+## Co-op: a teammate finished reviving us.
+func revive() -> void:
+	if life != Life.DOWNED:
+		return
+	life = Life.ALIVE
+	revive_progress = 0.0
+	health.revive(Constants.COOP_REVIVE_HEALTH)
+	weapons.set_downed(false, weapons.starting_weapon)
+	Sound.play(&"perk_drink")
+	life_changed.emit(life)
+
+
+## Co-op: back at the start of a wave after bleeding out, with a new game's guns.
+func come_back() -> void:
+	if life != Life.OUT:
+		return
+	life = Life.ALIVE
+	health.revive(1.0)
+	_head.rotation.z = 0.0
+	weapons.reset_loadout()
+	weapons.process_mode = Node.PROCESS_MODE_INHERIT
+	weapons.visible = true
+	_respawn()
+	life_changed.emit(life)
 
 
 ## `attacker` lets a raised guard (the Schmarrnpfanne) catch hits from the front.
@@ -83,7 +130,7 @@ func shake_view(degrees: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if health.is_dead():
+	if health.is_dead() and life != Life.DOWNED:
 		return
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		_look((event as InputEventMouseMotion).screen_relative)
@@ -101,6 +148,9 @@ func _process(delta: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if life == Life.DOWNED:
+		_crawl(delta)
+		return
 	if health.is_dead():
 		return
 	_update_crouch(delta)
@@ -116,6 +166,46 @@ func _physics_process(delta: float) -> void:
 	_footsteps(delta, was_on_floor, fall_speed)
 	if global_position.y < Constants.PLAYER_FALL_RESPAWN_Y:
 		_respawn()
+
+
+## Downed: low to the floor, slow, no jumping; bleeding unless a teammate is reviving us.
+func _crawl(delta: float) -> void:
+	_revive_heard += delta
+	if _revive_heard > Constants.COOP_REVIVE_HEARD_TIME:
+		revive_progress = 0.0
+		bleed_left -= delta
+		if bleed_left <= 0.0:
+			_bleed_out()
+			return
+	_crouch_amount = 1.0
+	_apply_height(Constants.COOP_DOWNED_HEIGHT)
+	if not is_on_floor():
+		velocity.y -= _gravity * delta
+	_update_horizontal_velocity(delta)
+	move_and_slide()
+
+
+func _go_down() -> void:
+	life = Life.DOWNED
+	bleed_left = Constants.COOP_BLEED_OUT_TIME
+	revive_progress = 0.0
+	_revive_heard = INF
+	# Section 9: the Schnaps are gone; the Brettljause and the Jagamoasta's herbs stay.
+	perks.clear()
+	weapons.set_downed(true, weapons.starting_weapon)
+	Sound.play(&"player_death")
+	life_changed.emit(life)
+
+
+func _bleed_out() -> void:
+	life = Life.OUT
+	revive_progress = 0.0
+	weapons.set_downed(false, weapons.starting_weapon)
+	weapons.process_mode = Node.PROCESS_MODE_DISABLED
+	weapons.visible = false
+	_head.rotation.z = deg_to_rad(70.0)
+	Events.player_died.emit(self)
+	life_changed.emit(life)
 
 
 func _footsteps(delta: float, was_on_floor: bool, fall_speed: float) -> void:
@@ -160,6 +250,8 @@ func _update_horizontal_velocity(delta: float) -> void:
 
 
 func _base_speed(input: Vector2) -> float:
+	if life == Life.DOWNED:
+		return Constants.COOP_CRAWL_SPEED
 	if _is_crouching():
 		return Constants.PLAYER_CROUCH_SPEED
 	if weapons.is_aiming():
@@ -213,6 +305,9 @@ func _on_damaged(amount: int) -> void:
 
 
 func _on_died() -> void:
+	if Net.in_match():
+		_go_down()
+		return
 	Sound.play(&"player_death")
 	weapons.process_mode = Node.PROCESS_MODE_DISABLED
 	weapons.visible = false

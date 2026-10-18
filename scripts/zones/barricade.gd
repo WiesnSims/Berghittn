@@ -111,8 +111,20 @@ func get_interact_prompt(_player: Node3D) -> String:
 
 
 func interact(player: Node3D) -> void:
+	# Co-op: the host nails it on and pays the points out.
+	if Coop.is_guest():
+		Coop.world.request_board(self)
+		return
 	if add_board():
 		Events.board_repaired.emit(self, player)
+
+
+## Co-op guests: the host's board count, nailed on or pulled off here to match.
+func set_boards(count: int) -> void:
+	while boards < count and add_board():
+		pass
+	while boards > count:
+		remove_board()
 
 
 func _animate(index: int, to: Transform3D, visible_after: bool) -> void:

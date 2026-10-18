@@ -38,6 +38,14 @@ func raise_max(amount: int) -> void:
 	changed.emit(current(), max_health)
 
 
+## Co-op (M7): up again after going down (revived, or back next wave) with this share of the maximum.
+func revive(share: float) -> void:
+	_health = maxf(max_health * share, 1.0)
+	_since_damage = 0.0
+	invincible_left = 0.0
+	changed.emit(current(), max_health)
+
+
 func heal_full() -> void:
 	_health = max_health
 	changed.emit(current(), max_health)

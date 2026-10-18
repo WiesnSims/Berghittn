@@ -89,6 +89,21 @@ func start_match() -> void:
 	_begin_match()
 
 
+## Host, after a co-op game over: everyone is back in the lobby (same room, joining open again).
+func back_to_lobby() -> void:
+	if not is_host() or state != State.MATCH:
+		return
+	_peer.send_control({"t": "lobby"})
+	_to_lobby.rpc()
+	_to_lobby()
+
+
+@rpc("authority", "call_remote", "reliable")
+func _to_lobby() -> void:
+	if state == State.MATCH:
+		_set_state(State.LOBBY)
+
+
 ## Where the relay is: the page's own origin in the browser, else --relay=<url> or the live site.
 func relay_base() -> String:
 	if OS.has_feature("web"):

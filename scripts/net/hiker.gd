@@ -9,9 +9,19 @@ const TROUSERS_MATERIAL: String = "res://assets/materials/characters/trousers.tr
 ## CharacterBuilder's shared materials).
 const TINT_GAIN: float = 1.25
 
+## Lying on the floor when downed: the model tips forward (rad) and lifts a little off it (m).
+const DOWNED_TILT: float = -1.35
+const DOWNED_LIFT: float = 0.18
+
 @onready var rig: EnemyRig = $Model
 @onready var _tag: Label3D = $NameTag
 
+## Co-op (M7): whose hiker this is, and how they are (Player.Life).
+var peer: int = 0
+var life: Player.Life = Player.Life.ALIVE
+## Co-op host: enemies go for this hiker like for a player (group "player"); a hit is handed on with
+## (peer, amount, attacker) to that player's own game.
+var on_hurt: Callable
 var _jacket: StandardMaterial3D
 var _trousers: StandardMaterial3D
 
@@ -45,3 +55,21 @@ func apply(profile: Dictionary, peer: int) -> void:
 
 func show_name(on: bool) -> void:
 	_tag.visible = on
+
+
+func is_targetable() -> bool:
+	return life == Player.Life.ALIVE and visible
+
+
+func take_damage(amount: int, attacker: Node3D = null) -> void:
+	if on_hurt.is_valid():
+		on_hurt.call(peer, amount, attacker)
+
+
+## Downed: lying on the floor; out (bled out): gone until the next wave.
+func set_life(new_life: Player.Life) -> void:
+	life = new_life
+	visible = life != Player.Life.OUT
+	var down: bool = life == Player.Life.DOWNED
+	rig.rotation.x = DOWNED_TILT if down else 0.0
+	rig.position.y = DOWNED_LIFT if down else 0.0

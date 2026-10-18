@@ -29,6 +29,14 @@ func _ready() -> void:
 	Events.wave_break_started.emit.call_deferred(1, _break_left)
 
 
+## Co-op (M7): the countdown to the next wave starts over at `delay` (the first wave waits for
+## everyone to click into the match).
+func begin_break(delay: float) -> void:
+	_phase = Phase.BREAK
+	_break_left = delay
+	Events.wave_break_started.emit(wave + 1, delay)
+
+
 func _physics_process(delta: float) -> void:
 	match _phase:
 		Phase.BREAK:

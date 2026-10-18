@@ -694,6 +694,13 @@ fix console errors, commit. Stop and report after each milestone.
   Part 1 (2026-10-18): the relay Worker `berghittn-relay` and the Pages Function, the lobby (name,
   5 heads, 5 hats, 8 jacket and 6 trouser colours, room code, invite link, remove, start from 2
   players), and walking the hut together as hikers with name tags; waves and events wait for part 2.
+  Part 2 (2026-10-18): the host runs the waves and enemies, guests see copies moved by its snapshots;
+  each player's hits go to the host, which pays the points to whoever earned them; doors, barricades
+  and the Hüttentruhe are shared; enemies go for the nearest player; downed (crawling, Dienstpistole
+  only, Schnaps gone, 30 s), revived by a teammate holding E for 4 s (back at half health), bled out
+  until the next wave (then back with the starting guns, points, Jause and herbs kept); everyone down
+  is game over and the room goes back to its lobby. The events and the special weapons' effects for
+  the others wait for part 3.
 
 ## 13. Project structure
 

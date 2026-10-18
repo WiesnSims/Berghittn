@@ -8,6 +8,8 @@ enum State { CLOSED, ROLLING, OFFERING, CLOSING }
 
 ## Emitted when a roll settles on a weapon, for tests and the HUD.
 signal offered(weapon: WeaponData)
+## A roll started for `buyer`, landing on `weapon` (co-op: the host passes it on).
+signal rolled(buyer: Node3D, weapon: WeaponData)
 
 @export var pool: ChestPool
 ## Degrees the lid swings open.
@@ -23,7 +25,8 @@ var interact_repeat: float = 0.0
 var state: State = State.CLOSED
 ## The weapon floating in the chest while OFFERING.
 var offer: WeaponData
-var _buyer: Player
+# Our Player, or (co-op) another player's hiker: only the buyer may take the offer.
+var _buyer: Node3D
 var _time_left: float = 0.0
 var _flip_left: float = 0.0
 var _shown: int = -1
@@ -40,6 +43,7 @@ var _tween: Tween
 
 func _ready() -> void:
 	add_to_group("interactables")
+	add_to_group("chests")
 	_rng.randomize()
 	_glow.visible = false
 	for entry: ChestEntry in pool.entries:
@@ -121,14 +125,44 @@ func interact(player: Node3D) -> void:
 		_open(buyer)
 	elif state == State.OFFERING and buyer == _buyer:
 		buyer.weapons.give_weapon(offer)
+		if Coop.world:
+			Coop.world.chest_taken(self)
 		_close()
 
 
 func _open(buyer: Player) -> void:
-	offer = pool.pick(buyer.weapons.has_weapon, _rng)
-	if offer == null or not buyer.points.spend(pool.cost):
+	# The buyer's own game picks: it knows which guns they already carry.
+	var weapon: WeaponData = pool.pick(buyer.weapons.has_weapon, _rng)
+	if weapon == null or not buyer.points.spend(pool.cost):
 		return
+	# Co-op: the host rolls it for everyone (and pays back if the chest was busy by then).
+	if Coop.is_guest():
+		Coop.world.request_chest(self, weapon, pool.cost)
+		return
+	_roll(buyer, weapon)
+
+
+## Co-op: a roll for `buyer` that lands on the weapon with this id. False if the chest is busy.
+func roll_for(buyer: Node3D, weapon_id: StringName) -> bool:
+	if state != State.CLOSED or buyer == null:
+		return false
+	for weapon: WeaponData in _weapons:
+		if weapon.id == weapon_id:
+			_roll(buyer, weapon)
+			return true
+	return false
+
+
+## Co-op: the buyer took the offer in their game.
+func taken() -> void:
+	if state == State.OFFERING:
+		_close()
+
+
+func _roll(buyer: Node3D, weapon: WeaponData) -> void:
+	offer = weapon
 	_buyer = buyer
+	rolled.emit(buyer, weapon)
 	state = State.ROLLING
 	Sound.play_at(&"chest_open", global_position)
 	_time_left = pool.roll_time
