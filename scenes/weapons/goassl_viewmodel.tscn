@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/weapons/goassl_viewmodel.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/textures/gun_wood.png" id="2_f4e72"]
 [ext_resource type="Texture2D" path="res://assets/textures/painted_wood.png" id="3_ncbym"]
+[ext_resource type="Texture2D" path="res://assets/textures/white.png" id="white_look"]
 
 [sub_resource type="StandardMaterial3D" id="Wood"]
 albedo_color = Color(0.5, 0.31, 0.15, 1)
@@ -237,6 +238,9 @@ metadata/source = SubResource("Seg7")
 
 [sub_resource type="StandardMaterial3D" id="White"]
 albedo_color = Color(0.95, 0.94, 0.9, 1)
+albedo_texture = ExtResource("white_look")
+uv1_triplanar = true
+texture_filter = 5
 
 [sub_resource type="BoxMesh" id="CrackerMesh"]
 material = SubResource("White")

@@ -10,14 +10,21 @@
 [ext_resource type="Resource" path="res://data/perks/obstler.tres" id="8"]
 [ext_resource type="Resource" path="res://data/perks/zirbenschnaps.tres" id="9"]
 [ext_resource type="Resource" path="res://data/perks/jagamoasta.tres" id="10"]
+[ext_resource type="Texture2D" path="res://assets/textures/white.png" id="white_look"]
 
 [sub_resource type="StandardMaterial3D" id="Paint"]
 albedo_color = Color(0.55, 0.12, 0.1, 1)
 roughness = 0.8
+albedo_texture = ExtResource("white_look")
+uv1_triplanar = true
+texture_filter = 5
 
 [sub_resource type="StandardMaterial3D" id="PaintGreen"]
 albedo_color = Color(0.15, 0.35, 0.2, 1)
 roughness = 0.8
+albedo_texture = ExtResource("white_look")
+uv1_triplanar = true
+texture_filter = 5
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_wy1t1"]
 _surfaces = [{
