@@ -203,6 +203,25 @@ godot --headless --script res://tools/models/build_enemies.gd
   it fell into after `RAGDOLL_TIME`, and with no room left a corpse falls the old way. While it
   walks the ragdoll is switched off (its bodies out of the physics space), so it costs nothing.
 
+## Weapon models (M6)
+
+The weapons keep their viewmodel scenes (the scripts animate the parts by name); a script reshapes
+the greybox parts and textures them in place:
+
+```
+godot --headless res://tools/models/build_weapons.tscn
+```
+
+- A long thin box (barrel, rod, handle) becomes an eight-sided tube, a box named `Stock` along the gun
+  gets a rifle stock's profile, every other box gets chamfered edges.
+- Colours become textured materials by what they look like: brown is walnut (`gun_wood`), metal is
+  worn steel (`gun_steel`, tinted brass where it was yellow), other colours painted wood;
+  near-white and near-black stay plain. They are projected in each part's own space, so the texture
+  moves with a bolt or magazine.
+- Each new mesh and material keeps its greybox original as metadata (`source`), so the script can be
+  rerun after changing a rule. It runs as a scene, not with `--script`: the viewmodel scripts need the
+  autoloads to compile.
+
 ## Tests
 
 ```
@@ -239,6 +258,14 @@ ragdoll that is off while it walks, inside the 3 MB model budget; the head hurtb
 swing that raises the arms; every type going limp when killed, its joints holding, thrown away from
 the shooter, frozen after a while and standing again from the pool; and a crowd of 12 killed at
 once simulating no more than 6 ragdolls.
+
+```
+godot --headless --fixed-fps 60 res://tests/m6_weapons.tscn
+```
+
+The weapon models: no greybox box left in any viewmodel, every lit colour textured and projected in
+its part's own space (only near-white and near-black plain), weapons and enemies inside the 3 MB
+model budget.
 
 ```
 godot --headless --fixed-fps 60 res://tests/m5_core.tscn
@@ -431,6 +458,12 @@ godot res://tests/model_view.tscn -- <out_dir>
 
 Needs a window: the enemy models in a plain studio, from the front and the back, their faces, every
 action pose and a ragdoll fall.
+
+```
+godot res://tests/weapon_view.tscn -- <out_dir> [weapon id ...]
+```
+
+Needs a window: every weapon model in a plain studio from the side and at an angle, and as held.
 
 ```
 godot res://tests/crowd_bench.tscn

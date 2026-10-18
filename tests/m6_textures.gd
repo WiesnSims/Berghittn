@@ -9,6 +9,9 @@ extends Node
 const TEXTURES_DIR: String = "res://assets/textures"
 const MATERIALS_DIR: String = "res://assets/materials"
 const TEXTURE_SIZE_MAX: int = 256
+## Hero assets (section 3: the weapons) may be 512.
+const HERO: Array[String] = ["gun_wood.png", "gun_steel.png"]
+const HERO_SIZE_MAX: int = 512
 const TEXTURE_BUDGET: int = 10 * 1024 * 1024
 ## Plain paint: the trail sign and the Speck keep a flat colour (props get models in M6 part 4).
 const PLAIN: Array[String] = ["sign", "speck"]
@@ -57,8 +60,9 @@ func _textures() -> void:
 		count += 1
 		var path: String = TEXTURES_DIR.path_join(file)
 		var texture := load(path) as Texture2D
-		_check(texture != null and texture.get_width() <= TEXTURE_SIZE_MAX and texture.get_height() <= TEXTURE_SIZE_MAX,
-				"%s loads and is at most %d px (%s)" % [file, TEXTURE_SIZE_MAX, texture.get_size() if texture else "missing"])
+		var most: int = HERO_SIZE_MAX if file in HERO else TEXTURE_SIZE_MAX
+		_check(texture != null and texture.get_width() <= most and texture.get_height() <= most,
+				"%s loads and is at most %d px (%s)" % [file, most, texture.get_size() if texture else "missing"])
 		var base: String = file.get_basename().trim_suffix("_normal")
 		_check(assets.contains("`%s`" % base), "%s is listed in ASSETS.md" % base)
 		# The headless renderer does not report mipmaps, so this asks the import settings.

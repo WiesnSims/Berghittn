@@ -663,6 +663,10 @@ fix console errors, commit. Stop and report after each milestone.
      A kill turns the body into a ragdoll thrown away from the shooter, colliding with the world only;
      at most 6 are simulated at once and each freezes where it fell after 3 s (with no room, a corpse
      falls the old way).
+     4b: the weapons keep their parts and animations; every greybox box is reshaped (barrels and
+     handles round, stocks with a real profile, everything else chamfered) and every colour is a
+     texture: walnut for wood, worn steel for metal and brass, painted wood for the rest (two CC0
+     textures at 512, allowed for weapons as hero assets).
 
 **M7 — Co-op (decision gate)**
 - Before coding, write `NETWORKING.md`: chosen transport, relay approach on

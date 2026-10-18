@@ -1,53 +1,128 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene format=4]
 
 [ext_resource type="Script" path="res://scripts/weapons/melee_viewmodel.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/textures/gun_wood.png" id="2_rmbeq"]
+[ext_resource type="Texture2D" path="res://assets/textures/gun_steel.png" id="3_xp6oe"]
 
 [sub_resource type="StandardMaterial3D" id="Wood"]
 albedo_color = Color(0.45, 0.31, 0.18, 1)
 roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rmbeq"]
+albedo_color = Color(0.5625, 0.3875, 0.22500001, 1)
+albedo_texture = ExtResource("2_rmbeq")
+roughness = 0.7
+uv1_scale = Vector3(2.857143, 2.857143, 2.857143)
+uv1_triplanar = true
+uv1_triplanar_sharpness = 4.0
+texture_filter = 5
+metadata/source = SubResource("Wood")
+
+[sub_resource type="BoxMesh" id="HandleMesh"]
+material = SubResource("Wood")
+size = Vector3(0.035, 0.035, 0.75)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_xp6oe"]
+_surfaces = [{
+"aabb": AABB(-0.0175, -0.0175, -0.375, 0.035, 0.035, 0.75),
+"format": 34359738375,
+"material": SubResource("StandardMaterial3D_rmbeq"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 84,
+"vertex_data": PackedByteArray("KVyPPNGG7TsAAMC+KVyPPNGG7TsAAMA+0YbtOylcjzwAAMA+KVyPPNGG7TsAAMC+0YbtOylcjzwAAMA+0YbtOylcjzwAAMC+0YbtOylcjzwAAMC+0YbtOylcjzwAAMA+0YbtuylcjzwAAMA+0YbtOylcjzwAAMC+0YbtuylcjzwAAMA+0YbtuylcjzwAAMC+0YbtuylcjzwAAMC+0YbtuylcjzwAAMA+KVyPvNGG7TsAAMA+0YbtuylcjzwAAMC+KVyPvNGG7TsAAMA+KVyPvNGG7TsAAMC+KVyPvNGG7TsAAMC+KVyPvNGG7TsAAMA+KVyPvNGG7bsAAMA+KVyPvNGG7TsAAMC+KVyPvNGG7bsAAMA+KVyPvNGG7bsAAMC+KVyPvNGG7bsAAMC+KVyPvNGG7bsAAMA+0Ybtuylcj7wAAMA+KVyPvNGG7bsAAMC+0Ybtuylcj7wAAMA+0Ybtuylcj7wAAMC+0Ybtuylcj7wAAMC+0Ybtuylcj7wAAMA+0YbtOylcj7wAAMA+0Ybtuylcj7wAAMC+0YbtOylcj7wAAMA+0YbtOylcj7wAAMC+0YbtOylcj7wAAMC+0YbtOylcj7wAAMA+KVyPPNGG7bsAAMA+0YbtOylcj7wAAMC+KVyPPNGG7bsAAMA+KVyPPNGG7bsAAMC+KVyPPNGG7bsAAMC+KVyPPNGG7bsAAMA+KVyPPNGG7TsAAMA+KVyPPNGG7bsAAMC+KVyPPNGG7TsAAMA+KVyPPNGG7TsAAMC+KVyPPNGG7TsAAMC+0YbtOylcjzwAAMC+0YbtuylcjzwAAMC+KVyPPNGG7TsAAMC+0YbtuylcjzwAAMC+KVyPvNGG7TsAAMC+KVyPPNGG7TsAAMC+KVyPvNGG7TsAAMC+KVyPvNGG7bsAAMC+KVyPPNGG7TsAAMC+KVyPvNGG7bsAAMC+0Ybtuylcj7wAAMC+KVyPPNGG7TsAAMC+0Ybtuylcj7wAAMC+0YbtOylcj7wAAMC+KVyPPNGG7TsAAMC+0YbtOylcj7wAAMC+KVyPPNGG7bsAAMC+KVyPPNGG7TsAAMA+0YbtuylcjzwAAMA+0YbtOylcjzwAAMA+KVyPPNGG7TsAAMA+KVyPvNGG7TsAAMA+0YbtuylcjzwAAMA+KVyPPNGG7TsAAMA+KVyPvNGG7bsAAMA+KVyPvNGG7TsAAMA+KVyPPNGG7TsAAMA+0Ybtuylcj7wAAMA+KVyPvNGG7bsAAMA+KVyPPNGG7TsAAMA+0YbtOylcj7wAAMA+0Ybtuylcj7wAAMA+KVyPPNGG7TsAAMA+KVyPPNGG7bsAAMA+0YbtOylcj7wAAMA+gdp8pSZyttCB2nylJnK20HylgdpIL7bQgdp8pSZyttB8pYHaSC+20HylgdpIL7bQfKWB2kgvttB8pYHaSC+20IJagdpIL0evfKWB2kgvttCCWoHaSC9Hr4JagdpIL0evglqB2kgvR6+CWoHaSC9Hr30lfKUmckevglqB2kgvR699JXylJnJHr30lfKUmckevfSV8pSZyR699JXylJnJHr30lglomcrbQfSV8pSZyR699JYJaJnK20H0lglomcrbQfSWCWiZyttB9JYJaJnK20IJafSVIL7bQfSWCWiZyttCCWn0lSC+20IJafSVIL7bQglp9JUgvttCCWn0lSC+20HylfSVIL0evglp9JUgvttB8pX0lSC9Hr3ylfSVIL0evfKV9JUgvR698pX0lSC9Hr4HaglomckevfKV9JUgvR6+B2oJaJnJHr4HaglomckevgdqCWiZyR6+B2oJaJnJHr4HafKUmcrbQgdqCWiZyR6+B2nylJnK20IHafKUmcrbQ//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA")
+}]
+metadata/source = SubResource("HandleMesh")
+
+[sub_resource type="BoxMesh" id="GripMesh"]
+material = SubResource("Wood")
+size = Vector3(0.12, 0.03, 0.03)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_kvvqn"]
+_surfaces = [{
+"aabb": AABB(-0.06, -0.015, -0.015, 0.12, 0.03, 0.03),
+"format": 34359738375,
+"material": SubResource("StandardMaterial3D_rmbeq"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 132,
+"vertex_data": PackedByteArray("j8J1veYdJ7zmHSe8j8J1veYdJzzmHSe8j8J1veYdJzzmHSc8j8J1veYdJ7zmHSe8j8J1veYdJzzmHSc8j8J1veYdJ7zmHSc8j8J1veYdJ7zmHSe8ZRlivY/CdbzmHSc8ZRlivY/CdbzmHSe8j8J1veYdJ7zmHSe8j8J1veYdJ7zmHSc8ZRlivY/CdbzmHSc8j8J1veYdJzzmHSe8ZRlivY/CdTzmHSe8ZRlivY/CdTzmHSc8j8J1veYdJzzmHSe8ZRlivY/CdTzmHSc8j8J1veYdJzzmHSc8j8J1PeYdJ7zmHSe8j8J1PeYdJzzmHSc8j8J1PeYdJzzmHSe8j8J1PeYdJ7zmHSe8j8J1PeYdJ7zmHSc8j8J1PeYdJzzmHSc8j8J1PeYdJ7zmHSe8ZRliPY/CdbzmHSe8ZRliPY/CdbzmHSc8j8J1PeYdJ7zmHSe8ZRliPY/CdbzmHSc8j8J1PeYdJ7zmHSc8j8J1PeYdJzzmHSe8ZRliPY/CdTzmHSc8ZRliPY/CdTzmHSe8j8J1PeYdJzzmHSe8j8J1PeYdJzzmHSc8ZRliPY/CdTzmHSc8ZRlivY/CdbzmHSe8ZRlivY/CdbzmHSc8ZRliPY/CdbzmHSc8ZRlivY/CdbzmHSe8ZRliPY/CdbzmHSc8ZRliPY/CdbzmHSe8ZRlivY/CdbzmHSe8ZRliPeYdJ7yPwnW8ZRliveYdJ7yPwnW8ZRlivY/CdbzmHSe8ZRliPY/CdbzmHSe8ZRliPeYdJ7yPwnW8ZRlivY/CdbzmHSc8ZRliveYdJ7yPwnU8ZRliPeYdJ7yPwnU8ZRlivY/CdbzmHSc8ZRliPeYdJ7yPwnU8ZRliPY/CdbzmHSc8ZRlivY/CdTzmHSe8ZRliPY/CdTzmHSc8ZRlivY/CdTzmHSc8ZRlivY/CdTzmHSe8ZRliPY/CdTzmHSe8ZRliPY/CdTzmHSc8ZRlivY/CdTzmHSe8ZRliveYdJzyPwnW8ZRliPeYdJzyPwnW8ZRlivY/CdTzmHSe8ZRliPeYdJzyPwnW8ZRliPY/CdTzmHSe8ZRlivY/CdTzmHSc8ZRliPeYdJzyPwnU8ZRliveYdJzyPwnU8ZRlivY/CdTzmHSc8ZRliPY/CdTzmHSc8ZRliPeYdJzyPwnU8ZRliveYdJ7yPwnW8ZRliPeYdJ7yPwnW8ZRliPeYdJzyPwnW8ZRliveYdJ7yPwnW8ZRliPeYdJzyPwnW8ZRliveYdJzyPwnW8ZRliveYdJ7yPwnW8j8J1veYdJzzmHSe8j8J1veYdJ7zmHSe8ZRliveYdJ7yPwnW8ZRliveYdJzyPwnW8j8J1veYdJzzmHSe8ZRliPeYdJ7yPwnW8j8J1PeYdJ7zmHSe8j8J1PeYdJzzmHSe8ZRliPeYdJ7yPwnW8j8J1PeYdJzzmHSe8ZRliPeYdJzyPwnW8ZRliveYdJ7yPwnU8ZRliPeYdJzyPwnU8ZRliPeYdJ7yPwnU8ZRliveYdJ7yPwnU8ZRliveYdJzyPwnU8ZRliPeYdJzyPwnU8ZRliveYdJ7yPwnU8j8J1veYdJ7zmHSc8j8J1veYdJzzmHSc8ZRliveYdJ7yPwnU8j8J1veYdJzzmHSc8ZRliveYdJzyPwnU8ZRliPeYdJ7yPwnU8j8J1PeYdJzzmHSc8j8J1PeYdJ7zmHSc8ZRliPeYdJ7yPwnU8ZRliPeYdJzyPwnU8j8J1PeYdJzzmHSc8j8J1veYdJ7zmHSe8ZRlivY/CdbzmHSe8ZRliveYdJ7yPwnW8j8J1veYdJ7zmHSc8ZRliveYdJ7yPwnU8ZRlivY/CdbzmHSc8j8J1veYdJzzmHSe8ZRliveYdJzyPwnW8ZRlivY/CdTzmHSe8j8J1veYdJzzmHSc8ZRlivY/CdTzmHSc8ZRliveYdJzyPwnU8j8J1PeYdJ7zmHSe8ZRliPeYdJ7yPwnW8ZRliPY/CdbzmHSe8j8J1PeYdJ7zmHSc8ZRliPY/CdbzmHSc8ZRliPeYdJ7yPwnU8j8J1PeYdJzzmHSe8ZRliPY/CdTzmHSe8ZRliPeYdJzyPwnW8j8J1PeYdJzzmHSc8ZRliPeYdJzyPwnU8ZRliPY/CdTzmHSc8AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//z//P1VVVNX/P/8/VVVU1f8//z9VVVTV/z//P1VVVNX/P/8/VVVU1f8//z9VVVTV/z//v1VVqqr/P/+/VVWqqv8//79VVaqq/z//v1VVqqr/P/+/VVWqqv8//79VVaqq////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+//7//P1VVqqr/v/8/VVWqqv+//z9VVaqq/7//P1VVqqr/v/8/VVWqqv+//z9VVaqq/7//v1VVVNX/v/+/VVVU1f+//79VVVTV/7//v1VVVNX/v/+/VVVU1f+//79VVVTV/38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//78AAFRVqar/vwAAVFWpqv+/AABUVamq/78AAFRVqar/vwAAVFWpqv+/AABUVamq/3//P6oqVJX/f/8/qipUlf9//z+qKlSV/3//P6oqVJX/f/8/qipUlf9//z+qKlSV/3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//7///6oqVJX/v///qipUlf+///+qKlSV/7///6oqVJX/v///qipUlf+///+qKlSV/3//v1RVqar/f/+/VFWpqv9//79UVamq/3//v1RVqar/f/+/VFWpqv9//79UVamq//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCAAAD/v1VVqqoAAP+/VVWqqgAA/79VVaqqAAD/v1VVqqoAAP+/VVWqqgAA/79VVaqq////v6mqqqr///+/qaqqqv///7+pqqqq////v6mqqqr///+/qaqqqv///7+pqqqq/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA/z//f6mqqqr/P/9/qaqqqv8//3+pqqqq/z//f6mqqqr/P/9/qaqqqv8//3+pqqqq/7//f1VVqqr/v/9/VVWqqv+//39VVaqq/7//f1VVqqr/v/9/VVWqqv+//39VVaqqqiqqKv8//7+qKqoq/z//v6oqqir/P/+/VFVVVXGcOM5UVVVVcZw4zlRVVVVxnDjOqipU1f8//5+qKlTV/z//n6oqVNX/P/+fVFWpqv9//59UVamq/3//n1RVqar/f/+fVNWqKv9//59U1aoq/3//n1TVqir/f/+fqqpVVf8//5+qqlVV/z//n6qqVVX/P/+fVNVU1XGcOM5U1VTVcZw4zlTVVNVxnDjOqqqpqv8//7+qqqmq/z//v6qqqar/P/+/")
+}]
+metadata/source = SubResource("GripMesh")
 
 [sub_resource type="StandardMaterial3D" id="Blade"]
 albedo_color = Color(0.55, 0.12, 0.09, 1)
 metallic = 0.4
 roughness = 0.5
 
-[sub_resource type="BoxMesh" id="HandleMesh"]
-material = SubResource("Wood")
-size = Vector3(0.035, 0.035, 0.75)
-
-[sub_resource type="BoxMesh" id="GripMesh"]
-material = SubResource("Wood")
-size = Vector3(0.12, 0.03, 0.03)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o33vk"]
+albedo_color = Color(0.6875, 0.14999999, 0.112500004, 1)
+albedo_texture = ExtResource("3_xp6oe")
+metallic = 0.55
+roughness = 0.45
+uv1_scale = Vector3(3.3333333, 3.3333333, 3.3333333)
+uv1_triplanar = true
+uv1_triplanar_sharpness = 4.0
+texture_filter = 5
+metadata/source = SubResource("Blade")
 
 [sub_resource type="BoxMesh" id="BladeMesh"]
 material = SubResource("Blade")
 size = Vector3(0.36, 0.015, 0.34)
 
+[sub_resource type="ArrayMesh" id="ArrayMesh_jwmbi"]
+_surfaces = [{
+"aabb": AABB(-0.18, -0.0075, -0.17, 0.36, 0.015, 0.34),
+"format": 34359738375,
+"material": SubResource("StandardMaterial3D_o33vk"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 132,
+"vertex_data": PackedByteArray("7FE4vuYdp7tWnyu+7FE4vuYdpztWnyu+7FE4vuYdpztWnys+7FE4vuYdp7tWnyu+7FE4vuYdpztWnys+7FE4vuYdp7tWnys+7FE4vuYdp7tWnyu+x9w1vo/C9btWnys+x9w1vo/C9btWnyu+7FE4vuYdp7tWnyu+7FE4vuYdp7tWnys+x9w1vo/C9btWnys+7FE4vuYdpztWnyu+x9w1vo/C9TtWnyu+x9w1vo/C9TtWnys+7FE4vuYdpztWnyu+x9w1vo/C9TtWnys+7FE4vuYdpztWnys+7FE4PuYdp7tWnyu+7FE4PuYdpztWnys+7FE4PuYdpztWnyu+7FE4PuYdp7tWnyu+7FE4PuYdp7tWnys+7FE4PuYdpztWnys+7FE4PuYdp7tWnyu+x9w1Po/C9btWnyu+x9w1Po/C9btWnys+7FE4PuYdp7tWnyu+x9w1Po/C9btWnys+7FE4PuYdp7tWnys+7FE4PuYdpztWnyu+x9w1Po/C9TtWnys+x9w1Po/C9TtWnyu+7FE4PuYdpztWnyu+7FE4PuYdpztWnys+x9w1Po/C9TtWnys+x9w1vo/C9btWnyu+x9w1vo/C9btWnys+x9w1Po/C9btWnys+x9w1vo/C9btWnyu+x9w1Po/C9btWnys+x9w1Po/C9btWnyu+x9w1vo/C9btWnyu+x9w1PuYdp7t7FC6+x9w1vuYdp7t7FC6+x9w1vo/C9btWnyu+x9w1Po/C9btWnyu+x9w1PuYdp7t7FC6+x9w1vo/C9btWnys+x9w1vuYdp7t7FC4+x9w1PuYdp7t7FC4+x9w1vo/C9btWnys+x9w1PuYdp7t7FC4+x9w1Po/C9btWnys+x9w1vo/C9TtWnyu+x9w1Po/C9TtWnys+x9w1vo/C9TtWnys+x9w1vo/C9TtWnyu+x9w1Po/C9TtWnyu+x9w1Po/C9TtWnys+x9w1vo/C9TtWnyu+x9w1vuYdpzt7FC6+x9w1PuYdpzt7FC6+x9w1vo/C9TtWnyu+x9w1PuYdpzt7FC6+x9w1Po/C9TtWnyu+x9w1vo/C9TtWnys+x9w1PuYdpzt7FC4+x9w1vuYdpzt7FC4+x9w1vo/C9TtWnys+x9w1Po/C9TtWnys+x9w1PuYdpzt7FC4+x9w1vuYdp7t7FC6+x9w1PuYdp7t7FC6+x9w1PuYdpzt7FC6+x9w1vuYdp7t7FC6+x9w1PuYdpzt7FC6+x9w1vuYdpzt7FC6+x9w1vuYdp7t7FC6+7FE4vuYdpztWnyu+7FE4vuYdp7tWnyu+x9w1vuYdp7t7FC6+x9w1vuYdpzt7FC6+7FE4vuYdpztWnyu+x9w1PuYdp7t7FC6+7FE4PuYdp7tWnyu+7FE4PuYdpztWnyu+x9w1PuYdp7t7FC6+7FE4PuYdpztWnyu+x9w1PuYdpzt7FC6+x9w1vuYdp7t7FC4+x9w1PuYdpzt7FC4+x9w1PuYdp7t7FC4+x9w1vuYdp7t7FC4+x9w1vuYdpzt7FC4+x9w1PuYdpzt7FC4+x9w1vuYdp7t7FC4+7FE4vuYdp7tWnys+7FE4vuYdpztWnys+x9w1vuYdp7t7FC4+7FE4vuYdpztWnys+x9w1vuYdpzt7FC4+x9w1PuYdp7t7FC4+7FE4PuYdpztWnys+7FE4PuYdp7tWnys+x9w1PuYdp7t7FC4+x9w1PuYdpzt7FC4+7FE4PuYdpztWnys+7FE4vuYdp7tWnyu+x9w1vo/C9btWnyu+x9w1vuYdp7t7FC6+7FE4vuYdp7tWnys+x9w1vuYdp7t7FC4+x9w1vo/C9btWnys+7FE4vuYdpztWnyu+x9w1vuYdpzt7FC6+x9w1vo/C9TtWnyu+7FE4vuYdpztWnys+x9w1vo/C9TtWnys+x9w1vuYdpzt7FC4+7FE4PuYdp7tWnyu+x9w1PuYdp7t7FC6+x9w1Po/C9btWnyu+7FE4PuYdp7tWnys+x9w1Po/C9btWnys+x9w1PuYdp7t7FC4+7FE4PuYdpztWnyu+x9w1Po/C9TtWnyu+x9w1PuYdpzt7FC6+7FE4PuYdpztWnys+x9w1PuYdpzt7FC4+x9w1Po/C9TtWnys+AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//z//P1VVVNX/P/8/VVVU1f8//z9VVVTV/z//P1VVVNX/P/8/VVVU1f8//z9VVVTV/z//v1VVqqr/P/+/VVWqqv8//79VVaqq/z//v1VVqqr/P/+/VVWqqv8//79VVaqq////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+//7//P1VVqqr/v/8/VVWqqv+//z9VVaqq/7//P1VVqqr/v/8/VVWqqv+//z9VVaqq/7//v1VVVNX/v/+/VVVU1f+//79VVVTV/7//v1VVVNX/v/+/VVVU1f+//79VVVTV/38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//78AAFVVqar/vwAAVVWpqv+/AABVVamq/78AAFVVqar/vwAAVVWpqv+/AABVVamq/3//P6oqVJX/f/8/qipUlf9//z+qKlSV/3//P6oqVJX/f/8/qipUlf9//z+qKlSV/3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//7///6oqVJX/v///qipUlf+///+qKlSV/7///6oqVJX/v///qipUlf+///+qKlSV/3//v1VVqar/f/+/VVWpqv9//79VVamq/3//v1VVqar/f/+/VVWpqv9//79VVamq//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCAAAD/v1RVqaoAAP+/VFWpqgAA/79UVamqAAD/v1RVqaoAAP+/VFWpqgAA/79UVamq////v6qqqar///+/qqqpqv///7+qqqmq////v6qqqar///+/qqqpqv///7+qqqmq/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA/z//f6qqqar/P/9/qqqpqv8//3+qqqmq/z//f6qqqar/P/9/qqqpqv8//3+qqqmq/7//f1RVqar/v/9/VFWpqv+//39UVamq/7//f1RVqar/v/9/VFWpqv+//39UVamqqiqqKv8//7+qKqoq/z//v6oqqir/P/+/VFVVVS+/y69UVVVVL7/Lr1RVVVUvv8uvqipU1f8//5+qKlTV/z//n6oqVNX/P/+fVFWpqv9//59UVamq/3//n1RVqar/f/+fVNWqKv9//59U1aoq/3//n1TVqir/f/+fqqpVVf8//5+qqlVV/z//n6qqVVX/P/+fVNVU1S+/y69U1VTVL7/Lr1TVVNUvv8uvqqqpqv8//7+qqqmq/z//v6qqqar/P/+/")
+}]
+metadata/source = SubResource("BladeMesh")
+
 [sub_resource type="BoxMesh" id="LipMesh"]
 material = SubResource("Blade")
 size = Vector3(0.36, 0.06, 0.015)
 
-[node name="SchaufelViewmodel" type="Node3D"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_ihuob"]
+_surfaces = [{
+"aabb": AABB(-0.18, -0.03, -0.0075, 0.36, 0.06, 0.015),
+"format": 34359738375,
+"material": SubResource("StandardMaterial3D_o33vk"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 132,
+"vertex_data": PackedByteArray("7FE4vmUZ4rzmHae77FE4vmUZ4jzmHae77FE4vmUZ4jzmHac77FE4vmUZ4rzmHae77FE4vmUZ4jzmHac77FE4vmUZ4rzmHac77FE4vmUZ4rzmHae7x9w1vo/C9bzmHac7x9w1vo/C9bzmHae77FE4vmUZ4rzmHae77FE4vmUZ4rzmHac7x9w1vo/C9bzmHac77FE4vmUZ4jzmHae7x9w1vo/C9TzmHae7x9w1vo/C9TzmHac77FE4vmUZ4jzmHae7x9w1vo/C9TzmHac77FE4vmUZ4jzmHac77FE4PmUZ4rzmHae77FE4PmUZ4jzmHac77FE4PmUZ4jzmHae77FE4PmUZ4rzmHae77FE4PmUZ4rzmHac77FE4PmUZ4jzmHac77FE4PmUZ4rzmHae7x9w1Po/C9bzmHae7x9w1Po/C9bzmHac77FE4PmUZ4rzmHae7x9w1Po/C9bzmHac77FE4PmUZ4rzmHac77FE4PmUZ4jzmHae7x9w1Po/C9TzmHac7x9w1Po/C9TzmHae77FE4PmUZ4jzmHae77FE4PmUZ4jzmHac7x9w1Po/C9TzmHac7x9w1vo/C9bzmHae7x9w1vo/C9bzmHac7x9w1Po/C9bzmHac7x9w1vo/C9bzmHae7x9w1Po/C9bzmHac7x9w1Po/C9bzmHae7x9w1vo/C9bzmHae7x9w1PmUZ4ryPwvW7x9w1vmUZ4ryPwvW7x9w1vo/C9bzmHae7x9w1Po/C9bzmHae7x9w1PmUZ4ryPwvW7x9w1vo/C9bzmHac7x9w1vmUZ4ryPwvU7x9w1PmUZ4ryPwvU7x9w1vo/C9bzmHac7x9w1PmUZ4ryPwvU7x9w1Po/C9bzmHac7x9w1vo/C9TzmHae7x9w1Po/C9TzmHac7x9w1vo/C9TzmHac7x9w1vo/C9TzmHae7x9w1Po/C9TzmHae7x9w1Po/C9TzmHac7x9w1vo/C9TzmHae7x9w1vmUZ4jyPwvW7x9w1PmUZ4jyPwvW7x9w1vo/C9TzmHae7x9w1PmUZ4jyPwvW7x9w1Po/C9TzmHae7x9w1vo/C9TzmHac7x9w1PmUZ4jyPwvU7x9w1vmUZ4jyPwvU7x9w1vo/C9TzmHac7x9w1Po/C9TzmHac7x9w1PmUZ4jyPwvU7x9w1vmUZ4ryPwvW7x9w1PmUZ4ryPwvW7x9w1PmUZ4jyPwvW7x9w1vmUZ4ryPwvW7x9w1PmUZ4jyPwvW7x9w1vmUZ4jyPwvW7x9w1vmUZ4ryPwvW77FE4vmUZ4jzmHae77FE4vmUZ4rzmHae7x9w1vmUZ4ryPwvW7x9w1vmUZ4jyPwvW77FE4vmUZ4jzmHae7x9w1PmUZ4ryPwvW77FE4PmUZ4rzmHae77FE4PmUZ4jzmHae7x9w1PmUZ4ryPwvW77FE4PmUZ4jzmHae7x9w1PmUZ4jyPwvW7x9w1vmUZ4ryPwvU7x9w1PmUZ4jyPwvU7x9w1PmUZ4ryPwvU7x9w1vmUZ4ryPwvU7x9w1vmUZ4jyPwvU7x9w1PmUZ4jyPwvU7x9w1vmUZ4ryPwvU77FE4vmUZ4rzmHac77FE4vmUZ4jzmHac7x9w1vmUZ4ryPwvU77FE4vmUZ4jzmHac7x9w1vmUZ4jyPwvU7x9w1PmUZ4ryPwvU77FE4PmUZ4jzmHac77FE4PmUZ4rzmHac7x9w1PmUZ4ryPwvU7x9w1PmUZ4jyPwvU77FE4PmUZ4jzmHac77FE4vmUZ4rzmHae7x9w1vo/C9bzmHae7x9w1vmUZ4ryPwvW77FE4vmUZ4rzmHac7x9w1vmUZ4ryPwvU7x9w1vo/C9bzmHac77FE4vmUZ4jzmHae7x9w1vmUZ4jyPwvW7x9w1vo/C9TzmHae77FE4vmUZ4jzmHac7x9w1vo/C9TzmHac7x9w1vmUZ4jyPwvU77FE4PmUZ4rzmHae7x9w1PmUZ4ryPwvW7x9w1Po/C9bzmHae77FE4PmUZ4rzmHac7x9w1Po/C9bzmHac7x9w1PmUZ4ryPwvU77FE4PmUZ4jzmHae7x9w1Po/C9TzmHae7x9w1PmUZ4jyPwvW77FE4PmUZ4jzmHac7x9w1PmUZ4jyPwvU7x9w1Po/C9TzmHac7AAD/f/9//78AAP9//3//vwAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+//z//P1VVVNX/P/8/VVVU1f8//z9VVVTV/z//P1VVVNX/P/8/VVVU1f8//z9VVVTV/z//v1VVqqr/P/+/VVWqqv8//79VVaqq/z//v1VVqqr/P/+/VVWqqv8//79VVaqq////f/9//7////9//3//v////3//f/+/////f/9//7////9//3//v////3//f/+//7//P1VVqqr/v/8/VVWqqv+//z9VVaqq/7//P1VVqqr/v/8/VVWqqv+//z9VVaqq/7//v1VVVNX/v/+/VVVU1f+//79VVVTV/7//v1VVVNX/v/+/VVVU1f+//79VVVTV/38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//78AAFRVqqr/vwAAVFWqqv+/AABUVaqq/78AAFRVqqr/vwAAVFWqqv+/AABUVaqq/3//P6oqVJX/f/8/qipUlf9//z+qKlSV/3//P6oqVJX/f/8/qipUlf9//z+qKlSV/3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//7///6oqVJX/v///qipUlf+///+qKlSV/7///6oqVJX/v///qipUlf+///+qKlSV/3//v1RVqqr/f/+/VFWqqv9//79UVaqq/3//v1RVqqr/f/+/VFWqqv9//79UVaqq//////9/AID//////38AgP//////fwCA//////9/AID//////38AgP//////fwCAAAD/v1VVqqoAAP+/VVWqqgAA/79VVaqqAAD/v1VVqqoAAP+/VVWqqgAA/79VVaqq////v6mqqqr///+/qaqqqv///7+pqqqq////v6mqqqr///+/qaqqqv///7+pqqqq/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA/z//f6mqqqr/P/9/qaqqqv8//3+pqqqq/z//f6mqqqr/P/9/qaqqqv8//3+pqqqq/7//f1VVqqr/v/9/VVWqqv+//39VVaqq/7//f1VVqqr/v/9/VVWqqv+//39VVaqqqiqqKv8//7+qKqoq/z//v6oqqir/P/+/VFVVVaGcrtFUVVVVoZyu0VRVVVWhnK7RqipU1f8//5+qKlTV/z//n6oqVNX/P/+fVFWpqv9//59UVamq/3//n1RVqar/f/+fVNWqKv9//59U1aoq/3//n1TVqir/f/+fqqpVVf8//5+qqlVV/z//n6qqVVX/P/+fVNVU1aGcrtFU1VTVoZyu0VTVVNWhnK7Rqqqpqv8//7+qqqmq/z//v6qqqar/P/+/")
+}]
+metadata/source = SubResource("LipMesh")
+
+[node name="SchaufelViewmodel" type="Node3D" unique_id=1496690577]
 script = ExtResource("1")
+start_pose = Transform3D(0, -0.5581504, -0.8297398, 0.7432942, 0.5550667, -0.3733829, 0.66896474, -0.61674076, 0.4148699, 0.42, -0.3, -0.15)
+hit_pose = Transform3D(0, -0.9384982, 0.34528407, 0.91977817, -0.13550282, -0.368303, 0.39243865, 0.31758475, 0.8632102, 0.28, -0.36, -0.22)
+end_pose = Transform3D(0, -0.3738783, 0.9274779, 0.86824316, 0.4601579, 0.18549559, -0.49613893, 0.80527633, 0.32461727, 0.08, -0.42, -0.28)
+guard_pose = Transform3D(0.9689124, 0, -0.24740396, -0.24740396, 0, -0.9689124, 0, 1, 0, 0.17, -0.72, -0.5)
 
-[node name="Model" type="Node3D" parent="."]
+[node name="Model" type="Node3D" parent="." unique_id=1893583760]
 
-[node name="Handle" type="MeshInstance3D" parent="Model"]
+[node name="Handle" type="MeshInstance3D" parent="Model" unique_id=1538661174]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.3)
 cast_shadow = 0
-mesh = SubResource("HandleMesh")
+mesh = SubResource("ArrayMesh_xp6oe")
 
-[node name="Grip" type="MeshInstance3D" parent="Model"]
+[node name="Grip" type="MeshInstance3D" parent="Model" unique_id=312800874]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.07)
 cast_shadow = 0
-mesh = SubResource("GripMesh")
+mesh = SubResource("ArrayMesh_kvvqn")
 
-[node name="Blade" type="MeshInstance3D" parent="Model"]
+[node name="Blade" type="MeshInstance3D" parent="Model" unique_id=735362497]
 transform = Transform3D(1, 0, 0, 0, 0.985, -0.174, 0, 0.174, 0.985, 0, -0.02, -0.82)
 cast_shadow = 0
-mesh = SubResource("BladeMesh")
+mesh = SubResource("ArrayMesh_jwmbi")
 
-[node name="Lip" type="MeshInstance3D" parent="Model"]
+[node name="Lip" type="MeshInstance3D" parent="Model" unique_id=1181584893]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, -0.66)
 cast_shadow = 0
-mesh = SubResource("LipMesh")
+mesh = SubResource("ArrayMesh_ihuob")
