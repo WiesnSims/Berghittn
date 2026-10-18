@@ -29,6 +29,10 @@ func _draw() -> void:
 		if marker == null or not marker.is_visible_in_tree():
 			continue
 		var point: Vector3 = marker.focus()
+		# Exactly beside the camera (say a teammate level with us) the point cannot be projected;
+		# a centimetre ahead gives the same arrow.
+		if absf((camera.global_transform.affine_inverse() * point).z) < 0.001:
+			point -= camera.global_basis.z * 0.01
 		var behind: bool = camera.is_position_behind(point)
 		var screen: Vector2 = camera.unproject_position(point)
 		if not behind and inner.has_point(screen):

@@ -79,8 +79,6 @@ func _enter_playing() -> void:
 	_start_screen.hide()
 	_pause_menu.hide()
 	get_tree().paused = false
-	# The click that took the mouse is still held: it must not fire as well.
-	_player.weapons.lock_trigger()
 
 
 func _enter_menu() -> void:
@@ -149,6 +147,7 @@ func _on_coop_over(wave: int) -> void:
 	await get_tree().create_timer(Constants.DEATH_SCREEN_DELAY).timeout
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_pause_menu.hide()
+	_hud.end_coop()
 	_death_screen.present(wave, _player.points.total, true)
 	Net.back_to_lobby()
 

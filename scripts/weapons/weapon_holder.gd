@@ -33,6 +33,7 @@ var downed: bool = false
 var _starting_melee: WeaponData
 var _before_down: int = -1
 var _borrowed: bool = false
+var _was_captured: bool = false
 
 @onready var _impact_marks: ImpactMarks = $ImpactMarks
 @onready var _impact_puffs: EffectPool = $ImpactPuffs
@@ -392,6 +393,10 @@ func _physics_process(delta: float) -> void:
 	else:
 		_sprint_left = maxf(_sprint_left - delta, 0.0)
 	var captured: bool = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+	# The click that took the mouse (a menu, co-op's "click to join") must not also fire.
+	if captured and not _was_captured:
+		lock_trigger()
+	_was_captured = captured
 	_update_aim(delta, force_aim or (captured and Input.is_action_pressed("secondary")))
 	if _blocking:
 		if not _melee_held() or (_melee_behavior and melee_weapon.secondary == WeaponData.Secondary.BEHAVIOR and not _melee_behavior.hold(delta)):

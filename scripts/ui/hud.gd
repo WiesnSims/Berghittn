@@ -43,6 +43,7 @@ var _player: Player
 # Co-op (M7): what happens to us when down or out (centre), and how the team is doing (top left).
 var _coop_label: Label
 var _team_label: Label
+var _coop_over: bool = false
 
 
 func _ready() -> void:
@@ -53,7 +54,10 @@ func _ready() -> void:
 	_coop_label.offset_left = -500.0
 	_coop_label.offset_right = 500.0
 	_team_label = _make_label(TEAM_COLOR, 18, HORIZONTAL_ALIGNMENT_LEFT)
-	_team_label.position = Vector2(24.0, 80.0)
+	# One line per teammate under the wave label; names are short (HikerStyle.NAME_MAX_LENGTH).
+	_team_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_team_label.position = Vector2(24.0, 112.0)
+	_team_label.size = Vector2(360.0, 100.0)
 	Events.wave_break_started.connect(_on_wave_break_started)
 	Events.wave_started.connect(_on_wave_started)
 	Events.wave_cleared.connect(_on_wave_cleared)
@@ -296,9 +300,14 @@ func _make_label(color: Color, font_size: int, align: HorizontalAlignment) -> La
 	return label
 
 
+## Co-op game over: the death screen says it all now.
+func end_coop() -> void:
+	_coop_over = true
+
+
 ## Co-op: our own downed or out state in the middle, and every teammate's state and health.
 func _update_coop() -> void:
-	if _player == null or Coop.players == null:
+	if _player == null or Coop.players == null or _coop_over:
 		_coop_label.text = ""
 		_team_label.text = ""
 		return
