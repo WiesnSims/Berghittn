@@ -12,6 +12,7 @@ enum State { MENU, CAPTURING, PLAYING, DEAD }
 @onready var _settings_menu: SettingsMenu = $UI/SettingsMenu
 @onready var _waves: WaveManager = $WaveManager
 @onready var _lobby: Lobby = $UI/Lobby
+@onready var _warmup: ShaderWarmup = $ShaderWarmup
 
 var _state: State = State.MENU
 # This scene runs (or ran) a co-op match: Net.in_match() turns false the moment the session ends.
@@ -22,6 +23,7 @@ func _ready() -> void:
 	var spawn := get_tree().get_first_node_in_group("player_spawn") as Node3D
 	_player.spawn_at(spawn.global_transform)
 	_hud.bind_player(_player)
+	_warmup.progress.connect(_start_screen.set_ready)
 	_player.died.connect(_on_player_died)
 	_start_screen.play_requested.connect(_request_play)
 	_pause_menu.resume_requested.connect(_request_play)
@@ -75,6 +77,9 @@ func _request_play() -> void:
 
 func _enter_playing() -> void:
 	_state = State.PLAYING
+	# Into the game before the shaders are all built (a co-op start): the rest in one go now.
+	if is_instance_valid(_warmup):
+		_warmup.finish_now()
 	GameState.has_started = true
 	_start_screen.hide()
 	_pause_menu.hide()

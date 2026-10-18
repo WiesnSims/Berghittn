@@ -389,7 +389,12 @@ const FROST_BUILD_TIME: float = 10.0
 const FROST_THAW_TIME: float = 3.0
 # Shader warm-up at load: frames the weapon models are drawn for, their size, and where (metres ahead
 # of the camera and apart).
-const WARMUP_FRAMES: int = 4
+## The warmup's render layer (20): the only one the camera draws until the shaders are built (#78).
+const WARMUP_LAYER: int = 1 << 19
+## Warmup items shown per frame; one with a new shader stalls its frame, the others are cheap.
+const WARMUP_PER_FRAME: int = 3
+## Share of the progress the items stand for; the rest is the world's first full frame.
+const WARMUP_ITEMS_SHARE: float = 0.95
 const WARMUP_SCALE: float = 0.02
 const WARMUP_DISTANCE: float = 0.5
 const WARMUP_SPACING: float = 0.02

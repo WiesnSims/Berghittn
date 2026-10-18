@@ -4,8 +4,6 @@
 locale = "de"
 messages = {
 [&"", &"UI_TITLE"]: [&"Berghittn"],
-[&"", &"UI_TAGLINE"]: [&"Schneesturm. Untote. Oane Hüttn."],
-[&"", &"UI_CLICK_TO_PLAY"]: [&"Klick zum Spielen"],
 [&"", &"UI_CONTROLS"]: [&"WASD gehen  ·  Maus schauen  ·  LMT schießen  ·  RMT Waffenmodus  ·  V Nahkampf  ·  G / MMT werfen  ·  R nachladen  ·  1 / 2 / Mausrad Waffe wechseln  ·  E benutzen  ·  Leertaste springen  ·  Shift sprinten  ·  C ducken  ·  Esc Pause  ·  F3 Debug"],
 [&"", &"UI_PAUSE_TITLE"]: [&"Pause"],
 [&"", &"UI_PAUSE_HINT"]: [&"A kurze Jausn, dann geht's weida."],
@@ -167,7 +165,6 @@ messages = {
 [&"", &"UI_NET_VERSION"]: [&"Dein Spiel ist veraltet. Lade die Seite neu (Strg+F5) und tritt noch einmal bei."],
 [&"", &"UI_NET_NO_ROOM"]: [&"Es gibt keinen Raum mit diesem Code."],
 [&"", &"UI_NET_LOST"]: [&"Die Verbindung zum Raum ist abgerissen."],
-[&"", &"UI_CLICK_TO_JOIN"]: [&"Das Spiel hat begonnen. Klick zum Mitspielen."],
 [&"", &"UI_LEAVE_MATCH"]: [&"Spiel verlassen"],
 [&"", &"UI_PLAYER_N"]: [&"Spieler %d"],
 [&"", &"UI_HEAD_BUA"]: [&"Bua"],
@@ -192,5 +189,8 @@ messages = {
 [&"", &"UI_COOP_OUT"]: [&"Ausgeblutet. Du bist zurück, wenn die nächste Welle beginnt."],
 [&"", &"UI_COOP_TEAM_DOWN"]: [&"%s  AM BODEN"],
 [&"", &"UI_COOP_TEAM_OUT"]: [&"%s  raus"],
-[&"", &"UI_BACK_TO_LOBBY"]: [&"Zurück zur Lobby"]
+[&"", &"UI_BACK_TO_LOBBY"]: [&"Zurück zur Lobby"],
+[&"", &"UI_SOLO"]: [&"Solo"],
+[&"", &"UI_JOIN_MATCH"]: [&"Mitspielen"],
+[&"", &"UI_PREPARING"]: [&"Die Hütte wird vorbereitet ... %d %%"]
 }
