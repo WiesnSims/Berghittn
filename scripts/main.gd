@@ -51,8 +51,7 @@ func _ready() -> void:
 		GameState.invite_used = true
 		var room: String = Net.room_from_url()
 		if room != "":
-			_open_lobby()
-			_lobby.join(room)
+			_join_from_invite(room)
 
 
 func _process(_delta: float) -> void:
@@ -92,6 +91,14 @@ func _enter_menu() -> void:
 	get_tree().paused = not _coop
 	_start_screen.visible = not GameState.has_started
 	_pause_menu.visible = GameState.has_started
+
+
+## The lobby (and the game) only once the shaders are built: the title shows how far that is.
+func _join_from_invite(room: String) -> void:
+	if is_instance_valid(_warmup) and not _start_screen.is_revealed():
+		await _warmup.finished
+	_open_lobby()
+	_lobby.join(room)
 
 
 func _open_lobby() -> void:

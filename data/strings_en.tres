@@ -192,5 +192,5 @@ messages = {
 [&"", &"UI_BACK_TO_LOBBY"]: [&"Back to the lobby"],
 [&"", &"UI_SOLO"]: [&"Solo"],
 [&"", &"UI_JOIN_MATCH"]: [&"Join the match"],
-[&"", &"UI_PREPARING"]: [&"Preparing the hut ... %d %%"]
+[&"", &"UI_PREPARING"]: [&"Preparing the hut ..."]
 }

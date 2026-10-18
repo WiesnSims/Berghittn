@@ -101,6 +101,10 @@ func finish_now() -> void:
 func _finish() -> void:
 	if _camera and _world_mask != 0:
 		_camera.cull_mask = _world_mask
+		_world_mask = 0
+		# The world's own first frame (anything left compiles there) before the menu comes in.
+		for i: int in 2:
+			await get_tree().process_frame
 		# In the browser console, for load-time reports (#78).
 		print("Shaders ready: %d items, %d ms after start" % [_items.size(), Time.get_ticks_msec()])
 	_done = true

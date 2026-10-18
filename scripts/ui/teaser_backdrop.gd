@@ -3,7 +3,8 @@ extends Control
 ## The title screen's background (#77): a still from the game (tools/teaser), alive in 2D only, so it
 ## costs no 3D shaders while the hut's are still being built behind it (#78). It drifts slowly like a
 ## camera, snow blows past, the Stube lamp flickers, and now and then the Jagdflinte goes off: a
-## flash at its muzzle, the room lit up for a moment and a little kick.
+## flash at its muzzle, the room lit up for a moment and a little kick. While the shaders are built
+## it holds still (set_animated): those frames come in bursts, and motion would show every one.
 
 const PICTURE: Texture2D = preload("res://assets/ui/teaser.jpg")
 ## Where the Jagdflinte's muzzle and the Stube lamp are in the picture (0..1; printed by tools/teaser).
@@ -22,6 +23,8 @@ var _picture: TextureRect
 var _muzzle: TextureRect
 var _lamp: TextureRect
 var _flash_fill: ColorRect
+var _snow_drift: CPUParticles2D
+var _animated: bool = true
 var _time: float = 0.0
 var _shot_left: float = 1.5
 var _flash_left: float = 0.0
@@ -48,13 +51,25 @@ func _ready() -> void:
 	add.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	_flash_fill.material = add
 	add_child(_flash_fill)
-	add_child(_snow())
+	_snow_drift = _snow()
+	add_child(_snow_drift)
 	add_child(_shade())
+
+
+## Still (the lamp at rest, no snow, no shots) or alive.
+func set_animated(on: bool) -> void:
+	_animated = on
+	_snow_drift.emitting = on
+	_snow_drift.visible = on
+	if on:
+		_snow_drift.restart()
 
 
 func _process(delta: float) -> void:
 	if not is_visible_in_tree():
 		return
+	if not _animated:
+		delta = 0.0
 	_time += delta
 	# Cover the screen at any aspect, a bit larger than it, drifting slowly back and forth.
 	var phase: float = sin(_time / DRIFT_TIME * TAU)

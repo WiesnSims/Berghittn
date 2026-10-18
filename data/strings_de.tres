@@ -192,5 +192,5 @@ messages = {
 [&"", &"UI_BACK_TO_LOBBY"]: [&"Zurück zur Lobby"],
 [&"", &"UI_SOLO"]: [&"Solo"],
 [&"", &"UI_JOIN_MATCH"]: [&"Mitspielen"],
-[&"", &"UI_PREPARING"]: [&"Die Hütte wird vorbereitet ... %d %%"]
+[&"", &"UI_PREPARING"]: [&"Die Hütte wird vorbereitet ..."]
 }

@@ -13,6 +13,7 @@ grow_vertical = 2
 script = ExtResource("1")
 
 [node name="Backdrop" type="Control" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -66,6 +67,30 @@ custom_minimum_size = Vector2(0, 18)
 layout_mode = 2
 mouse_filter = 2
 
+[node name="Loading" type="VBoxContainer" parent="Margin/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="LoadingLabel" type="Label" parent="Margin/Column/Loading"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.92, 0.84, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 24
+text = "UI_PREPARING"
+
+[node name="LoadingBar" type="ProgressBar" parent="Margin/Column/Loading"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 14)
+layout_mode = 2
+mouse_filter = 2
+max_value = 1.0
+show_percentage = false
+
 [node name="SoloButton" type="Button" parent="Margin/Column"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(320, 58)
@@ -96,6 +121,7 @@ size_flags_vertical = 3
 mouse_filter = 2
 
 [node name="Controls" type="Label" parent="Margin/Column"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(620, 0)
 layout_mode = 2
 size_flags_horizontal = 0

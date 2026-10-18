@@ -181,8 +181,10 @@ godot --headless --import                   # then reimport
 
 ## Title screen and loading (#77, #78)
 
-- The title (`StartScreen`) has Solo, Co-op and Settings; nothing starts on a click elsewhere. Solo
-  waits until the shaders are built and says how far that is ("Preparing the hut ... 60 %").
+- The title (`StartScreen`) has Solo, Co-op and Settings; nothing starts on a click elsewhere. Until
+  the shaders are built it shows only the still picture, "Preparing the hut ..." and a progress bar:
+  each new shader blocks the browser's main thread (up to ~0.7 s), so a live menu stuttered
+  (play-test). Then the menu fades in and the picture comes alive. An invite link waits too.
 - Behind it, `TeaserBackdrop` animates a still from the game in 2D (drift, snow, lamp flicker, the
   Jagdflinte firing now and then), so it needs no 3D shaders. The still is rendered by
   `godot res://tools/teaser/teaser.tscn` into `assets/ui/teaser.jpg` (lossy import); the tool prints

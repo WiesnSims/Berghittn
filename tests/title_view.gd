@@ -29,8 +29,8 @@ func _ready() -> void:
 		if frames == 15:
 			_shot("title_preparing.png")
 	print("warmup: %d frames, %d ms, last progress %.2f" % [frames, Time.get_ticks_msec() - started, _progress[-1] if not _progress.is_empty() else -1.0])
-	for i: int in 30:
-		await get_tree().process_frame
+	# Past the menu's fade-in.
+	await get_tree().create_timer(1.0, true).timeout
 	_shot("title_ready.png")
 	# The world behind the title, as the game will show it.
 	(main.get_node("UI/StartScreen") as Control).hide()
