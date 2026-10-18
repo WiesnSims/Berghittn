@@ -4,6 +4,7 @@ extends Node
 ## while the Terrasse is open (she waits for it) and never on a boss wave. On top of that, now and then a
 ## random event: at most one a wave, never on a boss wave or a wave Resi comes, not the same one twice
 ## in a row when another could come.
+## Co-op (M7): only the host's director sends events; CoopEvents gives every guest a copy of each.
 
 @export var zones: ZoneMap
 @export var resi_scene: PackedScene
@@ -30,7 +31,7 @@ func _ready() -> void:
 
 
 func _on_wave_started(wave: int, is_boss_wave: bool) -> void:
-	if is_boss_wave:
+	if is_boss_wave or Coop.is_guest():
 		# The Krampus has the stage to himself; Resi comes the wave after.
 		return
 	if wave >= _next_resi and not is_instance_valid(_resi) and zones.is_unlocked(&"terrasse"):
@@ -94,6 +95,7 @@ func send_resi() -> Resi:
 	_stage().add_child(_resi)
 	_resi.start((spots.get_node("Gate") as Node3D).global_position, (spots.get_node("Ramp") as Node3D).global_position,
 		(spots.get_node("Hub") as Node3D).global_position, wander)
+	_share(_resi, &"resi")
 	Sound.play(&"event_call")
 	return _resi
 
@@ -111,15 +113,16 @@ func send_fassl() -> Bierfassl:
 	_fassl = fassl_scene.instantiate() as Bierfassl
 	_stage().add_child(_fassl)
 	_fassl.start(route)
+	_share(_fassl, &"fassl")
 	Sound.play(&"event_call")
 	return _fassl
 
 
-## Sends the Murmeltier to a spot near the player (also used by tests).
+## Sends the Murmeltier to a spot near a player (also used by tests).
 func send_murmeltier() -> Murmeltier:
 	if is_instance_valid(_murmel):
 		return _murmel
-	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var player: Node3D = random_player(get_tree())
 	if player == null:
 		return null
 	var spot: Vector3 = reachable_spot(player.get_world_3d(), player.global_position, Constants.MURMEL_FIRST_MIN, Constants.MURMEL_FIRST_MAX)
@@ -128,6 +131,7 @@ func send_murmeltier() -> Murmeltier:
 	_murmel = murmel_scene.instantiate() as Murmeltier
 	_stage().add_child(_murmel)
 	_murmel.start(spot, player.global_position)
+	_share(_murmel, &"murmeltier")
 	Sound.play(&"event_call")
 	return _murmel
 
@@ -143,6 +147,7 @@ func send_guest() -> TouristGuest:
 	_guest = guest_scene.instantiate() as TouristGuest
 	_stage().add_child(_guest)
 	_guest.start(arrival.global_position, goal.global_position, guest_way(arrival.global_position, goal.global_position))
+	_share(_guest, &"guest")
 	Sound.play(&"event_call")
 	return _guest
 
@@ -222,6 +227,26 @@ static func _crosses_blocker(world: World3D, path: PackedVector3Array) -> bool:
 		if not space.intersect_ray(leg).is_empty():
 			return true
 	return false
+
+
+## A player still on their feet (in co-op any of them, as the host sees them: our Player or a
+## hiker), or null.
+static func random_player(tree: SceneTree) -> Node3D:
+	var up: Array[Node3D] = []
+	for node: Node in tree.get_nodes_in_group("player"):
+		if node.has_method("is_targetable") and node.call("is_targetable"):
+			up.append(node as Node3D)
+	return up.pick_random() if not up.is_empty() else tree.get_first_node_in_group("player") as Node3D
+
+
+## Where the actors appear.
+func stage_node() -> Node:
+	return _stage()
+
+
+func _share(actor: Node3D, kind: StringName) -> void:
+	if Coop.is_host() and Coop.events:
+		Coop.events.share(actor, kind)
 
 
 func _stage() -> Node:

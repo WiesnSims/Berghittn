@@ -4,6 +4,10 @@ extends Node3D
 ## Shows the weapon's own model, turning slowly over a red glow; stays until someone takes it.
 
 var weapon: WeaponData
+## Co-op (M7): the id everyone knows this drop by (the host's; 0 in solo). Only one player gets it.
+var net_id: int = 0
+## A guest asked the host for it and waits for the answer.
+var asked: bool = false
 var _model: Node3D
 var _spin: float = 0.0
 
@@ -16,20 +20,28 @@ static func spawn(data: WeaponData, at: Vector3, parent: Node) -> WeaponPickup:
 	var down := PhysicsRayQueryParameters3D.create(at + Vector3.UP * 1.0, at + Vector3.DOWN * 4.0, Constants.LAYER_WORLD)
 	var hit: Dictionary = pickup.get_world_3d().direct_space_state.intersect_ray(down)
 	pickup.global_position = hit.position if not hit.is_empty() else at
+	if Coop.is_host():
+		Coop.world.share_drop(pickup)
 	if data.id == &"krampusrute":
 		Events.event_announced.emit(TranslationServer.translate("EVENT_RUTE_DROPPED"))
 	return pickup
 
 
+## Only the weapon's meshes, as the Hüttentruhe shows them: its viewmodel's Model, grip at the origin,
+## running along -Z.
+static func model_of(data: WeaponData) -> Node3D:
+	var viewmodel: Node = data.viewmodel.instantiate()
+	var model: Node3D = viewmodel.get_node("Model")
+	viewmodel.remove_child(model)
+	viewmodel.free()
+	model.transform = Transform3D.IDENTITY
+	model.visible = true
+	return model
+
+
 func _ready() -> void:
 	add_to_group("interactables")
-	# Only the weapon's meshes, as the Hüttentruhe shows them.
-	var viewmodel: Node = weapon.viewmodel.instantiate()
-	_model = viewmodel.get_node("Model")
-	viewmodel.remove_child(_model)
-	viewmodel.free()
-	_model.transform = Transform3D.IDENTITY
-	_model.visible = true
+	_model = model_of(weapon)
 	var holder := Node3D.new()
 	holder.position = Vector3(0.0, 0.7, 0.0)
 	# Larger than in hand, to be seen from across the room.
@@ -72,7 +84,14 @@ func get_interact_prompt(player: Node3D) -> String:
 
 func interact(player: Node3D) -> void:
 	var taker := player as Player
-	if taker.weapons.has_weapon(weapon):
+	if taker.weapons.has_weapon(weapon) or asked:
+		return
+	# Co-op: the host's word on who was first; the drop is gone for everyone once someone has it.
+	if Coop.is_guest():
+		asked = true
+		Coop.world.request_drop(self)
 		return
 	taker.weapons.give_weapon(weapon)
+	if Coop.is_host():
+		Coop.world.drop_taken(self)
 	queue_free()

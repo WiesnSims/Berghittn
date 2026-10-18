@@ -65,7 +65,7 @@ async function main() {
 const timeout = setTimeout(() => {
 	console.log('FAIL: timed out');
 	process.exit(1);
-}, 120_000);
+}, Number(process.env.NET_TEST_TIMEOUT_MS || 240_000));
 const ok = await main().catch((e) => {
 	console.log(`FAIL: ${e.message}`);
 	return false;

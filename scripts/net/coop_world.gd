@@ -16,6 +16,9 @@ var _main: Node
 var _waves: WaveManager
 var _zones: ZoneMap
 var _over: bool = false
+## Weapons left on the floor (the Krampus-Rute) by net id, on every peer.
+var _drops: Dictionary = {}
+var _next_drop: int = 1
 
 
 func setup(main: Node, waves: WaveManager, zones: ZoneMap) -> void:
@@ -62,6 +65,25 @@ func _node(path: NodePath) -> Node:
 
 # --- requests from guests ---------------------------------------------------------------------------
 
+## Host: a weapon was dropped (WeaponPickup.spawn); the guests get it too, under one id.
+func share_drop(pickup: WeaponPickup) -> void:
+	pickup.net_id = _next_drop
+	_next_drop += 1
+	_drops[pickup.net_id] = pickup
+	_dropped.rpc(pickup.net_id, String(pickup.weapon.id), pickup.global_position)
+
+
+## Host: we took a drop; it goes for everyone.
+func drop_taken(pickup: WeaponPickup) -> void:
+	_drops.erase(pickup.net_id)
+	_drop_gone.rpc(pickup.net_id)
+
+
+## A guest wants a drop: the host gives it to whoever asked first.
+func request_drop(pickup: WeaponPickup) -> void:
+	_ask_drop.rpc_id(1, pickup.net_id)
+
+
 ## A guest paid for the door to `zone`.
 func request_unlock(zone: StringName, cost: int) -> void:
 	_ask_unlock.rpc_id(1, zone, cost)
@@ -104,6 +126,44 @@ func _ask_chest(path: NodePath, weapon_id: String, cost: int) -> void:
 	var chest := _node(path) as Huettentruhe
 	if chest == null or not chest.roll_for(Coop.node_of(sender), StringName(weapon_id)):
 		_refund.rpc_id(sender, cost)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _ask_drop(id: int) -> void:
+	var pickup: WeaponPickup = _drops.get(id)
+	if pickup == null or not is_instance_valid(pickup):
+		return
+	_drops.erase(id)
+	_drop_gone.rpc(id)
+	_drop_granted.rpc_id(multiplayer.get_remote_sender_id(), String(pickup.weapon.id))
+	pickup.queue_free()
+
+
+@rpc("authority", "call_remote", "reliable")
+func _dropped(id: int, weapon_id: String, at: Vector3) -> void:
+	var data := load("res://data/weapons/%s.tres" % weapon_id) as WeaponData if weapon_id.is_valid_identifier() else null
+	if data == null:
+		return
+	var pickup: WeaponPickup = WeaponPickup.spawn(data, at, _main)
+	pickup.net_id = id
+	_drops[id] = pickup
+
+
+@rpc("authority", "call_remote", "reliable")
+func _drop_gone(id: int) -> void:
+	var pickup: WeaponPickup = _drops.get(id)
+	_drops.erase(id)
+	if pickup and is_instance_valid(pickup):
+		pickup.queue_free()
+
+
+## We were first to the drop we asked for.
+@rpc("authority", "call_remote", "reliable")
+func _drop_granted(weapon_id: String) -> void:
+	var player := Coop.node_of(Net.my_id()) as Player
+	var data := load("res://data/weapons/%s.tres" % weapon_id) as WeaponData if weapon_id.is_valid_identifier() else null
+	if player and data:
+		player.weapons.give_weapon(data)
 
 
 @rpc("authority", "call_remote", "reliable")

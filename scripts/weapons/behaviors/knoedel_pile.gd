@@ -5,6 +5,8 @@ extends Node3D
 
 const SINK_TIME: float = 0.6
 
+## Co-op (M7): another player's heap, as we see it: it slows nobody here (their game does that).
+var harmless: bool = false
 var _left: float = 0.0
 var _radius: float = 0.0
 var _slow_factor: float = 1.0
@@ -72,6 +74,15 @@ func _physics_process(delta: float) -> void:
 	if _left <= 0.0:
 		return
 	_left -= delta
+	if not harmless:
+		_slow_waders()
+	if _left < SINK_TIME:
+		_mound.scale = Vector3(_radius, _radius * maxf(_left / SINK_TIME, 0.01), _radius)
+	if _left <= 0.0:
+		visible = false
+
+
+func _slow_waders() -> void:
 	for node: Node in get_tree().get_nodes_in_group("enemies"):
 		var enemy := node as Enemy
 		if enemy == null or not enemy.is_alive():
@@ -79,7 +90,3 @@ func _physics_process(delta: float) -> void:
 		var offset: Vector3 = enemy.global_position - global_position
 		if Vector2(offset.x, offset.z).length() <= _radius and absf(offset.y) < 1.0:
 			enemy.apply_slow(_slow_factor, _slow_time)
-	if _left < SINK_TIME:
-		_mound.scale = Vector3(_radius, _radius * maxf(_left / SINK_TIME, 0.01), _radius)
-	if _left <= 0.0:
-		visible = false

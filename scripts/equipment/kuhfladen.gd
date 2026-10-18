@@ -8,6 +8,10 @@ extends Node3D
 const GROUP: String = "kuhfladen"
 const FADE_TIME: float = 0.6
 
+## Co-op (M7): another player's, as we see it. It is trodden flat like theirs, but hurts nobody here:
+## their own game deals the damage.
+var harmless: bool = false
+
 var _thrower: Node3D
 var _left: float = Constants.KUHFLADEN_LIFETIME
 var _catches: int = 0
@@ -68,8 +72,9 @@ func _physics_process(delta: float) -> void:
 			continue
 		_caught[enemy.get_instance_id()] = true
 		_catches += 1
-		enemy.apply_slow(Constants.KUHFLADEN_SLOW_FACTOR, Constants.KUHFLADEN_SLOW_TIME)
-		enemy.receive_hit(Constants.KUHFLADEN_DAMAGE, false, false, _thrower)
+		if not harmless:
+			enemy.apply_slow(Constants.KUHFLADEN_SLOW_FACTOR, Constants.KUHFLADEN_SLOW_TIME)
+			enemy.receive_hit(Constants.KUHFLADEN_DAMAGE, false, false, _thrower)
 		Sound.play_at(&"kuhfladen_squelch", global_position)
 		if _catches >= Constants.KUHFLADEN_CATCHES:
 			_left = 0.0

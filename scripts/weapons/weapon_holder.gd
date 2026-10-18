@@ -15,6 +15,13 @@ signal weapon_changed(data: WeaponData)
 signal melee_changed(data: WeaponData)
 ## Emitted when a shot hit an enemy, for the hit marker.
 signal hit_confirmed(is_headshot: bool, killed: bool)
+## Co-op (M7): something the others should see (a shot, a swing, a held mode), for CoopPlayers to
+## pass on; their copy of these guns replays it (ghost).
+signal acted(action: Act, rounds: int)
+
+## What `acted` reports: a left-click shot, a right-click special, a melee swing starting, its blow
+## landing, and V held past the blow (guard or held mode) and let go.
+enum Act { SHOT, SECONDARY, SWING, MELEE, HOLD, RELEASE }
 
 ## One carried gun and the ammo it had when it was put away.
 class GunSlot:
@@ -28,6 +35,9 @@ class GunSlot:
 @export var starting_weapon: WeaponData
 ## Always carried (section 6: the shovel until the melee slot gets replaced).
 @export var melee_weapon: WeaponData
+## Co-op (M7): another player's guns as this browser shows them, on their hiker: their actions are
+## replayed (replay()) for the look and the sound only. Nothing is hit here; their own game does that.
+@export var ghost: bool = false
 ## Co-op (M7): downed, only the pistol is in hand; no switching, no melee (set_downed).
 var downed: bool = false
 var _starting_melee: WeaponData
@@ -42,7 +52,7 @@ var _capture_grace: float = 0.0
 @onready var _impact_puffs: EffectPool = $ImpactPuffs
 @onready var _hit_puffs: EffectPool = $HitPuffs
 # Every viewmodel hangs under this, so walking, sprinting and looking move them all.
-@onready var _motion: WeaponMotion = $Motion
+@onready var _motion: Node3D = $Motion
 
 ## The gun in hand and its ammo; written back to its slot when it is put away.
 var weapon: WeaponData
@@ -98,10 +108,18 @@ var _shooter: Node3D
 # waiting for the next shot.
 var _loop_sound: AudioStreamPlayer
 var _fire_loop_left: float = 0.0
+# A ghost's behaviors by weapon id (each keeps its own pools of shells and puddles), its held-fire
+# sound and flame, and its muzzle flash.
+var _ghost_behaviors: Dictionary = {}
+var _ghost_loop: AudioStreamPlayer3D
+var _ghost_flame: CPUParticles3D
+var _ghost_flash: OmniLight3D
 
 
 func _ready() -> void:
 	_rng.randomize()
+	if ghost:
+		return
 	_starting_melee = melee_weapon
 	if starting_weapon:
 		give_weapon(starting_weapon)
@@ -120,6 +138,12 @@ func _ready() -> void:
 
 func set_owner_body(body: CollisionObject3D) -> void:
 	_exclude = [body.get_rid()]
+	_shooter = body
+
+
+## A ghost's owner: the hiker its shots come from.
+func set_ghost_owner(body: Node3D) -> void:
+	_exclude = []
 	_shooter = body
 
 
@@ -367,7 +391,7 @@ func aim_eased() -> float:
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Here and not in _physics_process: wheel "presses" are released in the same frame and would be missed.
-	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED or _melee_left > 0.0 or _slots.size() < 2 or downed:
+	if ghost or Input.mouse_mode != Input.MOUSE_MODE_CAPTURED or _melee_left > 0.0 or _slots.size() < 2 or downed:
 		return
 	if event.is_action_pressed("weapon_next") or event.is_action_pressed("weapon_previous"):
 		_select((_current + 1) % _slots.size())
@@ -378,6 +402,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if ghost:
+		_ghost_step(delta)
+		return
 	if weapon == null:
 		return
 	_cooldown = maxf(_cooldown - delta, 0.0)
@@ -620,6 +647,7 @@ func fire_secondary() -> void:
 	_behavior.fire_secondary()
 	Sound.play(weapon.secondary_sound if weapon.secondary_sound != &"" else weapon.fire_sound)
 	fired.emit(rounds)
+	acted.emit(Act.SECONDARY, rounds)
 	ammo_changed.emit(mag, reserve)
 	if _viewmodel:
 		_viewmodel.play_secondary(rounds)
@@ -715,6 +743,8 @@ func ignite_around(center: Vector3, reach: float, burn_dps: int, burn_time: floa
 ## through). Each as {hurtbox, target (its middle), to_target, distance}. With `flat`, the angle is
 ## measured on the ground, as melee does: a body right below the eye still counts as straight ahead.
 func _bodies_in(center: Vector3, forward: Vector3, half_angle: float, reach: float, flat: bool = false) -> Array[Dictionary]:
+	if ghost:
+		return []
 	var sphere := SphereShape3D.new()
 	sphere.radius = reach + Constants.AREA_BODY_MARGIN
 	var query := PhysicsShapeQueryParameters3D.new()
@@ -752,6 +782,8 @@ func _bodies_in(center: Vector3, forward: Vector3, half_angle: float, reach: flo
 ## One body hit for behaviors that find their own targets (the Rodelkanone's sled): `amount` (before
 ## perks), and a survivor thrown along `push` (scaled like area_hit's, by how much it flinches).
 func strike(hurtbox: Hurtbox, amount: int, push: Vector3, is_melee: bool = false) -> Hurtbox.Result:
+	if ghost:
+		return Hurtbox.Result.IGNORED
 	var result: Hurtbox.Result = hurtbox.take_hit(_damage(amount), 1.0, is_melee, _shooter)
 	if result == Hurtbox.Result.IGNORED:
 		return result
@@ -790,6 +822,14 @@ func melee_strike(hurtbox: Hurtbox, amount: int, push: Vector3) -> Hurtbox.Resul
 ## The melee weapon's first-person model, for behaviors that animate it during their held mode.
 func melee_viewmodel() -> MeleeViewmodel:
 	return _melee_viewmodel
+
+
+## A sound from the guns: in the ears for our own, from where they are for a ghost.
+func play_sound(id: StringName) -> void:
+	if ghost:
+		Sound.play_at(id, global_position)
+	else:
+		Sound.play(id)
 
 
 ## A jolt of the shooter's view that is not recoil (a blast going off).
@@ -866,6 +906,7 @@ func _after_shot(rounds: int) -> void:
 	else:
 		Sound.play(weapon.fire_sound)
 	fired.emit(rounds)
+	acted.emit(Act.SHOT, rounds)
 	ammo_changed.emit(mag, reserve)
 	if _viewmodel:
 		_viewmodel.play_fire(rounds)
@@ -882,6 +923,7 @@ func _start_melee() -> void:
 	_melee_left = 1.0 / melee_weapon.fire_rate
 	_melee_hit_in = _melee_left * Constants.MELEE_HIT_FRACTION
 	Sound.play(melee_weapon.swing_sound)
+	acted.emit(Act.SWING, 1)
 	if _viewmodel:
 		_viewmodel.play_lower(_melee_left)
 	if _melee_viewmodel:
@@ -909,6 +951,7 @@ func _melee_held() -> bool:
 
 func _start_block() -> void:
 	_blocking = true
+	acted.emit(Act.HOLD, 1)
 	_melee_left = 0.0
 	# The gun stays down for as long as the guard is up.
 	if _viewmodel:
@@ -921,6 +964,7 @@ func _end_block() -> void:
 	if not _blocking:
 		return
 	_blocking = false
+	acted.emit(Act.RELEASE, 1)
 	if _melee_behavior and melee_weapon.secondary == WeaponData.Secondary.BEHAVIOR:
 		_melee_behavior.hold_end()
 	if _melee_viewmodel:
@@ -950,6 +994,7 @@ func _on_hit_confirmed(is_headshot: bool, _killed: bool) -> void:
 
 
 func _melee_hit() -> void:
+	acted.emit(Act.MELEE, 1)
 	if _melee_behavior and _melee_behavior.melee_hit():
 		return
 	# The swing sweeps an arc in front of the player and hits every enemy in it, once each.
@@ -1047,3 +1092,106 @@ func _spread_direction() -> Vector3:
 	var radius: float = tan(deg_to_rad(spread)) * sqrt(_rng.randf())
 	var angle: float = _rng.randf() * TAU
 	return (forward + basis.x * cos(angle) * radius + basis.y * sin(angle) * radius).normalized()
+
+
+# --- Co-op (M7): a ghost, another player's guns -------------------------------------------------------
+
+## Replays what another player's guns did, from `aim` (their eye, looking along -Z): the shot through
+## the weapon's own behavior (shells, sleds, puddles, notes) or as impacts for a plain gun, with its
+## sound from there.
+func replay(action: Act, data: WeaponData, rounds: int, aim: Transform3D) -> void:
+	global_transform = aim
+	var behavior: WeaponBehavior = _ghost_behavior(data)
+	match action:
+		Act.SHOT:
+			weapon = data
+			if behavior:
+				behavior.fire(rounds)
+			else:
+				for i: int in data.pellets * rounds:
+					_ghost_ray()
+				_flash()
+			_ghost_shot_sound(data, rounds)
+		Act.SECONDARY:
+			weapon = data
+			if behavior:
+				behavior.fire_secondary()
+			play_sound(data.secondary_sound if data.secondary_sound != &"" else data.fire_sound)
+		Act.SWING:
+			play_sound(data.swing_sound)
+		Act.MELEE:
+			melee_weapon = data
+			if behavior:
+				behavior.melee_hit()
+		Act.HOLD:
+			melee_weapon = data
+			if behavior:
+				behavior.hold_start()
+		Act.RELEASE:
+			if behavior:
+				behavior.hold_end()
+
+
+func _ghost_behavior(data: WeaponData) -> WeaponBehavior:
+	if not _ghost_behaviors.has(data.id):
+		_ghost_behaviors[data.id] = WeaponBehavior.create(data, self)
+	return _ghost_behaviors[data.id]
+
+
+func _ghost_step(delta: float) -> void:
+	if _fire_loop_left <= 0.0:
+		return
+	_fire_loop_left -= delta
+	if _fire_loop_left <= 0.0:
+		if is_instance_valid(_ghost_loop):
+			_ghost_loop.queue_free()
+		if _ghost_flame:
+			_ghost_flame.emitting = false
+
+
+func _ghost_shot_sound(data: WeaponData, rounds: int) -> void:
+	if data.fire_loop_sound == &"":
+		play_sound(data.secondary_sound if rounds > 1 and data.secondary_sound != &"" else data.fire_sound)
+		return
+	# Held fire (the flame): the start once, the loop and the stream of flame while the shots come.
+	if not is_instance_valid(_ghost_loop):
+		play_sound(data.fire_sound)
+		_ghost_loop = Sound.attach(data.fire_loop_sound, self)
+	_fire_loop_left = 2.0 / data.fire_rate
+	if _ghost_flame == null:
+		_ghost_flame = Flames.particles(48, Constants.GHOST_FLAME_LIFETIME, Vector2(0.4, 0.5))
+		_ghost_flame.direction = Vector3.FORWARD
+		_ghost_flame.spread = 8.0
+		_ghost_flame.gravity = Vector3(0.0, 1.5, 0.0)
+		_ghost_flame.position = Vector3(0.15, -0.2, -0.7)
+		add_child(_ghost_flame)
+	var speed: float = data.range / Constants.GHOST_FLAME_LIFETIME
+	_ghost_flame.initial_velocity_min = speed * 0.8
+	_ghost_flame.initial_velocity_max = speed
+	_ghost_flame.emitting = true
+
+
+## One pellet for the look: a puff where it hits a body, a mark and dust on a wall.
+func _ghost_ray() -> void:
+	var query := PhysicsRayQueryParameters3D.create(global_position, global_position + _spread_direction() * weapon.range, Constants.LAYER_WORLD | Constants.LAYER_HITBOX, _exclude)
+	query.collide_with_areas = true
+	var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		return
+	if hit.collider is Hurtbox:
+		_hit_puffs.play(hit.position, hit.normal)
+		return
+	_impact_marks.place(hit.position, hit.normal)
+	_impact_puffs.play(hit.position, hit.normal)
+
+
+## The muzzle lighting up the room for a moment.
+func _flash() -> void:
+	if _ghost_flash == null:
+		_ghost_flash = OmniLight3D.new()
+		_ghost_flash.light_color = Color(1.0, 0.8, 0.5)
+		_ghost_flash.omni_range = 4.0
+		_ghost_flash.position = Vector3(0.15, -0.15, -0.9)
+		add_child(_ghost_flash)
+	_ghost_flash.light_energy = 3.0
+	create_tween().tween_property(_ghost_flash, "light_energy", 0.0, 0.08)

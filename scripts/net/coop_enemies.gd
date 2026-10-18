@@ -7,14 +7,17 @@ extends Node3D
 ## kills and herbs land where they belong once the host passes the damage back.
 ## Main creates it as /root/Main/CoopEnemies on every peer, so the RPC paths match.
 
-## Bytes per enemy in a snapshot: id u16, position 3 x s16 (cm), yaw u16, lean 3 x s8.
-const ENTRY_BYTES: int = 13
+## Bytes per enemy in a snapshot: id u16, position 3 x s16 (cm), yaw u16, lean 3 x s8, flags u8.
+const ENTRY_BYTES: int = 14
+## Snapshot flags: it is burning.
+const FLAG_BURNING: int = 1
 const CM: float = 100.0
 const LEAN_SCALE: float = 40.0
 ## Enemy methods a guest may ask the host to call, with their argument counts (the host adds the
 ## hitting player as `source` to those that take one).
 const RELAYED: Dictionary = {&"receive_hit": 3, &"scorch": 1, &"ignite": 2, &"dance": 2,
-		&"apply_slow": 2, &"stun": 1, &"flee": 2, &"apply_knockback": 1}
+		&"apply_slow": 2, &"stun": 1, &"flee": 2, &"apply_knockback": 1,
+		&"lift": 0, &"carry_to": 2, &"hurl": 1}
 const WITH_SOURCE: Array[StringName] = [&"receive_hit", &"scorch", &"ignite", &"dance"]
 
 var _waves: WaveManager
@@ -102,6 +105,7 @@ func _send_snapshot() -> void:
 		bytes.encode_s8(at + 10, clampi(roundi(lean.x * LEAN_SCALE), -127, 127))
 		bytes.encode_s8(at + 11, clampi(roundi(lean.y * LEAN_SCALE), -127, 127))
 		bytes.encode_s8(at + 12, clampi(roundi(lean.z * CM), -127, 127))
+		bytes.encode_u8(at + 13, FLAG_BURNING if enemy.is_burning() else 0)
 		at += ENTRY_BYTES
 	_snapshot.rpc(Time.get_ticks_msec(), bytes)
 
@@ -152,7 +156,7 @@ func _guest_step(delta: float) -> void:
 	for id: int in _by_id:
 		var buffer: PoseBuffer = _buffers.get(id)
 		var puppet: Enemy = _by_id[id]
-		if buffer == null or buffer.is_empty() or not puppet.is_alive():
+		if buffer == null or buffer.is_empty() or not puppet.is_alive() or puppet.puppet_driven():
 			continue
 		var pose: Array = buffer.sample(now)
 		puppet.puppet_move(pose[0], pose[1], pose[2], delta)
@@ -200,9 +204,11 @@ func _spawned(id: int, data_id: String, wave: int, at: Transform3D, health: int)
 func _snapshot(sent: int, bytes: PackedByteArray) -> void:
 	var now: int = Time.get_ticks_msec()
 	for at: int in range(0, bytes.size() - ENTRY_BYTES + 1, ENTRY_BYTES):
-		var buffer: PoseBuffer = _buffers.get(bytes.decode_u16(at))
+		var id: int = bytes.decode_u16(at)
+		var buffer: PoseBuffer = _buffers.get(id)
 		if buffer == null:
 			continue
+		(_by_id[id] as Enemy).puppet_burn(bytes.decode_u8(at + 13) & FLAG_BURNING != 0)
 		var p := Vector3(bytes.decode_s16(at + 2), bytes.decode_s16(at + 4), bytes.decode_s16(at + 6)) / CM
 		var yaw: float = bytes.decode_u16(at + 8) / 65535.0 * TAU
 		var lean := Vector3(bytes.decode_s8(at + 10) / LEAN_SCALE, bytes.decode_s8(at + 11) / LEAN_SCALE, bytes.decode_s8(at + 12) / CM)

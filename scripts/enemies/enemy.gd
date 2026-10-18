@@ -82,6 +82,9 @@ var _lifted: bool = false
 var _hurled: bool = false
 var _hurl_time: float = 0.0
 var _on_land: Callable
+# Co-op guest: when the carried puppet's position, and a slow on it, last went to the host (ms).
+var _carry_sent_ms: int = 0
+var _slow_sent_ms: int = -100000
 var _body_layer: int = 0
 var _body_mask: int = 0
 # Dancing to the Harmonika: seconds left.
@@ -237,7 +240,10 @@ func apply_slow(factor: float, duration: float) -> void:
 	if data.is_boss:
 		return
 	if puppet:
-		_relay(&"apply_slow", [factor, duration])
+		# A heap slows whoever stands in it every frame; the host needs only a few of those.
+		if Time.get_ticks_msec() - _slow_sent_ms >= Constants.NET_SLOW_RELAY_INTERVAL * 1000.0:
+			_slow_sent_ms = Time.get_ticks_msec()
+			_relay(&"apply_slow", [factor, duration])
 		return
 	if _slow_left <= 0.0 or factor <= _slow_factor:
 		_slow_factor = factor
@@ -301,9 +307,12 @@ func is_fleeing() -> bool:
 ## The Mistgabel: lifted up on the fork. Its holder moves it (carry_to) until it is hurled or let go.
 ## Bosses are too heavy: false.
 func lift() -> bool:
-	# Co-op: carrying the host's enemy around comes with the special weapons (M7 part 3).
-	if puppet or not is_alive() or data.is_boss or _lifted or _hurled or not _can_dance():
+	if not is_alive() or data.is_boss or _lifted or _hurled or not _can_dance():
 		return false
+	# Co-op: a guest's fork lifts its puppet here, at once, and the host's enemy with it; the guest
+	# carries and hurls the puppet itself and the host moves its enemy along (carry_to, hurl).
+	if puppet:
+		_relay(&"lift", [])
 	_lifted = true
 	_knock = Vector3.ZERO
 	_drop_swing()
@@ -327,12 +336,17 @@ func carry_to(at: Vector3, facing: Vector3) -> void:
 	global_position = at
 	_face(facing, 1.0 / Engine.physics_ticks_per_second)
 	_visual.rotation.z = sin(Time.get_ticks_msec() * 0.02) * 0.3
+	if puppet and Time.get_ticks_msec() - _carry_sent_ms >= Constants.NET_POSE_INTERVAL * 1000.0:
+		_carry_sent_ms = Time.get_ticks_msec()
+		_relay(&"carry_to", [at, facing])
 
 
 ## Throws a lifted enemy along `launch` (m/s); `landed` is called with it where it comes down.
-func hurl(launch: Vector3, landed: Callable) -> void:
+func hurl(launch: Vector3, landed: Callable = Callable()) -> void:
 	if not _lifted:
 		return
+	if puppet:
+		_relay(&"hurl", [launch])
 	_lifted = false
 	_hurled = true
 	_hurl_time = 0.0
@@ -932,7 +946,8 @@ func _die(is_headshot: bool, is_melee: bool, source: Node3D, amount: int = 100) 
 	collision_mask = Constants.LAYER_WORLD
 	for hurtbox: Hurtbox in _hurtboxes:
 		hurtbox.collision_layer = 0
-	if data.drop:
+	# Co-op: the host's drop is the one everyone sees (CoopWorld); a puppet leaves none of its own.
+	if data.drop and not puppet:
 		WeaponPickup.spawn(data.drop, global_position, get_parent())
 	# Points first, then the wave manager: the last kill of a wave is paid out before "wave cleared".
 	Events.enemy_killed.emit(self, is_headshot, is_melee, source)
@@ -1152,6 +1167,19 @@ func puppet_pose(action: EnemyRig.Action, length: float) -> void:
 			Sound.play_at(&"window_climb", global_position)
 
 
+## On our fork or flying off it: we move it, not the host's snapshots.
+func puppet_driven() -> bool:
+	return _lifted or _hurled
+
+
+## Burning on the host: the flames on this puppet too.
+func puppet_burn(on: bool) -> void:
+	if on and _burn_fx == null:
+		_burn_fx = _build_burn_fx()
+	if _burn_fx and _burn_fx.emitting != on:
+		_burn_fx.emitting = on
+
+
 ## The host's enemy was hurt by `source` (our Player, another player's hiker, or null). We already
 ## flashed for our own hits.
 func puppet_damaged(amount: int, is_headshot: bool, source: Node3D, health_left: int, ours: bool) -> void:
@@ -1175,6 +1203,8 @@ func puppet_killed(is_headshot: bool, is_melee: bool, source: Node3D, amount: in
 
 
 func _puppet_step(delta: float) -> void:
+	if _hurled:
+		_hurling(delta)
 	_groan_left -= delta
 	if _groan_left <= 0.0:
 		_groan()

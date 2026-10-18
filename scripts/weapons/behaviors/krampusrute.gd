@@ -34,7 +34,7 @@ func melee_hit() -> bool:
 
 func hold_start() -> bool:
 	_scan_left = 0.0
-	Sound.play(&"chains")
+	holder.play_sound(&"chains")
 	return true
 
 

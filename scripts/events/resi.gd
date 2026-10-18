@@ -4,6 +4,8 @@ extends CharacterBody3D
 ## milk her (full heal and a free Brettljause helping). Once a player has come near her, her bell draws
 ## the enemies around her (group "lures", see Enemy), and if one reaches her she bolts. Until then they
 ## leave her alone, so she is not chased off before anyone got to her. The EventDirector sends her in.
+## Co-op (M7, CoopEvents): she walks on the host; a guest's copy only shows her, and a guest's milking
+## is the host's to allow (then the guest's own game heals them and serves the Jause).
 
 enum State { ARRIVING, GRAZING, MILKED, LEAVING, BOLTING }
 
@@ -16,6 +18,13 @@ const TAIL: Vector3 = Vector3(0.0, 1.38, 0.86)
 
 ## Seconds between milking pulls while E is held (Interactor).
 var interact_repeat: float = 0.1
+## Co-op: a guest's copy of the host's Resi.
+var copy: bool = false
+# A copy: walking between spots on the host (so not grazing), where it was a frame ago, and whether
+# the host has been asked to let us milk her.
+var _copy_walking: bool = false
+var _copy_last: Vector3
+var _asked: bool = false
 var _state: State = State.ARRIVING
 var _route: Array[Vector3] = []
 var _gate: Vector3
@@ -62,9 +71,47 @@ func start(gate: Vector3, ramp: Vector3, hub: Vector3, spots: Array[Vector3]) ->
 	_route = [ramp, hub]
 	_state = State.ARRIVING
 	_stay_left = Constants.RESI_STAY_TIME
-	Events.event_announced.emit(tr("EVENT_RESI_ARRIVES"))
+	Coop.announce("EVENT_RESI_ARRIVES")
 	_bell = Sound.attach(&"resi_bell", self)
 	_moo()
+
+
+# Co-op copy interface (see CoopEvents).
+
+func start_copy() -> void:
+	_copy_last = global_position
+	_bell = Sound.attach(&"resi_bell", self)
+	_moo()
+
+
+func net_state() -> Array:
+	return [int(_state), not _route.is_empty()]
+
+
+func net_apply(state: Array) -> void:
+	var new_state: State = int(state[0]) as State
+	_copy_walking = bool(state[1])
+	if new_state == _state:
+		return
+	if new_state in [State.MILKED, State.LEAVING, State.BOLTING]:
+		_drop_marker()
+	if new_state == State.MILKED:
+		_milk = 0.0
+	_state = new_state
+
+
+## Host: a guest milked their copy of her to the end.
+func net_request(what: StringName, peer: int) -> bool:
+	if what != &"milk" or not is_milkable():
+		return false
+	_milked()
+	Coop.announce("EVENT_RESI_MILKED_BY", [Coop.name_of(peer)], peer)
+	return true
+
+
+func net_granted(what: StringName, player: Player) -> void:
+	if what == &"milk":
+		_treat(player)
 
 
 func is_milkable() -> bool:
@@ -112,10 +159,18 @@ func interact(player: Node3D) -> void:
 	_milk += interact_repeat
 	_milk_since = 0.0
 	if _milk >= Constants.RESI_MILK_TIME:
+		if copy:
+			if not _asked:
+				_asked = true
+				Coop.events.request(self, &"milk")
+			return
 		_reward(player as Player)
 
 
 func _physics_process(delta: float) -> void:
+	if copy:
+		_copy_step(delta)
+		return
 	_milk_since += delta
 	if not _noticed:
 		_noticed = _player_near()
@@ -155,6 +210,14 @@ func _physics_process(delta: float) -> void:
 
 
 func _reward(player: Player) -> void:
+	_treat(player)
+	_milked()
+	if Coop.is_host():
+		Coop.announce("EVENT_RESI_MILKED_BY", [Coop.name_of(Net.my_id())], Net.my_id())
+
+
+## What the milker gets: full health and a helping of a Jause they can still eat more of.
+func _treat(player: Player) -> void:
 	player.health.heal_full()
 	var hungry: Array[JauseData] = JAUSE.filter(func(j: JauseData) -> bool: return player.perks.jause_level(j) < j.max_level)
 	var text: String = tr("EVENT_RESI_MILKED_FULL")
@@ -163,6 +226,9 @@ func _reward(player: Player) -> void:
 		player.perks.eat(jause)
 		text = tr("EVENT_RESI_MILKED") % tr(jause.display_name)
 	Events.event_announced.emit(text)
+
+
+func _milked() -> void:
 	_moo()
 	_milk = 0.0
 	_state = State.MILKED
@@ -174,7 +240,7 @@ func _leave(bolt: bool) -> void:
 	_state = State.BOLTING if bolt else State.LEAVING
 	_route = [_hub, _ramp, _gate, _gate + (_gate - _ramp).normalized() * 8.0]
 	if bolt:
-		Events.event_announced.emit(tr("EVENT_RESI_BOLTED"))
+		Coop.announce("EVENT_RESI_BOLTED")
 		_moo()
 	_drop_marker()
 
@@ -185,11 +251,30 @@ func _moo() -> void:
 
 
 func _player_near() -> bool:
+	# Any player on their feet (in co-op the host's hikers too).
 	for node: Node in get_tree().get_nodes_in_group("player"):
-		var player := node as Player
-		if player != null and not player.health.is_dead() and player.global_position.distance_to(global_position) <= Constants.RESI_NOTICE_RADIUS:
+		var player := node as Node3D
+		if player != null and player.call("is_targetable") and player.global_position.distance_to(global_position) <= Constants.RESI_NOTICE_RADIUS:
 			return true
 	return false
+
+
+## A copy: her walk and grazing from how the host moves her.
+func _copy_step(delta: float) -> void:
+	_milk_since += delta
+	if _milk_since > interact_repeat * 3.0:
+		_milk = 0.0
+		_asked = false
+	_moo_left -= delta
+	if _moo_left <= 0.0:
+		_moo()
+	var moved: Vector3 = global_position - _copy_last
+	moved.y = 0.0
+	_copy_last = global_position
+	var speed: float = moved.length() / maxf(delta, 0.001)
+	_moving = move_toward(_moving, 1.0 if speed > 0.2 else 0.0, delta * 4.0)
+	_walk_phase += delta * speed * 4.5
+	_animate(delta)
 
 
 func _drop_marker() -> void:
@@ -229,7 +314,8 @@ func _fall(delta: float) -> void:
 
 
 func _animate(delta: float) -> void:
-	var grazing: bool = _state == State.GRAZING and _route.is_empty() and _milk <= 0.0
+	var walking: bool = _copy_walking if copy else not _route.is_empty()
+	var grazing: bool = _state == State.GRAZING and not walking and _milk <= 0.0
 	_head_down = move_toward(_head_down, 1.0 if grazing else 0.0, delta * 1.5)
 	var t: float = Time.get_ticks_msec() / 1000.0
 	var swing: float = sin(_walk_phase) * 0.45 * _moving

@@ -486,5 +486,18 @@ const COOP_DOWNED_HEIGHT: float = 0.8
 const COOP_SPECTATE_OFFSET: Vector3 = Vector3(0.0, 2.2, 3.4)
 ## Co-op: the first wave waits this long after the host starts, so every guest can click in (s).
 const COOP_FIRST_WAVE_DELAY: float = 15.0
+## Another player's flame (their Brennkessel as we see it): seconds a flame lives on its way out.
+const GHOST_FLAME_LIFETIME: float = 0.45
+## Where a hiker holds their gun (m, from their feet; -Z ahead) and how big it is drawn there.
+const HIKER_GUN_AT: Vector3 = Vector3(0.16, 1.26, -0.42)
+const HIKER_GUN_SCALE: float = 1.3
+## The hiker's arms while holding a gun (degrees per bone, as EnemyRig.stance).
+const HIKER_HOLD_STANCE: Dictionary = {
+	&"arm_r": Vector3(45.0, 0.0, 6.0), &"forearm_r": Vector3(40.0, 0.0, 0.0),
+	&"arm_l": Vector3(50.0, 0.0, -22.0), &"forearm_l": Vector3(45.0, 0.0, 0.0),
+}
+## Co-op guests: a slow that is held on a puppet (it stands in a Knödel heap) goes to the host at
+## most this often (s); each lasts its own seconds, so the host's enemy stays slowed.
+const NET_SLOW_RELAY_INTERVAL: float = 0.25
 ## Clicks right after the mouse is taken (a menu click) do not fire for this long (s).
 const CAPTURE_FIRE_GRACE: float = 0.25

@@ -4,6 +4,8 @@ extends Node
 ## throw action (G or the middle mouse button) the way the player looks, flat along the floor.
 
 signal changed(item: EquipmentData, count: int)
+## One left the hand (co-op passes it on: the others get a harmless copy of `thrown`).
+signal threw(item: EquipmentData, thrown: Node3D)
 
 var item: EquipmentData
 var count: int = 0
@@ -41,6 +43,7 @@ func throw() -> bool:
 	thrown.launch(_player.global_position + forward * 0.7 + Vector3.UP * 0.05, forward, _player)
 	_player.kick_view(-1.5, 1.0)
 	Sound.play(&"throw")
+	threw.emit(item, thrown)
 	changed.emit(item, count)
 	if count == 0:
 		item = null
