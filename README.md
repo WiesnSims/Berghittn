@@ -238,6 +238,43 @@ godot --headless res://tools/models/build_props.tscn
 - The Deitscha Tourist is a character model like the enemies (`assets/models/guest.tscn`, built by
   `build_enemies.gd`); `TouristGuest` walks him with the rig.
 
+## Co-op (M7)
+
+Plan and decisions: `NETWORKING.md`. Part 1 (relay, lobby, walking the hut together) is in.
+
+- **Relay**: `relay/` is the helper Worker `berghittn-relay` with the `Room` Durable Object (one per
+  4-digit room code). It has no public route; `functions/api/room/[code].js` (Pages Function on
+  berghittn.pages.dev) hands it the WebSocket. Both share `relay/src/route.js`. Binary frames
+  `[peer i8][payload]` are forwarded with the sender rewritten; text frames are JSON control messages
+  (`welcome`, `joined`, `left`, `closed` with a reason, and from the host `start`, `kick`). Nothing is
+  stored; the host's socket attachment holds the room's build and started flag.
+- **Godot**: `RelayPeer` (`scripts/net/relay_peer.gd`, a `MultiplayerPeerExtension`) puts Godot's
+  multiplayer on that socket, batching packets into one frame per target every 50 ms. The `Net`
+  autoload (`scripts/autoload/net.gd`) is the session: create/join, the roster of names and hikers,
+  the host's start, and why a session ended. It is an autoload (beside `Sound`) because the session
+  must survive a scene reload. Solo never touches it.
+- **Lobby** (`scripts/ui/lobby.gd`, the Co-op button on the title): name, head, hat, jacket and
+  trouser colour (`HikerStyle`), saved with the settings; create a room or join by code; the invite
+  link `?room=<code>` opens the lobby straight into that room. The host sees everyone on the stage,
+  can remove players and starts with at least 2.
+- **Match** (part 1): `CoopPlayers` (`/root/Main/CoopPlayers` on every peer) sends our pose 20 times a
+  second and draws the others as `Hiker`s 100 ms in the past. Waves and events are off in co-op until
+  part 2. In co-op the world never pauses; a menu only switches our own player off.
+- **Build id**: `tools/build_web.mjs` writes `build_id.txt` (gitignored, packed via the preset's
+  include filter); the relay turns away a browser whose build differs from the host's.
+- **Hiker**: `godot --headless --script res://tools/models/build_hiker.gd` builds
+  `assets/models/hiker.tscn` (body, Head0-4, Hat1-5 as separate skinned parts; the jacket and trousers
+  use their own neutral materials that `Hiker` tints per player). Visual check:
+  `godot res://tests/hiker_view.tscn -- <dir>`, the lobby: `godot res://tests/lobby_view.tscn -- <dir>`.
+
+Tests (the relay runs locally in `wrangler dev`, or set `RELAY_URL=wss://<preview>.berghittn.pages.dev`):
+
+```
+node --test relay/test/relay.test.mjs           # ids, cap of 4, routing, kick, refusals
+node tools/net_test.mjs                         # tests/net_lobby: roster, hiker change, start, late joiner refused
+node tools/net_test.mjs res://tests/net_match.tscn   # two main scenes: invite join, each sees the other's hiker
+```
+
 ## Tests
 
 ```
@@ -534,6 +571,13 @@ Cloudflare Pages project `berghittn` -> https://berghittn.pages.dev
 
 ```
 npx wrangler@latest pages deploy export --project-name berghittn --branch main --commit-dirty=true
+```
+
+The deploy also uploads `functions/` (the co-op Function) with the Durable Object binding from the
+root `wrangler.toml`. The relay Worker is deployed on its own, only when `relay/` changed:
+
+```
+cd relay && npx wrangler@latest deploy      # "No targets deployed" is right: it has no public URL
 ```
 
 Note: in wrangler 4.15x, `pages project create` delegates to Workers by default; the

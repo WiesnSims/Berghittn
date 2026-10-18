@@ -74,6 +74,7 @@ func _enter_playing() -> void:
 	_start_screen.hide()
 	_pause_menu.hide()
 	get_tree().paused = false
+	_player.process_mode = Node.PROCESS_MODE_INHERIT
 	if _coop and not _coop_announced:
 		_coop_announced = true
 		Events.event_announced.emit(tr("UI_COOP_PREVIEW"))
@@ -81,8 +82,11 @@ func _enter_playing() -> void:
 
 func _enter_menu() -> void:
 	_state = State.MENU
-	# One player's menu must not freeze the world for everyone else.
+	# One player's menu must not freeze the world for everyone else, but their own player waits, so
+	# the click that closes a menu does not also fire.
 	get_tree().paused = not _coop
+	if _coop:
+		_player.process_mode = Node.PROCESS_MODE_DISABLED
 	_start_screen.visible = not GameState.has_started
 	_pause_menu.visible = GameState.has_started
 

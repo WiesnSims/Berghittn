@@ -691,6 +691,9 @@ fix console errors, commit. Stop and report after each milestone.
   Bled-out players come back at the start of the next wave. Done in four PRs, play-tested each:
   1 relay and lobby with the character editor, 2 two players and the core loop with downed/revive,
   3 special weapons, equipment and events, 4 four players and the acceptance.
+  Part 1 (2026-10-18): the relay Worker `berghittn-relay` and the Pages Function, the lobby (name,
+  5 heads, 5 hats, 8 jacket and 6 trouser colours, room code, invite link, remove, start from 2
+  players), and walking the hut together as hikers with name tags; waves and events wait for part 2.
 
 ## 13. Project structure
 

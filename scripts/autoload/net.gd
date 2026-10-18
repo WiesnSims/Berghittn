@@ -141,6 +141,8 @@ func _on_control(message: Dictionary) -> void:
 	match String(message.get("t", "")):
 		"welcome":
 			code = String(message.get("code", ""))
+			# In the browser console, for play-test reports and the browser test.
+			print("Co-op: room %s, peer %d, build %s" % [code, my_id(), build_id])
 			roster = {my_id(): HikerStyle.sanitize(Settings.profile)}
 			_set_state(State.LOBBY)
 			if not is_host():

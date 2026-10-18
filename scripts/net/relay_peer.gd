@@ -50,7 +50,10 @@ func _poll() -> void:
 	while _socket.get_available_packet_count() > 0:
 		var data: PackedByteArray = _socket.get_packet()
 		if _socket.was_string_packet():
-			_on_control(JSON.parse_string(data.get_string_from_utf8()))
+			var text: String = data.get_string_from_utf8()
+			# The keep-alive answer is plain text, not JSON.
+			if text != "pong":
+				_on_control(JSON.parse_string(text))
 		else:
 			_unpack(data)
 	var state: WebSocketPeer.State = _socket.get_ready_state()
@@ -91,8 +94,6 @@ func _on_control(message: Variant) -> void:
 		"closed":
 			_close_reason = String(m.get("reason", ""))
 			_socket.close()
-		"pong":
-			pass
 
 
 func _add_peer(peer: int) -> void:
