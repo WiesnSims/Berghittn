@@ -1,8 +1,8 @@
 [gd_scene load_steps=24 format=3]
 
 [ext_resource type="Script" path="res://scripts/perks/jause_item.gd" id="1"]
-[ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="2"]
-[ext_resource type="Material" path="res://assets/materials/greybox_metal.tres" id="3"]
+[ext_resource type="Material" path="res://assets/materials/wood_dark.tres" id="2"]
+[ext_resource type="Material" path="res://assets/materials/metal.tres" id="3"]
 [ext_resource type="Resource" path="res://data/jause/speck.tres" id="4"]
 [ext_resource type="Resource" path="res://data/jause/germknedl.tres" id="5"]
 [ext_resource type="Resource" path="res://data/jause/kasnockn.tres" id="6"]

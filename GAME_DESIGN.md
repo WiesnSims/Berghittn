@@ -644,7 +644,13 @@ fix console errors, commit. Stop and report after each milestone.
      (boards indoors, snow outdoors), purchases (till or a short "no"), doors, the Hüttentruhe (a
      music-box note per weapon it flips to), the Schnaps and the Jause, the equipment and the events.
      The comic hit words ("BONK!", "BIMM!", "AAAAAAH!" ...) are gone now that the sounds are in.
-  3. Textures: low-resolution photo textures (CC0 libraries, once the user approves them).
+  3. Textures: low-resolution photo textures (CC0, user approved 2026-10-17: ambientCG, Poly Haven and
+     other CC0 sources). All 15 come from Poly Haven, 256x256, made by `tools/textures`: plank walls,
+     worn floorboards, dark wood for beams and furniture, weathered barricade boards, a fieldstone
+     Kachelofen, terracotta tiles in the Küche, concrete in the Seilbahn, rusty steel, painted
+     planks for doors and skis, wool blankets and linen mattresses in the Lager, hay, snow, rock and
+     needle-dark pines; the terrain picks snow or rock by slope. Each keeps the average colour of
+     the greybox it replaced, so the lighting and grade of part 1 still fit. 0.82 MiB in all.
   4. Low-poly models for props, enemies and weapons, and the ragdolls.
 
 **M7 — Co-op (decision gate)**

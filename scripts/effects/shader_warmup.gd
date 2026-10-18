@@ -2,12 +2,13 @@ class_name ShaderWarmup
 extends Node3D
 ## WebGL compiles a material's shader the first time it is drawn, which in the browser stalls a
 ## frame for up to a second or two (play-test: opening the Hüttentruhe froze while its roll showed
-## the specials for the first time). So at load, behind the start screen, every weapon's model and
-## every effect the special weapons build in code (play-test 2026-10-18: the Brennlacke stalled on its
-## first squirt) is drawn for a few frames, tiny and right in front of the camera, and then thrown
-## away.
+## the specials for the first time). So at load, behind the start screen, every weapon's model, every
+## world material and every effect the special weapons build in code (play-test 2026-10-18: the
+## Brennlacke stalled on its first squirt) is drawn for a few frames, tiny and right in front of the
+## camera, and then thrown away.
 
 const WEAPONS_DIR: String = "res://data/weapons"
+const MATERIALS_DIR: String = "res://assets/materials"
 ## Effects built in code: shots, piles, puddles, rings, notes and blasts.
 const EFFECTS: Array[Script] = [
 	preload("res://scripts/weapons/behaviors/schnaps_blob.gd"),
@@ -38,6 +39,16 @@ func _ready() -> void:
 		var model: Node3D = _model_of(weapon)
 		if model:
 			models.append(model)
+	# The world's textured materials (M6 part 3): rooms behind closed doors are first drawn when the
+	# door opens. A box shows each triplanar projection.
+	for file: String in DirAccess.get_files_at(MATERIALS_DIR):
+		var material := load(MATERIALS_DIR.path_join(file.trim_suffix(".remap"))) as Material
+		if material == null:
+			continue
+		var swatch := MeshInstance3D.new()
+		swatch.mesh = BoxMesh.new()
+		swatch.material_override = material
+		models.append(swatch)
 	var effects: Array[Node3D] = []
 	for script: Script in EFFECTS:
 		var effect := Node3D.new()

@@ -1,11 +1,11 @@
 [gd_scene load_steps=14 format=3]
 
-[ext_resource type="Material" path="res://assets/materials/greybox_wood_floor.tres" id="1"]
-[ext_resource type="Material" path="res://assets/materials/greybox_stone.tres" id="2"]
-[ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="3"]
-[ext_resource type="Material" path="res://assets/materials/greybox_snow.tres" id="4"]
+[ext_resource type="Material" path="res://assets/materials/wood_floor.tres" id="1"]
+[ext_resource type="Material" path="res://assets/materials/stone.tres" id="2"]
+[ext_resource type="Material" path="res://assets/materials/wood_dark.tres" id="3"]
+[ext_resource type="Material" path="res://assets/materials/snow.tres" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/props/table_set.tscn" id="5"]
-[ext_resource type="Material" path="res://assets/materials/greybox_lamp.tres" id="6"]
+[ext_resource type="Material" path="res://assets/materials/lamp.tres" id="6"]
 [ext_resource type="Script" path="res://scripts/zones/spawn_point.gd" id="7"]
 [ext_resource type="PackedScene" path="res://scenes/zones/wallbuy_repetierer.tscn" id="8"]
 

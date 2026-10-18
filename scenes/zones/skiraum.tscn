@@ -1,18 +1,18 @@
 [gd_scene load_steps=14 format=3]
 
-[ext_resource type="Material" path="res://assets/materials/greybox_wood_floor.tres" id="1"]
-[ext_resource type="Material" path="res://assets/materials/greybox_wood_wall.tres" id="2"]
-[ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="3"]
+[ext_resource type="Material" path="res://assets/materials/wood_floor.tres" id="1"]
+[ext_resource type="Material" path="res://assets/materials/wood_wall.tres" id="2"]
+[ext_resource type="Material" path="res://assets/materials/wood_dark.tres" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/zones/window.tscn" id="4"]
-[ext_resource type="Material" path="res://assets/materials/greybox_pine.tres" id="5"]
-[ext_resource type="Material" path="res://assets/materials/greybox_door_locked.tres" id="6"]
-[ext_resource type="Material" path="res://assets/materials/greybox_board.tres" id="7"]
-[ext_resource type="Material" path="res://assets/materials/greybox_stone.tres" id="8"]
-[ext_resource type="Material" path="res://assets/materials/greybox_metal.tres" id="9"]
+[ext_resource type="Material" path="res://assets/materials/door_locked.tres" id="6"]
+[ext_resource type="Material" path="res://assets/materials/board.tres" id="7"]
+[ext_resource type="Material" path="res://assets/materials/metal.tres" id="9"]
 [ext_resource type="PackedScene" path="res://scenes/zones/wallbuy_stutzen.tscn" id="10"]
-[ext_resource type="Material" path="res://assets/materials/greybox_lamp.tres" id="11"]
-[ext_resource type="Material" path="res://assets/materials/greybox_snow.tres" id="12"]
+[ext_resource type="Material" path="res://assets/materials/lamp.tres" id="11"]
+[ext_resource type="Material" path="res://assets/materials/snow.tres" id="12"]
 [ext_resource type="Script" path="res://scripts/zones/spawn_point.gd" id="13"]
+[ext_resource type="Material" path="res://assets/materials/paint_green.tres" id="tex_paint_green"]
+[ext_resource type="Material" path="res://assets/materials/paint_grey.tres" id="tex_paint_grey"]
 
 [node name="Skiraum" type="Node3D"]
 
@@ -113,7 +113,7 @@ material = ExtResource("3")
 [node name="SkiWestA0" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, -0.0799, 0, 0.0799, 0.9968, 0, 0, 0, 1, 10.63, 1, -13.4)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("5")
+material = ExtResource("tex_paint_green")
 
 [node name="SkiWestB0" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, 0.0799, 0, -0.0799, 0.9968, 0, 0, 0, 1, 10.97, 1, -13.4)
@@ -138,22 +138,22 @@ material = ExtResource("7")
 [node name="SkiWestB2" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, 0.0799, 0, -0.0799, 0.9968, 0, 0, 0, 1, 10.97, 1, -11.2)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("8")
+material = ExtResource("tex_paint_grey")
 
 [node name="SkiWestA3" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, -0.0799, 0, 0.0799, 0.9968, 0, 0, 0, 1, 10.63, 1, -10.1)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("8")
+material = ExtResource("tex_paint_grey")
 
 [node name="SkiWestB3" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, 0.0799, 0, -0.0799, 0.9968, 0, 0, 0, 1, 10.97, 1, -10.1)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("5")
+material = ExtResource("tex_paint_green")
 
 [node name="SkiWestA4" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, -0.0799, 0, 0.0799, 0.9968, 0, 0, 0, 1, 10.63, 1, -9)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("5")
+material = ExtResource("tex_paint_green")
 
 [node name="SkiWestB4" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, 0.0799, 0, -0.0799, 0.9968, 0, 0, 0, 1, 10.97, 1, -9)
@@ -178,22 +178,22 @@ material = ExtResource("7")
 [node name="SkiWestB6" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, 0.0799, 0, -0.0799, 0.9968, 0, 0, 0, 1, 10.97, 1, -6.8)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("8")
+material = ExtResource("tex_paint_grey")
 
 [node name="SkiWestA7" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, -0.0799, 0, 0.0799, 0.9968, 0, 0, 0, 1, 10.63, 1, -5.7)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("8")
+material = ExtResource("tex_paint_grey")
 
 [node name="SkiWestB7" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, 0.0799, 0, -0.0799, 0.9968, 0, 0, 0, 1, 10.97, 1, -5.7)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("5")
+material = ExtResource("tex_paint_green")
 
 [node name="SkiWestA8" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, -0.0799, 0, 0.0799, 0.9968, 0, 0, 0, 1, 10.63, 1, -4.6)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("5")
+material = ExtResource("tex_paint_green")
 
 [node name="SkiWestB8" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, 0.0799, 0, -0.0799, 0.9968, 0, 0, 0, 1, 10.97, 1, -4.6)
@@ -203,7 +203,7 @@ material = ExtResource("6")
 [node name="SkiEastA0" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, -0.0799, 0, 0.0799, 0.9968, 0, 0, 0, 1, 13.83, 1, -13.4)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("5")
+material = ExtResource("tex_paint_green")
 
 [node name="SkiEastB0" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, 0.0799, 0, -0.0799, 0.9968, 0, 0, 0, 1, 14.17, 1, -13.4)
@@ -228,22 +228,22 @@ material = ExtResource("7")
 [node name="SkiEastB2" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, 0.0799, 0, -0.0799, 0.9968, 0, 0, 0, 1, 14.17, 1, -11.2)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("8")
+material = ExtResource("tex_paint_grey")
 
 [node name="SkiEastA3" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, -0.0799, 0, 0.0799, 0.9968, 0, 0, 0, 1, 13.83, 1, -10.1)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("8")
+material = ExtResource("tex_paint_grey")
 
 [node name="SkiEastB3" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, 0.0799, 0, -0.0799, 0.9968, 0, 0, 0, 1, 14.17, 1, -10.1)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("5")
+material = ExtResource("tex_paint_green")
 
 [node name="SkiEastA4" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, -0.0799, 0, 0.0799, 0.9968, 0, 0, 0, 1, 13.83, 1, -9)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("5")
+material = ExtResource("tex_paint_green")
 
 [node name="SkiEastB4" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, 0.0799, 0, -0.0799, 0.9968, 0, 0, 0, 1, 14.17, 1, -9)
@@ -268,22 +268,22 @@ material = ExtResource("7")
 [node name="SkiEastB6" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, 0.0799, 0, -0.0799, 0.9968, 0, 0, 0, 1, 14.17, 1, -6.8)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("8")
+material = ExtResource("tex_paint_grey")
 
 [node name="SkiEastA7" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, -0.0799, 0, 0.0799, 0.9968, 0, 0, 0, 1, 13.83, 1, -5.7)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("8")
+material = ExtResource("tex_paint_grey")
 
 [node name="SkiEastB7" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, 0.0799, 0, -0.0799, 0.9968, 0, 0, 0, 1, 14.17, 1, -5.7)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("5")
+material = ExtResource("tex_paint_green")
 
 [node name="SkiEastA8" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, -0.0799, 0, 0.0799, 0.9968, 0, 0, 0, 1, 13.83, 1, -4.6)
 size = Vector3(0.05, 1.8, 0.09)
-material = ExtResource("5")
+material = ExtResource("tex_paint_green")
 
 [node name="SkiEastB8" type="CSGBox3D" parent="Skis"]
 transform = Transform3D(0.9968, 0.0799, 0, -0.0799, 0.9968, 0, 0, 0, 1, 14.17, 1, -4.6)

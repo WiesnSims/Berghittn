@@ -29,8 +29,8 @@ extends Node3D
 @export var roughness: float = 0.18
 ## Faces steeper than this (normal Y below it) show bare rock instead of snow.
 @export var rock_steepness: float = 0.8
-@export var snow_color: Color = Color(0.78, 0.82, 0.88, 1)
-@export var rock_color: Color = Color(0.32, 0.31, 0.3, 1)
+## Snow and rock photo textures picked by slope (assets/shaders/terrain.gdshader).
+@export var ground_material: ShaderMaterial
 ## Pines grow only this far below the plateau (the Alm is above the tree line). Metres.
 @export var tree_line: float = -5.0
 @export var tree_count: int = 320
@@ -98,10 +98,8 @@ func _build_ground() -> void:
 	arrays[Mesh.ARRAY_COLOR] = colors
 	var mesh := ArrayMesh.new()
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
-	var material := StandardMaterial3D.new()
-	material.vertex_color_use_as_albedo = true
-	material.roughness = 1.0
-	mesh.surface_set_material(0, material)
+	ground_material.set_shader_parameter(&"rock_steepness", rock_steepness)
+	mesh.surface_set_material(0, ground_material)
 	var ground := MeshInstance3D.new()
 	ground.name = "Ground"
 	ground.mesh = mesh
@@ -112,9 +110,9 @@ func _build_ground() -> void:
 func _add_face(vertices: PackedVector3Array, normals: PackedVector3Array, colors: PackedColorArray, a: Vector3, b: Vector3, c: Vector3) -> void:
 	# Flat shaded, one normal per face: the faceted early-2000s look.
 	var normal: Vector3 = (c - a).cross(b - a).normalized()
-	var color: Color = rock_color if normal.y < rock_steepness else snow_color
-	# A little variation per face so the snow does not look like one sheet of plastic.
-	color = color.darkened(absf(_noise.get_noise_2d(a.x * 7.0, a.z * 7.0)) * 0.12)
+	# A little variation per face so the snow does not look like one sheet of plastic; the shader
+	# multiplies its texture by this.
+	var color: Color = Color.WHITE.darkened(absf(_noise.get_noise_2d(a.x * 7.0, a.z * 7.0)) * 0.12)
 	for v: Vector3 in [a, b, c]:
 		vertices.append(v)
 		normals.append(normal)

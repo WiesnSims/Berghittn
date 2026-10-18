@@ -1,0 +1,13 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/wool.png" id="1"]
+
+[resource]
+albedo_color = Color(0.625, 0.163, 0.125, 1)
+albedo_texture = ExtResource("1")
+roughness = 1
+uv1_scale = Vector3(2, 2, 2)
+uv1_triplanar = true
+uv1_triplanar_sharpness = 4.0
+uv1_world_triplanar = true
+texture_filter = 5

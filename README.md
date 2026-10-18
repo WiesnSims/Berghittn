@@ -150,6 +150,35 @@ library itself (344 MB) is not in the repo; download it from OpenGameArt to rebu
   to `band_8`), pitched up past the last; `Ambience` (`scripts/audio/ambience.gd`) the
   storm and the creaks.
 
+## Textures (M6)
+
+The world's surfaces are CC0 photo textures from Poly Haven (see ASSETS.md), made by
+`tools/textures/build.py`: it downloads each 1K map once into `tools/textures/cache/` (gitignored),
+shrinks it to 256x256 and brings the albedo to a target average colour. To swap or retune one, edit
+its line in `TEXTURES` and rebuild:
+
+```
+pip install pillow numpy
+python tools/textures/build.py              # everything, prints the ASSETS.md table
+python tools/textures/build.py stone snow   # only these
+godot --headless --import                   # then reimport
+```
+
+- The materials are in `assets/materials/` (one per surface: `wood_wall`, `wood_floor`, `stone`,
+  `snow` ...). The map is built from CSG boxes without useful UVs, so the textures are projected
+  from the world axes (triplanar) at their real size (`uv1_scale` = 1 / metres per repeat), which
+  keeps them even across boxes of any size. The parts that move (barricade `board`s, `door_locked`
+  panels) project in their own space so the texture rides along.
+- Neutral textures (`painted_wood`, `wool`) are light grey and coloured by the material's
+  `albedo_color`, so one file serves several materials (red doors, green and grey skis, red and
+  green blankets).
+- Imports: albedo lossy WebP (quality 0.85), normal maps lossless, mipmaps on, and no GPU texture
+  compression (browsers support it unevenly). All together 0.82 MiB of the 10 MB budget.
+- The terrain (`AlmTerrain`) uses `assets/shaders/terrain.gdshader`: snow on gentle faces, rock on
+  steep ones, both triplanar.
+- `ShaderWarmup` draws every material in `assets/materials/` behind the start screen, so a room is
+  not compiled the first time its door opens.
+
 ## Tests
 
 ```
@@ -168,6 +197,14 @@ godot --headless --fixed-fps 60 res://tests/m6_audio.tscn
 The sound: every sound the weapons, enemies and scripts ask for exists and the loops loop, the audio
 stays under 8 MB, the band's title tune, one faster tier per wave and the quiet break, guns, reloads,
 footsteps on boards and snow, groans, purchases, and the storm muffled indoors.
+
+```
+godot --headless --fixed-fps 60 res://tests/m6_textures.tscn
+```
+
+The textures: each at most 256x256, with mipmaps, listed in ASSETS.md and inside the 10 MB budget;
+every lit world material textured and triplanar (moving parts in their own space); the props that
+used to borrow a world colour have their own material; the terrain shows snow and rock.
 
 ```
 godot --headless --fixed-fps 60 res://tests/m5_core.tscn

@@ -1,15 +1,16 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
-[ext_resource type="Material" path="res://assets/materials/greybox_snow.tres" id="1"]
+[ext_resource type="Material" path="res://assets/materials/snow.tres" id="1"]
 [ext_resource type="Script" path="res://scripts/zones/alm_terrain.gd" id="2"]
-[ext_resource type="Material" path="res://assets/materials/greybox_pine.tres" id="3"]
-[ext_resource type="Material" path="res://assets/materials/greybox_rock.tres" id="4"]
+[ext_resource type="Material" path="res://assets/materials/pine.tres" id="3"]
+[ext_resource type="Material" path="res://assets/materials/rock.tres" id="4"]
 [ext_resource type="Script" path="res://scripts/zones/mountain_backdrop.gd" id="5"]
-[ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="6"]
-[ext_resource type="Material" path="res://assets/materials/greybox_sign.tres" id="7"]
-[ext_resource type="Material" path="res://assets/materials/greybox_metal.tres" id="8"]
-[ext_resource type="Material" path="res://assets/materials/greybox_concrete.tres" id="9"]
-[ext_resource type="Material" path="res://assets/materials/greybox_board.tres" id="10"]
+[ext_resource type="Material" path="res://assets/materials/wood_dark.tres" id="6"]
+[ext_resource type="Material" path="res://assets/materials/sign.tres" id="7"]
+[ext_resource type="Material" path="res://assets/materials/metal.tres" id="8"]
+[ext_resource type="Material" path="res://assets/materials/concrete.tres" id="9"]
+[ext_resource type="Material" path="res://assets/materials/board.tres" id="10"]
+[ext_resource type="Material" path="res://assets/materials/terrain.tres" id="11"]
 
 [node name="Exterior" type="Node3D"]
 
@@ -27,6 +28,7 @@ material = ExtResource("1")
 script = ExtResource("2")
 pine_material = ExtResource("3")
 rock_material = ExtResource("4")
+ground_material = ExtResource("11")
 
 [node name="Peaks" type="MeshInstance3D" parent="."]
 script = ExtResource("5")

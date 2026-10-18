@@ -1,19 +1,19 @@
 [gd_scene load_steps=15 format=3]
 
-[ext_resource type="Material" path="res://assets/materials/greybox_tile.tres" id="1"]
-[ext_resource type="Material" path="res://assets/materials/greybox_wood_floor.tres" id="2"]
-[ext_resource type="Material" path="res://assets/materials/greybox_wood_wall.tres" id="3"]
-[ext_resource type="Material" path="res://assets/materials/greybox_wood_dark.tres" id="4"]
+[ext_resource type="Material" path="res://assets/materials/tile.tres" id="1"]
+[ext_resource type="Material" path="res://assets/materials/wood_floor.tres" id="2"]
+[ext_resource type="Material" path="res://assets/materials/wood_wall.tres" id="3"]
+[ext_resource type="Material" path="res://assets/materials/wood_dark.tres" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/zones/window.tscn" id="5"]
-[ext_resource type="Material" path="res://assets/materials/greybox_stone.tres" id="6"]
-[ext_resource type="Material" path="res://assets/materials/greybox_metal.tres" id="7"]
-[ext_resource type="Material" path="res://assets/materials/greybox_board.tres" id="8"]
-[ext_resource type="Material" path="res://assets/materials/greybox_door_locked.tres" id="9"]
-[ext_resource type="Material" path="res://assets/materials/greybox_lamp.tres" id="10"]
+[ext_resource type="Material" path="res://assets/materials/stone.tres" id="6"]
+[ext_resource type="Material" path="res://assets/materials/metal.tres" id="7"]
+[ext_resource type="Material" path="res://assets/materials/board.tres" id="8"]
+[ext_resource type="Material" path="res://assets/materials/lamp.tres" id="10"]
 [ext_resource type="Script" path="res://scripts/zones/spawn_point.gd" id="11"]
 [ext_resource type="PackedScene" path="res://scenes/zones/schnaps_shrine.tscn" id="12"]
 [ext_resource type="PackedScene" path="res://scenes/zones/brettljause.tscn" id="13"]
 [ext_resource type="PackedScene" path="res://scenes/zones/wallbuy_schmarrnpfanne.tscn" id="14"]
+[ext_resource type="Material" path="res://assets/materials/speck.tres" id="tex_speck"]
 
 [node name="Kueche" type="Node3D"]
 
@@ -325,22 +325,22 @@ material = ExtResource("8")
 [node name="Speck0" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.2, 2.4, -13)
 size = Vector3(0.2, 0.5, 0.12)
-material = ExtResource("9")
+material = ExtResource("tex_speck")
 
 [node name="Speck1" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.3, 2.4, -13)
 size = Vector3(0.2, 0.5, 0.12)
-material = ExtResource("9")
+material = ExtResource("tex_speck")
 
 [node name="Speck2" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.4, 2.4, -13)
 size = Vector3(0.2, 0.5, 0.12)
-material = ExtResource("9")
+material = ExtResource("tex_speck")
 
 [node name="Speck3" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 2.4, -13)
 size = Vector3(0.2, 0.5, 0.12)
-material = ExtResource("9")
+material = ExtResource("tex_speck")
 
 [node name="Pots" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4, 1.07, -11.6)
