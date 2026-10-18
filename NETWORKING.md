@@ -144,6 +144,16 @@ like hitscan.
 | Harmonika dance, slows, burns (DoTs) | applied on the host from the owner's report; clients see the enemy's state in the snapshot |
 | Schmarrnpfanne guard | stays with the blocking player (they take hits on the host, so the host needs the guard state: sent with the transform) |
 
+**Built 2026-10-18 (part 3)**, simpler than the table above in one point: placed things (puddles,
+heaps, the Tanzboden, mines) also run in their owner's game, like projectiles, and act on the
+owner's view of the enemies; what they do goes to the host through the same hit relay. The others
+see a harmless copy: each hiker has a ghost of its player's guns that replays every shot through the
+weapon's own behavior with hitting switched off, and thrown equipment is copied with `harmless` set.
+Only what steers the host's enemy AI has to be on the host: a copied Kuhglocke still lures there,
+and the Mistgabel's lift, carry and hurl are relayed. The Schmarrnpfanne needed nothing new (part 2
+keeps health and the guard in the player's own game). The events run on the host; guests get copies
+moved by snapshots, and milking, tapping and catching are requests whose reward the asker's game pays.
+
 ## 6. Gameplay rules that co-op adds
 
 From section 10, plus what has to be decided now:
