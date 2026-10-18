@@ -4,7 +4,8 @@ extends Node
 ## more (each is a reshaped mesh that remembers its box), every lit colour is a textured material
 ## projected in the part's own space (so it rides along with a moving bolt or magazine), only
 ## near-white and near-black parts stay plain, and the weapons and the enemy models together stay
-## inside the 3 MB model budget.
+## inside the 3 MB model budget. The Handböller's big hammer falls on the shot and is cocked again in
+## the reload (play-test 2026-10-18).
 
 const WEAPONS_DIR: String = "res://scenes/weapons"
 const ENEMY_MODELS_DIR: String = "res://assets/models"
@@ -22,8 +23,26 @@ func _ready() -> void:
 		total += FileAccess.get_file_as_bytes(path).size()
 		_weapon(path)
 	_check(total < MODEL_BUDGET, "weapon and enemy models take %.2f MiB of the 3 MB budget" % (total / 1048576.0))
+	await _hammer()
 	print("RESULT: %s" % ("PASS" if failures.is_empty() else "%d FAILED" % failures.size()))
 	get_tree().quit(1 if failures.size() > 0 else 0)
+
+
+func _hammer() -> void:
+	var viewmodel := (load("res://scenes/weapons/handboeller_viewmodel.tscn") as PackedScene).instantiate() as HandboellerViewmodel
+	add_child(viewmodel)
+	await get_tree().process_frame
+	var hammer := viewmodel.get_node("Model/Hammer") as Node3D
+	_check(is_zero_approx(hammer.rotation.x), "the Handböller is drawn cocked")
+	viewmodel.play_fire()
+	await get_tree().create_timer(0.2).timeout
+	_check(is_equal_approx(hammer.rotation.x, -deg_to_rad(viewmodel.hammer_fall)), "its hammer falls on the shot (%.0f degrees)" % rad_to_deg(hammer.rotation.x))
+	viewmodel.play_reload(4.5)
+	await get_tree().create_timer(0.2).timeout
+	_check(hammer.rotation.x < -0.1, "the hammer stays down as the reload starts")
+	await get_tree().create_timer(1.0).timeout
+	_check(is_zero_approx(hammer.rotation.x), "and is cocked as the muzzle comes up")
+	viewmodel.queue_free()
 
 
 func _check(ok: bool, what: String) -> void:
