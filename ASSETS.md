@@ -43,3 +43,6 @@ The enemy models (M6 part 4) are self-made: built from tubes, balls and boxes by
 is built like the enemies, and so is the co-op player hiker (M7, `tools/models/build_hiker.gd`: its
 jacket and trousers reuse the `wool` and `leather` textures, tinted per player). No external models
 anywhere.
+
+The title screen's teaser picture (`assets/ui/teaser.jpg`, #77) is rendered from the game itself by
+`tools/teaser/teaser.tscn`; `assets/textures/white.png` (4x4 white, #78) is self-made. Both are our own.

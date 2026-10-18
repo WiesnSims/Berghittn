@@ -179,6 +179,27 @@ godot --headless --import                   # then reimport
 - `ShaderWarmup` draws every material in `assets/materials/` behind the start screen, so a room is
   not compiled the first time its door opens.
 
+## Title screen and loading (#77, #78)
+
+- The title (`StartScreen`) has Solo, Co-op and Settings; nothing starts on a click elsewhere. Solo
+  waits until the shaders are built and says how far that is ("Preparing the hut ... 60 %").
+- Behind it, `TeaserBackdrop` animates a still from the game in 2D (drift, snow, lamp flicker, the
+  Jagdflinte firing now and then), so it needs no 3D shaders. The still is rendered by
+  `godot res://tools/teaser/teaser.tscn` into `assets/ui/teaser.jpg` (lossy import); the tool prints
+  where the muzzle and the lamp are, for `MUZZLE_AT` / `LAMP_AT`.
+- Loading (measured 2026-10-18, Edge on Windows, first visit): downloads 1.9 s, Godot running by 2 s,
+  scene built by ~4.5 s; then the browser compiles ~150 WebGL programs, ~16 s on a first visit (one
+  per material setup and light pass; the lit ones take ~0.7 s each, built twice, with and without
+  instancing). The browser keeps them in its shader cache: a returning visit is ready in ~2 s.
+- So `ShaderWarmup` starts with the camera drawing only its own render layer (20): the first frame is
+  cheap and the title shows at ~5 s. It then shows a few items per frame (every material in the
+  world, every weapon, enemy, the hiker and the code-built effects) and reports `progress`; at the end
+  the camera gets the world back with everything compiled. A co-op start before that finishes it at
+  once (`finish_now`). It runs once per session (a restart skips it).
+- `SharedLook.adopt` puts plain lit colours on a white texture with the props' triplanar setup (the
+  same look) so they share shaders; `godot --headless res://tests/material_report.tscn` lists the
+  material setups (17, 8 of them lit). Visual check: `godot res://tests/title_view.tscn -- <dir>`.
+
 ## Enemy models and ragdolls (M6)
 
 The five enemies are self-made low-poly models, built by a script into `assets/models/enemies/`:
