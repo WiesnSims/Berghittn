@@ -3,12 +3,14 @@ extends Node3D
 ## WebGL compiles a material's shader the first time it is drawn, which in the browser stalls a
 ## frame for up to a second or two (play-test: opening the Hüttentruhe froze while its roll showed
 ## the specials for the first time). So at load, behind the start screen, every weapon's model, every
-## world material and every effect the special weapons build in code (play-test 2026-10-18: the
-## Brennlacke stalled on its first squirt) is drawn for a few frames, tiny and right in front of the
-## camera, and then thrown away.
+## enemy model, every world material and every effect the special weapons build in code (play-test
+## 2026-10-18: the Brennlacke stalled on its first squirt) is drawn for a few frames, tiny and right
+## in front of the camera, and then thrown away.
 
 const WEAPONS_DIR: String = "res://data/weapons"
 const MATERIALS_DIR: String = "res://assets/materials"
+## Enemy models (M6 part 4): skinned meshes compile a shader of their own.
+const ENEMIES_DIR: String = "res://data/enemies"
 ## Effects built in code: shots, piles, puddles, rings, notes and blasts.
 const EFFECTS: Array[Script] = [
 	preload("res://scripts/weapons/behaviors/schnaps_blob.gd"),
@@ -49,6 +51,10 @@ func _ready() -> void:
 		swatch.mesh = BoxMesh.new()
 		swatch.material_override = material
 		models.append(swatch)
+	for file: String in DirAccess.get_files_at(ENEMIES_DIR):
+		var enemy := load(ENEMIES_DIR.path_join(file.trim_suffix(".remap"))) as EnemyData
+		if enemy and enemy.model:
+			models.append(enemy.model.instantiate() as Node3D)
 	var effects: Array[Node3D] = []
 	for script: Script in EFFECTS:
 		var effect := Node3D.new()

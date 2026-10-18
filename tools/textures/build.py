@@ -47,6 +47,10 @@ TEXTURES = {
     "hay": ("thatch_roof_angled", (0.72, 0.58, 0.28), {"sat": 0.0, "contrast": 1.3}),
     "wool": ("poly_wool_herringbone", (0.8, 0.8, 0.8), {"sat": 0.0, "contrast": 1.6}),
     "linen": ("hessian_230", (0.78, 0.74, 0.66), {"sat": 0.3, "contrast": 0.7}),
+    # The enemies (M6 part 4): all neutral, each costume colours them.
+    "leather": ("brown_leather", (0.8, 0.8, 0.8), {"sat": 0.0, "contrast": 1.4}),
+    "fur": ("curly_teddy_natural", (0.8, 0.8, 0.8), {"sat": 0.0, "contrast": 2.2}),
+    "skin": ("grey_plaster_02", (0.8, 0.8, 0.8), {"sat": 0.0, "contrast": 0.5}),
 }
 
 

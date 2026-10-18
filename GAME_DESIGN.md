@@ -651,7 +651,18 @@ fix console errors, commit. Stop and report after each milestone.
      planks for doors and skis, wool blankets and linen mattresses in the Lager, hay, snow, rock and
      needle-dark pines; the terrain picks snow or rock by slope. Each keeps the average colour of
      the greybox it replaced, so the lighting and grade of part 1 still fit. 0.82 MiB in all.
-  4. Low-poly models for props, enemies and weapons, and the ragdolls.
+  4. Low-poly models for props, enemies and weapons, and the ragdolls. Itself split into three PRs
+     (2026-10-18), each play-tested: 4a the enemies and ragdolls, 4b the weapons, 4c the props.
+     4a: the five enemies are self-made low-poly models (`tools/models`, no external assets), each on
+     a 15-bone skeleton with the greybox palette and silhouette (the Wanderer's felt hat and rucksack,
+     the tourist's socks in sandals and camera, the Knappe's helmet lamp and pick, the Perchte's carved
+     mask and cowbells, the Krampus's horns, tongue, chains and Rute), textured with CC0 wool, leather,
+     fur and skin tinted per costume; 0.2 MiB. Their limbs move in code: a walk, a two-armed (Knappe,
+     Krampus: one-armed) swing, reaching in for a board, the head-first dive through a window, the
+     Perchte's crouch and leap, a Schuhplattler to the Harmonika, dazed, and flailing on the Mistgabel.
+     A kill turns the body into a ragdoll thrown away from the shooter, colliding with the world only;
+     at most 6 are simulated at once and each freezes where it fell after 3 s (with no room, a corpse
+     falls the old way).
 
 **M7 — Co-op (decision gate)**
 - Before coding, write `NETWORKING.md`: chosen transport, relay approach on

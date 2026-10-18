@@ -179,6 +179,30 @@ godot --headless --import                   # then reimport
 - `ShaderWarmup` draws every material in `assets/materials/` behind the start screen, so a room is
   not compiled the first time its door opens.
 
+## Enemy models and ragdolls (M6)
+
+The five enemies are self-made low-poly models, built by a script into `assets/models/enemies/`:
+
+```
+godot --headless --script res://tools/models/build_enemies.gd
+```
+
+- `tools/models/character_builder.gd` lofts tubes (rings along a path), balls and boxes, binds each
+  to one bone or blends it between two, and saves a scene: a `Skeleton3D` (hips, chest, head, and
+  per side arm, forearm, hand, thigh, shin, foot), the skinned `Body` and `Head` meshes (the head
+  apart so a head pop can hide it) and a `PhysicalBoneSimulator3D` with 11 bodies. Each model is
+  built at its `EnemyData.model_scale`, so no physics body is ever scaled.
+- Costumes are vertex colours over a few shared, neutral, UV-mapped materials in
+  `assets/materials/characters/` (wool, leather, fur, skin, linen, wood, metal, plain, glow).
+- `EnemyRig` (`scripts/enemies/enemy_rig.gd`, on the model's root) poses the bones in code: the
+  stance and walk the builder sets per type, plus one action at a time (`STRIKE`, `PULL`, `CLIMB`,
+  `CROUCH`, `LEAP`, `DANCE`, `DAZED`, `CARRIED`) that `Enemy` starts from its states. The head
+  hurtbox follows the head bone.
+- Ragdolls (#39): a kill hands the bones to physics, pushed away from the shooter. They collide
+  with the world only. At most `RAGDOLL_MAX` (6) are simulated at once; each freezes in the pose
+  it fell into after `RAGDOLL_TIME`, and with no room left a corpse falls the old way. While it
+  walks the ragdoll is switched off (its bodies out of the physics space), so it costs nothing.
+
 ## Tests
 
 ```
@@ -205,6 +229,16 @@ godot --headless --fixed-fps 60 res://tests/m6_textures.tscn
 The textures: each at most 256x256, with mipmaps, listed in ASSETS.md and inside the 10 MB budget;
 every lit world material textured and triplanar (moving parts in their own space); the props that
 used to borrow a world colour have their own material; the terrain shows snow and rock.
+
+```
+godot --headless --fixed-fps 60 res://tests/m6_ragdoll.tscn
+```
+
+The enemy models: each one a rig at its size with a skinned body, a poppable head and an 11-body
+ragdoll that is off while it walks, inside the 3 MB model budget; the head hurtbox on the head; a
+swing that raises the arms; every type going limp when killed, its joints holding, thrown away from
+the shooter, frozen after a while and standing again from the pool; and a crowd of 12 killed at
+once simulating no more than 6 ragdolls.
 
 ```
 godot --headless --fixed-fps 60 res://tests/m5_core.tscn
@@ -390,6 +424,21 @@ Needs a real window (not `--headless`): saves PNG frames of an enemy's window en
 inside or outside, of it tearing the boards off, of the pistol reload or the shovel swing, one
 frame with the HUD, or shooting an enemy (wall puffs, hit flash, casings, head pop), for checking
 visuals without playing.
+
+```
+godot res://tests/model_view.tscn -- <out_dir>
+```
+
+Needs a window: the enemy models in a plain studio, from the front and the back, their faces, every
+action pose and a ragdoll fall.
+
+```
+godot res://tests/crowd_bench.tscn
+```
+
+Frame rate with a full crowd: 24 enemies walking at the player, the six nearest killed every 3 s
+(six ragdolls at once); prints FPS and the worst frame every 2 s. For the browser, export it as the
+main scene with `tests/*` left in the export (2026-10-18: 144 FPS, worst frame 13.8 ms).
 
 ```
 godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne|knoedel|glocke|fladen|boeller|rodel|harmonika|brennkessel|goassl|mistgabel|rute
