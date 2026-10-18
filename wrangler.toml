@@ -1,0 +1,10 @@
+# Cloudflare Pages project berghittn (https://berghittn.pages.dev). The Functions in functions/ hand
+# co-op WebSockets to the Room Durable Object, which lives in the helper Worker in relay/.
+name = "berghittn"
+pages_build_output_dir = "export"
+compatibility_date = "2025-09-01"
+
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "Room"
+script_name = "berghittn-relay"

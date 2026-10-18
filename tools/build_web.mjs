@@ -14,7 +14,17 @@ const WASM = join(EXPORT_DIR, 'index.wasm');
 
 rmSync(EXPORT_DIR, { recursive: true, force: true });
 mkdirSync(EXPORT_DIR);
-execFileSync('godot', ['--headless', '--export-release', 'Web', join(EXPORT_DIR, 'index.html')], { stdio: 'inherit' });
+// Co-op (M7): the relay only lets players with the host's build into a room, so a browser running a
+// stale cached build is told to reload instead of desyncing. Read by Net, packed via include_filter.
+const commit = execFileSync('git', ['rev-parse', '--short', 'HEAD']).toString().trim();
+const buildId = `${commit}-${Date.now().toString(36)}`;
+writeFileSync('build_id.txt', buildId);
+try {
+	execFileSync('godot', ['--headless', '--export-release', 'Web', join(EXPORT_DIR, 'index.html')], { stdio: 'inherit' });
+} finally {
+	rmSync('build_id.txt', { force: true });
+}
+console.log(`build id: ${buildId}`);
 
 const size = statSync(WASM).size;
 // Pages serves unknown extensions as octet-stream without compression, so we gzip ourselves

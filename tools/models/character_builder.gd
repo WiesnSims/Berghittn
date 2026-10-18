@@ -19,6 +19,9 @@ const MATERIALS: Dictionary = {
 	&"metal": ["metal", 0.5],
 	&"plain": ["", 1.0],
 	&"glow": ["", 1.0],
+	# The player hiker's clothes (M7): white in the vertex colour, tinted per player at runtime.
+	&"jacket": ["wool", 0.45],
+	&"trousers": ["leather", 0.35],
 }
 const MATERIAL_DIR: String = "res://assets/materials/characters"
 ## The ragdoll's bodies; hands and feet ride on the forearms and shins.
@@ -32,7 +35,8 @@ var scale: float = 1.0
 ## Bone name -> [parent name, position at scale 1].
 var _bones: Dictionary = {}
 var _order: Array[StringName] = []
-## "body"/"head" -> material id -> Surface.
+## Part ("body", "head", or any name set with part()) -> material id -> Surface. Each part becomes
+## its own skinned mesh, so the game can swap parts (the hiker's heads and hats).
 var _surfaces: Dictionary = {&"body": {}, &"head": {}}
 var _part: StringName = &"body"
 ## Ragdoll body sizes: bone -> radius (limbs: capsules from the bone to its child), or a Vector3 box.
@@ -70,7 +74,14 @@ func ragdoll(limb_radii: Dictionary, hips_box: Vector3, chest_box: Vector3, head
 
 ## The following shapes go on the head mesh (true) or the body (false).
 func head(on: bool) -> void:
-	_part = &"head" if on else &"body"
+	part(&"head" if on else &"body")
+
+
+## The following shapes go on the named part's mesh (parts named head* are in group "head_part").
+func part(name: StringName) -> void:
+	_part = name
+	if not _surfaces.has(name):
+		_surfaces[name] = {}
 
 
 ## Rings lofted along `path`; radii[i] is ring i's half width (x) and half depth (y). `rig` is a
@@ -209,7 +220,9 @@ func save(path: String, root_name: String, rig_script: Script, settings: Diction
 		skeleton.set_bone_rest(index, Transform3D(Basis.IDENTITY, local * scale))
 	skeleton.reset_bone_poses()
 	var skin: Skin = skeleton.create_skin_from_rest_transforms()
-	for part: StringName in [&"body", &"head"]:
+	for part: StringName in _surfaces:
+		if (_surfaces[part] as Dictionary).is_empty():
+			continue
 		var mesh := ArrayMesh.new()
 		for material: StringName in _surfaces[part]:
 			var s: Surface = _surfaces[part][material]
@@ -219,12 +232,12 @@ func save(path: String, root_name: String, rig_script: Script, settings: Diction
 		ResourceSaver.save(mesh, mesh_path, ResourceSaver.FLAG_COMPRESS)
 		mesh.take_over_path(mesh_path)
 		var instance := MeshInstance3D.new()
-		instance.name = String(part).capitalize()
+		instance.name = String(part).to_pascal_case()
 		instance.mesh = mesh
 		instance.skin = skin
 		skeleton.add_child(instance)
 		instance.skeleton = NodePath("..")
-		if part == &"head":
+		if String(part).begins_with("head"):
 			instance.add_to_group(&"head_part", true)
 	skeleton.add_child(_ragdoll(skeleton))
 	for node: Node in root.find_children("*", "", true, false):
