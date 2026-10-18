@@ -8,20 +8,17 @@ extends CharacterBody3D
 enum State { WAITING, WALKING, ARRIVED, DEAD, GONE }
 
 const EISSTOCK: EquipmentData = preload("res://data/equipment/eisstock.tres")
-const HIP: float = 0.86
-const SHOULDER: float = 1.4
 
 var health: int = 0
 var _state: State = State.WAITING
 var _goal: Vector3
 var _time_left: float = 0.0
 var _leave_left: float = 0.0
-var _walk_phase: float = 0.0
 var _moving: float = 0.0
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
-var _rest: Dictionary = {}
 @onready var _agent: NavigationAgent3D = $NavigationAgent3D
-@onready var _model: Node3D = $Model
+# His model is a character rig like the enemies' (M6 part 4c): it walks him at his speed.
+@onready var _model: EnemyRig = $Model
 @onready var _bar: Label3D = $HealthBar
 @onready var _bubble: Label3D = $Bubble
 @onready var _marker: MapMarker = $Marker
@@ -29,8 +26,6 @@ var _rest: Dictionary = {}
 
 func _ready() -> void:
 	add_to_group("escorts")
-	for child: Node in _model.get_children():
-		_rest[child] = (child as Node3D).transform
 
 
 func start(at: Vector3, goal: Vector3) -> void:
@@ -108,7 +103,6 @@ func _walk(delta: float) -> void:
 	move_and_slide()
 	rotation.y = lerp_angle(rotation.y, atan2(-direction.x, -direction.z), minf(6.0 * delta, 1.0))
 	_moving = move_toward(_moving, 1.0, delta * 4.0)
-	_walk_phase += delta * Constants.GUEST_SPEED * 5.0
 	if _bubble.text == tr("GUEST_LOST"):
 		_bubble.visible = false
 
@@ -182,21 +176,11 @@ func _nearest_player(within: float) -> Player:
 	return best
 
 
-func _animate(_delta: float) -> void:
-	var swing: float = sin(_walk_phase) * 0.5 * _moving
+func _animate(delta: float) -> void:
+	_model.update(delta, Vector2(velocity.x, velocity.z).length())
+	# Lost, he turns this way and that with his map.
 	var t: float = Time.get_ticks_msec() / 1000.0
-	for child: Node3D in _rest:
-		var rest: Transform3D = _rest[child]
-		var name: String = child.name
-		if name.begins_with("Leg"):
-			var angle: float = swing if name.ends_with("L") else -swing
-			var hip := Vector3(rest.origin.x, HIP, 0.0)
-			child.transform = Transform3D(Basis(Vector3.RIGHT, angle), hip) * Transform3D(Basis.IDENTITY, -hip) * rest
-		elif name.begins_with("Arm"):
-			# The map bobs as he walks and turns as he looks around when lost.
-			var look: float = sin(t * 1.3) * 0.25 * (1.0 - _moving)
-			var bob: float = sin(_walk_phase * 2.0) * 0.03 * _moving
-			child.transform = Transform3D(Basis(Vector3.UP, look), Vector3(0.0, bob, 0.0)) * rest
+	_model.rotation.y = sin(t * 1.3) * 0.25 * (1.0 - _moving)
 
 
 static func _flat(v: Vector3) -> Vector3:
