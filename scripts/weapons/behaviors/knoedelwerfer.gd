@@ -43,6 +43,7 @@ func burst(at: Vector3, damage: int, radius: float, size: float) -> void:
 	if floor_hit.is_empty():
 		return
 	var pile: Node3D = _pooled(_piles, Constants.KNOEDEL_PILE_POOL, PILE, false)
+	pile.set("harmless", holder.ghost)
 	pile.call("lay", floor_hit.position, data.pile_radius * radius / data.area_radius, data.pile_time, data.slow_factor, data.slow_time)
 
 

@@ -127,12 +127,12 @@ func _on_match_started() -> void:
 		_enter_menu()
 
 
-## The host runs the waves; guests play the host's world back (CoopEnemies, CoopWorld). The events
-## (section 8a) come to co-op with M7 part 3.
+## The host runs the waves and the events (section 8a); guests play the host's world back
+## (CoopEnemies, CoopWorld, CoopEvents).
 func _setup_coop() -> void:
 	if not Net.is_host():
 		_waves.process_mode = Node.PROCESS_MODE_DISABLED
-	($EventDirector as Node).process_mode = Node.PROCESS_MODE_DISABLED
+		($EventDirector as Node).process_mode = Node.PROCESS_MODE_DISABLED
 	var peers: Array = Net.roster.keys()
 	peers.sort()
 	var spawn := get_tree().get_first_node_in_group("player_spawn") as Node3D
@@ -151,6 +151,10 @@ func _setup_coop() -> void:
 	add_child(world)
 	world.setup(self, _waves, $Zones as ZoneMap)
 	world.game_over.connect(_on_coop_over)
+	var events := CoopEvents.new()
+	events.name = "CoopEvents"
+	add_child(events)
+	events.setup($EventDirector as EventDirector)
 
 
 ## Everyone is down or out: the match is over; all go back to the same room's lobby from here.

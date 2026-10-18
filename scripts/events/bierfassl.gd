@@ -4,6 +4,8 @@ extends Node3D
 ## slope, in through the beer garden's west gate and across the garden, flattening every enemy in its
 ## way, until it hits something or a player stops it by walking into it. Then hold E to tap it:
 ## Freibier, a random Schnaps that player does not have yet.
+## Co-op (M7, CoopEvents): it rolls on the host (enemies flattened there, any player stops it); a
+## guest's copy only shows it, and a guest's tap is the host's to allow (the Schnaps is the guest's).
 
 enum State { ROLLING, RESTING, TAPPED }
 
@@ -14,7 +16,12 @@ const DISC_RADIUS: float = 36.5
 const DISC_HEIGHT: float = -0.3
 
 var interact_repeat: float = 0.1
+## Co-op: a guest's copy of the host's barrel.
+var copy: bool = false
 var _state: State = State.ROLLING
+# A copy: where it was a frame ago (it rolls by how far it went), and whether the host was asked.
+var _copy_last: Vector3
+var _asked: bool = false
 var _route: Array[Vector3] = []
 var _direction: Vector3 = Vector3.RIGHT
 var _speed: float = 0.0
@@ -45,7 +52,43 @@ func start(route: Array[Vector3]) -> void:
 	_speed = Constants.FASSL_SPEED
 	_state = State.ROLLING
 	_rumble = Sound.attach(&"fassl_roll", self)
-	Events.event_announced.emit(tr("EVENT_FASSL_LOOSE"))
+	Coop.announce("EVENT_FASSL_LOOSE")
+
+
+# Co-op copy interface (see CoopEvents).
+
+func start_copy() -> void:
+	_copy_last = global_position
+	_rumble = Sound.attach(&"fassl_roll", self)
+
+
+func net_state() -> Array:
+	return [int(_state)]
+
+
+func net_apply(state: Array) -> void:
+	var new_state: State = int(state[0]) as State
+	if new_state == _state:
+		return
+	if _state == State.ROLLING:
+		_stop_rumble()
+	if new_state == State.TAPPED:
+		_tapped()
+	_state = new_state
+
+
+## Host: a guest tapped their copy to the end.
+func net_request(what: StringName, peer: int) -> bool:
+	if what != &"tap" or _state != State.RESTING:
+		return false
+	_tapped()
+	Coop.announce("EVENT_FASSL_TAPPED_BY", [Coop.name_of(peer)], peer)
+	return true
+
+
+func net_granted(what: StringName, player: Player) -> void:
+	if what == &"tap":
+		_pour(player)
 
 
 func is_rolling() -> bool:
@@ -76,10 +119,18 @@ func interact(player: Node3D) -> void:
 	_tap += interact_repeat
 	_tap_since = 0.0
 	if _tap >= Constants.FASSL_TAP_TIME:
+		if copy:
+			if not _asked:
+				_asked = true
+				Coop.events.request(self, &"tap")
+			return
 		_freibier(player as Player)
 
 
 func _physics_process(delta: float) -> void:
+	if copy:
+		_copy_step(delta)
+		return
 	match _state:
 		State.ROLLING:
 			_rolling(delta)
@@ -149,21 +200,37 @@ func _flatten() -> void:
 
 func _come_to_rest() -> void:
 	_state = State.RESTING
-	if _rumble:
-		_rumble.queue_free()
-		_rumble = null
-	Sound.play_at(&"eisstock_hit", global_position)
+	_stop_rumble()
 	_rest_left = Constants.FASSL_REST_TIME
 	global_position.y = _ground_height(global_position.x, global_position.z) + RADIUS
 
 
+## Stopped: the rumble ends with a thud.
+func _stop_rumble() -> void:
+	if _rumble:
+		_rumble.queue_free()
+		_rumble = null
+	Sound.play_at(&"eisstock_hit", global_position)
+
+
 func _freibier(player: Player) -> void:
+	_tapped()
+	if Coop.is_host():
+		Coop.announce("EVENT_FASSL_TAPPED_BY", [Coop.name_of(Net.my_id())], Net.my_id())
+	_pour(player)
+
+
+func _tapped() -> void:
 	_state = State.TAPPED
 	_rest_left = 4.0
 	_foam.emitting = true
 	Sound.play_at(&"fassl_tap", global_position)
 	if is_instance_valid(_marker):
 		_marker.queue_free()
+
+
+## What the tapper gets: a Schnaps they do not have yet, or points if they have them all.
+func _pour(player: Player) -> void:
 	var missing: Array[PerkData] = []
 	for node: Node in get_tree().get_nodes_in_group("interactables"):
 		var bottle := node as PerkBottle
@@ -176,6 +243,20 @@ func _freibier(player: Player) -> void:
 	var perk: PerkData = missing[randi() % missing.size()]
 	player.perks.add(perk)
 	Events.event_announced.emit(tr("EVENT_FASSL_FREIBIER") % [tr(perk.display_name), tr(perk.title)])
+
+
+## A copy: rolling as far as the host moved it, about its own axis across the way it goes.
+func _copy_step(delta: float) -> void:
+	_tap_since += delta
+	if _tap_since > interact_repeat * 3.0:
+		_tap = 0.0
+		_asked = false
+	var moved: Vector3 = _flat(global_position - _copy_last)
+	_copy_last = global_position
+	if _state == State.ROLLING and moved.length() > 0.001:
+		_direction = moved.normalized()
+		look_at(global_position + _direction, Vector3.UP)
+		_roll.rotate_object_local(Vector3.RIGHT, -moved.length() / RADIUS)
 
 
 func _ground_point(flat: Vector3) -> Vector3:

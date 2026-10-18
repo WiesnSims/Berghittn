@@ -7,8 +7,14 @@ extends Node3D
 ## like a hit at home (the Pfanne's guard, Sturschädl, going down).
 ## Downed teammates get a revive spot and a marker; a player who bled out watches a teammate until
 ## the next wave starts. Main creates it as /root/Main/CoopPlayers on every peer.
+## What each player's guns and equipment do is passed on too (M7 part 3): every hiker carries a copy
+## of the gun in hand, and a ghost of their guns replays their shots, swings and specials for the
+## look and the sound; thrown things fly as harmless copies. Their own game deals the damage.
 
 const HIKER := preload("res://scenes/net/hiker.tscn")
+const BOELLER_BLAST: Script = preload("res://scripts/perks/boeller_blast.gd")
+const WEAPONS: String = "res://data/weapons/%s.tres"
+const EQUIPMENT: String = "res://data/equipment/%s.tres"
 const MARKER_COLOR := Color(1.0, 0.3, 0.25)
 
 var _player: Player
@@ -17,6 +23,8 @@ var _send_left: float = 0.0
 var _remotes: Dictionary = {}
 var _spectator: Camera3D
 var _watching: int = 0
+# Weapon and equipment data by id, loaded the first time someone uses them.
+var _data: Dictionary = {}
 
 
 func setup(player: Player) -> void:
@@ -25,6 +33,10 @@ func setup(player: Player) -> void:
 	Net.roster_changed.connect(_sync_roster)
 	Events.wave_started.connect(_on_wave_started.unbind(2))
 	_player.life_changed.connect(_on_own_life_changed)
+	_player.weapons.weapon_changed.connect(func(data: WeaponData) -> void: _held.rpc(String(data.id)))
+	_player.weapons.acted.connect(_on_acted)
+	_player.equipment.threw.connect(_on_threw)
+	_player.perks.triggered.connect(_on_perk)
 	_spectator = Camera3D.new()
 	_spectator.fov = 70.0
 	add_child(_spectator)
@@ -75,7 +87,8 @@ func _process(delta: float) -> void:
 		_send_left = maxf(_send_left + Constants.NET_POSE_INTERVAL, 0.0)
 		var flags: int = (1 if _player.is_crouching() else 0) | (_player.life << 1)
 		var share: int = roundi(100.0 * _player.health.current() / maxf(_player.health.max_health, 1.0))
-		_pose.rpc(Time.get_ticks_msec(), _player.global_position, _player.rotation.y, flags, share)
+		var pitch: float = asin(clampf(-_player.weapons.global_basis.z.y, -1.0, 1.0))
+		_pose.rpc(Time.get_ticks_msec(), _player.global_position, _player.rotation.y, pitch, flags, share)
 	var now: int = Time.get_ticks_msec()
 	for remote: Remote in _remotes.values():
 		remote.update(now, delta)
@@ -96,6 +109,7 @@ func _sync_roster() -> void:
 			add_child(hiker)
 			hiker.hide()
 			hiker.add_child(ReviveSpot.new(hiker))
+			hiker.arm()
 			if Net.is_host():
 				hiker.add_to_group("player")
 				hiker.on_hurt = _hurt_remote
@@ -188,16 +202,108 @@ func _update_spectator() -> void:
 
 
 @rpc("any_peer", "call_remote", "unreliable_ordered")
-func _pose(sent_ms: int, at: Vector3, yaw: float, flags: int, health_percent: int) -> void:
+func _pose(sent_ms: int, at: Vector3, yaw: float, pitch: float, flags: int, health_percent: int) -> void:
+	var sender: int = multiplayer.get_remote_sender_id()
+	var remote: Remote = _remotes.get(sender)
+	if remote == null:
+		return
+	remote.add(Time.get_ticks_msec(), sent_ms, at, yaw, flags, health_percent)
+	remote.hiker.aim(pitch)
+	# Heard from them for the first time: which gun they hold (a change before both sides were in the
+	# match would have been missed).
+	if not remote.asked:
+		remote.asked = true
+		_ask_held.rpc_id(sender)
+
+
+# --- what the others' guns do -------------------------------------------------------------------------
+
+func _on_acted(action: WeaponHolder.Act, rounds: int) -> void:
+	var weapons: WeaponHolder = _player.weapons
+	var data: WeaponData = weapons.melee_weapon if action >= WeaponHolder.Act.SWING else weapons.weapon
+	if data:
+		_acted.rpc(action, String(data.id), rounds, weapons.global_transform)
+
+
+func _on_threw(item: EquipmentData, thrown: Node3D) -> void:
+	var velocity: Vector3 = thrown.get("velocity") if "velocity" in thrown else Vector3.ZERO
+	_thrown.rpc(String(item.id), thrown.global_position, velocity)
+
+
+func _on_perk(id: StringName, _text: String) -> void:
+	if id == PlayerPerks.BOELLERSCHUSS:
+		_boeller.rpc()
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _ask_held() -> void:
+	if _player.weapons.weapon:
+		_held.rpc_id(multiplayer.get_remote_sender_id(), String(_player.weapons.weapon.id))
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _held(weapon_id: String) -> void:
 	var remote: Remote = _remotes.get(multiplayer.get_remote_sender_id())
-	if remote:
-		remote.add(Time.get_ticks_msec(), sent_ms, at, yaw, flags, health_percent)
+	var data := _load(WEAPONS, weapon_id) as WeaponData
+	if remote and data:
+		remote.hiker.hold(data)
+
+
+## Their gun went off (or their melee weapon swung, struck, or went into its held mode), from `aim`.
+@rpc("any_peer", "call_remote", "reliable")
+func _acted(action: int, weapon_id: String, rounds: int, aim: Transform3D) -> void:
+	var remote: Remote = _remotes.get(multiplayer.get_remote_sender_id())
+	var data := _load(WEAPONS, weapon_id) as WeaponData
+	if remote == null or data == null or action < 0 or action > WeaponHolder.Act.RELEASE:
+		return
+	remote.hiker.weapons.replay(action as WeaponHolder.Act, data, clampi(rounds, 1, 16), aim)
+	if action == WeaponHolder.Act.SWING:
+		remote.hiker.swing(1.0 / data.fire_rate)
+
+
+## They threw or placed equipment: a copy where theirs is, with its speed, that hurts nobody (a
+## Kuhglocke still lures: on the host it pulls the real enemies).
+@rpc("any_peer", "call_remote", "reliable")
+func _thrown(item_id: String, at: Vector3, velocity: Vector3) -> void:
+	var remote: Remote = _remotes.get(multiplayer.get_remote_sender_id())
+	var item := _load(EQUIPMENT, item_id) as EquipmentData
+	if remote == null or item == null or item.projectile == null:
+		return
+	var copy := item.projectile.instantiate() as Node3D
+	if "harmless" in copy:
+		copy.set("harmless", true)
+	get_parent().add_child(copy)
+	copy.call("launch", at, Vector3.ZERO, remote.hiker)
+	if "velocity" in copy:
+		copy.set("velocity", velocity)
+
+
+## Their Böllerschuss went off around them.
+@rpc("any_peer", "call_remote", "reliable")
+func _boeller() -> void:
+	var remote: Remote = _remotes.get(multiplayer.get_remote_sender_id())
+	if remote == null:
+		return
+	var blast := Node3D.new()
+	blast.set_script(BOELLER_BLAST)
+	get_parent().add_child(blast)
+	blast.global_position = remote.hiker.global_position
+
+
+## A weapon or equipment resource by id, or null for anything that is not one (ids come off the net).
+func _load(path: String, id: String) -> Resource:
+	var key: String = path % id
+	if not _data.has(key):
+		_data[key] = load(key) if id.is_valid_identifier() and ResourceLoader.exists(key) else null
+	return _data[key]
 
 
 ## One other player's hiker and the poses heard from them.
 class Remote:
 	var hiker: Hiker
 	var health_share: float = 1.0
+	## We asked them which gun they hold.
+	var asked: bool = false
 	var _poses := PoseBuffer.new()
 	var _last_position: Vector3
 	var _crouching: bool = false

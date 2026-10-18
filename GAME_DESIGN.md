@@ -701,6 +701,14 @@ fix console errors, commit. Stop and report after each milestone.
   until the next wave (then back with the starting guns, points, Jause and herbs kept); everyone down
   is game over and the room goes back to its lobby. The events and the special weapons' effects for
   the others wait for part 3.
+  Part 3 (2026-10-18): every hiker holds a copy of their gun and a ghost of their guns replays their
+  shots, swings and specials on the other screens (impacts and muzzle flash, the Alphorn's rings,
+  shells, Knödel and their heaps, sleds, puddles and flames, the Tanzboden, notes, the Böllerschuss),
+  harmless there; thrown equipment flies as harmless copies (a Kuhglocke still lures the host's
+  enemies). Burning enemies burn on every screen; a guest's Mistgabel lifts, carries and hurls the
+  host's enemy; the Krampus-Rute drop goes to whoever takes it first. The host runs the events and
+  every guest sees copies of Resi, the Bierfassl, the Murmeltier and the Tourist; milking, tapping
+  and catching go to the host, the reward to the player who did it, with a banner for the others.
 
 ## 13. Project structure
 

@@ -263,7 +263,8 @@ godot --headless res://tools/models/build_props.tscn
 
 ## Co-op (M7)
 
-Plan and decisions: `NETWORKING.md`. Part 1 (relay, lobby, walking the hut together) is in.
+Plan and decisions: `NETWORKING.md`. Parts 1 to 3 are in: relay and lobby, the core loop with
+downed and revive, and the special weapons, equipment and events.
 
 - **Relay**: `relay/` is the helper Worker `berghittn-relay` with the `Room` Durable Object (one per
   4-digit room code). It has no public route; `functions/api/room/[code].js` (Pages Function on
@@ -280,21 +281,39 @@ Plan and decisions: `NETWORKING.md`. Part 1 (relay, lobby, walking the hut toget
   trouser colour (`HikerStyle`), saved with the settings; create a room or join by code; the invite
   link `?room=<code>` opens the lobby straight into that room. The host sees everyone on the stage,
   can remove players and starts with at least 2.
-- **Match**: main adds three nodes on every peer (the same paths, so RPCs match):
+- **Match**: main adds four nodes on every peer (the same paths, so RPCs match):
   - `CoopPlayers`: our pose, life (alive / downed / out) and health 20 times a second; the others as
     `Hiker`s 100 ms in the past (`PoseBuffer`). On the host the hikers are in group `player`, so enemies
     go for them; a hit is sent to that player (`take_damage` there, with the attacking puppet for the
     Pfanne's guard). Downed teammates get a `ReviveSpot` (hold E, 4 s) and a `MapMarker`; out players
     watch a teammate from behind and come back on the next `wave_started`.
+    Part 3: each hiker `arm()`s a ghost `WeaponHolder` (`scenes/net/ghost_weapons.tscn`, `ghost =
+    true`) and holds a copy of the gun in hand (`WeaponPickup.model_of`, pitched with the aim sent in
+    the pose). Our holder's `acted` (shot, special, swing, blow, hold, release) goes out with the aim
+    transform and the ghost `replay`s it through the weapon's own behavior: in ghost mode
+    `_bodies_in` finds nothing and `strike` hits nothing, so only the look and the sound happen
+    (plain guns: impacts and a muzzle flash; the flame: a stream of `Flames`). Thrown equipment
+    (`PlayerEquipment.threw`) is copied with `harmless` set; a copied Kuhglocke still lures, so a
+    guest's bell pulls the host's enemies. The Böllerschuss is passed on as its blast.
   - `CoopEnemies`: on the host it numbers the WaveManager's enemies and sends spawns, 13-byte
-    snapshots at 20 Hz, actions (`Enemy.posed`), damage and kills with the hitting peer. Guests keep
-    puppets (`Enemy.puppet`) under it; a hit on a puppet goes to the host through `Enemy.hit_relay`
-    (receive_hit, scorch, ignite, dance, slows, stuns, flee, knockback) and flashes at once.
+    snapshots at 20 Hz (14 bytes each: id, position, yaw, lean, a burning flag), actions
+    (`Enemy.posed`), damage and kills with the hitting peer. Guests keep puppets (`Enemy.puppet`)
+    under it; a hit on a puppet goes to the host through `Enemy.hit_relay` (receive_hit, scorch,
+    ignite, dance, slows, stuns, flee, knockback, and the Mistgabel's lift, carry_to and hurl) and
+    flashes at once. A puppet on a guest's fork is moved by that guest (`puppet_driven`), and the
+    host's enemy follows its carry and hurl.
   - `CoopWorld`: waves, doors (`request_unlock`, refunds), barricades (board counts, `request_board`),
-    the Hüttentruhe (`rolled` / `roll_for` / `taken`), and game over (`Net.back_to_lobby`, relay `lobby`).
+    the Hüttentruhe (`rolled` / `roll_for` / `taken`), dropped weapons (the Krampus-Rute: the host's
+    `share_drop`, a guest's `request_drop`, first come), and game over (`Net.back_to_lobby`, relay
+    `lobby`).
+  - `CoopEvents`: the host's EventDirector sends the events; each actor is shared with an id and the
+    guests get a copy (`copy = true`) moved by 20 Hz snapshots, its state set by `net_state` /
+    `net_apply`. Milking, tapping and catching on a copy are `request`s; the host's actor decides
+    (`net_request`) and the asker's game pays the reward (`net_granted`). `Coop.announce` shows a
+    banner on every screen (the reward's own banner stays with the one who got it).
   - `Coop` (static) says where they are and `is_guest()`; `Player.life`, `WeaponHolder.set_downed` /
-    `reset_loadout` carry downed and bled out. The events stay off in co-op until part 3. In co-op the
-    world never pauses; the click that takes the mouse locks the trigger until it is let go.
+    `reset_loadout` carry downed and bled out. In co-op the world never pauses; the click that takes
+    the mouse locks the trigger until it is let go.
 - **Build id**: `tools/build_web.mjs` writes `build_id.txt` (gitignored, packed via the preset's
   include filter); the relay turns away a browser whose build differs from the host's.
 - **Hiker**: `godot --headless --script res://tools/models/build_hiker.gd` builds
@@ -309,6 +328,7 @@ node --test relay/test/relay.test.mjs           # ids, cap of 4, routing, kick, 
 node tools/net_test.mjs                         # tests/net_lobby: roster, hiker change, start, late joiner refused
 node tools/net_test.mjs res://tests/net_match.tscn   # two main scenes: invite join, each sees the other's hiker
 node tools/net_test.mjs res://tests/net_core.tscn    # enemies + kill points, door, board, chest, down/revive, out/back, game over
+node tools/net_test.mjs res://tests/net_specials.tscn  # held gun, replayed Alphorn, copied bell, burning, fork, Rute drop, all four events
 ```
 
 ## Tests

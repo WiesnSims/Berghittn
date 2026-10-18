@@ -4,13 +4,21 @@ extends CharacterBody3D
 ## and heads for the Stube on the navmesh, the long way round through the Schuppen and over the Terrasse
 ## when those are open. He only walks while a player is near him (he would never find the way alone), and enemies go for him like for a player (group "escorts", see Enemy). Escorted there
 ## alive, he hands the nearest player the Eisstöcke, the only ones in the game.
+## Co-op (M7, CoopEvents): he walks on the host, escorted by any player and chased by the host's
+## enemies; a guest's copy only shows him. The Eisstöcke go to the nearest player's own game.
 
 enum State { WAITING, WALKING, ARRIVED, DEAD, GONE }
 
 const EISSTOCK: EquipmentData = preload("res://data/equipment/eisstock.tres")
 
 var health: int = 0
+## Co-op: a guest's copy of the host's Tourist.
+var copy: bool = false
 var _state: State = State.WAITING
+# What his speech bubble says (a translation key, "" when it is hidden), so a copy can say it too.
+var _bubble_key: String = ""
+# A copy: where he was a frame ago, for his walk.
+var _copy_last: Vector3
 var _goal: Vector3
 # Points he walks by on the way to the goal, in order (see EventDirector.guest_way).
 var _way: Array[Vector3] = []
@@ -39,7 +47,47 @@ func start(at: Vector3, goal: Vector3, way: Array[Vector3] = []) -> void:
 	_time_left = Constants.GUEST_TIME
 	_state = State.WAITING
 	_update_bar()
-	Events.event_announced.emit(tr("EVENT_GUEST_ARRIVES"))
+	Coop.announce("EVENT_GUEST_ARRIVES")
+
+
+# Co-op copy interface (see CoopEvents).
+
+func start_copy() -> void:
+	_copy_last = global_position
+	health = Constants.GUEST_HEALTH
+	_update_bar()
+
+
+func net_state() -> Array:
+	return [int(_state), health, _bubble_key]
+
+
+func net_apply(state: Array) -> void:
+	var new_state: State = int(state[0]) as State
+	if int(state[1]) != health:
+		health = int(state[1])
+		_update_bar()
+	if String(state[2]) != _bubble_key:
+		_say(String(state[2]))
+	if new_state == _state:
+		return
+	_state = new_state
+	match new_state:
+		State.ARRIVED:
+			Sound.play_at(&"camera", global_position + Vector3.UP * 1.5)
+			_drop_marker()
+		State.DEAD:
+			_fall_down()
+
+
+func net_request(_what: StringName, _peer: int) -> bool:
+	return false
+
+
+## Host: he handed us (a guest) his Eisstöcke.
+func net_granted(what: StringName, player: Player) -> void:
+	if what == &"eisstock":
+		_hand_over(player)
 
 
 func is_alive() -> bool:
@@ -53,7 +101,7 @@ func has_arrived() -> bool:
 # Target interface (what enemies need from whatever they chase, see Enemy._nearest_target).
 
 func is_targetable() -> bool:
-	return is_alive()
+	return is_alive() and not copy
 
 
 func take_damage(amount: int, _attacker: Node3D = null) -> void:
@@ -61,13 +109,19 @@ func take_damage(amount: int, _attacker: Node3D = null) -> void:
 		return
 	health -= amount
 	_update_bar()
-	_bubble.text = tr("GUEST_OUCH")
-	_bubble.visible = true
+	_say("GUEST_OUCH")
 	if health <= 0:
 		_die()
 
 
 func _physics_process(delta: float) -> void:
+	if copy:
+		var moved: Vector3 = _flat(global_position - _copy_last)
+		_copy_last = global_position
+		velocity = moved / maxf(delta, 0.001)
+		_moving = move_toward(_moving, 1.0 if velocity.length() > 0.2 else 0.0, delta * 4.0)
+		_animate(delta)
+		return
 	match _state:
 		State.WAITING, State.WALKING:
 			_time_left -= delta
@@ -83,8 +137,7 @@ func _physics_process(delta: float) -> void:
 				_walk(delta)
 			else:
 				_stand(delta)
-				_bubble.text = tr("GUEST_LOST")
-				_bubble.visible = true
+				_say("GUEST_LOST")
 		State.ARRIVED, State.DEAD:
 			_stand(delta)
 			_leave_left -= delta
@@ -109,8 +162,8 @@ func _walk(delta: float) -> void:
 	move_and_slide()
 	rotation.y = lerp_angle(rotation.y, atan2(-direction.x, -direction.z), minf(6.0 * delta, 1.0))
 	_moving = move_toward(_moving, 1.0, delta * 4.0)
-	if _bubble.text == tr("GUEST_LOST"):
-		_bubble.visible = false
+	if _bubble_key == "GUEST_LOST":
+		_say("")
 
 
 func _stand(delta: float) -> void:
@@ -124,27 +177,38 @@ func _stand(delta: float) -> void:
 func _arrive() -> void:
 	_state = State.ARRIVED
 	_leave_left = 4.0
-	_bubble.text = tr("GUEST_URIG")
-	_bubble.visible = true
+	_say("GUEST_URIG")
 	# A souvenir photo of the Stube.
 	Sound.play_at(&"camera", global_position + Vector3.UP * 1.5)
-	Events.event_announced.emit(tr("GUEST_URIG"))
+	Coop.announce("GUEST_URIG")
 	_drop_marker()
-	var player := _nearest_player(INF)
-	if player:
-		player.equipment.give(EISSTOCK, EISSTOCK.max_carry)
-		# After his line, so both banners are seen.
-		get_tree().create_timer(2.0).timeout.connect(func() -> void: Events.event_announced.emit(tr("EVENT_GUEST_REWARD")))
+	var nearest: Node3D = _nearest_player(INF)
+	if nearest is Player:
+		_hand_over(nearest as Player)
+	elif nearest and Coop.is_host():
+		Coop.events.grant(self, Coop.peer_of(nearest), &"eisstock")
+	if nearest and Coop.is_host():
+		Coop.announce("EVENT_GUEST_REWARD_TO", [Coop.name_of(Coop.peer_of(nearest))], Coop.peer_of(nearest))
+
+
+func _hand_over(player: Player) -> void:
+	player.equipment.give(EISSTOCK, EISSTOCK.max_carry)
+	# After his line, so both banners are seen.
+	get_tree().create_timer(2.0).timeout.connect(func() -> void: Events.event_announced.emit(tr("EVENT_GUEST_REWARD")))
 
 
 func _die() -> void:
 	_state = State.DEAD
 	_leave_left = 5.0
+	_fall_down()
+	Coop.announce("EVENT_GUEST_DIED")
+
+
+func _fall_down() -> void:
 	collision_layer = 0
 	_bar.visible = false
-	_bubble.visible = false
+	_say("")
 	_drop_marker()
-	Events.event_announced.emit(tr("EVENT_GUEST_DIED"))
 	var tween := create_tween()
 	tween.tween_property(_model, "rotation:x", -PI * 0.5, 0.6).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 
@@ -153,7 +217,13 @@ func _give_up() -> void:
 	_state = State.DEAD
 	_leave_left = 0.5
 	_drop_marker()
-	Events.event_announced.emit(tr("EVENT_GUEST_GAVE_UP"))
+	Coop.announce("EVENT_GUEST_GAVE_UP")
+
+
+func _say(key: String) -> void:
+	_bubble_key = key
+	_bubble.text = tr(key) if key != "" else ""
+	_bubble.visible = key != ""
 
 
 func _drop_marker() -> void:
@@ -168,12 +238,13 @@ func _update_bar() -> void:
 	_bar.modulate = Color(1.0 - share, 0.4 + 0.5 * share, 0.3)
 
 
-func _nearest_player(within: float) -> Player:
-	var best: Player = null
+## The nearest player on their feet (in co-op the host's hikers too) within `within`, or null.
+func _nearest_player(within: float) -> Node3D:
+	var best: Node3D = null
 	var best_distance: float = within
 	for node: Node in get_tree().get_nodes_in_group("player"):
-		var player := node as Player
-		if player == null or player.health.is_dead():
+		var player := node as Node3D
+		if player == null or not player.call("is_targetable"):
 			continue
 		var distance: float = player.global_position.distance_to(global_position)
 		if distance <= best_distance:

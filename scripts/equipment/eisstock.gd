@@ -7,6 +7,8 @@ extends Node3D
 const RADIUS: float = 0.16
 
 var velocity: Vector3
+## Co-op (M7): another player's, as we see it: it slides and clatters, but hits nobody here.
+var harmless: bool = false
 var _bounces_left: int = Constants.EISSTOCK_BOUNCES
 var _thrower: Node3D
 var _hit: Dictionary = {}
@@ -94,7 +96,9 @@ func _strike() -> void:
 			continue
 		_hit[id] = now
 		Sound.play_at(&"eisstock_hit", global_position)
-		if enemy.data.is_boss:
+		if harmless:
+			pass
+		elif enemy.data.is_boss:
 			enemy.receive_hit(Constants.EISSTOCK_BOSS_DAMAGE, false, false, _thrower)
 			if enemy.is_alive():
 				enemy.apply_knockback(velocity.normalized() * 7.0)

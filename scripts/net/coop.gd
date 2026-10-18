@@ -7,6 +7,22 @@ extends RefCounted
 static var players: CoopPlayers
 static var enemies: CoopEnemies
 static var world: CoopWorld
+static var events: CoopEvents
+
+
+## A banner (a translation key, with `args` for its %s) on this screen and, from the host, on every
+## guest's too; `except_peer` does not get it (they had a banner of their own). Solo: just here.
+static func announce(key: String, args: Array = [], except_peer: int = 0) -> void:
+	if except_peer == 0 or not Net.in_match() or except_peer != Net.my_id():
+		var text: String = TranslationServer.translate(key)
+		Events.event_announced.emit(text % args if not args.is_empty() else text)
+	if is_host() and events:
+		events.say(key, args, except_peer)
+
+
+## A player's name as the lobby shows it.
+static func name_of(peer: int) -> String:
+	return HikerStyle.display_name(Net.roster.get(peer, {}), peer)
 
 
 ## A co-op match runs and the host decides the world.

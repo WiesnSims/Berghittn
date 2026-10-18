@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_holder.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/weapons/impact_marks.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/effects/effect_pool.gd" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/effects/impact_puff.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/effects/hit_puff.tscn" id="5"]
+
+[node name="GhostWeapons" type="Node3D"]
+top_level = true
+script = ExtResource("1")
+ghost = true
+
+[node name="Motion" type="Node3D" parent="."]
+
+[node name="ImpactMarks" type="Node3D" parent="."]
+script = ExtResource("2")
+
+[node name="ImpactPuffs" type="Node3D" parent="."]
+script = ExtResource("3")
+effect = ExtResource("4")
+size = 4
+
+[node name="HitPuffs" type="Node3D" parent="."]
+script = ExtResource("3")
+effect = ExtResource("5")
+size = 4
