@@ -101,12 +101,14 @@ const MARKER_COLUMN_ALPHA: float = 0.22
 const MARKER_COLUMN_FADE_NEAR: float = 6.0
 const MARKER_COLUMN_FADE_FAR: float = 14.0
 # Events (section 8a). Die Resi: first wave, waves between visits, seconds into the wave she arrives,
-# how long she stays, how far her bell carries, seconds of milking, and her walking and bolting speeds.
+# how long she stays, how near a player must come before her bell lures at all, how far it carries
+# then, seconds of milking, and her walking and bolting speeds.
 const RESI_FIRST_WAVE: int = 3
 const RESI_EVERY_MIN: int = 3
 const RESI_EVERY_MAX: int = 5
 const RESI_DELAY: float = 12.0
 const RESI_STAY_TIME: float = 45.0
+const RESI_NOTICE_RADIUS: float = 10.0
 const RESI_LURE_RADIUS: float = 20.0
 const RESI_MILK_TIME: float = 2.5
 const RESI_WALK_SPEED: float = 1.1

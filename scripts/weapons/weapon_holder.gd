@@ -54,6 +54,10 @@ var _reload_total: float = 0.0
 # A click that came in while the gun was still cycling; it fires as soon as it can, so fast clicking
 # is never swallowed.
 var _fire_buffer_left: float = 0.0
+# After a reload, a trigger (or fanning right click) still held from before does not fire until it is
+# let go: only a new pull once the gun is ready shoots (play-test 2026-10-18).
+var _fire_locked: bool = false
+var _fan_locked: bool = false
 var _reload_left: float = 0.0
 # What the running reload fills the gun to.
 var _reload_target: int = 0
@@ -339,6 +343,8 @@ func _physics_process(delta: float) -> void:
 		if _reload_left <= 0.0:
 			_finish_reload()
 		return
+	_fire_locked = _fire_locked and Input.is_action_pressed("fire")
+	_fan_locked = _fan_locked and Input.is_action_pressed("secondary")
 	# An empty gun reloads by itself once its last shot has cycled (play-test 2026-10-17: a click on
 	# the empty gun during the cycle could run out before it counted, so R was needed).
 	# (Not while the last round of a held tune still plays: that one ends first.)
@@ -358,7 +364,7 @@ func _physics_process(delta: float) -> void:
 		return
 	if was_playing:
 		_stop_playing()
-	_fanning = weapon.secondary == WeaponData.Secondary.FAN and (force_aim or Input.is_action_pressed("secondary"))
+	_fanning = weapon.secondary == WeaponData.Secondary.FAN and (force_aim or Input.is_action_pressed("secondary")) and not _fan_locked
 	if _fanning:
 		if _cooldown <= 0.0:
 			if mag > 0:
@@ -383,7 +389,7 @@ func _physics_process(delta: float) -> void:
 	else:
 		_fire_buffer_left = maxf(_fire_buffer_left - delta, 0.0)
 	# Semi-auto fires once per click, as fast as the clicks come (up to fire_rate).
-	var wants_fire: bool = Input.is_action_pressed("fire") if weapon.is_auto else _fire_buffer_left > 0.0
+	var wants_fire: bool = (Input.is_action_pressed("fire") if weapon.is_auto else _fire_buffer_left > 0.0) and not _fire_locked
 	if wants_fire and _cooldown <= 0.0:
 		_fire_buffer_left = 0.0
 		if mag > 0:
@@ -440,6 +446,10 @@ func start_reload() -> void:
 	var chamber: float = weapon.chamber_time * speed if mag == 0 else 0.0
 	_reload_left = weapon.reload_time * speed + chamber
 	_reload_total = _reload_left
+	# A click from before the reload (still buffered from the last shot's cycle) must not fire after it.
+	_fire_buffer_left = 0.0
+	_fire_locked = true
+	_fan_locked = true
 	reload_started.emit(_reload_left)
 	_stop_loop()
 	Sound.play(weapon.reload_sound)

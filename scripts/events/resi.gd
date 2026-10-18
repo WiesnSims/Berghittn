@@ -1,8 +1,9 @@
 class_name Resi
 extends CharacterBody3D
 ## Die Resi (section 8a): a lost Almkuh who wanders down into the beer garden for a while. Hold E to
-## milk her (full heal and a free Brettljause helping). Her bell draws the enemies around her
-## (group "lures", see Enemy), and if one reaches her she bolts. The EventDirector sends her in.
+## milk her (full heal and a free Brettljause helping). Once a player has come near her, her bell draws
+## the enemies around her (group "lures", see Enemy), and if one reaches her she bolts. Until then they
+## leave her alone, so she is not chased off before anyone got to her. The EventDirector sends her in.
 
 enum State { ARRIVING, GRAZING, MILKED, LEAVING, BOLTING }
 
@@ -27,6 +28,8 @@ var _wait_left: float = 0.0
 var _leg_time: float = 0.0
 var _milk: float = 0.0
 var _milk_since: float = INF
+# Whether a player has come near her yet; only from then on does her bell lure (and stays luring).
+var _noticed: bool = false
 var _walk_phase: float = 0.0
 var _moving: float = 0.0
 var _head_down: float = 0.0
@@ -71,7 +74,7 @@ func is_milkable() -> bool:
 # Lure interface (see Enemy._find_lure).
 
 func is_luring() -> bool:
-	return is_milkable()
+	return _noticed and is_milkable()
 
 
 func lure_radius() -> float:
@@ -114,6 +117,8 @@ func interact(player: Node3D) -> void:
 
 func _physics_process(delta: float) -> void:
 	_milk_since += delta
+	if not _noticed:
+		_noticed = _player_near()
 	_moo_left -= delta
 	if _moo_left <= 0.0:
 		_moo()
@@ -177,6 +182,14 @@ func _leave(bolt: bool) -> void:
 func _moo() -> void:
 	_moo_left = _rng.randf_range(Constants.RESI_MOO_MIN, Constants.RESI_MOO_MAX)
 	Sound.play_at(&"resi_moo", global_position + Vector3.UP * 1.3)
+
+
+func _player_near() -> bool:
+	for node: Node in get_tree().get_nodes_in_group("player"):
+		var player := node as Player
+		if player != null and not player.health.is_dead() and player.global_position.distance_to(global_position) <= Constants.RESI_NOTICE_RADIUS:
+			return true
+	return false
 
 
 func _drop_marker() -> void:

@@ -460,6 +460,13 @@ open, and is hit once it has climbed in. `chamber`: guns with a chamber hold mag
 with a round chambered) and mag after a reload from empty.
 
 ```
+godot --headless --fixed-fps 60 res://tests/fire_after_reload.tscn
+```
+
+A click buffered from before a reload, a click during it, and a trigger held through it must not
+fire once the reload is done; only a new pull afterwards does (#73).
+
+```
 godot --headless --fixed-fps 60 res://tests/m2_smoke.tscn
 ```
 
