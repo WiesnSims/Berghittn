@@ -63,6 +63,14 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "UI_SETTINGS"
 
+[node name="LeaveButton" type="Button" parent="Center/Box"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "UI_LEAVE_MATCH"
+
 [node name="Controls" type="Label" parent="Center/Box"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)

@@ -14,6 +14,7 @@ Settings="*res://scripts/autoload/settings.gd"
 Events="*res://scripts/autoload/events.gd"
 GameState="*res://scripts/autoload/game_state.gd"
 Sound="*res://scripts/autoload/sound.gd"
+Net="*res://scripts/autoload/net.gd"
 
 [input]
 

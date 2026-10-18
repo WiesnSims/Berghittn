@@ -11,3 +11,4 @@ node_modules/
 .playwright-mcp/
 __pycache__/
 tools/textures/cache/
+build_id.txt

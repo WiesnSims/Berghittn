@@ -22,6 +22,8 @@ var locale: String = Constants.DEFAULT_LOCALE
 var volumes: Dictionary = {}
 ## Share of the window resolution the 3D view renders at; lower helps weak laptops.
 var render_scale: float = 1.0
+## Co-op name and hiker (HikerStyle profile), chosen in the lobby.
+var profile: Dictionary = HikerStyle.default_profile()
 
 
 func _ready() -> void:
@@ -72,6 +74,7 @@ func _load() -> void:
 	render_scale = clampf(file.get_value(SECTION, "render_scale", render_scale), Constants.RENDER_SCALE_MIN, 1.0)
 	for bus: StringName in BUSES:
 		set_volume(bus, file.get_value(SECTION, "volume_" + bus, volume(bus)))
+	profile = HikerStyle.sanitize(file.get_value(SECTION, "profile", profile))
 
 
 func save() -> void:
@@ -83,4 +86,5 @@ func save() -> void:
 	file.set_value(SECTION, "render_scale", render_scale)
 	for bus: StringName in BUSES:
 		file.set_value(SECTION, "volume_" + bus, volume(bus))
+	file.set_value(SECTION, "profile", profile)
 	file.save(SAVE_PATH)

@@ -444,3 +444,24 @@ const BAND_FADE_TIME: float = 1.5
 const BAND_INTRO_MAX: float = 15.0
 const BAND_PITCH_PER_WAVE: float = 0.02
 const BAND_PITCH_MAX: float = 1.2
+
+# Co-op (M7, NETWORKING.md).
+## The live site; the relay sits behind it at /api/room/<code>.
+const NET_SITE: String = "https://berghittn.pages.dev"
+const NET_CODE_LENGTH: int = 4
+## The host can start once this many are in the lobby.
+const NET_MIN_PLAYERS: int = 2
+const NET_MAX_PLAYERS: int = 4
+## Queued packets go out at most this long after they were queued: about 20 frames a second, which
+## is what the Free plan's quota is planned around (NETWORKING.md section 7).
+const NET_FLUSH_INTERVAL_MS: int = 50
+const NET_PING_INTERVAL_MS: int = 20000
+## Frames stay under the relay's 64 KiB limit.
+const NET_FRAME_SOFT_LIMIT: int = 48 * 1024
+const NET_SOCKET_BUFFER: int = 1 << 20
+## Other players are drawn this far in the past, between two received poses.
+const NET_INTERPOLATION_DELAY: float = 0.1
+## Players stand this far apart at the start of a co-op match (m, along the spawn's right).
+const NET_SPAWN_SPACING: float = 1.2
+## How often a player sends where they are (s).
+const NET_POSE_INTERVAL: float = 0.05

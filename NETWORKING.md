@@ -63,7 +63,10 @@ The Durable Object does not understand the game. It knows sockets, peer ids and 
 - Binary frames: `[type u8][peer id u8][payload…]`.
   - Client → relay: `peer id` is the target (0 = everyone, 1 = host, n = that peer).
   - Relay → client: `peer id` is the sender. The relay always rewrites it, so nobody can pretend to be the host.
-- Control frames from the relay: `WELCOME(your id, host build)`, `PEER_JOINED(id)`, `PEER_LEFT(id)`, `ROOM_CLOSED`.
+- Control frames from the relay (JSON text): `welcome` (your id, the code, who is there), `joined`,
+  `left`, and `closed` with a reason (`host_left`, `kicked`, `full`, `started`, `version`, `no_room`)
+  sent just before the relay closes a socket (built 2026-10-18: a close the relay starts does not
+  always arrive as a close event, so the reason travels as a message and as the close reason).
 - If the host's socket closes, the room closes for everyone (no host migration; section 8).
 - Safety: max 4 sockets, max frame size 64 KiB, and a per-socket rate limit (frames above about 60/s
   are dropped) so a broken client cannot burn the daily quota.
