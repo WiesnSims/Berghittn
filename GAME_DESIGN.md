@@ -186,7 +186,7 @@ effects, see section 6a), `secondary` (what right click does, see the rules belo
 | `knoedelwerfer` | Knödelwerfer | wonder weapon | 180 area | 1.0 | 12 / 36 | chest only, rare |
 | `rodelkanone` | Rodelkanone | wonder weapon | 300 line | 0.4 | 4 / 12 | chest only, rare |
 | `brennkessel` | Brennkessel-Werfer | wonder weapon | 15 per tick | 8 ticks/s | 100 fuel / 200 | chest only, rare |
-| `harmonika` | Steirische Harmonika | wonder weapon | 20/s while dancing | 0.3 | 3 / 9 | chest only, rare |
+| `harmonika` | Steirische Harmonika | wonder weapon | 20/s while dancing | 0.3 | 4 / 12 | chest only, rare |
 | `handboeller` | Handböller | hand mortar | 150 area | 0.7 | 1 / 10 | 1500 (wall-buy, Seilbahn) |
 | `schmarrnpfanne` | Schmarrnpfanne | melee | 90 | 1.0 | – | 400 (wall-buy, Küche) |
 | `goassl` | Goaßl | melee (whip) | 40 | 1.5 | – | chest only |
@@ -231,7 +231,8 @@ Rules:
     (10 a second, 3 s after leaving it). Covers a doorway or a window while the flame works elsewhere.
   - `rodelkanone`: the Kehre (press): a sled shot with a double charge (two rounds) that banks off
     walls up to three times instead of breaking and runs 25 m; for rooms and corridors where a
-    straight 15 m never fits.
+    straight 15 m never fits. After each bank it turns 60 % of the way towards the nearest enemy
+    it can see on its side of the wall (play-test 2026-10-19).
   - Melee weapons live on V, not in hand, so their mode is **holding V past the blow** (M5): tap V
     swings as before, keep it held and the weapon stays up.
   - `goassl`: the lash (hold V): the whip wraps round the first body along the aim within 7 m and
@@ -341,7 +342,7 @@ Alpine folk culture.
   plays on the musette accordion (M6) while golden notes rise all around (3D shapes, user decision
   2026-10-17: quarters, eighths, sixteenths, beamed pairs and hollow half notes, mixed), with a ring
   rolling out to the 8 m edge; the Tanzboden plays the Landler, a slow tune in three. The bellows pump through the polka and close as the next can start (3.3 s, with the white
-  ready ring). 3 / 9, reload 3 s (the air button: bellows pulled wide open and pressed shut). In the
+  ready ring). 4 / 12 (play-test 2026-10-19; was 3 / 9), reload 3 s (the air button: bellows pulled wide open and pressed shut). In the
   chest at weight 1.
 
 **Regular absurd weapons**

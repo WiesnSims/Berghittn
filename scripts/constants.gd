@@ -323,6 +323,10 @@ const RODEL_LANE: float = 0.7
 const RODEL_STEP: float = 0.4
 const RODEL_MAX_DROP: float = 4.0
 const RODEL_SIDE_PUSH: float = 1.2
+# The Kehre's aim after each bank: how far of the way it turns towards the nearest enemy it can see
+# (0 not at all, 1 straight at it), and the height it looks from and at.
+const RODEL_KEHRE_AIM: float = 0.6
+const RODEL_AIM_EYE: float = 0.8
 # Steirische Harmonika: seconds a polka makes enemies dance, how much harder other hits land on a
 # dancer, and how long a dancer keeps dancing after stepping off a Tanzboden.
 const DANCE_TIME: float = 4.0
