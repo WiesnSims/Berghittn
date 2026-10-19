@@ -491,6 +491,8 @@ const GHOST_FLAME_LIFETIME: float = 0.45
 ## Where a hiker holds their gun (m, from their feet; -Z ahead) and how big it is drawn there.
 const HIKER_GUN_AT: Vector3 = Vector3(0.16, 1.26, -0.42)
 const HIKER_GUN_SCALE: float = 1.3
+# A teammate's name tag in the match, fixed on screen: about 18 px high at 720p.
+const HIKER_TAG_SCREEN_SIZE: float = 0.0008
 ## The hiker's arms while holding a gun (degrees per bone, as EnemyRig.stance).
 const HIKER_HOLD_STANCE: Dictionary = {
 	&"arm_r": Vector3(45.0, 0.0, 6.0), &"forearm_r": Vector3(40.0, 0.0, 0.0),

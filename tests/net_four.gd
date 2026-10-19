@@ -6,9 +6,10 @@ extends Node
 ## keeps 24 enemies alive while everyone kills one now and then, and each player measures what the
 ## relay brings them (NETWORKING.md section 9: under 10 KiB/s down) and the host its frame time.
 ##
-## Bench mode for the browser measurement: --bench=<seconds> --players=<room size> --bots=<processes>
-## (the room's other players are real browsers; the bots wait for them, then play as above for that
-## long without checking anything).
+## Bench mode for the browser measurement: --bench=<seconds> --players=<room size>, with --build=<id>
+## of the deployed build. The room's other players are real browsers, so the game sits at /root/Main
+## as in a browser (RPC paths must match) and nothing is checked: the host starts once everyone is
+## in, the bots walk and fire, the host keeps 24 enemies alive for that long and then leaves.
 
 const TIMEOUT: float = 40.0
 ## Where each slot (peers in order) stands, from the spawn (m).
@@ -31,7 +32,6 @@ var _player: Player
 var _waves: WaveManager
 var _role: String
 var _players: int
-var _bots: int
 var _bench: float
 var _failed: String = ""
 # Label -> {peer: true} of everyone else who reached it.
@@ -50,15 +50,22 @@ func _ready() -> void:
 		return
 	_role = _arg("role", "host")
 	_players = int(_arg("players", "4"))
-	_bots = int(_arg("bots", str(_players)))
 	_bench = float(_arg("bench", "0"))
 	# Never dressed: each must get their peer's default.
 	Settings.profile = {}
 	_main = (load("res://scenes/main.tscn") as PackedScene).instantiate()
-	add_child(_main)
+	if _bench > 0.0:
+		get_tree().root.add_child.call_deferred(_main)
+		await _main.ready
+	else:
+		add_child(_main)
 	_player = _main.get_node("Player") as Player
 	_waves = _main.get_node("WaveManager") as WaveManager
-	var ok: bool = await _run()
+	var ok: bool = false
+	if _bench > 0.0:
+		ok = await _run_bench()
+	else:
+		ok = await _run()
 	Engine.set_meta("net_four_done", 0 if ok else 1)
 	# Our last mark is still in the relay peer's next frame.
 	await get_tree().create_timer(0.5).timeout
@@ -110,6 +117,37 @@ func _run() -> bool:
 	if host:
 		await get_tree().create_timer(1.0).timeout
 		Net.leave()
+	return true
+
+
+func _run_bench() -> bool:
+	var host: bool = _role == "host"
+	await get_tree().process_frame
+	if host:
+		Net.create_room()
+		if not await _until(func() -> bool: return Net.in_lobby()):
+			return _fail("no room")
+		print("ROOM %s" % Net.code)
+		if not await _until(func() -> bool: return Net.roster.size() == _players, 120.0):
+			return _fail("only %d of %d players came" % [Net.roster.size(), _players])
+		Net.start_match()
+	if not await _until(func() -> bool: return Net.in_match() and Coop.world != null):
+		return _fail("no match (%s)" % Net.state)
+	_player.health.invincible_left = 1.0e9
+	_spot = _spot_of(Net.my_id())
+	_playing = true
+	print("BENCH playing")
+	if not host:
+		await _until(func() -> bool: return not Net.in_match(), _bench + 60.0)
+		return true
+	await get_tree().create_timer(8.0).timeout
+	_waves._start_wave(CROWD_WAVE)
+	_fill()
+	print("BENCH full")
+	await get_tree().create_timer(_bench).timeout
+	_playing = false
+	print("BENCH done")
+	Net.leave()
 	return true
 
 
@@ -239,7 +277,7 @@ func _average(values: Array) -> float:
 ## Every bot reaches `label` before any goes on.
 func _sync(label: String) -> bool:
 	_mark.rpc(label)
-	if await _until(func() -> bool: return (_marks.get(label, {}) as Dictionary).size() >= _bots - 1):
+	if await _until(func() -> bool: return (_marks.get(label, {}) as Dictionary).size() >= _players - 1):
 		return true
 	return _fail("only %s reached '%s'" % [_marks.get(label, {}).keys(), label])
 
