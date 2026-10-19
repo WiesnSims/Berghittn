@@ -75,7 +75,8 @@ func _run() -> void:
 		if not await _until(func() -> bool: return Net.roster.size() == _players, 180.0 if _browsers else TIMEOUT):
 			return _check(false, "%d of %d players came" % [Net.roster.size(), _players])
 		Net.start_match()
-	if not await _until(func() -> bool: return Net.in_match() and Coop.world != null):
+		print("STARTED")
+	if not await _until(func() -> bool: return Net.in_match() and Coop.world != null, 240.0 if _browsers else TIMEOUT):
 		return _check(false, "match started")
 	var points_before: int = _player.points.total
 	if host:
@@ -118,6 +119,11 @@ func _bot(stand: Vector3, host: bool) -> void:
 	for enemy: Enemy in _hit.keys():
 		if not enemy.is_alive():
 			_hit.erase(enemy)
+	# Killed by the other player (or by us): forgotten, so a pooled body sent in again starts afresh.
+	for id: int in _born.keys():
+		var body := instance_from_id(id) as Enemy
+		if body == null or not body.is_alive():
+			_born.erase(id)
 	for enemy: Enemy in _alive_enemies():
 		if _hit.has(enemy):
 			continue
