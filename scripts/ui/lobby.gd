@@ -55,7 +55,7 @@ static func reason_text(reason: String) -> String:
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	_profile = HikerStyle.sanitize(Settings.profile)
+	_profile = Settings.profile_for(Net.my_id())
 	_build()
 	Net.state_changed.connect(_refresh)
 	Net.roster_changed.connect(_refresh)
@@ -293,7 +293,7 @@ func _swatches(colors: Array[Color], field: String, into: Array[Button]) -> Grid
 # --- behaviour ------------------------------------------------------------------------------------
 
 func _load_profile() -> void:
-	_profile = HikerStyle.sanitize(Settings.profile)
+	_profile = Settings.profile_for(Net.my_id())
 	_name_edit.text = _profile["name"]
 
 
@@ -348,6 +348,9 @@ func _my_key() -> int:
 func _refresh() -> void:
 	if not visible:
 		return
+	# Not dressed yet: our peer id (known once in the room) picks the default.
+	if Settings.profile.is_empty():
+		_profile = Settings.profile_for(Net.my_id())
 	var online: bool = Net.state != Net.State.OFFLINE
 	_offline_box.visible = not online
 	_room_box.visible = Net.in_lobby()

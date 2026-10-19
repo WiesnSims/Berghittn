@@ -20,6 +20,12 @@ func add(now: int, sent: int, at: Vector3, yaw: float, extra: Vector3 = Vector3.
 		_has_offset = true
 	if not _poses.is_empty() and sent <= int(_poses[-1][0]):
 		return
+	# Nothing came for a while because nothing changed (CoopEnemies leaves still enemies out): it
+	# stood there until one interval ago, so it sets off from there instead of jumping.
+	var interval: int = roundi(Constants.NET_POSE_INTERVAL * 1000.0)
+	if not _poses.is_empty() and sent - int(_poses[-1][0]) > interval * 3 / 2:
+		var last: Array = _poses[-1]
+		_poses.append([sent - interval, last[1], last[2], last[3]])
 	_poses.append([sent, at, yaw, extra])
 	while _poses.size() > 2 and sent - int(_poses[0][0]) > KEEP_MS:
 		_poses.pop_front()

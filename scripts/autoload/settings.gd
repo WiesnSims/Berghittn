@@ -22,8 +22,9 @@ var locale: String = Constants.DEFAULT_LOCALE
 var volumes: Dictionary = {}
 ## Share of the window resolution the 3D view renders at; lower helps weak laptops.
 var render_scale: float = 1.0
-## Co-op name and hiker (HikerStyle profile), chosen in the lobby.
-var profile: Dictionary = HikerStyle.default_profile()
+## Co-op name and hiker (HikerStyle profile), chosen in the lobby; empty until the player changes
+## something there, and until then each player wears their peer's default (profile_for).
+var profile: Dictionary = {}
 
 
 func _ready() -> void:
@@ -74,7 +75,15 @@ func _load() -> void:
 	render_scale = clampf(file.get_value(SECTION, "render_scale", render_scale), Constants.RENDER_SCALE_MIN, 1.0)
 	for bus: StringName in BUSES:
 		set_volume(bus, file.get_value(SECTION, "volume_" + bus, volume(bus)))
-	profile = HikerStyle.sanitize(file.get_value(SECTION, "profile", profile))
+	var saved: Variant = file.get_value(SECTION, "profile", {})
+	if saved is Dictionary and not (saved as Dictionary).is_empty():
+		profile = HikerStyle.sanitize(saved)
+
+
+## Our hiker as peer `peer` wears it: the one dressed in the lobby, or that peer's default, so
+## four players who never dressed theirs still look different (NETWORKING.md section 6).
+func profile_for(peer: int) -> Dictionary:
+	return HikerStyle.sanitize(profile) if not profile.is_empty() else HikerStyle.default_profile(peer)
 
 
 func save() -> void:

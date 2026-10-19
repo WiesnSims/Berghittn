@@ -192,6 +192,11 @@ With the 20 Hz batching from section 2, each player sends about 20 frames per se
 | 2 | 40 | 7,200 | ~13.9 | ~450 |
 | 4 | 80 | 14,400 | ~6.9 | ~450 |
 
+**Checked 2026-10-19 (part 4)**: until part 4, Godot's `rpc()` to everyone went out as one copy per
+peer, so with 4 players each sent 3 frames per flush (3x the requests above). `RelayPeer` now sends
+such a packet once, to everyone or to all but one, so the table holds: about 20 frames a second
+per player whatever the room size.
+
 Duration (the object is awake the whole match, 128 MB) is about 450 GB-s per hour, so 13,000 GB-s
 allows ~28 room-hours a day; the request count is the limit that bites first. Storage: none.
 
@@ -218,6 +223,14 @@ later"; solo keeps working). **We stay on the Free plan** (user decision Q6); th
   (two browsers, 10 waves) is checked this way first, then play-tested by you.
 - Bandwidth and frame rate are measured with 4 players and 24 enemies (target: under 10 KiB/s per
   player down, 60 FPS kept).
+- **Measured 2026-10-19 (part 4)**, `tests/net_four` (4 processes, everyone walking and firing 5 shots
+  a second, the host keeping 24 enemies alive): a guest gets 8-9 KiB/s down and sends 0.7 KiB/s, the
+  host sends 7.7 KiB/s and spends about 5 ms per frame on its game. Before part 4 it was 10.8 KiB/s
+  down; what brought it under: rpc() to everyone sent once (above), the pose and each shot packed into
+  16 bytes like the enemy snapshot, and enemies that did not move left out of the snapshot (the
+  relay loses nothing, so the puppet just stays; `PoseBuffer` sets off from there when it moves
+  again). One Edge window with three bots and the 24 enemies stayed at the screen's 144 FPS, with
+  8.8 KiB/s down. The F3 overlay shows the co-op traffic.
 
 ## 10. Proposed order (one PR each, play-test after each, like M6)
 

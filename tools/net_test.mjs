@@ -2,6 +2,7 @@
 //     node tools/net_test.mjs [test scene, default res://tests/net_lobby.tscn]
 // Set RELAY_URL to use a relay that is already running. The scene is started once per role: host,
 // then guest with the code the host prints, then (after the host prints STARTED) a late joiner.
+// net_four starts three guests (guest1..guest3) for four players.
 import { spawn } from 'node:child_process';
 import { createInterface } from 'node:readline';
 
@@ -50,15 +51,15 @@ async function main() {
 	}
 	const host = godot('host');
 	const [, code] = await host.line(/^ROOM (\d+)/);
-	const guest = godot('guest', [`--room=${code}`]);
-	const runs = [host.exited, guest.exited];
+	const guests = scene.includes('net_four') ? ['guest1', 'guest2', 'guest3'] : ['guest'];
+	const runs = [host.exited, ...guests.map((role) => godot(role, [`--room=${code}`]).exited)];
 	// The lobby test also checks that a late joiner is turned away.
 	if (scene.includes('net_lobby')) {
 		await host.line(/^STARTED/);
 		runs.push(godot('late', [`--room=${code}`]).exited);
 	}
 	const results = await Promise.all(runs);
-	console.log(`exit codes host/guest${runs.length > 2 ? '/late' : ''}: ${results.join('/')}`);
+	console.log(`exit codes host/${guests.join('/')}${scene.includes('net_lobby') ? '/late' : ''}: ${results.join('/')}`);
 	return results.every((c) => c === 0);
 }
 

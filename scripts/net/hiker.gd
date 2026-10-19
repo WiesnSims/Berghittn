@@ -60,8 +60,11 @@ func apply(profile: Dictionary, peer: int) -> void:
 	_tag.text = HikerStyle.display_name(p, peer)
 
 
-## For a co-op match: the ghost of their guns, and hands to hold a copy of the one they carry.
+## For a co-op match: the ghost of their guns, and hands to hold a copy of the one they carry. The
+## name keeps one size on screen, so a teammate right beside us does not hide the view behind it.
 func arm() -> void:
+	_tag.fixed_size = true
+	_tag.pixel_size = Constants.HIKER_TAG_SCREEN_SIZE
 	weapons = GHOST_WEAPONS.instantiate() as WeaponHolder
 	add_child(weapons)
 	weapons.set_ghost_owner(self)

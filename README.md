@@ -263,8 +263,9 @@ godot --headless res://tools/models/build_props.tscn
 
 ## Co-op (M7)
 
-Plan and decisions: `NETWORKING.md`. Parts 1 to 3 are in: relay and lobby, the core loop with
-downed and revive, and the special weapons, equipment and events.
+Plan and decisions: `NETWORKING.md`. All four parts are in: relay and lobby, the core loop with
+downed and revive, the special weapons, equipment and events, and four players with the bandwidth
+work (measured in `NETWORKING.md` section 9).
 
 - **Relay**: `relay/` is the helper Worker `berghittn-relay` with the `Room` Durable Object (one per
   4-digit room code). It has no public route; `functions/api/room/[code].js` (Pages Function on
@@ -273,16 +274,21 @@ downed and revive, and the special weapons, equipment and events.
   (`welcome`, `joined`, `left`, `closed` with a reason, and from the host `start`, `kick`). Nothing is
   stored; the host's socket attachment holds the room's build and started flag.
 - **Godot**: `RelayPeer` (`scripts/net/relay_peer.gd`, a `MultiplayerPeerExtension`) puts Godot's
-  multiplayer on that socket, batching packets into one frame per target every 50 ms. The `Net`
+  multiplayer on that socket, batching packets into frames every 50 ms. Godot sends an `rpc()` to
+  everyone as one copy per peer in a row; RelayPeer sends such a packet once (target 0, or -n for
+  all but n) and starts a new frame only where the target changes, so the order holds for each peer.
+  It counts bytes both ways (`Net.traffic()`, shown on the F3 overlay in co-op). The `Net`
   autoload (`scripts/autoload/net.gd`) is the session: create/join, the roster of names and hikers,
   the host's start, and why a session ended. It is an autoload (beside `Sound`) because the session
   must survive a scene reload. Solo never touches it.
 - **Lobby** (`scripts/ui/lobby.gd`, the Co-op button on the title): name, head, hat, jacket and
   trouser colour (`HikerStyle`), saved with the settings; create a room or join by code; the invite
   link `?room=<code>` opens the lobby straight into that room. The host sees everyone on the stage,
-  can remove players and starts with at least 2.
+  can remove players and starts with at least 2. Until a player changes something there, their
+  hiker is their peer's default (`Settings.profile_for`), so four players never look alike.
 - **Match**: main adds four nodes on every peer (the same paths, so RPCs match):
-  - `CoopPlayers`: our pose, life (alive / downed / out) and health 20 times a second; the others as
+  - `CoopPlayers`: our pose, life (alive / downed / out) and health 20 times a second (16 packed
+    bytes, like each shot's aim); the others as
     `Hiker`s 100 ms in the past (`PoseBuffer`). On the host the hikers are in group `player`, so enemies
     go for them; a hit is sent to that player (`take_damage` there, with the attacking puppet for the
     Pfanne's guard). Downed teammates get a `ReviveSpot` (hold E, 4 s) and a `MapMarker`; out players
@@ -295,8 +301,9 @@ downed and revive, and the special weapons, equipment and events.
     (plain guns: impacts and a muzzle flash; the flame: a stream of `Flames`). Thrown equipment
     (`PlayerEquipment.threw`) is copied with `harmless` set; a copied Kuhglocke still lures, so a
     guest's bell pulls the host's enemies. The Böllerschuss is passed on as its blast.
-  - `CoopEnemies`: on the host it numbers the WaveManager's enemies and sends spawns, 13-byte
-    snapshots at 20 Hz (14 bytes each: id, position, yaw, lean, a burning flag), actions
+  - `CoopEnemies`: on the host it numbers the WaveManager's enemies and sends spawns,
+    snapshots at 20 Hz (14 bytes each: id, position, yaw, lean, a burning flag; an enemy whose entry
+    did not change is left out), actions
     (`Enemy.posed`), damage and kills with the hitting peer. Guests keep puppets (`Enemy.puppet`)
     under it; a hit on a puppet goes to the host through `Enemy.hit_relay` (receive_hit, scorch,
     ignite, dance, slows, stuns, flee, knockback, and the Mistgabel's lift, carry_to and hurl) and
@@ -329,7 +336,13 @@ node tools/net_test.mjs                         # tests/net_lobby: roster, hiker
 node tools/net_test.mjs res://tests/net_match.tscn   # two main scenes: invite join, each sees the other's hiker
 node tools/net_test.mjs res://tests/net_core.tscn    # enemies + kill points, door, board, chest, down/revive, out/back, game over
 node tools/net_test.mjs res://tests/net_specials.tscn  # held gun, replayed Alphorn, copied bell, burning, fork, Rute drop, all four events
+node tools/net_test.mjs res://tests/net_four.tscn      # 4 players: default jackets, everyone sees everyone, 24 enemies: KiB/s and frame time
+NET_TEST_TIMEOUT_MS=1500000 node tools/net_test.mjs res://tests/net_waves.tscn  # two players clear waves 1-10 (about 10 min)
 ```
+
+With browsers on a deployed build, the bots take its id and the browsers join by the room link:
+`godot --headless res://tests/net_four.tscn -- --relay=wss://<site> --role=host --players=4 --bench=60 --build=<id>`
+(and `--role=guest1 --room=<code>`), or `tests/net_waves.tscn` with `--players=4 --browsers=1`.
 
 ## Tests
 

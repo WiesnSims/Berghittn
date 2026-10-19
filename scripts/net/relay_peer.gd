@@ -3,16 +3,23 @@ extends MultiplayerPeerExtension
 ## Godot's multiplayer over the co-op relay (NETWORKING.md section 2): one WebSocket to the room's
 ## Durable Object, which forwards frames between the players. The host is peer 1, as Godot expects.
 ##
-## Every packet Godot queues goes into a frame per target that is sent NET_FLUSH_INTERVAL_MS later at
-## the latest, so a player sends about 20 frames a second whatever the game does: the relay bills
-## incoming frames, not packets. Frame: [peer i8] then [length u16][packet] for each packet.
+## Every packet Godot queues goes into a frame that is sent NET_FLUSH_INTERVAL_MS later at the
+## latest, so a player sends about 20 frames a second whatever the game does: the relay bills
+## incoming frames, not packets. Frame: [target i8] then [length u16][packet] for each packet.
+## SceneMultiplayer sends an rpc() to everyone as one copy per peer, one after the other; the same
+## packet for several peers in a row goes out once, to 0 (everyone) or -n (all but n), so 4 players
+## cost no more frames or upload than 2. A new frame starts only where the target changes, and the
+## frames go out in order, so each peer still gets everything in the order it was sent.
 ## Text frames are the relay's JSON control messages (welcome, joined, left, closed).
+## bytes_in and bytes_out count every frame both ways, for the F3 overlay and the bandwidth test.
 
 ## A relay control message the session (Net) cares about: welcome, closed.
 signal control(message: Dictionary)
 
 const LENGTH_BYTES: int = 2
 
+var bytes_in: int = 0
+var bytes_out: int = 0
 var _socket := WebSocketPeer.new()
 var _status: ConnectionStatus = CONNECTION_DISCONNECTED
 var _id: int = 0
@@ -23,8 +30,11 @@ var _refusing: bool = false
 var _peers: Array[int] = []
 # Arrived packets: [sender, PackedByteArray].
 var _incoming: Array = []
-# Target -> the frame being filled for it.
-var _outgoing: Dictionary = {}
+# The frames to send, in order; the last one is being filled.
+var _frames: Array[PackedByteArray] = []
+# The packet put last and the peers it is for, kept back to see if it is a broadcast.
+var _held: PackedByteArray = PackedByteArray()
+var _held_for: Array[int] = []
 var _last_flush: int = 0
 var _last_ping: int = 0
 var _close_reason: String = ""
@@ -42,13 +52,14 @@ func open(url: String) -> Error:
 ## Sends a control message to the relay (host only: start, kick).
 func send_control(message: Dictionary) -> void:
 	if _socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
-		_socket.send_text(JSON.stringify(message))
+		_send_text(JSON.stringify(message))
 
 
 func _poll() -> void:
 	_socket.poll()
 	while _socket.get_available_packet_count() > 0:
 		var data: PackedByteArray = _socket.get_packet()
+		bytes_in += data.size()
 		if _socket.was_string_packet():
 			var text: String = data.get_string_from_utf8()
 			# The keep-alive answer is plain text, not JSON.
@@ -69,7 +80,7 @@ func _poll() -> void:
 		_last_flush = now
 	# The relay answers "ping" without waking up; it keeps a quiet lobby's connection alive.
 	if now - _last_ping >= Constants.NET_PING_INTERVAL_MS:
-		_socket.send_text("ping")
+		_send_text("ping")
 		_last_ping = now
 
 
@@ -118,7 +129,8 @@ func _drop() -> void:
 	for peer: int in _peers.duplicate():
 		_remove_peer(peer)
 	_status = CONNECTION_DISCONNECTED
-	_outgoing.clear()
+	_frames.clear()
+	_held_for.clear()
 	_incoming.clear()
 	control.emit({"t": "closed", "reason": _close_reason if _close_reason != "" else "lost"})
 
@@ -138,9 +150,51 @@ func _unpack(data: PackedByteArray) -> void:
 
 
 func _flush() -> void:
-	for target: int in _outgoing:
-		_socket.put_packet(_outgoing[target])
-	_outgoing.clear()
+	_queue_held()
+	for frame: PackedByteArray in _frames:
+		_send(frame)
+	_frames.clear()
+
+
+## The held packet into the frames, once for all the peers it is for.
+func _queue_held() -> void:
+	if _held_for.is_empty():
+		return
+	var others: Array = _peers.filter(func(peer: int) -> bool: return not peer in _held_for)
+	if others.is_empty() or _held_for.has(0):
+		_queue(0, _held)
+	elif others.size() == 1 and _held_for.size() > 1:
+		_queue(-others[0], _held)
+	else:
+		for peer: int in _held_for:
+			_queue(peer, _held)
+	_held_for.clear()
+
+
+func _queue(target: int, buffer: PackedByteArray) -> void:
+	if _frames.is_empty() or _frames.back()[0] != target & 0xff:
+		_frames.append(PackedByteArray([target & 0xff]))
+	var frame: PackedByteArray = _frames.back()
+	var at: int = frame.size()
+	frame.resize(at + LENGTH_BYTES)
+	frame.encode_u16(at, buffer.size())
+	frame.append_array(buffer)
+	_frames[-1] = frame
+	# The relay refuses frames over 64 KiB; send early rather than grow past it.
+	if frame.size() > Constants.NET_FRAME_SOFT_LIMIT:
+		for full: PackedByteArray in _frames:
+			_send(full)
+		_frames.clear()
+
+
+func _send(frame: PackedByteArray) -> void:
+	_socket.put_packet(frame)
+	bytes_out += frame.size()
+
+
+func _send_text(text: String) -> void:
+	_socket.send_text(text)
+	bytes_out += text.length()
 
 
 func _put_packet_script(buffer: PackedByteArray) -> Error:
@@ -148,16 +202,14 @@ func _put_packet_script(buffer: PackedByteArray) -> Error:
 		return ERR_UNCONFIGURED
 	if buffer.size() > _get_max_packet_size():
 		return ERR_OUT_OF_MEMORY
-	var frame: PackedByteArray = _outgoing.get(_target, PackedByteArray([_target & 0xff]))
-	var at: int = frame.size()
-	frame.resize(at + LENGTH_BYTES)
-	frame.encode_u16(at, buffer.size())
-	frame.append_array(buffer)
-	_outgoing[_target] = frame
-	# The relay refuses frames over 64 KiB; send early rather than grow past it.
-	if frame.size() > Constants.NET_FRAME_SOFT_LIMIT:
-		_socket.put_packet(frame)
-		_outgoing.erase(_target)
+	# The next copy of a broadcast: one more peer for the held packet.
+	if _target > 0 and not _held_for.is_empty() and not _held_for.has(_target) and not _held_for.has(0) \
+			and buffer == _held:
+		_held_for.append(_target)
+		return OK
+	_queue_held()
+	_held = buffer
+	_held_for.append(_target)
 	return OK
 
 

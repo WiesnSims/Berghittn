@@ -31,6 +31,8 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	if FileAccess.file_exists(BUILD_ID_PATH):
 		build_id = FileAccess.get_file_as_string(BUILD_ID_PATH).strip_edges()
+	# Desktop bots joining a browser on a deployed build (tests/net_four.gd bench mode) pass its id.
+	build_id = _user_arg("build", build_id)
 	multiplayer.peer_disconnected.connect(_on_peer_left)
 
 
@@ -48,6 +50,11 @@ func is_host() -> bool:
 
 func my_id() -> int:
 	return multiplayer.get_unique_id()
+
+
+## Bytes received and sent over the relay since this session opened (zero offline).
+func traffic() -> Vector2i:
+	return Vector2i(_peer.bytes_in, _peer.bytes_out) if _peer else Vector2i.ZERO
 
 
 func create_room() -> void:
@@ -158,7 +165,7 @@ func _on_control(message: Dictionary) -> void:
 			code = String(message.get("code", ""))
 			# In the browser console, for play-test reports and the browser test.
 			print("Co-op: room %s, peer %d, build %s" % [code, my_id(), build_id])
-			roster = {my_id(): HikerStyle.sanitize(Settings.profile)}
+			roster = {my_id(): Settings.profile_for(my_id())}
 			_set_state(State.LOBBY)
 			if not is_host():
 				_hello.rpc_id(1, roster[my_id()])

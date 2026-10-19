@@ -709,6 +709,11 @@ fix console errors, commit. Stop and report after each milestone.
   host's enemy; the Krampus-Rute drop goes to whoever takes it first. The host runs the events and
   every guest sees copies of Resi, the Bierfassl, the Murmeltier and the Tourist; milking, tapping
   and catching go to the host, the reward to the player who did it, with a banner for the others.
+  Part 4 (2026-10-19): four players in one match (each undressed hiker gets its own default jacket,
+  name tags keep one size on screen); under the 10 KiB/s target with 4 players and 24 enemies
+  (8-9 KiB/s: broadcasts sent once, packed poses and shots, still enemies left out of snapshots),
+  which also keeps the relay at about 20 billed frames a second per player; two players clear waves
+  1 to 10 together in the headless test, and two browsers stay in one match through 10 waves.
 
 ## 13. Project structure
 

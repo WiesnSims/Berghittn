@@ -8,6 +8,8 @@ extends Node3D
 ## Main creates it as /root/Main/CoopEnemies on every peer, so the RPC paths match.
 
 ## Bytes per enemy in a snapshot: id u16, position 3 x s16 (cm), yaw u16, lean 3 x s8, flags u8.
+## An enemy whose entry is the same as in the last snapshot (standing, striking) is left out: the
+## relay loses nothing, so the guest's puppet just stays (M7 part 4, a third less with a crowd).
 const ENTRY_BYTES: int = 14
 ## Snapshot flags: it is burning.
 const FLAG_BURNING: int = 1
@@ -25,6 +27,8 @@ var _waves: WaveManager
 var _by_id: Dictionary = {}
 var _next_id: int = 1
 var _send_left: float = 0.0
+# Host: net id -> the entry (without the id) last sent for it.
+var _sent: Dictionary = {}
 # Guests: puppets waiting to be reused, by EnemyData id, and each puppet's received poses.
 var _pools: Dictionary = {}
 var _buffers: Dictionary = {}
@@ -89,11 +93,10 @@ func _send_snapshot() -> void:
 	for enemy: Enemy in _by_id.values():
 		if enemy.is_alive():
 			alive.append(enemy)
-	if alive.is_empty():
-		return
 	var bytes := PackedByteArray()
 	bytes.resize(alive.size() * ENTRY_BYTES)
 	var at: int = 0
+	var sent: Dictionary = {}
 	for enemy: Enemy in alive:
 		var p: Vector3 = enemy.global_position * CM
 		var lean: Vector3 = enemy.puppet_lean()
@@ -106,7 +109,14 @@ func _send_snapshot() -> void:
 		bytes.encode_s8(at + 11, clampi(roundi(lean.y * LEAN_SCALE), -127, 127))
 		bytes.encode_s8(at + 12, clampi(roundi(lean.z * CM), -127, 127))
 		bytes.encode_u8(at + 13, FLAG_BURNING if enemy.is_burning() else 0)
-		at += ENTRY_BYTES
+		var entry: PackedByteArray = bytes.slice(at + 2, at + ENTRY_BYTES)
+		sent[enemy.net_id] = entry
+		if _sent.get(enemy.net_id) != entry:
+			at += ENTRY_BYTES
+	_sent = sent
+	if at == 0:
+		return
+	bytes.resize(at)
 	_snapshot.rpc(Time.get_ticks_msec(), bytes)
 
 
