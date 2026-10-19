@@ -43,18 +43,18 @@ func _hats() -> void:
 	for hat: int in range(1, HikerStyle.HATS.size()):
 		if not hiker.rig.has_node("Skeleton/Hat%d" % hat):
 			missing.append(hat)
-	_check(HikerStyle.HATS.size() == 13 and missing.is_empty(), "13 hats, each with its part on the hiker (missing %s)" % [missing])
-	hiker.apply({"hat": 12}, 1)
-	_check((hiker.rig.get_node("Skeleton/Hat12") as Node3D).visible, "the Krampus-Hörndl shows when worn")
+	_check(HikerStyle.HATS.size() == 10 and missing.is_empty() and not hiker.rig.has_node("Skeleton/Hat10"), "10 hats, each with its part on the hiker (missing %s)" % [missing])
+	hiker.apply({"hat": 9}, 1)
+	_check((hiker.rig.get_node("Skeleton/Hat9") as Node3D).visible, "the Krampus-Hörndl shows when worn")
 	hiker.queue_free()
 	for peer: int in range(1, 5):
 		_check(HatUnlocks.has_hat(HikerStyle.default_profile(peer)["hat"]), "peer %d's default hat needs no earning" % peer)
-	Settings.profile = HikerStyle.sanitize({"name": "Test", "hat": 12})
-	_check(not HatUnlocks.has_hat(12) and HatUnlocks.hint(12) != "", "the Krampus-Hörndl is locked, with a hint")
-	_check(Settings.edit_profile(1)["hat"] == 12, "the lobby keeps a locked hat for the preview")
+	Settings.profile = HikerStyle.sanitize({"name": "Test", "hat": 9})
+	_check(not HatUnlocks.has_hat(9) and HatUnlocks.hint(9) != "", "the Krampus-Hörndl is locked, with a hint")
+	_check(Settings.edit_profile(1)["hat"] == 9, "the lobby keeps a locked hat for the preview")
 	_check(Settings.profile_for(1)["hat"] == 0, "a locked hat is not worn (or sent to the others)")
-	Settings.profile = HikerStyle.sanitize({"name": "Test", "hat": 7})
-	_check(Settings.profile_for(1)["hat"] == 7, "a free stuffed hat is worn")
+	Settings.profile = HikerStyle.sanitize({"name": "Test", "hat": 4})
+	_check(Settings.profile_for(1)["hat"] == 4, "a free stuffed hat is worn")
 
 
 func _wall_and_unlocks() -> void:
@@ -68,10 +68,10 @@ func _wall_and_unlocks() -> void:
 	_check(wall.hung() == 1, "the first Perchte goes on the wall")
 	for i: int in 3:
 		_kill(&"perchte")
-	_check(wall.hung() == 1 and not HatUnlocks.has_hat(11), "the 2nd to 4th do not, and 4 Perchten earn nothing yet")
+	_check(wall.hung() == 1 and not HatUnlocks.has_hat(8), "the 2nd to 4th do not, and 4 Perchten earn nothing yet")
 	_kill(&"perchte")
 	_check(wall.hung() == 2, "the 5th Perchte goes on the wall")
-	_check(HatUnlocks.has_hat(11) and Settings.perchten == 5, "5 Perchten earn the Perchtn-Haubn")
+	_check(HatUnlocks.has_hat(8) and Settings.perchten == 5, "5 Perchten earn the Perchtn-Haubn")
 	_kill(&"knappe")
 	_check(wall.hung() == 2, "a Knappe does not")
 	for i: int in 5:
@@ -82,9 +82,9 @@ func _wall_and_unlocks() -> void:
 	var last := wall.get_node("Plaque5").get_child(1) as MeshInstance3D
 	_check(last != null and last.mesh == TrophyWall.KRAMPUS and last.scale.is_equal_approx(Vector3.ONE), "the last plaque has a Krampus, popped to full size")
 	Events.wave_cleared.emit(9)
-	_check(not HatUnlocks.has_hat(12), "wave 9 does not earn the Krampus-Hörndl")
+	_check(not HatUnlocks.has_hat(9), "wave 9 does not earn the Krampus-Hörndl")
 	Events.wave_cleared.emit(10)
-	_check(HatUnlocks.has_hat(12), "surviving wave 10 earns it")
+	_check(HatUnlocks.has_hat(9), "surviving wave 10 earns it")
 	var before: int = banners.size()
 	Events.wave_cleared.emit(11)
 	_check(banners.size() == before, "earned once, announced once")
@@ -103,14 +103,14 @@ func _raurakl() -> void:
 	var raurakl := RAURAKL.instantiate() as Raurakl
 	add_child(raurakl)
 	var model := raurakl.get_node("Model") as Node3D
-	_check(raurakl.receive_hit(10, false, false, null) == Hurtbox.Result.HIT and not HatUnlocks.has_hat(10),
+	_check(raurakl.receive_hit(10, false, false, null) == Hurtbox.Result.HIT and not HatUnlocks.has_hat(7),
 			"a hit that is not ours spins it but earns nothing")
 	await get_tree().create_timer(Constants.RAURAKL_SPIN_TIME + 0.1).timeout
 	_check(is_equal_approx(model.rotation.y, TAU * 2.0) and (raurakl.get_node("Bubble") as Label3D).visible, "it spun twice and grumbles")
 	var player := Player.new()
 	raurakl.receive_hit(10, false, false, player)
 	player.free()
-	_check(HatUnlocks.has_hat(10), "our own hit earns the Raurakl-Kappl")
+	_check(HatUnlocks.has_hat(7), "our own hit earns the Raurakl-Kappl")
 	var hurtbox := raurakl.get_node("Hurtbox") as Hurtbox
 	_check(hurtbox.collision_layer == Constants.LAYER_HITBOX and hurtbox.receiver == raurakl, "its hurtbox is on the hitbox layer")
 	raurakl.queue_free()

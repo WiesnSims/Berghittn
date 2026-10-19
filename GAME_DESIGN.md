@@ -718,6 +718,8 @@ fix console errors, commit. Stop and report after each milestone.
 **M8 — Stuffed animals (cosmetics, user request 2026-10-19)**
 After the milestones, the user asked for stuffed-animal cosmetics and approved all of the
 suggestions, with an Edelmarder (marten) added:
+- After the play-test (approved 2026-10-19) the Stirnband, Skihelm and Schildkappe were dropped as
+  too boring: the lobby has no hat, the Tirolerhut, the Bommelmütz and the seven below.
 - Stuffed hats in the lobby: Mankei-Haubn (a Murmeltier lying on the head), Fuchspelz (fox-fur
   hat with the fox's head and tail), Auerhahn-Huat (a felt hat with a displaying Auerhahn on top),
   Marder-Haubn (an Edelmarder curled round the head, biting its tail).

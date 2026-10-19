@@ -324,12 +324,12 @@ work (measured in `NETWORKING.md` section 9).
 - **Build id**: `tools/build_web.mjs` writes `build_id.txt` (gitignored, packed via the preset's
   include filter); the relay turns away a browser whose build differs from the host's.
 - **Hiker**: `godot --headless --script res://tools/models/build_hiker.gd` builds
-  `assets/models/hiker.tscn` (body, Head0-4, Hat1-5 as separate skinned parts; the jacket and trousers
+  `assets/models/hiker.tscn` (body, Head0-4, Hat1-9 as separate skinned parts; the jacket and trousers
   use their own neutral materials that `Hiker` tints per player). Visual check:
   `godot res://tests/hiker_view.tscn -- <dir>`, the lobby: `godot res://tests/lobby_view.tscn -- <dir>`.
 - **Stuffed animals (M8)**:
   - `tools/models/stuffed.gd` draws each animal once in its own frame, and a transform places it
-    on a hat (`build_hiker.gd`, Hat6-12) or in the Stube.
+    on a hat (`build_hiker.gd`, Hat3-9) or in the Stube.
   - `godot --headless --script res://tools/models/build_trophies.gd` builds the Stube's meshes into
     `assets/models/trophies/` as plain unskinned meshes (`CharacterBuilder.save_static`).
   - `HatUnlocks` (a node in main) earns the locked hats (`HikerStyle.LOCKED`) into

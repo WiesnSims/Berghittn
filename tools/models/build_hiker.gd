@@ -202,24 +202,11 @@ func _hats(b: Builder) -> void:
 			[Vector2(0.135, 0.148), Vector2(0.13, 0.143), Vector2(0.1, 0.11), Vector2(0.05, 0.055)], &"wool", knit, &"head", 10)
 	b.tube([Vector3(0.0, 1.66, 0.005), Vector3(0.0, 1.71, 0.005)], [Vector2(0.14, 0.153), Vector2(0.138, 0.151)], &"wool", Color(0.92, 0.9, 0.86), &"head", 10, false)
 	b.ball(Vector3(0.0, 1.86, -0.005), Vector3(0.055, 0.05, 0.055), &"wool", Color(0.92, 0.9, 0.86), &"head", 7, 5)
-	# 3 Stirnband: a wool headband over the ears.
-	b.part(&"hat_3")
-	b.tube([Vector3(0.0, 1.66, 0.01), Vector3(0.0, 1.715, 0.01)], [Vector2(0.13, 0.142), Vector2(0.126, 0.138)], &"wool", Color(0.15, 0.4, 0.65), &"head", 10, false)
-	b.tube([Vector3(0.0, 1.685, 0.01), Vector3(0.0, 1.69, 0.01)], [Vector2(0.132, 0.144), Vector2(0.132, 0.144)], &"plain", Color(0.95, 0.95, 0.95), &"head", 10, false)
-	# 4 Skihelm with the goggles pushed up.
-	b.part(&"hat_4")
-	var shell := Color(0.9, 0.9, 0.88)
-	b.tube([Vector3(0.0, 1.675, 0.015), Vector3(0.0, 1.74, 0.012), Vector3(0.0, 1.79, 0.008), Vector3(0.0, 1.815, 0.005), Vector3(0.0, 1.822, 0.005)],
-			[Vector2(0.14, 0.155), Vector2(0.138, 0.152), Vector2(0.11, 0.124), Vector2(0.06, 0.07), Vector2(0.003, 0.003)], &"plain", shell, &"head", 10)
-	b.tube([Vector3(0.0, 1.705, 0.015), Vector3(0.0, 1.735, 0.015)], [Vector2(0.142, 0.157), Vector2(0.141, 0.156)], &"plain", Color(0.12, 0.12, 0.12), &"head", 10, false)
-	b.box(Vector3(0.0, 1.72, -0.145), Vector3(0.17, 0.05, 0.03), &"plain", Color(0.95, 0.6, 0.15), &"head", Basis(Vector3.RIGHT, 0.25))
-	# 5 Schildkappe: a cap with a peak.
-	b.part(&"hat_5")
-	var cap := Color(0.25, 0.28, 0.3)
-	_cap(b, cap)
+	# (Stirnband, Skihelm and Schildkappe were dropped after the M8 play-test: too boring.)
 	_stuffed_hats(b)
 
 
+## A cap with a peak, under the Raurakl.
 func _cap(b: Builder, cap: Color) -> void:
 	b.tube([Vector3(0.0, 1.69, 0.012), Vector3(0.0, 1.76, 0.01), Vector3(0.0, 1.8, 0.005), Vector3(0.0, 1.812, 0.005)],
 			[Vector2(0.13, 0.142), Vector2(0.12, 0.132), Vector2(0.075, 0.085), Vector2(0.003, 0.003)], &"wool", cap, &"head", 10)
@@ -229,11 +216,11 @@ func _cap(b: Builder, cap: Color) -> void:
 ## The stuffed hats (M8, user request 2026-10-19): animals from stuffed.gd, and the earned ones
 ## (HikerStyle.LOCKED) after them.
 func _stuffed_hats(b: Builder) -> void:
-	# 6 Mankei-Haubn: a Murmeltier lying on the head, its tail down the back.
-	b.part(&"hat_6")
+	# 3 Mankei-Haubn: a Murmeltier lying on the head, its tail down the back.
+	b.part(&"hat_3")
 	Stuffed.new(b, Stuffed.place(Vector3(0.0, 1.705, 0.0)), &"head").marmot_lying()
-	# 7 Fuchspelz: a fox-fur hat with the fox's head at the front and its tail down to the shoulder.
-	b.part(&"hat_7")
+	# 4 Fuchspelz: a fox-fur hat with the fox's head at the front and its tail down to the shoulder.
+	b.part(&"hat_4")
 	var fox := Color(0.78, 0.36, 0.12)
 	var white := Color(0.93, 0.9, 0.85)
 	var black := Color(0.08, 0.06, 0.05)
@@ -250,15 +237,15 @@ func _stuffed_hats(b: Builder) -> void:
 	b.tube([Vector3(0.1, 1.74, 0.11), Vector3(0.14, 1.62, 0.13), Vector3(0.15, 1.5, 0.1), Vector3(0.14, 1.41, 0.06)],
 			[Vector2(0.04, 0.04), Vector2(0.05, 0.05), Vector2(0.045, 0.045), Vector2(0.032, 0.032)], &"fur", fox, &"head", 7)
 	b.spike([Vector3(0.14, 1.41, 0.06), Vector3(0.135, 1.37, 0.05), Vector3(0.13, 1.33, 0.04)], 0.032, &"fur", white, &"head", 6)
-	# 8 Auerhahn-Huat: a low felt hat with a whole Auerhahn displaying on top.
-	b.part(&"hat_8")
+	# 5 Auerhahn-Huat: a low felt hat with a whole Auerhahn displaying on top.
+	b.part(&"hat_5")
 	var felt := Color(0.3, 0.22, 0.14)
 	b.tube([Vector3(0.0, 1.735, 0.0), Vector3(0.0, 1.75, 0.0)], [Vector2(0.2, 0.21), Vector2(0.19, 0.2)], &"wool", felt, &"head", 10)
 	b.tube([Vector3(0.0, 1.74, 0.0), Vector3(0.0, 1.8, 0.0), Vector3(0.0, 1.835, 0.0)], [Vector2(0.13, 0.14), Vector2(0.125, 0.135), Vector2(0.11, 0.12)], &"wool", felt, &"head", 9)
 	b.tube([Vector3(0.0, 1.75, 0.0), Vector3(0.0, 1.775, 0.0)], [Vector2(0.132, 0.142), Vector2(0.13, 0.14)], &"plain", Color(0.15, 0.3, 0.18), &"head", 9, false)
 	Stuffed.new(b, Stuffed.place(Vector3(0.0, 1.83, 0.01), 0.48), &"head").auerhahn()
-	# 9 Marder-Haubn: an Edelmarder curled round the head like a stole, biting its own tail.
-	b.part(&"hat_9")
+	# 6 Marder-Haubn: an Edelmarder curled round the head like a stole, biting its own tail.
+	b.part(&"hat_6")
 	var ring := func(a: float) -> Vector3:
 		return Vector3(sin(a) * 0.142, 1.715 + 0.018 * cos(a), -0.02 - cos(a) * 0.152)
 	var spine: Array = []
@@ -267,12 +254,12 @@ func _stuffed_hats(b: Builder) -> void:
 	var tail: Array = [ring.call(0.3 + 12.0 * 0.43), ring.call(TAU - 0.3) + Vector3(0.0, 0.02, 0.0),
 			ring.call(TAU - 0.08) + Vector3(0.0, 0.05, -0.01), Vector3(0.05, 1.79, -0.16)]
 	Stuffed.new(b, Transform3D.IDENTITY, &"head").marten(spine, tail, Vector3(-0.35, 0.0, -1.0), false)
-	# 10 Raurakl-Kappl (earned): the Kappl with the Raurakl sitting on it.
-	b.part(&"hat_10")
+	# 7 Raurakl-Kappl (earned): the Kappl with the Raurakl sitting on it.
+	b.part(&"hat_7")
 	_cap(b, Color(0.22, 0.26, 0.2))
 	Stuffed.new(b, Stuffed.place(Vector3(0.0, 1.79, 0.02), 0.85), &"head").raurakl()
-	# 11 Perchtn-Haubn (earned): a shaggy hood with the Perchte's horns and a little bell.
-	b.part(&"hat_11")
+	# 8 Perchtn-Haubn (earned): a shaggy hood with the Perchte's horns and a little bell.
+	b.part(&"hat_8")
 	var shag := Color(0.36, 0.26, 0.17)
 	var bone := Color(0.9, 0.86, 0.74)
 	b.ball(Vector3(0.0, 1.69, 0.03), Vector3(0.137, 0.127, 0.142), &"fur", shag, &"head", 10, 7)
@@ -284,8 +271,8 @@ func _stuffed_hats(b: Builder) -> void:
 	for x: float in [-1.0, 1.0]:
 		b.spike([Vector3(0.08 * x, 1.79, 0.0), Vector3(0.13 * x, 1.87, 0.02), Vector3(0.14 * x, 1.94, 0.07), Vector3(0.11 * x, 1.99, 0.12)], 0.03, &"plain", bone, &"head", 6)
 	b.tube([Vector3(0.0, 1.55, 0.16), Vector3(0.0, 1.49, 0.165)], [Vector2(0.022, 0.018), Vector2(0.035, 0.03)], &"metal", Color(0.75, 0.6, 0.3), &"head", 6)
-	# 12 Krampus-Hörndl (earned): his horns on a black fur band.
-	b.part(&"hat_12")
+	# 9 Krampus-Hörndl (earned): his horns on a black fur band.
+	b.part(&"hat_9")
 	var band := Color(0.09, 0.08, 0.08)
 	b.tube([Vector3(0.0, 1.715, 0.012), Vector3(0.0, 1.76, 0.012)], [Vector2(0.123, 0.135), Vector2(0.112, 0.124)], &"fur", band, &"head", 10, false)
 	for x: float in [-1.0, 1.0]:

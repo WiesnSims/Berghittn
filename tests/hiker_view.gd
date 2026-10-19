@@ -6,7 +6,7 @@ extends Node3D
 
 const HIKER := preload("res://scenes/net/hiker.tscn")
 const SPACING: float = 0.75
-const STUFFED_FROM: int = 6
+const STUFFED_FROM: int = 3
 
 
 func _ready() -> void:

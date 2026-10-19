@@ -7,12 +7,12 @@ extends RefCounted
 
 ## Name keys of the heads (assets/models/hiker.tscn parts Head0..Head4).
 const HEADS: Array[String] = ["UI_HEAD_BUA", "UI_HEAD_BART", "UI_HEAD_OPA", "UI_HEAD_ZOEPF", "UI_HEAD_LOCKEN"]
-## Name keys of the hats; 0 is none (parts Hat1..Hat12). From 6 on they are the stuffed hats (M8).
-const HATS: Array[String] = ["UI_HAT_NONE", "UI_HAT_TIROLER", "UI_HAT_BOMMEL", "UI_HAT_STIRNBAND", "UI_HAT_HELM",
-		"UI_HAT_KAPPE", "UI_HAT_MANKEI", "UI_HAT_FUCHS", "UI_HAT_AUERHAHN", "UI_HAT_MARDER", "UI_HAT_RAURAKL",
-		"UI_HAT_PERCHTE", "UI_HAT_KRAMPUS"]
+## Name keys of the hats; 0 is none (parts Hat1..Hat9). From 3 on they are the stuffed hats (M8; the
+## Stirnband, Skihelm and Kappl were dropped in its play-test).
+const HATS: Array[String] = ["UI_HAT_NONE", "UI_HAT_TIROLER", "UI_HAT_BOMMEL", "UI_HAT_MANKEI", "UI_HAT_FUCHS",
+		"UI_HAT_AUERHAHN", "UI_HAT_MARDER", "UI_HAT_RAURAKL", "UI_HAT_PERCHTE", "UI_HAT_KRAMPUS"]
 ## Hats that are earned before they can be worn (HatUnlocks): hat index -> unlock id.
-const LOCKED: Dictionary = {10: &"raurakl", 11: &"perchten", 12: &"krampus"}
+const LOCKED: Dictionary = {7: &"raurakl", 8: &"perchten", 9: &"krampus"}
 const JACKETS: Array[Color] = [
 	Color(0.72, 0.14, 0.1), Color(0.16, 0.32, 0.62), Color(0.2, 0.42, 0.22), Color(0.92, 0.66, 0.12),
 	Color(0.45, 0.2, 0.5), Color(0.1, 0.55, 0.6), Color(0.88, 0.42, 0.12), Color(0.2, 0.2, 0.22),
