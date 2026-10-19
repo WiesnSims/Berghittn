@@ -4,7 +4,8 @@ extends Node
 ## where the player aims, comes down and runs 15 m along the ground from there, striking every enemy
 ## in its way once for 300 (not beside the lane, not past the end of its run), a sled aimed high flies
 ## farther before it lands, throws survivors aside, breaks on a wall without passing it, the Kehre banks off a
-## wall for two rounds and reaches what is around the corner, sleds come from a pool, the next one
+## wall for two rounds and reaches what is around the corner, after a bank it turns towards the
+## nearest enemy it can see (not one behind the wall), sleds come from a pool, the next one
 ## shows at the muzzle as the gun is ready again, and the Hüttentruhe has it at weight 1.
 
 # Open pasture in front of the hut, clear of furniture.
@@ -114,6 +115,7 @@ func _run() -> void:
 	await _aim_high()
 	await _wall_stop()
 	await _kehre()
+	await _kehre_aim()
 	await _indoors()
 	await _pool()
 	_extras()
@@ -243,6 +245,36 @@ func _kehre() -> void:
 		_check(not sled.is_busy(), "until its %.0f m are run" % gun.secondary_range)
 	wall.queue_free()
 	await _clear([around])
+
+
+func _kehre_aim() -> void:
+	var wanderer: EnemyData = load("res://data/enemies/wanderer.tres")
+	var holder: WeaponHolder = player.weapons
+	player.global_position = _ground(Vector3.ZERO)
+	_look_flat(Vector3(1, 0, 0))
+	# A wall straight across: without an enemy the sled would come straight back along -x.
+	var wall: StaticBody3D = _wall(Vector3(6, 0, 0), 90.0)
+	var aside: Enemy = _spawn(wanderer, Vector3(1, 0, 3))
+	var behind: Enemy = _spawn(wanderer, Vector3(8, 0, -1))
+	await _frames(3)
+	holder.mag = 4
+	holder._cooldown = 0.0
+	holder.fire_secondary()
+	var sled: Node3D = _busy_sled()
+	var waited: int = 0
+	while sled and sled.is_busy() and sled._banks == 3 and waited < 120:
+		await _frames(1)
+		waited += 1
+	if sled == null or sled._banks == 3:
+		_check(false, "a Kehre sled banked off the straight wall")
+	else:
+		# In the air its heading follows its flight a frame later.
+		await _frames(2)
+		var way: Vector3 = sled._direction
+		_check(way.x < 0.0 and way.z > 0.25, "after the bank it turns towards the enemy aside, not the one behind the wall (%.2f, %.2f)" % [way.x, way.z])
+	await _seconds(2.5)
+	wall.queue_free()
+	await _clear([aside, behind])
 
 
 func _indoors() -> void:

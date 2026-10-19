@@ -1,6 +1,6 @@
 extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/m5_harmonika.tscn
-## Headless check of the Steirische Harmonika (section 6a) on the real main scene: 3 / 9, a polka that
+## Headless check of the Steirische Harmonika (section 6a) on the real main scene: 4 / 12, a polka that
 ## makes every enemy within 8 m dance for 4 s (not past 8 m, not behind a wall): dancers stay on the
 ## spot, do not attack, take 20 a second and twice the damage from other hits; a boss takes the
 ## damage but does not dance. The Tanzboden (right click) takes two rounds and lies where the player
@@ -123,7 +123,7 @@ func _polka() -> void:
 	await _seconds(0.6)
 	_look_flat(Vector3(1, 0, 0))
 	var holder: WeaponHolder = player.weapons
-	_check(holder.weapon == gun and holder.mag == 3 and holder.reserve == 9, "Harmonika in hand, 3 / 9")
+	_check(holder.weapon == gun and holder.mag == 4 and holder.reserve == 12, "Harmonika in hand, 4 / 12")
 	# Right next to the player (it would be swinging), at 4 m behind the player, 7 m ahead; out of reach
 	# at 11 m; and 5 m off behind a wall.
 	var close: Enemy = _spawn(knappe, Vector3(1.0, 0, 0))
@@ -134,7 +134,7 @@ func _polka() -> void:
 	var walled: Enemy = _spawn(wanderer, Vector3(0, 0, -5))
 	await _frames(20)
 	holder._fire()
-	_check(holder.mag == 2, "one polka used")
+	_check(holder.mag == 3, "one polka used")
 	await _frames(2)
 	_check(close.is_dancing() and behind.is_dancing() and far_in.is_dancing(), "everyone within 8 m dances, all around")
 	_check(not out.is_dancing(), "not 11 m away")

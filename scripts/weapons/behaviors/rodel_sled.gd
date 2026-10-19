@@ -114,6 +114,11 @@ func _fly(delta: float) -> void:
 		_banks -= 1
 		global_position = hit.position + hit.normal * NOSE
 		_velocity = _velocity.bounce(hit.normal)
+		var level := Vector3(_velocity.x, 0.0, _velocity.z)
+		if level.length() > 0.5:
+			var wall_normal := Vector3(hit.normal.x, 0.0, hit.normal.z).normalized()
+			level = _aim(level.normalized(), wall_normal) * level.length()
+			_velocity = Vector3(level.x, _velocity.y, level.z)
 		_face_flight()
 	else:
 		global_position = hit.position
@@ -151,7 +156,7 @@ func _ride(distance: float) -> void:
 		_banks -= 1
 		var normal := Vector3(hit.normal.x, 0.0, hit.normal.z).normalized()
 		var turned: Vector3 = _direction.bounce(normal)
-		_direction = Vector3(turned.x, 0.0, turned.z).normalized()
+		_direction = _aim(Vector3(turned.x, 0.0, turned.z).normalized(), normal)
 		# Its nose against the wall, pointing the new way.
 		global_position = Vector3(hit.position.x, global_position.y, hit.position.z) + normal * NOSE
 		_face(Vector3.UP)
@@ -175,6 +180,33 @@ func _ride(distance: float) -> void:
 	global_position = next
 	if _dropped > Constants.RODEL_MAX_DROP:
 		_crash()
+
+
+## The way on after a bank (flat `turned`, off a wall facing `normal`), turned part of the way towards
+## the nearest enemy it has not struck yet that it can see on this side of the wall, within the
+## distance it has left (play-test 2026-10-19).
+func _aim(turned: Vector3, normal: Vector3) -> Vector3:
+	var space: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
+	var eye: Vector3 = global_position + Vector3.UP * Constants.RODEL_AIM_EYE
+	var best := Vector3.ZERO
+	var nearest: float = _left
+	for node: Node in get_tree().get_nodes_in_group("enemies"):
+		var enemy := node as Enemy
+		if enemy == null or not enemy.is_alive() or _struck.has(enemy):
+			continue
+		var offset: Vector3 = enemy.global_position - global_position
+		offset.y = 0.0
+		var distance: float = offset.length()
+		if distance < 0.5 or distance >= nearest or offset.dot(normal) <= 0.0:
+			continue
+		var sight := PhysicsRayQueryParameters3D.create(eye, enemy.global_position + Vector3.UP * Constants.RODEL_AIM_EYE, Constants.LAYER_WORLD, _launcher.get("holder").shooter_exclude())
+		if not space.intersect_ray(sight).is_empty():
+			continue
+		nearest = distance
+		best = offset / distance
+	if best == Vector3.ZERO:
+		return turned
+	return turned.slerp(best, Constants.RODEL_KEHRE_AIM).normalized()
 
 
 ## Every body in its lane it has not run into yet: struck once and thrown aside, out of the lane.
