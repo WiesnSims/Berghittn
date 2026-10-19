@@ -9,6 +9,7 @@ messages = {
 [&"", &"UI_PAUSE_HINT"]: [&"A quick Jause, then back to it."],
 [&"", &"UI_RESUME"]: [&"Resume"],
 [&"", &"UI_DEBUG_OVERLAY"]: [&"%d FPS   pos %.1f / %.1f / %.1f"],
+[&"", &"UI_DEBUG_NET"]: [&"net in %.1f  out %.1f KiB/s"],
 [&"", &"UI_AMMO"]: [&"%d / %d"],
 [&"", &"UI_RELOADING"]: [&"Reloading…"],
 [&"", &"UI_RELOAD_HINT"]: [&"R to reload"],

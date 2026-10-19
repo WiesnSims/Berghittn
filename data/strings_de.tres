@@ -9,6 +9,7 @@ messages = {
 [&"", &"UI_PAUSE_HINT"]: [&"A kurze Jausn, dann geht's weida."],
 [&"", &"UI_RESUME"]: [&"Weiter"],
 [&"", &"UI_DEBUG_OVERLAY"]: [&"%d FPS   Pos %.1f / %.1f / %.1f"],
+[&"", &"UI_DEBUG_NET"]: [&"Netz rein %.1f  raus %.1f KiB/s"],
 [&"", &"UI_AMMO"]: [&"%d / %d"],
 [&"", &"UI_RELOADING"]: [&"Nachladen…"],
 [&"", &"UI_RELOAD_HINT"]: [&"R zum Nachladen"],

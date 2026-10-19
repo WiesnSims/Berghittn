@@ -16,6 +16,14 @@ const BOELLER_BLAST: Script = preload("res://scripts/perks/boeller_blast.gd")
 const WEAPONS: String = "res://data/weapons/%s.tres"
 const EQUIPMENT: String = "res://data/equipment/%s.tres"
 const MARKER_COLOR := Color(1.0, 0.3, 0.25)
+## Packed like the enemy snapshot (M7 part 4: a quarter of the download with 4 players).
+## Pose: sent ms u32, position 3 x s16 (cm), yaw u16, pitch s16, flags u8, health % u8.
+const POSE_BYTES: int = 16
+## A shot or swing: action u8, rounds u8, aim origin 3 x s16 (cm), aim rotation 4 x s16.
+const ACTED_BYTES: int = 16
+const CM: float = 100.0
+const ANGLE_SCALE: float = 10000.0
+const UNIT_SCALE: float = 32767.0
 
 var _player: Player
 var _send_left: float = 0.0
@@ -88,7 +96,15 @@ func _process(delta: float) -> void:
 		var flags: int = (1 if _player.is_crouching() else 0) | (_player.life << 1)
 		var share: int = roundi(100.0 * _player.health.current() / maxf(_player.health.max_health, 1.0))
 		var pitch: float = asin(clampf(-_player.weapons.global_basis.z.y, -1.0, 1.0))
-		_pose.rpc(Time.get_ticks_msec(), _player.global_position, _player.rotation.y, pitch, flags, share)
+		var bytes := PackedByteArray()
+		bytes.resize(POSE_BYTES)
+		bytes.encode_u32(0, Time.get_ticks_msec())
+		_encode_position(bytes, 4, _player.global_position)
+		bytes.encode_u16(10, roundi(fposmod(_player.rotation.y, TAU) / TAU * 65535.0))
+		bytes.encode_s16(12, roundi(pitch * ANGLE_SCALE))
+		bytes.encode_u8(14, flags)
+		bytes.encode_u8(15, clampi(share, 0, 100))
+		_pose.rpc(bytes)
 	var now: int = Time.get_ticks_msec()
 	for remote: Remote in _remotes.values():
 		remote.update(now, delta)
@@ -202,13 +218,15 @@ func _update_spectator() -> void:
 
 
 @rpc("any_peer", "call_remote", "unreliable_ordered")
-func _pose(sent_ms: int, at: Vector3, yaw: float, pitch: float, flags: int, health_percent: int) -> void:
+func _pose(bytes: PackedByteArray) -> void:
 	var sender: int = multiplayer.get_remote_sender_id()
 	var remote: Remote = _remotes.get(sender)
-	if remote == null:
+	if remote == null or bytes.size() != POSE_BYTES:
 		return
-	remote.add(Time.get_ticks_msec(), sent_ms, at, yaw, flags, health_percent)
-	remote.hiker.aim(pitch)
+	var yaw: float = bytes.decode_u16(10) / 65535.0 * TAU
+	remote.add(Time.get_ticks_msec(), bytes.decode_u32(0), _decode_position(bytes, 4), yaw,
+			bytes.decode_u8(14), bytes.decode_u8(15))
+	remote.hiker.aim(bytes.decode_s16(12) / ANGLE_SCALE)
 	# Heard from them for the first time: which gun they hold (a change before both sides were in the
 	# match would have been missed).
 	if not remote.asked:
@@ -221,8 +239,31 @@ func _pose(sent_ms: int, at: Vector3, yaw: float, pitch: float, flags: int, heal
 func _on_acted(action: WeaponHolder.Act, rounds: int) -> void:
 	var weapons: WeaponHolder = _player.weapons
 	var data: WeaponData = weapons.melee_weapon if action >= WeaponHolder.Act.SWING else weapons.weapon
-	if data:
-		_acted.rpc(action, String(data.id), rounds, weapons.global_transform)
+	if data == null:
+		return
+	var aim: Transform3D = weapons.global_transform
+	var turn: Quaternion = aim.basis.get_rotation_quaternion()
+	var bytes := PackedByteArray()
+	bytes.resize(ACTED_BYTES)
+	bytes.encode_u8(0, action)
+	bytes.encode_u8(1, clampi(rounds, 1, 255))
+	_encode_position(bytes, 2, aim.origin)
+	bytes.encode_s16(8, roundi(turn.x * UNIT_SCALE))
+	bytes.encode_s16(10, roundi(turn.y * UNIT_SCALE))
+	bytes.encode_s16(12, roundi(turn.z * UNIT_SCALE))
+	bytes.encode_s16(14, roundi(turn.w * UNIT_SCALE))
+	_acted.rpc(String(data.id), bytes)
+
+
+static func _encode_position(bytes: PackedByteArray, at: int, position: Vector3) -> void:
+	var p: Vector3 = position * CM
+	bytes.encode_s16(at, clampi(roundi(p.x), -32768, 32767))
+	bytes.encode_s16(at + 2, clampi(roundi(p.y), -32768, 32767))
+	bytes.encode_s16(at + 4, clampi(roundi(p.z), -32768, 32767))
+
+
+static func _decode_position(bytes: PackedByteArray, at: int) -> Vector3:
+	return Vector3(bytes.decode_s16(at), bytes.decode_s16(at + 2), bytes.decode_s16(at + 4)) / CM
 
 
 func _on_threw(item: EquipmentData, thrown: Node3D) -> void:
@@ -251,12 +292,17 @@ func _held(weapon_id: String) -> void:
 
 ## Their gun went off (or their melee weapon swung, struck, or went into its held mode), from `aim`.
 @rpc("any_peer", "call_remote", "reliable")
-func _acted(action: int, weapon_id: String, rounds: int, aim: Transform3D) -> void:
+func _acted(weapon_id: String, bytes: PackedByteArray) -> void:
 	var remote: Remote = _remotes.get(multiplayer.get_remote_sender_id())
 	var data := _load(WEAPONS, weapon_id) as WeaponData
-	if remote == null or data == null or action < 0 or action > WeaponHolder.Act.RELEASE:
+	if remote == null or data == null or bytes.size() != ACTED_BYTES:
 		return
-	remote.hiker.weapons.replay(action as WeaponHolder.Act, data, clampi(rounds, 1, 16), aim)
+	var action: int = bytes.decode_u8(0)
+	if action > WeaponHolder.Act.RELEASE:
+		return
+	var turn := Quaternion(bytes.decode_s16(8), bytes.decode_s16(10), bytes.decode_s16(12), bytes.decode_s16(14))
+	var aim := Transform3D(Basis((turn / UNIT_SCALE).normalized()), _decode_position(bytes, 2))
+	remote.hiker.weapons.replay(action as WeaponHolder.Act, data, clampi(bytes.decode_u8(1), 1, 16), aim)
 	if action == WeaponHolder.Act.SWING:
 		remote.hiker.swing(1.0 / data.fire_rate)
 
