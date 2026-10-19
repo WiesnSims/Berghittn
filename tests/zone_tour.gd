@@ -25,6 +25,7 @@ extends Node
 ## goassl / mistgabel / rute: the melee weapon on V: a blow into wanderers on the pasture, then V held
 ## past the blow (the Goaßl's lash, the Mistgabel lifting and hurling, the Rute's Larve); for the
 ## Rute also the Krampus dropping it.
+## trophies: the Stube's stuffed animals (M8), the trophy wall empty and full, the Raurakl hit.
 ## alphorn: the horn in hand, a blast into a crowd on the pasture, the Echo, the reload, and the horn
 ## shown over the Hüttentruhe.
 
@@ -116,6 +117,8 @@ func _ready() -> void:
 		await _brennkessel_tour(main)
 	elif mode in ["goassl", "mistgabel", "rute"]:
 		await _melee_tour(main, mode)
+	elif mode == "trophies":
+		await _trophy_tour(main)
 	else:
 		await _zones(main)
 	get_tree().quit()
@@ -143,6 +146,46 @@ func _zones(main: Node) -> void:
 		for i: int in 3:
 			await get_tree().process_frame
 		await _save(view[0])
+
+
+func _trophy_tour(main: Node) -> void:
+	(main.get_node("UI") as CanvasLayer).hide()
+	var camera := Camera3D.new()
+	camera.fov = 70.0
+	add_child(camera)
+	camera.current = true
+	var views: Array = [
+		["trophy_fireplace", Vector3(2.6, 1.7, 1.6), Vector3(6.2, 2.0, 0.3)],
+		["trophy_bar", Vector3(-6.4, 1.7, -2.4), Vector3(-8.9, 1.9, -5.9)],
+		["trophy_auerhahn", Vector3(-0.6, 1.7, 3.2), Vector3(-0.1, 2.6, 6.0)],
+		["trophy_hall", Vector3(-6.0, 1.7, 3.0), Vector3(6.5, 3.0, -2.0)],
+		["trophy_wall", Vector3(2.4, 2.0, -1.0), Vector3(7.0, 3.6, -3.4)],
+		["trophy_gams", Vector3(4.9, 2.4, 0.7), Vector3(6.3, 2.55, 0.0)],
+		["trophy_marder", Vector3(5.0, 1.95, 1.5), Vector3(5.85, 1.7, 0.8)],
+		["trophy_hirsch", Vector3(-8.0, 2.3, -4.3), Vector3(-8.2, 2.5, -6.0)],
+		["trophy_mankei", Vector3(-9.2, 1.6, -4.4), Vector3(-9.6, 1.3, -5.2)],
+	]
+	for view: Array in views:
+		camera.look_at_from_position(view[1], view[2])
+		for i: int in 3:
+			await get_tree().process_frame
+		await _save(view[0])
+	var wall := main.find_child("TrophyWall", true, false) as TrophyWall
+	for i: int in 6:
+		wall._hang(TrophyWall.KRAMPUS if i % 2 == 0 else TrophyWall.PERCHTE, "")
+	await get_tree().create_timer(0.6).timeout
+	camera.look_at_from_position(Vector3(2.4, 2.0, -1.0), Vector3(7.0, 3.6, -3.4))
+	await _save("trophy_wall_full")
+	camera.look_at_from_position(Vector3(4.6, 3.4, -3.0), Vector3(7.0, 3.8, -3.4))
+	await _save("trophy_wall_close")
+	var raurakl := main.find_child("Raurakl", true, false) as Raurakl
+	camera.look_at_from_position(Vector3(-9.2, 5.15, -0.4), Vector3(-11.0, 5.4, 1.0))
+	for i: int in 3:
+		await get_tree().process_frame
+	await _save("trophy_raurakl")
+	raurakl.receive_hit(10, false, false, main.get_node("Player") as Player)
+	await get_tree().create_timer(0.3).timeout
+	await _save("trophy_raurakl_hit")
 
 
 func _guns(main: Node) -> void:

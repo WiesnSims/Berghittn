@@ -37,6 +37,7 @@
 [ext_resource type="Script" path="res://scripts/audio/ambience.gd" id="36"]
 [ext_resource type="Script" path="res://scripts/audio/band_director.gd" id="37"]
 [ext_resource type="Script" path="res://scripts/ui/lobby.gd" id="38"]
+[ext_resource type="Script" path="res://scripts/trophies/hat_unlocks.gd" id="39"]
 
 [sub_resource type="NavigationMesh" id="NavMesh"]
 geometry_collision_mask = 1
@@ -128,6 +129,9 @@ atmosphere = NodePath("../Atmosphere")
 
 [node name="BandDirector" type="Node" parent="."]
 script = ExtResource("37")
+
+[node name="HatUnlocks" type="Node" parent="."]
+script = ExtResource("39")
 
 [node name="PostFX" type="CanvasLayer" parent="."]
 layer = 0

@@ -31,6 +31,8 @@ var _profile: Dictionary
 var _name_edit: LineEdit
 var _head_label: Label
 var _hat_label: Label
+# What a hat not earned yet takes (HatUnlocks).
+var _hat_hint: Label
 var _jacket_swatches: Array[Button] = []
 var _trouser_swatches: Array[Button] = []
 var _offline_box: VBoxContainer
@@ -132,6 +134,10 @@ func _build() -> void:
 	_row(right, "UI_LOBBY_NAME").add_child(_name_edit)
 	_head_label = _add_stepper(right, "UI_LOBBY_HEAD", "head", HikerStyle.HEADS.size())
 	_hat_label = _add_stepper(right, "UI_LOBBY_HAT", "hat", HikerStyle.HATS.size())
+	_hat_hint = _label("", 15, HINT_COLOR)
+	_hat_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_hat_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	right.add_child(_hat_hint)
 	_row(right, "UI_LOBBY_JACKET").add_child(_swatches(HikerStyle.JACKETS, "jacket", _jacket_swatches))
 	_row(right, "UI_LOBBY_TROUSERS").add_child(_swatches(HikerStyle.TROUSERS, "trousers", _trouser_swatches))
 	right.add_child(HSeparator.new())
@@ -293,7 +299,7 @@ func _swatches(colors: Array[Color], field: String, into: Array[Button]) -> Grid
 # --- behaviour ------------------------------------------------------------------------------------
 
 func _load_profile() -> void:
-	_profile = Settings.profile_for(Net.my_id())
+	_profile = Settings.edit_profile(Net.my_id())
 	_name_edit.text = _profile["name"]
 
 
@@ -302,7 +308,8 @@ func _set_field(field: String, value: Variant) -> void:
 	_profile = HikerStyle.sanitize(_profile)
 	Settings.profile = _profile.duplicate()
 	Settings.save()
-	Net.update_profile(_profile)
+	# The others see a hat only once it is earned; we see it here already.
+	Net.update_profile(Settings.profile_for(Net.my_id()))
 	_refresh()
 
 
@@ -361,6 +368,10 @@ func _refresh() -> void:
 		_status.text = ""
 	_head_label.text = tr(HikerStyle.HEADS[_profile["head"]])
 	_hat_label.text = tr(HikerStyle.HATS[_profile["hat"]])
+	_hat_hint.text = HatUnlocks.hint(_profile["hat"])
+	if _hat_hint.text != "":
+		_hat_label.text = tr("UI_HAT_LOCKED") % _hat_label.text
+	_hat_hint.visible = _hat_hint.text != ""
 	for i: int in _jacket_swatches.size():
 		_jacket_swatches[i].set_pressed_no_signal(i == _profile["jacket"])
 	for i: int in _trouser_swatches.size():

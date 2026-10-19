@@ -248,6 +248,22 @@ func save(path: String, root_name: String, rig_script: Script, settings: Diction
 	root.free()
 
 
+## Saves every part as a plain, unskinned mesh at `prefix` + "_" + part + ".res", for props that never
+## move (the Stube's stuffed animals); bones given to the shapes are ignored.
+func save_static(prefix: String) -> void:
+	for part: StringName in _surfaces:
+		if (_surfaces[part] as Dictionary).is_empty():
+			continue
+		var mesh := ArrayMesh.new()
+		for material: StringName in _surfaces[part]:
+			var s: Surface = _surfaces[part][material]
+			mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, s.static_arrays(scale))
+			mesh.surface_set_material(mesh.get_surface_count() - 1, _material(material))
+		var mesh_path: String = prefix + "_" + part + ".res"
+		ResourceSaver.save(mesh, mesh_path, ResourceSaver.FLAG_COMPRESS)
+		mesh.take_over_path(mesh_path)
+
+
 func _ragdoll(skeleton: Skeleton3D) -> PhysicalBoneSimulator3D:
 	var simulator := PhysicalBoneSimulator3D.new()
 	simulator.name = "Ragdoll"
@@ -413,5 +429,18 @@ class Surface:
 		arrays[Mesh.ARRAY_COLOR] = colors
 		arrays[Mesh.ARRAY_BONES] = bone_ids
 		arrays[Mesh.ARRAY_WEIGHTS] = weights
+		arrays[Mesh.ARRAY_INDEX] = indices
+		return arrays
+
+	func static_arrays(scale: float) -> Array:
+		var scaled := PackedVector3Array()
+		for p: Vector3 in positions:
+			scaled.append(p * scale)
+		var arrays: Array = []
+		arrays.resize(Mesh.ARRAY_MAX)
+		arrays[Mesh.ARRAY_VERTEX] = scaled
+		arrays[Mesh.ARRAY_NORMAL] = normals
+		arrays[Mesh.ARRAY_TEX_UV] = uvs
+		arrays[Mesh.ARRAY_COLOR] = colors
 		arrays[Mesh.ARRAY_INDEX] = indices
 		return arrays

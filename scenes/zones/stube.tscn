@@ -21,6 +21,13 @@
 [ext_resource type="Script" path="res://scripts/zones/wall_buy.gd" id="17_o3sgg"]
 [ext_resource type="Resource" path="res://data/weapons/jagdflinte.tres" id="18_rb0r0"]
 [ext_resource type="Resource" path="res://data/equipment/kuhglocke.tres" id="21_17jin"]
+[ext_resource type="PackedScene" path="res://scenes/props/trophy_wall.tscn" id="m8_wall"]
+[ext_resource type="PackedScene" path="res://scenes/props/raurakl.tscn" id="m8_raurakl"]
+[ext_resource type="ArrayMesh" path="res://assets/models/trophies/trophy_gams.res" id="m8_gams"]
+[ext_resource type="ArrayMesh" path="res://assets/models/trophies/trophy_hirsch.res" id="m8_hirsch"]
+[ext_resource type="ArrayMesh" path="res://assets/models/trophies/trophy_auerhahn.res" id="m8_auerhahn"]
+[ext_resource type="ArrayMesh" path="res://assets/models/trophies/trophy_mankei.res" id="m8_mankei"]
+[ext_resource type="ArrayMesh" path="res://assets/models/trophies/trophy_marder.res" id="m8_marder"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_pvch6"]
 _surfaces = [{
@@ -1120,3 +1127,31 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 3.5)
 transform = Transform3D(-3.6199901e-06, 0, 1, 0, 1, 0, -1, 0, -3.6199901e-06, 7, 1.5, 5.35)
 script = ExtResource("17_o3sgg")
 equipment = ExtResource("21_17jin")
+
+[node name="Stuffed" type="Node3D" parent="."]
+
+[node name="TrophyWall" parent="Stuffed" instance=ExtResource("m8_wall")]
+transform = Transform3D(0, 0, 1.3, 0, 1.3, 0, -1.3, 0, 0, 6.948, 3.7, -3.4)
+
+[node name="Gams" type="MeshInstance3D" parent="Stuffed"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 6.26, 2.55, 0)
+mesh = ExtResource("m8_gams")
+
+[node name="Marder" type="MeshInstance3D" parent="Stuffed"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.85, 1.58, 0.8)
+mesh = ExtResource("m8_marder")
+
+[node name="Hirsch" type="MeshInstance3D" parent="Stuffed"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -8.2, 2.45, -5.96)
+mesh = ExtResource("m8_hirsch")
+
+[node name="Mankei" type="MeshInstance3D" parent="Stuffed"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -9.6, 1.11, -5.2)
+mesh = ExtResource("m8_mankei")
+
+[node name="Auerhahn" type="MeshInstance3D" parent="Stuffed"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 2.6, 5.96)
+mesh = ExtResource("m8_auerhahn")
+
+[node name="Raurakl" parent="Stuffed" instance=ExtResource("m8_raurakl")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -10.96, 5.5, 1)
