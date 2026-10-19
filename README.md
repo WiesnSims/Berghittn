@@ -324,9 +324,22 @@ work (measured in `NETWORKING.md` section 9).
 - **Build id**: `tools/build_web.mjs` writes `build_id.txt` (gitignored, packed via the preset's
   include filter); the relay turns away a browser whose build differs from the host's.
 - **Hiker**: `godot --headless --script res://tools/models/build_hiker.gd` builds
-  `assets/models/hiker.tscn` (body, Head0-4, Hat1-5 as separate skinned parts; the jacket and trousers
+  `assets/models/hiker.tscn` (body, Head0-4, Hat1-9 as separate skinned parts; the jacket and trousers
   use their own neutral materials that `Hiker` tints per player). Visual check:
   `godot res://tests/hiker_view.tscn -- <dir>`, the lobby: `godot res://tests/lobby_view.tscn -- <dir>`.
+- **Stuffed animals (M8)**:
+  - `tools/models/stuffed.gd` draws each animal once in its own frame, and a transform places it
+    on a hat (`build_hiker.gd`, Hat3-9) or in the Stube.
+  - `godot --headless --script res://tools/models/build_trophies.gd` builds the Stube's meshes into
+    `assets/models/trophies/` as plain unskinned meshes (`CharacterBuilder.save_static`).
+  - `HatUnlocks` (a node in main) earns the locked hats (`HikerStyle.LOCKED`) into
+    `Settings.unlocks` / `Settings.perchten`.
+  - `Settings.profile_for` leaves out a hat that is not earned yet, while `edit_profile` (the
+    lobby) keeps it.
+  - `TrophyWall` and `Raurakl` live in `scenes/props/`.
+  - Test: `godot --headless --fixed-fps 60 res://tests/m8_trophies.tscn`.
+  - Look: `godot res://tests/zone_tour.tscn -- <dir> trophies` and `hiker_view` (close-ups of
+    each stuffed hat).
 
 Tests (the relay runs locally in `wrangler dev`, or set `RELAY_URL=wss://<preview>.berghittn.pages.dev`):
 
@@ -618,7 +631,7 @@ Frame rate with a full crowd: 24 enemies walking at the player, the six nearest 
 main scene with `tests/*` left in the export (2026-10-18: 144 FPS, worst frame 13.8 ms).
 
 ```
-godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|alphorn|pfanne|knoedel|glocke|fladen|boeller|rodel|harmonika|brennkessel|goassl|mistgabel|rute
+godot res://tests/zone_tour.tscn -- <out_dir> zones|guns|motion|aim|m5|trophies|alphorn|pfanne|knoedel|glocke|fladen|boeller|rodel|harmonika|brennkessel|goassl|mistgabel|rute
 ```
 
 Also needs a window: one frame per zone (all doors open), the wall-buys and a door mid-swing; or

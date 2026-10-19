@@ -715,6 +715,30 @@ fix console errors, commit. Stop and report after each milestone.
   which also keeps the relay at about 20 billed frames a second per player; two players clear waves
   1 to 10 together in the headless test, and two browsers stay in one match through 10 waves.
 
+**M8 — Stuffed animals (cosmetics, user request 2026-10-19)**
+After the milestones, the user asked for stuffed-animal cosmetics and approved all of the
+suggestions, with an Edelmarder (marten) added:
+- After the play-test (approved 2026-10-19) the Stirnband, Skihelm and Schildkappe were dropped as
+  too boring: the lobby has no hat, the Tirolerhut, the Bommelmütz and the seven below.
+- Stuffed hats in the lobby: Mankei-Haubn (a Murmeltier lying on the head), Fuchspelz (fox-fur
+  hat with the fox's head and tail), Auerhahn-Huat (a felt hat with a displaying Auerhahn on top),
+  Marder-Haubn (an Edelmarder curled round the head, biting its tail).
+- Earned hats, kept in this browser only (accounts stay out of scope): the Raurakl-Kappl (find the
+  Raurakl in the Stube and shoot it), the Perchtn-Haubn (5 Perchten fallen in our matches, all
+  together), the Krampus-Hörndl (survive wave 10). The lobby shows a locked hat on our own hiker
+  with what it takes; the others see it only once it is earned.
+- The Stube has stuffed animals:
+  - a Gamskopf on the chimney;
+  - an Edelmarder stalking along a branch on the mantel;
+  - a Hirsch skull with antlers over the bar, and a Mankei on the bar;
+  - an Auerhahn on a shelf by the Erker;
+  - up on the gallery, the Raurakl (a Wolpertinger: a hare with antlers, wings and fangs). Shot or
+    struck, it spins and grumbles. This is decoration, so only the shooter's own screen shows it.
+- The Trophäenwand on the Stube's east wall has six empty plaques. Every Krampus that falls, and
+  the first Perchte of a match (then every 5th), goes up on the next free plaque with a banner.
+  Each screen counts the kills itself, and co-op shows every kill on every screen in the same
+  order, so all the walls match.
+
 ## 13. Project structure
 
 ```

@@ -503,3 +503,16 @@ const HIKER_HOLD_STANCE: Dictionary = {
 const NET_SLOW_RELAY_INTERVAL: float = 0.25
 ## Clicks right after the mouse is taken (a menu click) do not fire for this long (s).
 const CAPTURE_FIRE_GRACE: float = 0.25
+
+# --- Stuffed animals and trophies (M8, user request 2026-10-19) -----------------------------------
+## The trophy wall hangs the first Perchte that falls in a match, then every this many.
+const TROPHY_PERCHTE_EVERY: int = 5
+## A trophy pops onto its plaque in this long (s).
+const TROPHY_POP_TIME: float = 0.35
+## Perchten that have to fall in our matches (all together) for the Perchtn-Haubn.
+const UNLOCK_PERCHTEN: int = 5
+## Survive this wave for the Krampus-Hörndl.
+const UNLOCK_WAVE: int = 10
+## The Raurakl, when hit: two turns in this long (s), and its grumble shows this long after.
+const RAURAKL_SPIN_TIME: float = 0.8
+const RAURAKL_BUBBLE_TIME: float = 2.5

@@ -25,6 +25,9 @@ var render_scale: float = 1.0
 ## Co-op name and hiker (HikerStyle profile), chosen in the lobby; empty until the player changes
 ## something there, and until then each player wears their peer's default (profile_for).
 var profile: Dictionary = {}
+## Earned hats (HatUnlocks): their unlock ids, and how many Perchten have fallen in our matches.
+var unlocks: Array[String] = []
+var perchten: int = 0
 
 
 func _ready() -> void:
@@ -78,11 +81,26 @@ func _load() -> void:
 	var saved: Variant = file.get_value(SECTION, "profile", {})
 	if saved is Dictionary and not (saved as Dictionary).is_empty():
 		profile = HikerStyle.sanitize(saved)
+	var earned: Variant = file.get_value(SECTION, "unlocks", [])
+	if earned is Array:
+		for id: Variant in earned:
+			if id is String and not (id as String) in unlocks:
+				unlocks.append(id)
+	perchten = maxi(int(file.get_value(SECTION, "perchten", 0)), 0)
 
 
 ## Our hiker as peer `peer` wears it: the one dressed in the lobby, or that peer's default, so
-## four players who never dressed theirs still look different (NETWORKING.md section 6).
+## four players who never dressed theirs still look different (NETWORKING.md section 6). A hat not
+## earned yet stays in the lobby (edit_profile) and is not worn.
 func profile_for(peer: int) -> Dictionary:
+	var worn: Dictionary = edit_profile(peer)
+	if not HatUnlocks.has_hat(worn["hat"]):
+		worn["hat"] = 0
+	return worn
+
+
+## Our hiker as the lobby shows it to us, a hat we have not earned yet included.
+func edit_profile(peer: int) -> Dictionary:
 	return HikerStyle.sanitize(profile) if not profile.is_empty() else HikerStyle.default_profile(peer)
 
 
@@ -96,4 +114,6 @@ func save() -> void:
 	for bus: StringName in BUSES:
 		file.set_value(SECTION, "volume_" + bus, volume(bus))
 	file.set_value(SECTION, "profile", profile)
+	file.set_value(SECTION, "unlocks", unlocks)
+	file.set_value(SECTION, "perchten", perchten)
 	file.save(SAVE_PATH)

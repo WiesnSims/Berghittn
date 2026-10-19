@@ -41,7 +41,8 @@ The enemy models (M6 part 4) are self-made: built from tubes, balls and boxes by
 `gun_steel` and `painted_wood`. The props (M6 part 4c) are reshaped the same way by
 `tools/models/build_props.tscn`, with the textures above (the animals in `fur`); the Deitscha Tourist
 is built like the enemies, and so is the co-op player hiker (M7, `tools/models/build_hiker.gd`: its
-jacket and trousers reuse the `wool` and `leather` textures, tinted per player). No external models
+jacket and trousers reuse the `wool` and `leather` textures, tinted per player), and so are the
+stuffed animals and trophies (M8, `tools/models/stuffed.gd`, `build_trophies.gd`). No external models
 anywhere.
 
 The title screen's teaser picture (`assets/ui/teaser.jpg`, #77) is rendered from the game itself by
