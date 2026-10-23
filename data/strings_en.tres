@@ -221,5 +221,12 @@ messages = {
 [&"", &"UI_HAT_UNLOCKED"]: [&"New hat for the lobby: %s!"],
 [&"", &"UI_UNLOCK_RAURAKL"]: [&"Somewhere in the hut sits a Raurakl. Shoot it."],
 [&"", &"UI_UNLOCK_PERCHTEN"]: [&"Perchten defeated: %d / %d"],
-[&"", &"UI_UNLOCK_KRAMPUS"]: [&"Survive wave %d"]
+[&"", &"UI_UNLOCK_KRAMPUS"]: [&"Survive wave %d"],
+[&"", &"UI_NOMOI"]: [&"Nomoi!"],
+[&"", &"UI_NOMOI_WAITING"]: [&"You're in!"],
+[&"", &"UI_NOMOI_COUNT"]: [&"%d / %d want nomoi"],
+[&"", &"UI_PLAY_WITH_FRIENDS"]: [&"Play with friends"],
+[&"", &"UI_WERTUNG_NAME"]: [&"Player"],
+[&"", &"UI_WERTUNG_POINTS"]: [&"Points"],
+[&"", &"UI_LOBBY_MATCH_RUNNING"]: [&"Match running, you're in the next one."]
 }

@@ -28,6 +28,7 @@ func _ready() -> void:
 	_start_screen.play_requested.connect(_request_play)
 	_pause_menu.resume_requested.connect(_request_play)
 	_death_screen.restart_requested.connect(_restart)
+	_death_screen.friends_requested.connect(_play_with_friends)
 	_start_screen.settings_requested.connect(_settings_menu.open)
 	_pause_menu.settings_requested.connect(_settings_menu.open)
 	_start_screen.coop_requested.connect(_open_lobby)
@@ -43,6 +44,11 @@ func _ready() -> void:
 	elif GameState.open_lobby and Net.in_lobby():
 		GameState.open_lobby = false
 		_open_lobby()
+	elif GameState.create_room:
+		# Play with friends, from the solo end screen: a room of our own, its invite link ready.
+		GameState.create_room = false
+		_open_lobby()
+		Net.create_room()
 	elif GameState.has_started:
 		# A restart already asked for pointer lock; go straight in once the browser grants it.
 		_state = State.CAPTURING
@@ -108,8 +114,9 @@ func _open_lobby() -> void:
 
 func _on_match_started() -> void:
 	if _coop:
-		# This scene already ran a match; the new one starts in a fresh one.
+		# This scene already ran a match; the new one starts in a fresh one, behind "Join match".
 		GameState.pending_match = true
+		GameState.has_started = false
 		get_tree().paused = false
 		get_tree().reload_current_scene.call_deferred()
 		return
@@ -119,8 +126,8 @@ func _on_match_started() -> void:
 	_setup_coop()
 	# The world runs for everyone from now on, whether or not this browser has its pointer lock yet.
 	get_tree().paused = false
-	if Net.is_host():
-		# The host's Start click is the gesture the browser wants for pointer lock.
+	if Net.is_host() and not Net.auto_started:
+		# The host's Start click is the gesture the browser wants for pointer lock (Nomoi! has none).
 		_request_play()
 	else:
 		_start_screen.set_join_mode(true)
@@ -157,15 +164,20 @@ func _setup_coop() -> void:
 	events.setup($EventDirector as EventDirector)
 
 
-## Everyone is down or out: the match is over; all go back to the same room's lobby from here.
+## Everyone is down or out: the match is over. The room is a lobby again (friends may join), and
+## the end screen offers Nomoi! (everyone again) or the lobby.
 func _on_coop_over(wave: int) -> void:
 	_state = State.DEAD
+	# Nothing new turns up behind the end screen, and no kill after the end counts.
+	_waves.process_mode = Node.PROCESS_MODE_DISABLED
+	($EventDirector as Node).process_mode = Node.PROCESS_MODE_DISABLED
+	Net.share_run(_player.stats.row(HikerStyle.display_name(Settings.profile_for(Net.my_id()), Net.my_id()), _player.points.total))
+	Net.back_to_lobby()
 	await get_tree().create_timer(Constants.DEATH_SCREEN_DELAY).timeout
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_pause_menu.hide()
 	_hud.end_coop()
 	_death_screen.present(wave, _player.points.total, _player.stats, Settings.record_run(wave, _player.points.total), true)
-	Net.back_to_lobby()
 
 
 func _on_net_ended(reason: String) -> void:
@@ -190,7 +202,8 @@ func _on_player_died() -> void:
 
 func _restart() -> void:
 	if _coop:
-		# Co-op: back to the room's lobby, in a fresh scene.
+		# Co-op: back to the room's lobby, in a fresh scene; the others' Nomoi! no longer waits for us.
+		Net.skip_nomoi()
 		GameState.has_started = false
 		GameState.open_lobby = true
 		get_tree().paused = false
@@ -198,4 +211,12 @@ func _restart() -> void:
 		return
 	# Request the lock inside the click so the reloaded scene can skip the menus.
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	get_tree().reload_current_scene()
+
+
+## Solo end screen: a room of our own, its lobby open with the invite link ready.
+func _play_with_friends() -> void:
+	GameState.has_started = false
+	GameState.create_room = true
+	get_tree().paused = false
 	get_tree().reload_current_scene()

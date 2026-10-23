@@ -53,13 +53,14 @@ async function main() {
 	const [, code] = await host.line(/^ROOM (\d+)/);
 	const guests = scene.includes('net_four') ? ['guest1', 'guest2', 'guest3'] : ['guest'];
 	const runs = [host.exited, ...guests.map((role) => godot(role, [`--room=${code}`]).exited)];
-	// The lobby test also checks that a late joiner is turned away.
-	if (scene.includes('net_lobby')) {
+	// A late joiner once the match runs: turned away (net_lobby), or waiting for the next one (net_nomoi).
+	const late = /net_(lobby|nomoi)/.test(scene);
+	if (late) {
 		await host.line(/^STARTED/);
 		runs.push(godot('late', [`--room=${code}`]).exited);
 	}
 	const results = await Promise.all(runs);
-	console.log(`exit codes host/${guests.join('/')}${scene.includes('net_lobby') ? '/late' : ''}: ${results.join('/')}`);
+	console.log(`exit codes host/${guests.join('/')}${late ? '/late' : ''}: ${results.join('/')}`);
 	return results.every((c) => c === 0);
 }
 
