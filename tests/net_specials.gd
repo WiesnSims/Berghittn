@@ -5,7 +5,8 @@ extends Node
 ## are replayed there (the bell lures on the host); the host's burning enemy burns on the guest; the
 ## guest's Mistgabel lifts, carries and hurls the host's enemy; the Krampus-Rute drop is the guest's
 ## alone; and every event comes to the guest: the Murmeltier caught, die Resi milked, the Bierfassl
-## tapped, the Tourist's Eisstöcke, each paid in the guest's own game, with the host's banners.
+## tapped, the Tourist's Eisstöcke, each paid in the guest's own game, with the host's banners; an
+## enemy's line (Gredn) picked by the host is heard and shown on the guest.
 
 const TIMEOUT: float = 25.0
 const ALPHORN: WeaponData = preload("res://data/weapons/alphorn.tres")
@@ -112,6 +113,33 @@ func _run() -> bool:
 			return _fail("the hurled puppet never landed")
 	print("enemy: burning shown on the guest, lifted, carried and hurled by the guest's fork")
 	if not await _sync("fork"):
+		return false
+	# --- a line (Gredn): picked by the host, its index sent, heard and shown on the guest ---
+	var gredn: Gredn = Gredn.current
+	if host:
+		var talker: Enemy = null
+		for child: Node in waves.get_children():
+			var enemy := child as Enemy
+			if enemy and enemy.is_alive() and enemy.net_id != 0:
+				talker = enemy
+		if talker == null:
+			return _fail("no enemy left to talk")
+		gredn.always = true
+		gredn._gap_left = 0.0
+		talker.talk_left = 0.0
+		var line: int = gredn.talk(talker, Gredn.Moment.SPOT)
+		gredn.always = false
+		if line < 0:
+			return _fail("the host's enemy said nothing")
+		_note.rpc("line", line)
+	else:
+		(_player.get_node("Head/Camera3D") as Camera3D).make_current()
+		if not await _until(func() -> bool: return _marks.has("line") and gredn.last_heard == int(_marks["line"])):
+			return _fail("the host's line was not heard on the guest (%d)" % gredn.last_heard)
+		if gredn.shown() != 1:
+			return _fail("the line is not shown over the puppet")
+	print("gredn: the host's line heard and shown on the guest")
+	if not await _sync("gredn"):
 		return false
 	if host:
 		for child: Node in waves.get_children():

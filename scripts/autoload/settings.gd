@@ -19,6 +19,8 @@ var aim_sensitivity: float = Constants.DEFAULT_AIM_SENSITIVITY
 var invert_y: bool = false
 ## Damage numbers over hit enemies (M9 part 2): off by default.
 var damage_numbers: bool = false
+## Enemies say their lines (M9 part 3, Gredn): on by default.
+var chatter: bool = true
 var locale: String = Constants.DEFAULT_LOCALE
 ## Linear 0..1 per bus name.
 var volumes: Dictionary = {}
@@ -79,6 +81,7 @@ func _load() -> void:
 	aim_sensitivity = file.get_value(SECTION, "aim_sensitivity", aim_sensitivity)
 	invert_y = file.get_value(SECTION, "invert_y", invert_y)
 	damage_numbers = file.get_value(SECTION, "damage_numbers", damage_numbers)
+	chatter = file.get_value(SECTION, "chatter", chatter)
 	var saved_locale: String = file.get_value(SECTION, "locale", locale)
 	if saved_locale in LOCALES:
 		locale = saved_locale
@@ -130,6 +133,7 @@ func save() -> void:
 	file.set_value(SECTION, "aim_sensitivity", aim_sensitivity)
 	file.set_value(SECTION, "invert_y", invert_y)
 	file.set_value(SECTION, "damage_numbers", damage_numbers)
+	file.set_value(SECTION, "chatter", chatter)
 	file.set_value(SECTION, "locale", locale)
 	file.set_value(SECTION, "render_scale", render_scale)
 	for bus: StringName in BUSES:

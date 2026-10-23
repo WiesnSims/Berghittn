@@ -20,6 +20,9 @@ var _coop: bool = false
 
 
 func _ready() -> void:
+	var gredn := Gredn.new()
+	gredn.name = "Gredn"
+	add_child(gredn)
 	var spawn := get_tree().get_first_node_in_group("player_spawn") as Node3D
 	_player.spawn_at(spawn.global_transform)
 	_hud.bind_player(_player)

@@ -85,6 +85,7 @@ func _announce(enemy: Enemy) -> void:
 	_by_id[enemy.net_id] = enemy
 	if not enemy.posed.is_connected(_on_posed):
 		enemy.posed.connect(_on_posed)
+		enemy.said.connect(_on_said)
 	_spawned.rpc(enemy.net_id, String(enemy.data.id), _waves.wave, enemy.global_transform, enemy.health)
 
 
@@ -123,6 +124,12 @@ func _send_snapshot() -> void:
 func _on_posed(enemy: Enemy, action: EnemyRig.Action, length: float) -> void:
 	if enemy.net_id != 0 and enemy.is_alive():
 		_posed.rpc(enemy.net_id, action, length)
+
+
+## A line (Gredn) picked here: its index goes out to the guests, before a dying enemy's death.
+func _on_said(enemy: Enemy, line: int) -> void:
+	if enemy.net_id != 0:
+		_said.rpc(enemy.net_id, line)
 
 
 func _on_damaged(node: Node3D, amount: int, is_headshot: bool, source: Node3D) -> void:
@@ -230,6 +237,13 @@ func _posed(id: int, action: int, length: float) -> void:
 	var puppet: Enemy = _by_id.get(id)
 	if puppet and puppet.is_alive():
 		puppet.puppet_pose(action as EnemyRig.Action, length)
+
+
+@rpc("authority", "call_remote", "reliable")
+func _said(id: int, line: int) -> void:
+	var puppet: Enemy = _by_id.get(id)
+	if puppet and puppet.is_alive() and Gredn.current:
+		Gredn.current.say(puppet, line)
 
 
 @rpc("authority", "call_remote", "reliable")

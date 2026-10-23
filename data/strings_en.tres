@@ -235,5 +235,6 @@ messages = {
 [&"", &"STREAK_BLUATBAD"]: [&"A echtes Kroatenjoahr!"],
 [&"", &"STREAK_ZWOA"]: [&"Zwoa Detschn mid oamoi aushoin!"],
 [&"", &"STREAK_SCHAEDLWEH"]: [&"Schädlweh!"],
-[&"", &"UI_SET_DAMAGE_NUMBERS"]: [&"Damage numbers"]
+[&"", &"UI_SET_DAMAGE_NUMBERS"]: [&"Damage numbers"],
+[&"", &"UI_SET_CHATTER"]: [&"Enemy chatter"]
 }
