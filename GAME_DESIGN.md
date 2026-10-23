@@ -740,6 +740,14 @@ suggestions, with an Edelmarder (marten) added:
   Each screen counts the kills itself, and co-op shows every kill on every screen in the same
   order, so all the walls match.
 
+**Death screen stats (user request 2026-10-23)**
+The game-over screen shows the run under the wave and points: kills, headshot kills (with their
+share), the favourite weapon (the one with the most kills; a kill goes to the weapon in hand, a
+melee kill to the melee weapon) and how many Schnaps went down (shrine and Freibier, again after
+going down). Each screen counts only its own player's run. The personal best (furthest wave, then
+more points on the same wave) is kept in this browser, solo and co-op alike; a better run says
+"New personal best!", otherwise the best is shown below.
+
 ## 13. Project structure
 
 ```

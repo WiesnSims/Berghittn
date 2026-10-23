@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/player.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player/player_health.gd" id="2"]
@@ -15,6 +15,7 @@
 [ext_resource type="Script" path="res://scripts/weapons/weapon_motion.gd" id="13"]
 [ext_resource type="Script" path="res://scripts/player/player_perks.gd" id="14"]
 [ext_resource type="Script" path="res://scripts/player/player_equipment.gd" id="15"]
+[ext_resource type="Script" path="res://scripts/player/player_stats.gd" id="16"]
 
 [sub_resource type="CapsuleShape3D" id="Capsule"]
 resource_local_to_scene = true
@@ -66,6 +67,9 @@ script = ExtResource("7")
 
 [node name="Perks" type="Node" parent="."]
 script = ExtResource("14")
+
+[node name="Stats" type="Node" parent="."]
+script = ExtResource("16")
 
 [node name="Equipment" type="Node" parent="."]
 script = ExtResource("15")

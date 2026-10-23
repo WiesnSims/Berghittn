@@ -164,7 +164,7 @@ func _on_coop_over(wave: int) -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_pause_menu.hide()
 	_hud.end_coop()
-	_death_screen.present(wave, _player.points.total, true)
+	_death_screen.present(wave, _player.points.total, _player.stats, Settings.record_run(wave, _player.points.total), true)
 	Net.back_to_lobby()
 
 
@@ -185,7 +185,7 @@ func _on_player_died() -> void:
 	await get_tree().create_timer(Constants.DEATH_SCREEN_DELAY).timeout
 	get_tree().paused = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	_death_screen.present(_waves.wave, _player.points.total)
+	_death_screen.present(_waves.wave, _player.points.total, _player.stats, Settings.record_run(_waves.wave, _player.points.total))
 
 
 func _restart() -> void:

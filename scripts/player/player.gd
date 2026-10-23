@@ -15,6 +15,7 @@ enum Life { ALIVE, DOWNED, OUT }
 @onready var health: PlayerHealth = $Health
 @onready var points: PlayerPoints = $Points
 @onready var perks: PlayerPerks = $Perks
+@onready var stats: PlayerStats = $Stats
 @onready var equipment: PlayerEquipment = $Equipment
 @onready var interactor: Interactor = $Interactor
 @onready var weapons: WeaponHolder = $Head/Camera3D/WeaponHolder
