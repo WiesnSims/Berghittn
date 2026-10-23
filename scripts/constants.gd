@@ -180,6 +180,10 @@ const PERK_STUR_INVINCIBLE_TIME: float = 4.0
 const PERK_COSY_STILL_SPEED: float = 0.3
 const PERK_COSY_TIME: float = 2.0
 const PERK_COSY_REGEN_MULTIPLIER: float = 3.0
+# ...but not while this many different enemies have hit within this many seconds (play-test: a
+# crowd could not get through 30 HP/s); then the normal 5 s wait applies.
+const PERK_COSY_SWARM_ATTACKERS: int = 2
+const PERK_COSY_SWARM_WINDOW: float = 3.0
 # Grantler (Obstler): damage share per enemy within the radius, and the most it adds.
 const PERK_GRANT_RADIUS: float = 5.0
 const PERK_GRANT_PER_ENEMY: float = 0.05

@@ -512,7 +512,7 @@ from the Brettljause below. Tuning numbers are `PERK_*` in constants.gd.
 
 | Schnaps | Perk | Cost | Effect |
 |---|---|---|---|
-| Jagertee | **Gmiatlichkeit** | 1500 | Stand still or crouch for 2 s: health regenerates at once (no 5 s wait) and three times as fast; a warm glow shows it |
+| Jagertee | **Gmiatlichkeit** | 1500 | Stand still or crouch for 2 s: health regenerates at once (no 5 s wait) and three times as fast; a warm glow shows it. Not while two or more different enemies have hit you within 3 s (play-test 2026-10-23: standing still was near invincible at wave 42) |
 | Enzian | **Sturschädl** | 2000 | Once per wave a deadly hit leaves 1 HP and 4 s of invincibility: pulsing gold screen glow, banner "Na, sicher ned!" |
 | Marillenbrand | **Böllerschuss** | 2500 | Starting a reload on an empty magazine sets off a Schützen black-powder Böller at your feet: 150 + 20·wave damage within 4.5 m (half at the edge, walls block it), survivors are thrown back; 6 s to pack the next charge |
 | Obstler | **Grantler** | 2500 | +5 % damage for every enemy within 5 m, up to +30 %; the tile shows the bonus |
