@@ -828,6 +828,20 @@ Perchte and Krampus as first sampled). First draft of the lines (all our own):
 - Bergknappe: "Glück auf!", "Do geht's eini!"; at a barricade "Des is a weicher Fels."
 - Perchte: growls and "Hö-hö-hö!"; before the lunge "Jetzt kimmst!"
 - Krampus: "Warst a brav?", "In mei Sackl mit dir!"
+- Built (2026-10-24, branch m9-gredn): Gredn (scripts/enemies/gredn.gd) holds every line (enemy,
+  moment, text, sound); the voices are made by tools/audio/voices.py (python tools/audio/build.py,
+  skipped without eSpeak NG). The moments: seeing a player (once a life, within 15 m, no wall
+  between), a groan (now and then a line instead), starting on a barricade, a hit taking at least
+  30 % of its health, the Perchte's lunge, dying (last words instead of the death cry); each with
+  its own chance (constants.gd, GREDN_*). A line is only picked with a player within 15 m; while it
+  plays the enemy does not groan. The text is a Label3D riding over the head as long as the voice
+  (at least 1.6 s), then fading; with two showing, a nearer line takes the farther one's place.
+  Setting "Enemy chatter" / "Gegner reden", on by default. Co-op: the host sends the line index
+  (CoopEnemies._said) before the enemy's death. Lines added to the draft (our own, play-test
+  them): Wanderer hit "Mei Fuaß…"; Tourist at a barricade "Hallo? Is des Zimmer no frei?", hit
+  "Aua! Des gibt a schlechte Bewertung!", dying "Null Sterne…"; Knappe hit "Des kitzlt nur.", dying
+  "Schicht is…"; Krampus hit "Des wirst ma büßn!", dying "I kimm wieder… nächsts Joahr!". Tests:
+  tests/m9_gredn, tests/net_specials.
 
 *Part 4 — Weapon upgrades: da Dengelstock*
 Our own take on the upgrade machine of zombie modes. A Dengelstock is the little anvil an Alm

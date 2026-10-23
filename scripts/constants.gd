@@ -309,6 +309,34 @@ const DAMAGE_NUMBER_HEIGHT: float = 2.0
 const DAMAGE_NUMBER_RISE: float = 0.6
 const DAMAGE_NUMBER_TIME: float = 0.8
 const DAMAGE_NUMBER_PIXEL_SIZE: float = 0.0012
+
+# Talking enemies, "Gredn" (M9 part 3). First numbers, tuned by play-test.
+## One line per enemy at most every this many seconds, and one overall every GAP_MIN..GAP_MAX.
+const GREDN_ENEMY_GAP: float = 20.0
+const GREDN_GAP_MIN: float = 2.5
+const GREDN_GAP_MAX: float = 3.5
+## Lines are said (and shown, heard) only within this many metres of a player.
+const GREDN_REACH: float = 15.0
+## At most this many lines shown at once (the nearest win).
+const GREDN_SHOWN: int = 2
+## The chance that a moment brings a line: spotting a player, a groan, starting on a barricade, a
+## hard hit, the Perchte's lunge, dying.
+const GREDN_CHANCE_SPOT: float = 0.6
+const GREDN_CHANCE_IDLE: float = 0.3
+const GREDN_CHANCE_BARRICADE: float = 0.5
+const GREDN_CHANCE_HIT: float = 0.4
+const GREDN_CHANCE_LUNGE: float = 0.6
+const GREDN_CHANCE_DEATH: float = 0.35
+## A hit "hard" enough for a line takes at least this share of the enemy's health and leaves it alive.
+const GREDN_HARD_HIT: float = 0.3
+## The text over the head: height over the feet (m, at model scale 1), size on screen, the seconds
+## it stays at least (else as long as the voice) and fades out.
+const GREDN_HEIGHT: float = 2.25
+const GREDN_PIXEL_SIZE: float = 0.0016
+const GREDN_TIME_MIN: float = 1.6
+const GREDN_FADE_TIME: float = 0.5
+## How loud the voices are (dB).
+const GREDN_VOLUME: float = -3.0
 # Ready ring at the crosshair (play-test, Alphorn): seconds the pulse takes when the gun is ready again.
 const READY_PULSE_TIME: float = 0.3
 const DAMAGE_FLASH_TIME: float = 0.4

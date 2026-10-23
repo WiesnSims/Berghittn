@@ -30,6 +30,7 @@ const EFFECTS: Array[Script] = [
 	preload("res://scripts/weapons/behaviors/tanzboden.gd"),
 	preload("res://scripts/perks/boeller_blast.gd"),
 	preload("res://scripts/effects/damage_number.gd"),
+	preload("res://scripts/effects/gredn_line.gd"),
 ]
 
 ## The world this warms up for (main's World); its materials are collected from it.

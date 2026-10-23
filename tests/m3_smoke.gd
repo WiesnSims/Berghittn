@@ -86,6 +86,8 @@ func _run() -> void:
 	player = main.get_node("Player")
 	waves = main.get_node("WaveManager")
 	player.weapons.hit_confirmed.connect(_on_hit_confirmed)
+	# Kill streak bonuses (M9 part 2) pay on top.
+	player.feedback.streak.connect(func(_text: String, bonus: int) -> void: expected_points += bonus)
 	Events.board_repaired.connect(func(_b: Node3D, s: Node3D) -> void:
 		if s == player:
 			repairs += 1

@@ -6,7 +6,9 @@
 
 Folders follow the audio buses: sfx/ (Effects), music/ (Music), ambience/ (Ambience). Variants are
 numbered name_1.ogg, name_2.ogg ...; the game picks one at random (scripts/autoload/sound.gd).
-Files are mono: positional sounds are mono anyway, and the band plays from an old gramophone."""
+Files are mono: positional sounds are mono anyway, and the band plays from an old gramophone.
+The enemies' voice lines (voices.py) need eSpeak NG; without it they are skipped, the files already
+there kept."""
 import sys
 import zlib
 from pathlib import Path
@@ -17,6 +19,7 @@ import soundfile as sf
 import dsp
 import music
 import sfx
+import voices
 
 ROOT = Path(__file__).resolve().parents[2] / "assets" / "audio"
 AMBIENCE = {"wind_loop", "fire_crackle", "creak"}
@@ -29,6 +32,11 @@ LOOPS = sfx.LOOPS | music.MUSIC_LOOPS | music.MUSICAL_LOOPS
 def jobs():
     for name, (fn, variants) in sfx.SOUNDS.items():
         yield ("ambience" if name in AMBIENCE else "sfx"), name, fn, variants
+    if voices.espeak():
+        for name, (fn, variants) in voices.SOUNDS.items():
+            yield "sfx", name, fn, variants
+    else:
+        print("eSpeak NG not found: the voice lines (gredn_*) are left as they are")
     for name, fn in music.MUSICAL_SFX.items():
         yield "sfx", name, fn, 1
     for name, fn in music.MUSIC.items():

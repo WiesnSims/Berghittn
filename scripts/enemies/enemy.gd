@@ -8,6 +8,8 @@ signal died(enemy: Enemy)
 signal despawned(enemy: Enemy)
 ## Co-op (M7): it started an action (a swing, a board pulled, a climb), for the host to pass on.
 signal posed(enemy: Enemy, action: EnemyRig.Action, length: float)
+## It said Gredn line `line` (M9 part 3; solo and host), for co-op to pass on.
+signal said(enemy: Enemy, line: int)
 
 ## QUEUED: waiting at a window another enemy is working. BREAKING: tearing boards off a barricade.
 ## LUNGING: crouching for and then flying through a leap at the player (Perchte).
@@ -101,6 +103,12 @@ var _inside: bool = false
 var _lure: Node3D
 # Seconds until the next groan.
 var _groan_left: float = 0.0
+## Seconds until it may say another line (Gredn).
+var talk_left: float = 0.0
+# It has seen a player this life (the SPOT line comes once), and seconds left of a line it is saying
+# (no groans or death cry over it).
+var _spotted: bool = false
+var _speaking_left: float = 0.0
 # Seconds its corpse has been a ragdoll.
 var _ragdoll_time: float = 0.0
 ## The corpses being simulated now, oldest first (at most Constants.RAGDOLL_MAX).
@@ -167,6 +175,9 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 		part.visible = true
 	_set_active(true)
 	_state = State.CHASING
+	talk_left = 0.0
+	_spotted = false
+	_speaking_left = 0.0
 	# A boss roars as it arrives; the rest start groaning a while after they appear.
 	_groan_left = 0.3 if data.is_boss else randf_range(0.5, Constants.GROAN_MAX)
 	if data.is_boss:
@@ -227,6 +238,8 @@ func _take_hit(amount: int, is_headshot: bool, is_melee: bool, source: Node3D, p
 		_flinch(is_headshot)
 		if pays:
 			Events.enemy_damaged.emit(self, amount, is_headshot, source)
+		if amount >= max_health * Constants.GREDN_HARD_HIT:
+			Gredn.moment(self, Gredn.Moment.HIT)
 		return Hurtbox.Result.HIT
 	if is_headshot and amount >= data.head_pop_damage:
 		_pop_head()
@@ -448,6 +461,8 @@ func _physics_process(delta: float) -> void:
 
 func _step(delta: float) -> void:
 	_lunge_cooldown_left -= delta
+	talk_left -= delta
+	_speaking_left -= delta
 	if is_alive():
 		_groan_left -= delta
 		if _groan_left <= 0.0:
@@ -603,6 +618,9 @@ func _chase(delta: float) -> void:
 	if _target == null:
 		_halt(delta)
 		return
+	if not _spotted and _sees_target():
+		_spotted = true
+		Gredn.moment(self, Gredn.Moment.SPOT)
 	if _in_attack_range():
 		_start_attack()
 		return
@@ -731,7 +749,8 @@ func _can_lunge() -> bool:
 func _start_lunge() -> void:
 	_state = State.LUNGING
 	_lunge_time = 0.0
-	_voice(&"enemy_attack")
+	if Gredn.moment(self, Gredn.Moment.LUNGE) < 0:
+		_voice(&"enemy_attack")
 	_lunge_struck = false
 	_pose(EnemyRig.Action.CROUCH, data.lunge_windup)
 	_kill_tween()
@@ -827,6 +846,7 @@ func _start_window() -> void:
 		_start_climb()
 		return
 	_state = State.BREAKING
+	Gredn.moment(self, Gredn.Moment.BARRICADE)
 	_kill_tween()
 	_visual.transform = Transform3D.IDENTITY
 	_tween = create_tween()
@@ -934,7 +954,10 @@ func _leave_window() -> void:
 
 func _die(is_headshot: bool, is_melee: bool, source: Node3D, amount: int = 100) -> void:
 	_state = State.DEAD
-	_voice(data.death_sound)
+	# Its last words, if any, instead of the cry (in co-op they came from the host just before).
+	Gredn.moment(self, Gredn.Moment.DEATH)
+	if _speaking_left <= 0.0:
+		_voice(data.death_sound)
 	if _lifted or _hurled:
 		_lifted = false
 		_hurled = false
@@ -1067,6 +1090,16 @@ func _nearest_target() -> Node3D:
 	return best
 
 
+## Its target within reach of a line (Gredn) and no wall between them: it has seen them.
+func _sees_target() -> bool:
+	var offset: Vector3 = _target.global_position - global_position
+	if offset.length() > Constants.GREDN_REACH:
+		return false
+	var eyes := Vector3.UP * Constants.ENEMY_MOUTH_HEIGHT
+	var query := PhysicsRayQueryParameters3D.create(global_position + eyes, _target.global_position + eyes, Constants.LAYER_WORLD)
+	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
+
+
 func _in_attack_range() -> bool:
 	var offset: Vector3 = _target.global_position - global_position
 	if absf(offset.y) > Constants.ENEMY_ATTACK_MAX_HEIGHT or _flat(offset).length() > data.attack_range:
@@ -1103,16 +1136,26 @@ func _face(direction: Vector3, delta: float) -> void:
 
 func _groan() -> void:
 	_groan_left = randf_range(Constants.GROAN_MIN, Constants.GROAN_MAX)
+	# Now and then a line instead (Gredn); never a groan over one.
+	if _speaking_left > 0.0 or Gredn.moment(self, Gredn.Moment.IDLE) >= 0:
+		return
 	if not data.groan_sounds.is_empty():
-		Sound.play_at(data.groan_sounds.pick_random(), _mouth())
+		Sound.play_at(data.groan_sounds.pick_random(), mouth())
 
 
 ## A sound from its mouth, at its voice's pitch.
 func _voice(id: StringName) -> void:
-	Sound.play_at(id, _mouth(), 0.0, data.voice_pitch)
+	Sound.play_at(id, mouth(), 0.0, data.voice_pitch)
 
 
-func _mouth() -> Vector3:
+## It is saying a line `length` seconds long (Gredn): no groan or cry over it.
+func speaking(length: float) -> void:
+	_speaking_left = length
+	_groan_left = maxf(_groan_left, length + Constants.GROAN_MIN)
+
+
+## Where its voice comes from.
+func mouth() -> Vector3:
 	return global_position + Vector3.UP * Constants.ENEMY_MOUTH_HEIGHT * data.model_scale
 
 
@@ -1205,6 +1248,7 @@ func puppet_killed(is_headshot: bool, is_melee: bool, source: Node3D, amount: in
 func _puppet_step(delta: float) -> void:
 	if _hurled:
 		_hurling(delta)
+	_speaking_left -= delta
 	_groan_left -= delta
 	if _groan_left <= 0.0:
 		_groan()
