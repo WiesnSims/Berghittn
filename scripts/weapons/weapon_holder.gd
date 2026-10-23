@@ -72,6 +72,8 @@ var _current: int = -1
 var _cooldown: float = 0.0
 # How long the current cooldown and reload are in all, for the ready ring at the crosshair.
 var _cooldown_total: float = 0.0
+# The ready ring shows the current cycle (set by the shot that started it).
+var _ring_cycle: bool = false
 var _reload_total: float = 0.0
 # A click that came in while the gun was still cycling; it fires as soon as it can, so fast clicking
 # is never swallowed.
@@ -353,6 +355,12 @@ func is_reloading() -> bool:
 ## Share of the running reload done (0..1), or -1 when not reloading.
 func reload_progress() -> float:
 	return 1.0 - _reload_left / _reload_total if is_reloading() and _reload_total > 0.0 else -1.0
+
+
+## The ready ring shows the cycle after this shot: guns with long gaps (WeaponData.cycle_ring), and
+## the long wait after the Querschläger.
+func shows_cycle_ring() -> bool:
+	return weapon != null and (weapon.cycle_ring or _ring_cycle)
 
 
 ## Share of the gun's cycle after a shot done (0..1), or -1 when it is ready to fire again.
@@ -659,6 +667,7 @@ func fire_ricochet() -> int:
 		return 0
 	mag -= weapon.secondary_rounds
 	_set_cooldown(weapon.ricochet_cycle)
+	_ring_cycle = true
 	var hit: int = _ricochet()
 	Sound.play(weapon.fire_sound)
 	fired.emit(1)
@@ -1009,6 +1018,7 @@ func _after_shot(rounds: int) -> void:
 func _set_cooldown(time: float) -> void:
 	_cooldown = time
 	_cooldown_total = time
+	_ring_cycle = false
 
 
 func _start_melee() -> void:

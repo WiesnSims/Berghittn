@@ -49,7 +49,7 @@ func set_spread(pixels: float) -> void:
 
 
 ## The ready ring: `reload` and `cycle` are shares done (0..1) or -1. A cycle only shows when
-## `show_cycle` (WeaponData.cycle_ring).
+## `show_cycle` (WeaponHolder.shows_cycle_ring).
 func set_progress(reload: float, cycle: float, show_cycle: bool) -> void:
 	var was: float = _progress
 	_reloading = reload >= 0.0

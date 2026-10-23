@@ -7,7 +7,8 @@ extends Viewmodel
 ## throw (less when aimed). The cycle fits the time to the next shot.
 ## The reload rolls the gun so its right side faces up and thumbs the missing rounds one by one
 ## through the loading gate, nose first; from empty the gun comes back up and the lever is worked to
-## chamber one. The Querschläger kicks harder and the lever is worked slowly after it.
+## chamber one. The Querschläger kicks harder; then the gun is turned to look at it, the barrel
+## smoking, the lever jams half open and is rattled loose before it can be thrown and shut.
 
 ## Pause after the shot before the lever is thrown, and how long the throw takes; together the
 ## longest the cycle runs (it is squeezed into a faster shot, see Viewmodel.cycle_time). Seconds.
@@ -29,10 +30,16 @@ extends Viewmodel
 ## inside it (model space, from the gate).
 @export var round_insert_from: Vector3 = Vector3(0.035, -0.03, 0.06)
 @export var round_insert_to: Vector3 = Vector3(-0.012, 0.0, -0.04)
-## The Querschläger: how much harder it kicks, and the most its lever cycle may be slowed down to
-## fill the long wait after it.
+## The Querschläger: how much harder it kicks; the pose the gun is looked at in while it smokes
+## (metres from rest, degrees turned and rolled); where the lever jams (degrees) and how often it is
+## rattled; and seconds the barrel smokes.
 @export var ricochet_kick: float = 1.6
-@export var ricochet_slowest: float = 3.0
+@export var check_offset: Vector3 = Vector3(-0.03, -0.02, 0.02)
+@export var check_turn: float = 30.0
+@export var check_roll: float = -25.0
+@export var jam_angle: float = 24.0
+@export var rattles: int = 4
+@export var smoke_time: float = 1.2
 
 # Pivots: the lever at its front end, the hammer at its base.
 @onready var _lever: Node3D = $Model/Lever
@@ -43,10 +50,16 @@ extends Viewmodel
 @onready var _round_rest: Vector3 = _round.position
 
 
+var _smoke: CPUParticles3D
+
+
 func _ready() -> void:
 	super()
 	_round.visible = false
 	_hammer.rotation.x = deg_to_rad(hammer_angle)
+	_smoke = _build_smoke()
+	_flash.get_parent().add_child(_smoke)
+	_smoke.position = _flash.position
 
 
 func fire_animation_time() -> float:
@@ -58,8 +71,41 @@ func play_fire(_rounds: int = 1) -> void:
 
 
 ## The Querschläger: a harder kick, then the lever worked slowly through the long wait after it.
+## The Querschläger: the hard kick, then over the whole wait (cycle_time) the gun is turned to look at
+## it while the barrel smokes, the lever jams half open, is rattled loose with the gun shaken, then
+## thrown, the casing out, and snapped shut.
 func play_secondary(_rounds: int) -> void:
-	_shot(ricochet_kick, ricochet_slowest)
+	_flash_and_kick(ricochet_kick)
+	_hammer.rotation.x = 0.0
+	var c: float = cycle_time if cycle_time > 0.0 else 2.0
+	_smoke.restart()
+	_smoke.emitting = true
+	get_tree().create_timer(smoke_time).timeout.connect(func() -> void: _smoke.emitting = false)
+	var check: Transform3D = _rest.translated(check_offset).rotated_local(Vector3.UP, deg_to_rad(check_turn)).rotated_local(Vector3.FORWARD, deg_to_rad(check_roll))
+	_tween.kill()
+	_tween = create_tween()
+	_tween.tween_property(_model, "transform", check, c * 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_tween.tween_interval(c * 0.15)
+	# Rattled: shaken against the stuck lever.
+	var jolt: float = c * 0.24 / rattles
+	for i: int in rattles:
+		var side: float = 1.0 if i % 2 == 0 else -1.0
+		_tween.tween_property(_model, "transform", check.translated_local(Vector3(0.0, -0.012, 0.0)).rotated_local(Vector3.FORWARD, deg_to_rad(5.0 * side)), jolt * 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		_tween.tween_property(_model, "transform", check, jolt * 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_tween.tween_property(_model, "transform", _work_pose(), c * 0.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	_tween.tween_interval(c * 0.17)
+	_lockup(_tween, c * 0.06, c * 0.05)
+	_parts_tween = create_tween()
+	_parts_tween.tween_interval(c * 0.3)
+	# Half open, and stuck.
+	_parts_tween.tween_callback(func() -> void: Sound.play(&"lever_open", -4.0, 0.8))
+	_parts_tween.tween_property(_lever, "rotation:x", deg_to_rad(jam_angle), c * 0.05).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	for i: int in rattles:
+		_parts_tween.tween_property(_lever, "rotation:x", deg_to_rad(jam_angle * 0.55), jolt * 0.5)
+		_parts_tween.tween_callback(func() -> void: Sound.play(&"lever_close", -8.0, randf_range(0.8, 0.95)))
+		_parts_tween.tween_property(_lever, "rotation:x", deg_to_rad(jam_angle), jolt * 0.5)
+	# Loose: thrown all the way, the casing out, shut.
+	_work_lever(_parts_tween, c * 0.3, true)
 
 
 ## The kick of a shot and the lever cycle after it, fitted to the time until the next shot (squeezed,
@@ -152,6 +198,43 @@ func _work_lever(tween: Tween, time: float, eject: bool) -> void:
 	tween.tween_property(_lever, "rotation:x", 0.0, shut).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.parallel().tween_property(_bolt, "position", _bolt_rest, shut).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.tween_callback(func() -> void: Sound.play(&"lever_close", -6.0, 1.15))
+
+
+## Grey puffs from the muzzle that drift up and grow; left behind in the room, not carried with the gun.
+func _build_smoke() -> CPUParticles3D:
+	var smoke := CPUParticles3D.new()
+	smoke.amount = 40
+	smoke.lifetime = 1.4
+	smoke.local_coords = false
+	smoke.emitting = false
+	smoke.direction = Vector3.UP
+	smoke.spread = 25.0
+	smoke.initial_velocity_min = 0.03
+	smoke.initial_velocity_max = 0.08
+	smoke.gravity = Vector3(0.0, 0.25, 0.0)
+	smoke.scale_amount_min = 0.6
+	smoke.scale_amount_max = 1.0
+	var grow := Curve.new()
+	grow.add_point(Vector2(0.0, 0.5))
+	grow.add_point(Vector2(1.0, 3.0))
+	smoke.scale_amount_curve = grow
+	var fade := Gradient.new()
+	fade.set_color(0, Color(0.78, 0.76, 0.73, 0.5))
+	fade.set_color(1, Color(0.75, 0.73, 0.7, 0.0))
+	smoke.color_ramp = fade
+	var puff := SphereMesh.new()
+	puff.radius = 0.02
+	puff.height = 0.04
+	puff.radial_segments = 6
+	puff.rings = 3
+	var grey := StandardMaterial3D.new()
+	grey.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	grey.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	grey.vertex_color_use_as_albedo = true
+	puff.material = grey
+	smoke.mesh = puff
+	smoke.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return smoke
 
 
 func _reset_parts() -> void:

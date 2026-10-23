@@ -35,5 +35,5 @@ secondary_rounds = 3
 secondary_range = 8.0
 ricochet_damage = PackedInt32Array(90, 75, 60, 55, 50)
 ricochet_reach = 12.0
-ricochet_cycle = 1.1
+ricochet_cycle = 2.0
 fire_sound = &"shot_repetierer"

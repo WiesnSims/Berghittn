@@ -220,8 +220,9 @@ Rules:
     less with every body: 90, 75, 60, 55, 50 (user request 2026-10-24; a head hit first counts
     double, the hops strike bodies). It stops after 5 bodies or once it has flown 12 m from body to
     body: a bunch close together takes all five, enemies 6 m
-    apart three. Needs 3 rounds in the gun; the lever is then worked slowly (1.1 s until the next
-    shot). A bright streak shows the path and the bullet whines off ("pjiuu").
+    apart three. Needs 3 rounds in the gun. Then 2 s until the next shot (play-test 2026-10-24: not to be
+    spammed): the gun is turned to look at, the barrel smoking, the lever jams half open and is
+    rattled loose, then thrown and shut; the ready ring at the crosshair fills meanwhile. A bright streak shows the path and the bullet whines off ("pjiuu").
   - `alphorn`: the Echo (press): the bell swings up to the sky and the note comes down all around
     the player, 200 damage within 6 m in every direction and a harder shove; uses two notes. The
     panic button when surrounded.

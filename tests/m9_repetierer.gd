@@ -184,7 +184,12 @@ func _ricochet() -> void:
 	dealt.reverse()
 	_check(dealt == Array(gun.ricochet_damage), "less with every hop: %s" % [dealt])
 	_check(holder.mag == gun.mag_size - gun.secondary_rounds and is_equal_approx(holder._cooldown, gun.ricochet_cycle), "uses %d rounds, then the lever takes %.1f s" % [gun.secondary_rounds, gun.ricochet_cycle])
+	_check(holder.shows_cycle_ring() and holder.cycle_progress() >= 0.0, "the ready ring fills while the lever is rattled loose")
 	await _clear(bunch)
+	holder.mag = gun.mag_size
+	holder._cooldown = 0.0
+	holder._fire()
+	_check(not holder.shows_cycle_ring(), "not after a normal shot")
 
 	# Spread out, 6 m from one to the next: only three before the 12 m of hops run out.
 	var line: Array[Enemy] = []
