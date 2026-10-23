@@ -748,9 +748,9 @@ going down). Each screen counts only its own player's run. The personal best (fu
 more points on the same wave) is kept in this browser, solo and co-op alike; a better run says
 "New personal best!", otherwise the best is shown below.
 
-**M9 — Hüttenabend (plan, proposed 2026-10-23; all questions answered the same day)**
+**M9 — Hüttenabend (plan, proposed 2026-10-23; Q1-Q6 answered the same day, Q7 open)**
 User request 2026-10-23: a "play again" button for easier co-op sharing, hit and kill feedback,
-talking enemies and weapon upgrades, and room for more ideas. Four parts, one PR each, play-tested
+talking enemies, weapon upgrades and two new enemies, and room for more ideas. Five parts, one PR each, play-tested
 after each one, cheapest first. The user's answers are worked in below; nothing is built before
 the plan is approved.
 
@@ -830,6 +830,42 @@ a sheet-metal hood, so it reads as safe in a hay loft.
   data. Ghost weapons in co-op show the forged look; the death screen shows the upgraded name.
 - Split into 4a (the Dengelstock, the guns and the Schaufel) and 4b (the special weapons).
 
+*Part 5 — Neue Gäste: two new enemies (user request 2026-10-23)*
+Both are EnemyData resources on the shared Enemy scene, with their own model (tools/models), rig
+poses, ragdoll, voice lines (eSpeak NG, as in part 3) and a co-op puppet like the others. Two PRs:
+5a the Venedigermandl, 5b the new fighter.
+
+**5a — Das Venedigermandl** (a treasure enemy, like the gold scarabs in Elden Ring). In Alpine
+legend the Venedigermandl are little men from Venice who sneak into the mountains to dig for gold.
+Ours is a small hunched man in a long dark coat and a pointed hat, with a pick and a fat sack of
+gold, glowing faintly gold so he is easy to spot in the storm.
+- He never attacks. Once a player is within 15 m he runs away from the nearest player (5.5 m/s,
+  away along the navmesh, through open zones only, never through windows) and giggles; out of
+  reach he goes back to digging.
+- Health like a Bergknappe (400 + 50·wave); slows, stuns and the Goaßl work on him, lures do not.
+- 10 s after he first appears (a gold spark in the air and a little jingle; "Do glanzt wos!"
+  banner) he vanishes in a puff of gold dust ("Arrivederci!"): kill him before that.
+- Each hit knocks gold coins out of the sack (+10 as usual, plus a small coin burst); the kill
+  pays 1000 + 100·wave to the killer and spills the whole sack (a big coin fountain).
+- He comes now and then on his own, outside the wave count (the wave still ends without him):
+  from wave 4, a 25 % chance a wave, never on a boss wave, at a spawn point in an open zone at
+  least 20 m from every player. At most one at a time. All numbers in constants.gd.
+
+**5b — a new "normal" enemy with an ability no enemy has yet.** The user picks one (Q7):
+- (A, proposed) **Da Wilderer**, a ranged enemy: a zombie poacher with an old rifle, from wave 7
+  (wave_table weight 1.0, 250 + 30·wave health, 3.0 m/s). He keeps 12 to 25 m off, stops where he
+  can see a player, aims for 1.2 s (a glint from his scope and a click: the moment to get into
+  cover) and fires once (25 damage, a visible tracer, walls block it), then moves on. Close up he
+  clubs with the stock. He makes the long sight lines of the Terrasse and the Schuppen dangerous
+  and gives cover a purpose. Lines: "Des is mei Revier!", "Hob di!".
+- (B) **Die Bergdohlen**, flying enemies: Alpine choughs with dead white eyes, in flocks of 3 to 5
+  from wave 6. Small, 60 + 8·wave health (one good hit), 6 m/s, they fly over fences and through
+  broken windows without stopping at barricades, peck (8 damage) and flutter off for a moment.
+  They make you look and shoot up. They fly outdoors and through open doors and windows, not on
+  the navmesh (a simple steering flight with ceiling and wall checks). They count towards the
+  24 alive at once, so a flock is a few of the slots.
+- Both could come, one after the other, as 5b and 5c.
+
 *Open pool: more ideas (not planned; any of these can become a part once the user picks it, and
 new ones are added here)*
 - Power-ups from enemies (section 8, never built): Doppelte Punkte, Sofort-Kill, Nachschub, maybe
@@ -855,6 +891,8 @@ new ones are added here)*
   approved: Wanderer and Tourist clean, without hiss; Perchte and Krampus as sampled).
 - Q5 (answered): the Dengelstock is up in the Holzschuppen's hay loft.
 - Q6 (answered): a second upgrade that doubles the effect of the first.
+- Q7 (open): the new fighter in part 5b: (A) the Wilderer (ranged, proposed), (B) the Bergdohlen
+  (flying), or both one after the other?
 
 
 ## 13. Project structure
