@@ -789,6 +789,12 @@ Today: a hit marker cross, a headshot sound and the points popups. Added:
   enemies flash briefly (only where that stays cheap in the Compatibility renderer).
 - Damage numbers over the enemy, off by default, with a setting to turn them on (Q2).
 - Each screen shows only its own player's feedback; co-op hits are already confirmed by the host.
+- Built (2026-10-23, branch m9-feedback): KillFeedback on the Player. A chain means each kill
+  within 4 s of the one before (KILL_STREAK_GAP), so 8 is reachable; each tier pays once per chain.
+  "One shot or blast" is kills within 0.1 s of each other (KILL_MULTI_WINDOW). Schädlweh pays on
+  every third headshot kill in a row. The kill X shows for every kill of ours, whatever did it
+  (mines, flames, thrown things too). Enemies already flashed on a hit (M5), so that stays. Sounds
+  kill_thock and kill_bumm are synthesised in tools/audio/sfx.py. Test: tests/m9_feedback.
 
 *Part 3 — Talking enemies ("Gredn")*
 Now and then enemies say a short dialect line: when they spot a player, while breaking a

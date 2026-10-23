@@ -5,6 +5,7 @@ extends Control
 const SPENT_COLOR: Color = Color(0.9, 0.3, 0.25, 1)
 const DOWN_COLOR: Color = Color(1.0, 0.35, 0.3)
 const TEAM_COLOR: Color = Color(0.96, 0.92, 0.84)
+const STREAK_COLOR: Color = Color(1.0, 0.82, 0.3)
 
 @onready var _ammo_label: Label = %AmmoLabel
 @onready var _weapon_label: Label = %WeaponLabel
@@ -44,6 +45,9 @@ var _player: Player
 var _coop_label: Label
 var _team_label: Label
 var _coop_over: bool = false
+# Kill streaks (M9 part 2): a small banner under the crosshair.
+var _streak_label: Label
+var _streak_tween: Tween
 
 
 func _ready() -> void:
@@ -53,6 +57,13 @@ func _ready() -> void:
 	_coop_label.offset_bottom = -180.0
 	_coop_label.offset_left = -500.0
 	_coop_label.offset_right = 500.0
+	_streak_label = _make_label(STREAK_COLOR, 26, HORIZONTAL_ALIGNMENT_CENTER)
+	_streak_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	_streak_label.offset_top = 48.0
+	_streak_label.offset_bottom = 88.0
+	_streak_label.offset_left = -300.0
+	_streak_label.offset_right = 300.0
+	_streak_label.modulate.a = 0.0
 	_team_label = _make_label(TEAM_COLOR, 18, HORIZONTAL_ALIGNMENT_LEFT)
 	# One line per teammate under the wave label; names are short (HikerStyle.NAME_MAX_LENGTH).
 	_team_label.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -97,6 +108,8 @@ func bind_player(player: Player) -> void:
 	_weapons.reload_started.connect(_on_reload_changed.unbind(1))
 	_weapons.reload_finished.connect(_on_reload_changed)
 	_weapons.hit_confirmed.connect(_crosshair.show_hit)
+	player.feedback.killed.connect(_crosshair.show_kill)
+	player.feedback.streak.connect(_show_streak)
 	player.health.changed.connect(_on_health_changed)
 	player.health.damaged.connect(_on_damaged.unbind(1))
 	player.died.connect(_on_player_died)
@@ -285,6 +298,20 @@ func _show_banner(text: String) -> void:
 	_banner_tween.tween_property(_banner, "modulate:a", 1.0, 0.3)
 	_banner_tween.tween_interval(Constants.WAVE_BANNER_TIME)
 	_banner_tween.tween_property(_banner, "modulate:a", 0.0, 0.6)
+
+
+## "Dreierpack!  +50" under the crosshair; the bonus also shows in the points popup.
+func _show_streak(text: String, bonus: int) -> void:
+	_streak_label.text = tr("UI_STREAK") % [tr(text), bonus]
+	if _streak_tween:
+		_streak_tween.kill()
+	_streak_label.modulate.a = 1.0
+	_streak_label.scale = Vector2.ONE * 1.25
+	_streak_label.pivot_offset = _streak_label.size * 0.5
+	_streak_tween = create_tween()
+	_streak_tween.tween_property(_streak_label, "scale", Vector2.ONE, 0.15)
+	_streak_tween.tween_interval(Constants.STREAK_BANNER_TIME)
+	_streak_tween.tween_property(_streak_label, "modulate:a", 0.0, 0.4)
 
 
 func _make_label(color: Color, font_size: int, align: HorizontalAlignment) -> Label:

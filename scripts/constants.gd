@@ -271,6 +271,38 @@ const ENEMY_HIT_FLASH_TIME: float = 0.12
 const IMPACT_MARK_COUNT: int = 32
 const IMPACT_MARK_LIFETIME: float = 8.0
 const HIT_MARKER_TIME: float = 0.15
+
+# Hit and kill feedback (M9 part 2). First numbers, tuned by play-test.
+## The kill marker (a bigger X: red, gold for a headshot kill) shows this long (s).
+const KILL_MARKER_TIME: float = 0.4
+## A kill chain breaks when the next kill takes longer than this (s).
+const KILL_STREAK_GAP: float = 4.0
+## Kills this close together count as one shot or blast (s).
+const KILL_MULTI_WINDOW: float = 0.1
+## Bonus points: chain of 3, 5 and 8, each enemy after the first with one shot, every third
+## headshot kill in a row.
+const STREAK_BONUS_3: int = 50
+const STREAK_BONUS_5: int = 150
+const STREAK_BONUS_8: int = 300
+const STREAK_BONUS_MULTI: int = 50
+const STREAK_HEADSHOTS: int = 3
+const STREAK_BONUS_HEADSHOTS: int = 100
+## The streak banner under the crosshair (s).
+const STREAK_BANNER_TIME: float = 1.6
+## The headshot kill's "Bumm" climbs this much pitch per kill of the chain, for at most this many.
+const KILL_PITCH_STEP: float = 0.05
+const KILL_PITCH_STEPS: int = 7
+## A headshot kill kicks the view (degrees up, and at most this much sideways).
+const KILL_KICK_PITCH: float = 1.2
+const KILL_KICK_YAW: float = 0.4
+## Any kill bumps the gun back and up (m).
+const KILL_BUMP: float = 0.018
+## Damage numbers (setting, off by default): height over the enemy's feet (m), how far they rise
+## (m), how long they last (s) and their size on screen.
+const DAMAGE_NUMBER_HEIGHT: float = 2.0
+const DAMAGE_NUMBER_RISE: float = 0.6
+const DAMAGE_NUMBER_TIME: float = 0.8
+const DAMAGE_NUMBER_PIXEL_SIZE: float = 0.0012
 # Ready ring at the crosshair (play-test, Alphorn): seconds the pulse takes when the gun is ready again.
 const READY_PULSE_TIME: float = 0.3
 const DAMAGE_FLASH_TIME: float = 0.4

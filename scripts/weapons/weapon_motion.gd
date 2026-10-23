@@ -44,6 +44,8 @@ var _look_lag: Vector2 = Vector2.ZERO
 var _land_dip: float = 0.0
 var _was_on_floor: bool = true
 var _fall_speed: float = 0.0
+# A kill's bump (M9 part 2): metres back and up, springing back at land_recover.
+var _bump: float = 0.0
 var _position: Vector3 = Vector3.ZERO
 var _rotation: Vector3 = Vector3.ZERO
 
@@ -56,6 +58,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	var motion := event as InputEventMouseMotion
 	if motion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		_look_lag = (_look_lag + motion.screen_relative * look_lag_per_pixel).limit_length(look_lag_max)
+
+
+## A kill: the gun jolts back and up a little.
+func bump(amount: float) -> void:
+	_bump = maxf(_bump, amount)
 
 
 func _process(delta: float) -> void:
@@ -77,6 +84,7 @@ func _process(delta: float) -> void:
 	_was_on_floor = on_floor
 	_fall_speed = maxf(-velocity.y, 0.0)
 	_land_dip = lerpf(_land_dip, 0.0, minf(land_recover * delta, 1.0))
+	_bump = lerpf(_bump, 0.0, minf(land_recover * delta, 1.0))
 	_look_lag = _look_lag.lerp(Vector2.ZERO, minf(look_lag_recover * delta, 1.0))
 
 	# Aimed, the gun is held tight to the eye: barely any bob, lag or lean.
@@ -85,10 +93,10 @@ func _process(delta: float) -> void:
 	var bob := Vector3(sin(_bob_phase) * bob_side, -absf(cos(_bob_phase)) * bob_up, 0.0) * _bob_amount * loose
 	var air: float = 0.0 if on_floor else clampf(-velocity.y * air_lag_per_speed, -air_lag_max, air_lag_max)
 	var eased_sprint: float = smoothstep(0.0, 1.0, _sprint)
-	var target_position: Vector3 = bob + sprint_offset * eased_sprint + Vector3(0.0, air - _land_dip, 0.0)
+	var target_position: Vector3 = bob + sprint_offset * eased_sprint + Vector3(0.0, air - _land_dip + _bump * 0.5, _bump)
 	# The gun trails the view: turning right leaves it a little to the left, looking up leaves it low.
 	var target_rotation := Vector3(
-		deg_to_rad(sprint_rotation.x * eased_sprint + _look_lag.y * loose),
+		deg_to_rad(sprint_rotation.x * eased_sprint + _look_lag.y * loose + _bump * 150.0),
 		deg_to_rad(sprint_rotation.y * eased_sprint + _look_lag.x * loose),
 		deg_to_rad(sprint_rotation.z * eased_sprint - local.x / Constants.PLAYER_WALK_SPEED * strafe_roll * loose))
 	var weight: float = minf(smoothing * delta, 1.0)

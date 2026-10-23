@@ -147,6 +147,11 @@ func set_ghost_owner(body: Node3D) -> void:
 	_shooter = body
 
 
+## A kill of ours (KillFeedback): the gun in hand jolts a little.
+func bump() -> void:
+	(_motion as WeaponMotion).bump(Constants.KILL_BUMP)
+
+
 ## Puts a gun in hand: into a free slot if there is one, otherwise in place of the gun in hand.
 ## Handed over ready to fire, chambered and with full reserve.
 func give_weapon(data: WeaponData) -> void:
