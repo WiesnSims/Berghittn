@@ -23,6 +23,9 @@ signal acted(action: Act, rounds: int)
 ## landing, and V held past the blow (guard or held mode) and let go.
 enum Act { SHOT, SECONDARY, SWING, MELEE, HOLD, RELEASE }
 
+# The Querschläger's streak from hop to hop.
+const RICOCHET_TRAIL: Script = preload("res://scripts/effects/ricochet_trail.gd")
+
 ## One carried gun and the ammo it had when it was put away.
 class GunSlot:
 	var data: WeaponData
@@ -89,11 +92,6 @@ var _switch_left: float = 0.0
 # Seconds until the gun is back up after a sprint and may fire.
 var _sprint_left: float = 0.0
 var _aiming: bool = false
-# The Ehrensalve (SALVE secondary) under way: rounds still to go off, of how many in all, and
-# seconds until the next.
-var _salve_left: int = 0
-var _salve_rounds: int = 0
-var _salve_next: float = 0.0
 # Playing the held secondary (PLAY) this frame, and seconds left of the round it is on.
 var _playing: bool = false
 var _play_left: float = 0.0
@@ -372,11 +370,6 @@ func is_scoped() -> bool:
 	return weapon != null and weapon.secondary == WeaponData.Secondary.SCOPE and aim_amount >= Constants.SCOPE_SHOW_AT
 
 
-## Firing the Ehrensalve into the sky right now (SALVE secondary): each round kicks the view less.
-func is_saluting() -> bool:
-	return _salve_left > 0
-
-
 ## Right click held on a PLAY weapon (a held tune): walking slows, no sprinting.
 func is_playing() -> bool:
 	return _playing
@@ -455,9 +448,6 @@ func _physics_process(delta: float) -> void:
 		if _reload_left <= 0.0:
 			_finish_reload()
 		return
-	if _salve_left > 0:
-		_salve(delta)
-		return
 	_fire_locked = _fire_locked and Input.is_action_pressed("fire")
 	# An empty gun reloads by itself once its last shot has cycled (play-test 2026-10-17: a click on
 	# the empty gun during the cycle could run out before it counted, so R was needed).
@@ -478,9 +468,9 @@ func _physics_process(delta: float) -> void:
 		return
 	if was_playing:
 		_stop_playing()
-	if weapon.secondary == WeaponData.Secondary.SALVE and Input.is_action_just_pressed("secondary") and _cooldown <= 0.0:
-		if mag > 0:
-			start_salve()
+	if weapon.secondary == WeaponData.Secondary.RICOCHET and Input.is_action_just_pressed("secondary") and _cooldown <= 0.0:
+		if mag >= weapon.secondary_rounds:
+			fire_ricochet()
 		else:
 			start_reload()
 		return
@@ -604,7 +594,6 @@ func _finish_reload() -> void:
 
 
 func _cancel_reload() -> void:
-	_salve_left = 0
 	if is_reloading():
 		_reload_left = 0.0
 		reload_finished.emit()
@@ -663,52 +652,78 @@ func fire_all() -> void:
 	_fire(mag)
 
 
-## The Ehrensalve (SALVE secondary): the gun goes up to the sky and every loaded round goes off, one
-## every secondary_round_time (see _salve).
-func start_salve() -> void:
-	if mag <= 0:
-		return
-	_salve_rounds = mag
-	_salve_left = mag
-	_salve_next = Constants.SALVE_RAISE_TIME
-	_fire_buffer_left = 0.0
-	if _viewmodel:
-		_viewmodel.play_salve_raise(Constants.SALVE_RAISE_TIME)
-
-
-## One round of the salve into the sky: no hit, but everyone within secondary_range (walls shield)
-## covers their ears for secondary_stun a round of the whole salve. Then the gun comes down, empty.
-func _salve(delta: float) -> void:
-	_salve_next -= delta
-	if _salve_next > 0.0:
-		return
-	_salve_next += weapon.secondary_round_time
-	_salve_left -= 1
-	mag -= 1
-	Sound.play(weapon.fire_sound, 0.0, _rng.randf_range(0.94, 1.08))
-	deafen_around(weapon.secondary_range, weapon.secondary_stun * _salve_rounds)
+## The Querschläger (RICOCHET secondary): one shot for secondary_rounds, then a long lever cycle.
+## Returns how many bodies it hit.
+func fire_ricochet() -> int:
+	if mag < weapon.secondary_rounds:
+		return 0
+	mag -= weapon.secondary_rounds
+	_set_cooldown(weapon.ricochet_cycle)
+	var hit: int = _ricochet()
+	Sound.play(weapon.fire_sound)
 	fired.emit(1)
-	acted.emit(Act.SECONDARY, 1)
+	acted.emit(Act.SECONDARY, weapon.secondary_rounds)
 	ammo_changed.emit(mag, reserve)
 	if _viewmodel:
-		_viewmodel.play_salve_shot(weapon.secondary_round_time)
-	if _salve_left <= 0 or mag <= 0:
-		_salve_left = 0
-		_set_cooldown(Constants.SALVE_LOWER_TIME)
-		if _viewmodel:
-			_viewmodel.play_salve_lower(Constants.SALVE_LOWER_TIME)
+		_viewmodel.cycle_time = _cooldown_total
+		_viewmodel.play_secondary(weapon.secondary_rounds)
+	return hit
 
 
-## Every enemy within `reach` (walls shielding) cowers with its ears covered for `duration`. Returns
-## how many.
-func deafen_around(reach: float, duration: float) -> int:
-	var reached: int = 0
-	for body: Dictionary in _bodies_in(global_position, -global_basis.z, 180.0, reach):
-		var enemy := (body.hurtbox as Hurtbox).receiver as Enemy
-		if enemy and enemy.is_alive():
-			enemy.deafen(duration)
-			reached += 1
-	return reached
+## The bullet's path: along the aim to the first body or wall, then glancing off on to the nearest
+## enemy it can see within secondary_range that it has not hit yet, and on, until ricochet_hits
+## bodies or ricochet_reach metres flown from hop to hop. A head hit first counts double; the hops
+## strike bodies.
+func _ricochet() -> int:
+	var query := PhysicsRayQueryParameters3D.create(global_position, global_position + _spread_direction() * weapon.range, Constants.LAYER_WORLD | Constants.LAYER_HITBOX, _exclude)
+	query.collide_with_areas = true
+	var first: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
+	if first.is_empty():
+		return 0
+	var path := PackedVector3Array([global_transform * Constants.MUZZLE_OFFSET, first.position])
+	var struck: Dictionary = {}
+	var at: Vector3 = first.position
+	var hurtbox := first.collider as Hurtbox
+	if hurtbox:
+		_ricochet_hit(hurtbox, first.position, first.normal)
+		struck[hurtbox.receiver] = true
+	else:
+		_impact_marks.place(first.position, first.normal)
+		_impact_puffs.play(first.position, first.normal)
+		# Off the wall, from just in front of it.
+		at += first.normal * 0.1
+	var left: float = weapon.ricochet_reach
+	while struck.size() < weapon.ricochet_hits and left > 0.0:
+		var next: Dictionary = {}
+		for body: Dictionary in _bodies_in(at, Vector3.FORWARD, 180.0, minf(weapon.secondary_range, left)):
+			var receiver: Node = (body.hurtbox as Hurtbox).receiver
+			var enemy := receiver as Enemy
+			if struck.has(receiver) or (enemy and not enemy.is_alive()):
+				continue
+			if next.is_empty() or body.distance < next.distance:
+				next = body
+		if next.is_empty():
+			break
+		left -= next.distance
+		at = next.target
+		struck[(next.hurtbox as Hurtbox).receiver] = true
+		path.append(at)
+		_ricochet_hit(next.hurtbox, at, -(next.to_target as Vector3).normalized())
+	if path.size() > 2 or hurtbox == null:
+		Sound.play(&"ricochet", 0.0, _rng.randf_range(0.9, 1.1))
+	var trail := Node3D.new()
+	trail.set_script(RICOCHET_TRAIL)
+	trail.set("points", path)
+	_shooter.get_parent().add_child(trail)
+	return struck.size()
+
+
+func _ricochet_hit(hurtbox: Hurtbox, at: Vector3, normal: Vector3) -> void:
+	var amount: int = hurtbox.damage_for(_damage(weapon.secondary_damage), weapon.headshot_multiplier)
+	var result: Hurtbox.Result = hurtbox.receiver.receive_hit(amount, hurtbox.is_head, false, _shooter)
+	if result != Hurtbox.Result.IGNORED:
+		_hit_puffs.play(at, normal)
+		hit_confirmed.emit(hurtbox.is_head, result == Hurtbox.Result.KILLED)
 
 
 ## A special weapon's own second shot (BEHAVIOR secondary), using secondary_rounds at once.
@@ -1195,7 +1210,7 @@ func replay(action: Act, data: WeaponData, rounds: int, aim: Transform3D) -> voi
 			if behavior:
 				behavior.fire_secondary()
 			else:
-				# The Ehrensalve: a round into the sky.
+				# The Querschläger.
 				_flash()
 			play_sound(data.secondary_sound if data.secondary_sound != &"" else data.fire_sound)
 		Act.SWING:

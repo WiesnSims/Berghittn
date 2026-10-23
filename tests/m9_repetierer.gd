@@ -2,9 +2,9 @@ extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/m9_repetierer.tscn
 ## Headless check of the Repetierer on the real main scene (user request 2026-10-24): the reload loads
 ## only the rounds missing, one at a time (a short reload for a few, a long one from empty, the rounds
-## counting as they go in and kept when it is cut short); the Ehrensalve fires every loaded round into
-## the sky, hurting nobody, and everyone within 10 m (not behind a wall, not farther, not a boss)
-## covers their ears for 0.25 s a round, then is deaf to the next salve for a while.
+## counting as they go in and kept when it is cut short); the Querschläger, for three rounds, glances
+## from body to body: five in a bunch, three when they stand 6 m apart, off a wall on to one near it
+## but never through the wall; not with fewer than three rounds in the gun.
 
 # Open pasture in front of the hut, clear of furniture.
 const FIELD: Vector3 = Vector3(10.0, -0.3, 31.0)
@@ -87,7 +87,7 @@ func _run() -> void:
 	await _seconds(Constants.WEAPON_SWITCH_TIME + 0.2)
 
 	await _reload()
-	await _salve()
+	await _ricochet()
 
 	print("RESULT: %s" % ("PASS" if failures.is_empty() else "%d FAILED" % failures.size()))
 	get_tree().quit(1 if failures.size() > 0 else 0)
@@ -122,35 +122,83 @@ func _reload() -> void:
 	await _frames(2)
 
 
-func _salve() -> void:
+## No recoil or bloom left, so the shot flies where it is aimed.
+func _steady() -> void:
+	var camera := player.get_node("Head/Camera3D") as CameraRecoil
+	camera.sway = Vector2.ZERO
+	camera._target = Vector2.ZERO
+	camera._current = Vector2.ZERO
+	camera.rotation = Vector3.ZERO
+	holder.bloom = 0.0
+
+
+func _look_at(point: Vector3) -> void:
+	var head := player.get_node("Head") as Node3D
+	var cam := player.get_node("Head/Camera3D") as Camera3D
+	player.look_at(Vector3(point.x, player.global_position.y, point.z), Vector3.UP)
+	var d: Vector3 = point - cam.global_position
+	head.rotation.x = atan2(d.y, Vector2(d.x, d.z).length())
+
+
+## Fires the Querschläger at `target`'s middle; returns how many bodies it hit.
+func _ricochet_at(target: Vector3) -> int:
+	_steady()
+	_look_at(target)
+	await _frames(1)
+	holder.mag = gun.mag_size
+	holder._cooldown = 0.0
+	return holder.fire_ricochet()
+
+
+func _hurt(list: Array[Enemy]) -> int:
+	var count: int = 0
+	for e: Enemy in list:
+		if e.health < 10000:
+			count += 1
+	return count
+
+
+func _clear(list: Array[Enemy]) -> void:
+	for e: Enemy in list:
+		if e.is_alive():
+			e._take_hit(1000000, false, false, null)
+	await _seconds(Constants.ENEMY_CORPSE_TIME + 0.5)
+
+
+func _ricochet() -> void:
 	var data: EnemyData = load("res://data/enemies/wanderer.tres")
-	var near: Enemy = _spawn(data, Vector3(5.0, 0.0, 0.0))
-	var behind: Enemy = _spawn(data, Vector3(-8.0, 0.0, 0.0))
-	var far: Enemy = _spawn(data, Vector3(0.0, 0.0, 14.0))
-	var walled: Enemy = _spawn(data, Vector3(0.0, 0.0, -6.0))
-	_wall(Vector3(0.0, 0.0, -3.0))
-	var boss: Enemy = _spawn(load("res://data/enemies/krampus.tres"), Vector3(0.0, 0.0, 4.0))
-	boss.health = 10000
+	_look_at(player.global_position + Vector3(1, 0, 0))
+	# Six in a tight bunch 6 m ahead: five are hit, one with full damage each, the sixth is spared.
+	var bunch: Array[Enemy] = []
+	for offset: Vector3 in [Vector3(6, 0, 0), Vector3(7.2, 0, 0.8), Vector3(7.2, 0, -0.8), Vector3(8.4, 0, 0), Vector3(8.4, 0, 1.6), Vector3(8.4, 0, -1.6)]:
+		bunch.append(_spawn(data, offset))
 	await _frames(3)
-	var rounds: int = 6
-	holder.mag = rounds
-	holder.reserve = 40
-	holder.start_salve()
-	_check(holder.is_saluting(), "right click: the salve starts")
-	await _seconds(Constants.SALVE_RAISE_TIME + gun.secondary_round_time * (rounds - 1) + 0.03)
-	_check(holder.mag == 0 and not holder.is_saluting(), "all %d rounds went off, one every %.2f s" % [rounds, gun.secondary_round_time])
-	_check(near.is_deafened() and behind.is_deafened(), "within %.0f m, in front and behind: ears covered" % gun.secondary_range)
-	_check(not far.is_deafened() and not walled.is_deafened(), "farther off, or behind a wall: not")
-	_check(not boss.is_deafened(), "the Krampus does not care")
-	_check(near.health == 10000 and boss.health == 10000, "shot into the sky: nobody hurt")
-	var cowers: float = gun.secondary_stun * rounds
-	await _seconds(cowers - 0.2)
-	_check(near.is_deafened(), "still cowering after %.1f s" % (cowers - 0.2))
-	await _seconds(0.4)
-	_check(not near.is_deafened(), "back up after %.2f s (%.2f a round)" % [cowers, gun.secondary_stun])
-	_check(holder.is_reloading(), "and the empty gun reloads")
-	holder.deafen_around(gun.secondary_range, 2.0)
-	_check(not near.is_deafened(), "deaf to the next salve for a while")
-	await _seconds(Constants.DEAF_TIME + 0.1)
-	holder.deafen_around(gun.secondary_range, 2.0)
-	_check(near.is_deafened(), "and after %.0f s it works again" % Constants.DEAF_TIME)
+	var hit: int = await _ricochet_at(bunch[0].global_position + Vector3.UP * 1.0)
+	_check(hit == gun.ricochet_hits and _hurt(bunch) == gun.ricochet_hits, "close together: %d of 6 hit (%d)" % [_hurt(bunch), gun.ricochet_hits])
+	_check(bunch[1].health == 10000 - gun.secondary_damage, "each hop hits for %d" % gun.secondary_damage)
+	_check(holder.mag == gun.mag_size - gun.secondary_rounds and is_equal_approx(holder._cooldown, gun.ricochet_cycle), "uses %d rounds, then the lever takes %.1f s" % [gun.secondary_rounds, gun.ricochet_cycle])
+	await _clear(bunch)
+
+	# Spread out, 6 m from one to the next: only three before the 12 m of hops run out.
+	var line: Array[Enemy] = []
+	for offset: Vector3 in [Vector3(6, 0, 0), Vector3(6, 0, 6), Vector3(6, 0, 12), Vector3(6, 0, 18)]:
+		line.append(_spawn(data, offset))
+	await _frames(3)
+	hit = await _ricochet_at(line[0].global_position + Vector3.UP * 1.0)
+	_check(hit == 3 and _hurt(line) == 3 and line[3].health == 10000, "6 m apart: three hit (%d)" % _hurt(line))
+	await _clear(line)
+
+	# Off a wall on to the one standing near it; not round the wall to the one behind it.
+	_wall(Vector3(8, 0, 0))
+	var near: Enemy = _spawn(data, Vector3(6, 0, 3))
+	var behind: Enemy = _spawn(data, Vector3(10, 0, 0.5))
+	await _frames(3)
+	# (Aimed level with the one near it: the ground probe there would land on top of the wall.)
+	hit = await _ricochet_at(Vector3(FIELD.x + 7.85, near.global_position.y + 1.0, FIELD.z))
+	_check(hit == 1 and near.health < 10000 and behind.health == 10000, "a shot into the wall glances off on to the one near it, not the one behind")
+	await _clear([near, behind] as Array[Enemy])
+
+	# Fewer than three rounds: no Querschläger.
+	holder.mag = 2
+	holder._cooldown = 0.0
+	_check(holder.fire_ricochet() == 0 and holder.mag == 2, "needs three rounds in the gun")

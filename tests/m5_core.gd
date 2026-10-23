@@ -2,7 +2,7 @@ extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/m5_core.tscn
 ## Headless M5 check on the real main scene: the enemy mix per wave, boss waves, the Perchte lunge,
 ## bullet penetration, the four Schnaps and their effects, the Hüttentruhe (take, let sink, swap),
-## the Repetierer's Ehrensalve (set up; m9_repetierer tries it), the Lager's ammo crate, every Schnaps perk and the Brettljause.
+## the Repetierer's Querschläger (set up; m9_repetierer tries it), the Lager's ammo crate, every Schnaps perk and the Brettljause.
 
 # Open pasture in front of the hut, clear of furniture.
 const FIELD: Vector3 = Vector3(10.0, -0.3, 31.0)
@@ -553,7 +553,7 @@ func _repetierer() -> void:
 	var rep: WeaponData = load("res://data/weapons/repetierer.tres")
 	player.weapons.give_weapon(rep)
 	await _seconds(0.6)
-	_check(rep.secondary == WeaponData.Secondary.SALVE and rep.secondary_stun > 0.0 and rep.secondary_range > 0.0, "Repetierer: right click fires the Ehrensalve")
+	_check(rep.secondary == WeaponData.Secondary.RICOCHET and rep.secondary_rounds == 3 and rep.ricochet_hits == 5, "Repetierer: right click fires the Querschläger")
 	_check(rep.penetration == 1 and rep.reload_round_time > 0.0, "Repetierer: goes through one body, loads round by round")
 
 

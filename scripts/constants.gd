@@ -260,6 +260,8 @@ const MAX_RAY_STEPS: int = 12
 
 # Weapon feedback.
 const MUZZLE_FLASH_TIME: float = 0.07
+# Where a streak drawn from the gun starts, from the eye (right, up, ahead; metres).
+const MUZZLE_OFFSET: Vector3 = Vector3(0.15, -0.15, -0.8)
 # Camera recoil: how fast the kick snaps in and how fast the view settles back (per second).
 # Ejected casings: how many can be in the air at once, and seconds each one flies.
 const CASING_POOL_SIZE: int = 8
@@ -413,13 +415,6 @@ const RUTE_FLEE_TIME: float = 3.0
 const RUTE_FLEE_RADIUS: float = 2.5
 const LARVE_SCAN: float = 0.2
 const LARVE_LINGER: float = 1.0
-# Repetierer's Ehrensalve: seconds the gun takes up to the sky before the first shot and back down
-# after the last, the share of a normal shot's kick each round of it gives the view, and seconds an
-# enemy stays deaf to the next salve once its ears have cleared (so it cannot be kept cowering).
-const SALVE_RAISE_TIME: float = 0.25
-const SALVE_LOWER_TIME: float = 0.3
-const SALVE_RECOIL: float = 0.35
-const DEAF_TIME: float = 6.0
 # Screen shake from blasts: seconds it lasts and how fast it trembles (cycles per second).
 const SHAKE_TIME: float = 0.45
 const SHAKE_FREQUENCY: float = 18.0

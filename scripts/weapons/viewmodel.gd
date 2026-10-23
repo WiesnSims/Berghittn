@@ -121,20 +121,6 @@ func play_secondary(rounds: int) -> void:
 	play_fire(rounds)
 
 
-## The Ehrensalve (SALVE secondary): the gun goes up to the sky over `time`, then a shot every
-## `interval`, then comes down over `time`. Guns with one override these.
-func play_salve_raise(_time: float) -> void:
-	pass
-
-
-func play_salve_shot(_interval: float) -> void:
-	play_fire(1)
-
-
-func play_salve_lower(_time: float) -> void:
-	pass
-
-
 ## A held PLAY secondary is playing (set every frame while it plays) or stopped; guns with one
 ## override this.
 func set_playing(_on: bool) -> void:

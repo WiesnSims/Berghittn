@@ -114,6 +114,16 @@ def load_clunk(v):
     return d.mix(thud(170, 0.05, 1.0), (0.01, click(900, 0.01, 0.6)))
 
 
+def ricochet(v):
+    """The Querschlaeger: the crack of the bullet glancing off, then its whine falling away."""
+    s = 0.45
+    start = [3600, 4200, 3100][v % 3]
+    pitch = d.glide(s, start, start * 0.38, 1.6) * (1 + 0.025 * np.sin(2 * np.pi * 38 * d.t_of(s)))
+    whine = d.sine(pitch, s) * d.env_points(s, [(0, 0), (0.01, 0.55), (0.12, 0.35), (s, 0)])
+    crack = d.bandpass(d.noise(0.05), 2500, 9000) * d.env_exp(0.05, 0.006)
+    return d.reverb(d.mix(crack, (0.005, whine)), 0.5, 0.15)
+
+
 def load_ready(v):
     return d.mix(click(1500, 0.008, 0.7), (0.0, thud(240, 0.03, 0.6)), (0.12, click(2600, 0.004, 0.5)))
 
@@ -695,7 +705,7 @@ SOUNDS = {
     "dry_click": (dry_click, 1),
     "mag_out": (mag_out, 1), "mag_in": (mag_in, 1), "break_open": (break_open, 1),
     "break_close": (break_close, 1), "bolt_open": (bolt_open, 1), "bolt_close": (bolt_close, 1),
-    "lever_open": (lever_open, 1), "lever_close": (lever_close, 1), "load_clunk": (load_clunk, 1),
+    "lever_open": (lever_open, 1), "lever_close": (lever_close, 1), "load_clunk": (load_clunk, 1), "ricochet": (ricochet, 3),
     "load_ready": (load_ready, 1), "weapon_raise": (weapon_raise, 1), "hitmarker": (hitmarker, 1),
     "headshot": (headshot, 1), "kill_thock": (kill_thock, 1), "kill_bumm": (kill_bumm, 1), "bellows": (bellows, 1), "alphorn_load": (alphorn_load, 1),
     "swing": (swing, 3), "throw": (throw, 1), "schaufel_hit": (schaufel_hit, 2),

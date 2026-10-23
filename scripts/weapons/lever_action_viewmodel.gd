@@ -7,7 +7,7 @@ extends Viewmodel
 ## throw (less when aimed). The cycle fits the time to the next shot.
 ## The reload rolls the gun so its right side faces up and thumbs the missing rounds one by one
 ## through the loading gate, nose first; from empty the gun comes back up and the lever is worked to
-## chamber one. The Ehrensalve holds it up to the sky, firing and working the lever as fast as it goes.
+## chamber one. The Querschläger kicks harder and the lever is worked slowly after it.
 
 ## Pause after the shot before the lever is thrown, and how long the throw takes; together the
 ## longest the cycle runs (it is squeezed into a faster shot, see Viewmodel.cycle_time). Seconds.
@@ -29,11 +29,10 @@ extends Viewmodel
 ## inside it (model space, from the gate).
 @export var round_insert_from: Vector3 = Vector3(0.035, -0.03, 0.06)
 @export var round_insert_to: Vector3 = Vector3(-0.012, 0.0, -0.04)
-## The Ehrensalve: where the gun is held (metres from rest) and how far the muzzle points up and
-## turns in (degrees).
-@export var salve_offset: Vector3 = Vector3(-0.02, -0.02, 0.0)
-@export var salve_raise: float = 60.0
-@export var salve_turn: float = 12.0
+## The Querschläger: how much harder it kicks, and the most its lever cycle may be slowed down to
+## fill the long wait after it.
+@export var ricochet_kick: float = 1.6
+@export var ricochet_slowest: float = 3.0
 
 # Pivots: the lever at its front end, the hammer at its base.
 @onready var _lever: Node3D = $Model/Lever
@@ -55,12 +54,23 @@ func fire_animation_time() -> float:
 
 
 func play_fire(_rounds: int = 1) -> void:
-	_flash_and_kick()
+	_shot(1.0, 1.0)
+
+
+## The Querschläger: a harder kick, then the lever worked slowly through the long wait after it.
+func play_secondary(_rounds: int) -> void:
+	_shot(ricochet_kick, ricochet_slowest)
+
+
+## The kick of a shot and the lever cycle after it, fitted to the time until the next shot (squeezed,
+## or slowed down by at most `slowest`).
+func _shot(strength: float, slowest: float) -> void:
+	_flash_and_kick(strength)
 	# The hammer has fallen on the round.
 	_hammer.rotation.x = 0.0
 	var scale: float = 1.0
 	if cycle_time > 0.0:
-		scale = clampf(cycle_time * 0.95 / fire_animation_time(), 0.3, 1.0)
+		scale = clampf(cycle_time * 0.95 / fire_animation_time(), 0.3, slowest)
 	var delay: float = lever_delay * scale
 	var time: float = lever_time * scale
 	# The recoil settles into the dip of the throw instead of back to rest.
@@ -112,44 +122,6 @@ func play_reload(duration: float, chamber_time: float = 0.0) -> void:
 		_tween.tween_property(_model, "transform", _work_pose(), chamber_time * 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		_work_lever(_tween, chamber_time * 0.75, false)
 		_lockup(_tween, 0.0, chamber_time * 0.1)
-
-
-func play_salve_raise(time: float) -> void:
-	_restart_tween()
-	_tween.tween_property(_model, "transform", _salve_pose(), time).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-
-
-## A round into the sky: the flash up there, a jolt, and the lever flung down and back at once.
-func play_salve_shot(interval: float) -> void:
-	_muzzle_flash()
-	_hammer.rotation.x = 0.0
-	var held: Transform3D = _salve_pose()
-	if _tween:
-		_tween.kill()
-	_model.transform = held.translated_local(Vector3(0, 0, kick_distance * 0.6)).rotated_local(Vector3.RIGHT, deg_to_rad(kick_angle * 0.5))
-	_tween = create_tween()
-	_tween.tween_property(_model, "transform", held, interval * 0.6).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	if _parts_tween:
-		_parts_tween.kill()
-	_lever.rotation.x = 0.0
-	_bolt.position = _bolt_rest
-	_parts_tween = create_tween()
-	_parts_tween.tween_interval(interval * 0.1)
-	_work_lever(_parts_tween, interval * 0.8, true)
-
-
-## Brought down once the last shot's jolt is over (its lever still snaps shut on the way).
-func play_salve_lower(time: float) -> void:
-	if _tween:
-		_tween.kill()
-	_tween = create_tween()
-	_tween.tween_interval(time * 0.3)
-	_tween.tween_property(_model, "transform", _rest, time * 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
-
-
-## Held up for the Ehrensalve: raised, the muzzle to the sky and turned in a little.
-func _salve_pose() -> Transform3D:
-	return _rest.translated(salve_offset).rotated_local(Vector3.RIGHT, deg_to_rad(salve_raise)).rotated_local(Vector3.UP, deg_to_rad(salve_turn))
 
 
 ## The gun as the lever is thrown: muzzle down a little, canted out to the right.
