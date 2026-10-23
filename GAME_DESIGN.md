@@ -260,9 +260,10 @@ Rules:
   2026-10-17); holding the button does not auto-fire. A click during the cycle is remembered for a
   moment and fires as soon as the gun is ready, so fast clicking is never swallowed.
 - Penetration (user request, 2026-10-17): big calibres go through bodies. `penetration` is how many
-  enemies behind the first one a shot can still hit; each body passed halves the damage
-  (`penetration_falloff` 0.5: 100 %, 50 %, 25 %, …). Stutzen: 3 more, Repetierer: 1 more, pistol:
-  none. Jagdflinte pellets go through 2 more, but only within 6 m of the muzzle
+  enemies behind the first one a shot can still hit; each body passed costs part of the damage
+  (`penetration_falloff`, the share left). Stutzen: 3 more at 0.75 (100 %, 75 %, 56 %, 42 %; user
+  request 2026-10-23), Repetierer: 1 more at 0.5, pistol: none. A shot into a head behind still
+  counts the headshot multiplier. Jagdflinte pellets go through 2 more, but only within 6 m of the muzzle
   (`penetration_range`, play-test 2026-10-17): up close a blast hits the whole front of a crowd.
 - Bloom (user request, 2026-10-16): each shot widens the spread a little (`bloom_per_shot`, capped
   at `bloom_max`), and it settles back; the crosshair arms move apart by the same amount, so it stays

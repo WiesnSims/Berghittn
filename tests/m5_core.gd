@@ -161,9 +161,10 @@ func _penetration() -> void:
 	var dealt: Array[int] = []
 	for i: int in line.size():
 		dealt.append(before[i] - maxi(line[i].health, 0) if line[i].is_alive() else before[i])
-	# 120, then half of it, a quarter, an eighth; the fifth body stops nothing more.
-	_check(not line[0].is_alive() and line[1].health == before[1] - 60 and line[2].health == before[2] - 30 and line[3].health == before[3] - 15 and line[4].health == before[4],
+	# 120, then a quarter less for each body passed (90, 68, 51); the fifth body stops nothing more.
+	_check(not line[0].is_alive() and line[1].health == before[1] - 90 and line[2].health == before[2] - 68 and line[3].health == before[3] - 51 and line[4].health == before[4],
 		"Stutzen goes through 3 more: health %s -> %s" % [before, line.map(func(e: Enemy) -> int: return e.health)])
+	await _stutzen_heads(stutzen, wanderer)
 	# The pistol does not go through.
 	player.weapons.give_weapon(pistol)
 	await _seconds(0.6)
@@ -194,6 +195,34 @@ func _penetration() -> void:
 		_check((player.weapons.bloom >= 4.0) if spam else (player.weapons.bloom < 0.5),
 			"pistol at %d clicks/s: bloom %.1f°" % [60 / rhythm, player.weapons.bloom])
 	await _shotgun_close()
+
+
+## Through two heads in a row: the one behind still takes the headshot, a quarter less (240, 180).
+func _stutzen_heads(stutzen: WeaponData, wanderer: EnemyData) -> void:
+	var pair: Array[Enemy] = []
+	for i: int in 2:
+		pair.append(_spawn(wanderer, FIELD + Vector3(i * 1.2, 0.0, 3.0), FIELD + Vector3(-3.0, 0.0, 3.0)))
+	await _frames(2)
+	for i: int in 2:
+		pair[i].set_physics_process(false)
+		pair[i].global_position = FIELD + Vector3(i * 1.2, 0.0, 3.0)
+	await _frames(3)
+	_place(FIELD + Vector3(-3.0, 0.0, 3.0))
+	await _frames(1)
+	var head: Vector3 = (pair[0].get_node("Visual/HeadHurtbox/Shape") as Node3D).global_position
+	_look_at(Vector3(FIELD.x + 8.0, head.y, FIELD.z + 3.0))
+	player.weapons.aim_amount = 1.0
+	player.weapons.bloom = 0.0
+	player.weapons.mag = 5
+	player.weapons._cooldown = 0.0
+	await _frames(1)
+	var before: Array[int] = [pair[0].health, pair[1].health]
+	_steady()
+	player.weapons._fire()
+	var dealt: Array[int] = [before[0] - pair[0].health, before[1] - pair[1].health]
+	_check(dealt == [240, 180], "Stutzen through two heads: the one behind still a headshot (%s)" % [dealt])
+	_place(FIELD + Vector3(-3.0, 0.0, 0.0))
+	await _frames(1)
 
 
 func _shotgun_close() -> void:
