@@ -836,7 +836,8 @@ Perchte and Krampus as first sampled). First draft of the lines (all our own):
   its own chance (constants.gd, GREDN_*). A line is only picked with a player within 15 m; while it
   plays the enemy does not groan. The text is a Label3D riding over the head as long as the voice
   (at least 1.6 s), then fading; with two showing, a nearer line takes the farther one's place.
-  Setting "Enemy chatter" / "Gegner reden", on by default. Co-op: the host sends the line index
+  Setting "Enemy chatter" / "Gegner reden", on by default. Play-test 2026-10-24 (more chatter): one
+  line per enemy every 10 s, one overall every 1.5 to 2.5 s, and higher chances per moment. Co-op: the host sends the line index
   (CoopEnemies._said) before the enemy's death. Lines added to the draft (our own, play-test
   them): Wanderer hit "Mei Fuaß…"; Tourist at a barricade "Hallo? Is des Zimmer no frei?", hit
   "Aua! Des gibt a schlechte Bewertung!", dying "Tschüss!" (the German goodbye every Austrian winces at); Knappe hit "Geh bitte…",

@@ -3,7 +3,7 @@ extends Node3D
 ## Talking enemies (M9 part 3): now and then an enemy says a short dialect line as it spots a player,
 ## groans, starts on a barricade, takes a hard hit, lunges or dies, with its voice (tools/audio/
 ## voices.py) and the text over its head. One per enemy every GREDN_ENEMY_GAP seconds and one every
-## ~3 s overall; only near a player. Main makes one as /root/Main/Gredn.
+## GREDN_GAP_MIN..MAX overall; only near a player. Main makes one as /root/Main/Gredn.
 ##
 ## Solo and the host pick the lines (talk); every screen then shows a line (say) if the chatter
 ## setting is on and the enemy is within GREDN_REACH of its camera, the nearest GREDN_SHOWN at most.

@@ -2,7 +2,7 @@ extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/m9_gredn.tscn
 ## Headless check of the talking enemies (M9 part 3, Gredn) on the real main scene: every line has
 ## its voice; an enemy that sees the player says its SPOT line, with the text over its head; one line
-## per enemy every 20 s and one every ~3 s overall; a light hit says nothing, a hard one may; last
+## per enemy every 10 s and one every ~2 s overall; a light hit says nothing, a hard one may; last
 ## words instead of the death cry; nothing from an enemy far from every player; the nearest two lines
 ## at most on screen; nothing with the chatter setting off.
 
@@ -109,14 +109,14 @@ func _run() -> void:
 	_check(_line_of(near, Gredn.Moment.SPOT) and gredn.shown() == 1, "seeing the player: \"%s\"" % (Gredn.LINES[gredn.last_heard][2] if gredn.last_heard >= 0 else "nothing"))
 	var label := gredn.get_child(0) as Node3D
 	_check(label != null and absf(label.global_position.y - near.global_position.y - Constants.GREDN_HEIGHT) < 0.05, "the text rides over its head")
-	_check(near.talk_left > Constants.GREDN_ENEMY_GAP - 1.0 and near._speaking_left > 0.0, "it waits 20 s for the next and does not groan over this one")
+	_check(near.talk_left > Constants.GREDN_ENEMY_GAP - 1.0 and near._speaking_left > 0.0, "it waits %d s for the next and does not groan over this one" % roundi(Constants.GREDN_ENEMY_GAP))
 
-	# The same enemy, hit hard right after: nothing (20 s each); another one: not within ~3 s.
+	# The same enemy, hit hard right after: nothing (10 s each); another one: not within ~2 s.
 	_quiet()
 	near.health = 10000
 	near.max_health = 10000
 	near._take_hit(5000, false, false, null)
-	_check(gredn.last_heard == -1, "the same enemy says nothing for 20 s")
+	_check(gredn.last_heard == -1, "the same enemy says nothing for %d s" % roundi(Constants.GREDN_ENEMY_GAP))
 	var other: Enemy = _spawn("knappe", Vector3(5, 0, 3))
 	other._spotted = true
 	await _frames(2)
@@ -125,7 +125,7 @@ func _run() -> void:
 	other.health = 10000
 	gredn._gap_left = Constants.GREDN_GAP_MIN
 	other._take_hit(5000, false, false, null)
-	_check(gredn.last_heard == -1, "nobody else within ~3 s of a line")
+	_check(gredn.last_heard == -1, "nobody else within %.1f s of a line" % Constants.GREDN_GAP_MIN)
 	await _seconds(Constants.GREDN_GAP_MIN + 0.1)
 	# A light hit is no reason to talk; a hard one is.
 	other._take_hit(500, false, false, null)
