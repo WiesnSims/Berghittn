@@ -107,7 +107,7 @@ func come_back() -> void:
 func take_damage(amount: int, attacker: Node3D = null) -> void:
 	if weapons.block(attacker):
 		amount = roundi(amount * weapons.melee_weapon.block_share)
-	health.take_damage(amount)
+	health.take_damage(amount, attacker)
 
 
 func is_crouching() -> bool:
