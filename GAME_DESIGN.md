@@ -781,9 +781,9 @@ Today: a hit marker cross, a headshot sound and the points popups. Added:
 - Kill marker: a bigger red X on a kill, gold for a headshot kill, each with its own short
   sound (a dull "thock"; a "Bumm" for the headshot, rising in pitch through a streak).
 - Kill streaks in dialect, a small banner under the crosshair, each with bonus points (Q3; first
-  numbers, tuned by play-test, in constants.gd): 3 kills within 4 s "Dreierpack!" +50, 5
-  "Gmetzl!" +150, 8 "Bluatbad am Berg!" +300; two or more with one shot or blast "Zwoa auf oan
-  Streich!" +50 for each enemy after the first; three headshot kills in a row "Schädlweh!" +100.
+  numbers, tuned by play-test, in constants.gd): 3 kills within 4 s "Dreierlei!" +50, 5
+  "Gmetzl!" +150, 8 "A echtes Kroatenjoahr!" +300; two or more with one shot or blast "Zwoa
+  Detschn mid oamoi aushoin!" +50 for each enemy after the first; three headshot kills in a row "Schädlweh!" +100.
   The bonus shows in the points popup like any other gain.
 - A little punch: the camera kicks on a headshot kill, the viewmodel bumps on any kill, and hit
   enemies flash briefly (only where that stays cheap in the Compatibility renderer).

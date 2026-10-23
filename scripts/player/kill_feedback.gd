@@ -3,10 +3,10 @@ extends Node
 ## Hit and kill feedback for this player's own kills (M9 part 2): the kill sound, a little punch
 ## (the view kicks on a headshot kill, the gun bumps on any kill), damage numbers when the setting
 ## is on, and the dialect kill streaks with their bonus points:
-##   a chain of kills, each within KILL_STREAK_GAP of the last: 3 "Dreierpack!", 5 "Gmetzl!",
-##   8 "Bluatbad am Berg!";
-##   two or more kills within KILL_MULTI_WINDOW (one shot or blast): "Zwoa auf oan Streich!" and a
-##   bonus for each enemy after the first;
+##   a chain of kills, each within KILL_STREAK_GAP of the last: 3 "Dreierlei!", 5 "Gmetzl!",
+##   8 "A echtes Kroatenjoahr!";
+##   two or more kills within KILL_MULTI_WINDOW (one shot or blast): "Zwoa Detschn mid oamoi
+##   aushoin!" and a bonus for each enemy after the first;
 ##   every third headshot kill in a row: "Schädlweh!".
 ## Like PlayerPoints it only listens to what its own player did, so in co-op each screen has its own.
 

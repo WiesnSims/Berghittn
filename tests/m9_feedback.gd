@@ -31,7 +31,7 @@ func _ready() -> void:
 			await _wait(0.5)
 		_kill(player, false)
 	var paid: int = player.points.total - before - 8 * Constants.POINTS_KILL_BODY
-	_check(_streaks == ["STREAK_DREIERPACK", "STREAK_GMETZL", "STREAK_BLUATBAD"], "a chain of 8: Dreierpack, Gmetzl, Bluatbad (%s)" % [_streaks])
+	_check(_streaks == ["STREAK_DREIERPACK", "STREAK_GMETZL", "STREAK_BLUATBAD"], "a chain of 8: Dreierlei, Gmetzl, Kroatenjoahr (%s)" % [_streaks])
 	_check(paid == Constants.STREAK_BONUS_3 + Constants.STREAK_BONUS_5 + Constants.STREAK_BONUS_8, "their bonus points were paid (%d)" % paid)
 	_check(_kills == 8, "a kill marker for every kill")
 	var hud := main.get_node("UI/Hud") as Hud
@@ -57,8 +57,8 @@ func _ready() -> void:
 	for i: int in 3:
 		_kill(player, false)
 	paid = player.points.total - before - 3 * Constants.POINTS_KILL_BODY
-	_check(_streaks == ["STREAK_ZWOA", "STREAK_DREIERPACK"], "three with one shot: Zwoa auf oan Streich, then the chain's Dreierpack (%s)" % [_streaks])
-	_check(paid == 2 * Constants.STREAK_BONUS_MULTI + Constants.STREAK_BONUS_3, "two multi bonuses and the Dreierpack (%d)" % paid)
+	_check(_streaks == ["STREAK_ZWOA", "STREAK_DREIERPACK"], "three with one shot: Zwoa Detschn, then the chain's Dreierlei (%s)" % [_streaks])
+	_check(paid == 2 * Constants.STREAK_BONUS_MULTI + Constants.STREAK_BONUS_3, "two multi bonuses and the Dreierlei (%d)" % paid)
 
 	# Headshots in a row, broken by a body shot.
 	await _wait(Constants.KILL_STREAK_GAP + 0.5)

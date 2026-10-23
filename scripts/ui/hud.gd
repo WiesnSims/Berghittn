@@ -300,7 +300,7 @@ func _show_banner(text: String) -> void:
 	_banner_tween.tween_property(_banner, "modulate:a", 0.0, 0.6)
 
 
-## "Dreierpack!  +50" under the crosshair; the bonus also shows in the points popup.
+## "Dreierlei!  +50" under the crosshair; the bonus also shows in the points popup.
 func _show_streak(text: String, bonus: int) -> void:
 	_streak_label.text = tr("UI_STREAK") % [tr(text), bonus]
 	if _streak_tween:

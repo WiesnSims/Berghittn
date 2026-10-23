@@ -230,10 +230,10 @@ messages = {
 [&"", &"UI_WERTUNG_POINTS"]: [&"Punkte"],
 [&"", &"UI_LOBBY_MATCH_RUNNING"]: [&"Das Spiel läuft grad, du bist bei der nächsten Runde dabei."],
 [&"", &"UI_STREAK"]: [&"%s  +%d"],
-[&"", &"STREAK_DREIERPACK"]: [&"Dreierpack!"],
+[&"", &"STREAK_DREIERPACK"]: [&"Dreierlei!"],
 [&"", &"STREAK_GMETZL"]: [&"Gmetzl!"],
-[&"", &"STREAK_BLUATBAD"]: [&"Bluatbad am Berg!"],
-[&"", &"STREAK_ZWOA"]: [&"Zwoa auf oan Streich!"],
+[&"", &"STREAK_BLUATBAD"]: [&"A echtes Kroatenjoahr!"],
+[&"", &"STREAK_ZWOA"]: [&"Zwoa Detschn mid oamoi aushoin!"],
 [&"", &"STREAK_SCHAEDLWEH"]: [&"Schädlweh!"],
 [&"", &"UI_SET_DAMAGE_NUMBERS"]: [&"Schadenszahlen"]
 }
