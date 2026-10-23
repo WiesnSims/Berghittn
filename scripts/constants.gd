@@ -251,6 +251,10 @@ const AIM_FLASH_LIGHT: float = 0.5
 
 # Seconds a semi-auto click is remembered while the gun still cycles, so fast clicking always fires.
 const FIRE_BUFFER_TIME: float = 0.12
+# Loading round by round (WeaponData.reload_round_time): the share of the reload's own time spent
+# bringing the gun up to load (the rest takes it back), and of each round's time until it is in.
+const RELOAD_LIFT_SHARE: float = 0.45
+const RELOAD_ROUND_IN_AT: float = 0.65
 # Most bodies plus the wall one shot's ray is traced through (penetration).
 const MAX_RAY_STEPS: int = 12
 
@@ -409,6 +413,13 @@ const RUTE_FLEE_TIME: float = 3.0
 const RUTE_FLEE_RADIUS: float = 2.5
 const LARVE_SCAN: float = 0.2
 const LARVE_LINGER: float = 1.0
+# Repetierer's Ehrensalve: seconds the gun takes up to the sky before the first shot and back down
+# after the last, the share of a normal shot's kick each round of it gives the view, and seconds an
+# enemy stays deaf to the next salve once its ears have cleared (so it cannot be kept cowering).
+const SALVE_RAISE_TIME: float = 0.25
+const SALVE_LOWER_TIME: float = 0.3
+const SALVE_RECOIL: float = 0.35
+const DEAF_TIME: float = 6.0
 # Screen shake from blasts: seconds it lasts and how fast it trembles (cycles per second).
 const SHAKE_TIME: float = 0.45
 const SHAKE_FREQUENCY: float = 18.0

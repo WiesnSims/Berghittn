@@ -78,7 +78,7 @@ func _run() -> void:
 	for pose: Array in [["walk", EnemyRig.Action.NONE, 2.0, 0.3], ["strike_windup", EnemyRig.Action.STRIKE, 0.0, 0.4],
 			["strike_hit", EnemyRig.Action.STRIKE, 0.0, 0.62], ["pull", EnemyRig.Action.PULL, 0.0, 0.3], ["climb", EnemyRig.Action.CLIMB, 0.0, 0.5],
 			["crouch", EnemyRig.Action.CROUCH, 0.0, 0.3], ["leap", EnemyRig.Action.LEAP, 0.0, 0.3],
-			["dance", EnemyRig.Action.DANCE, 0.0, 0.7], ["dazed", EnemyRig.Action.DAZED, 0.0, 0.6], ["carried", EnemyRig.Action.CARRIED, 0.0, 0.5]]:
+			["dance", EnemyRig.Action.DANCE, 0.0, 0.7], ["dazed", EnemyRig.Action.DAZED, 0.0, 0.6], ["deafened", EnemyRig.Action.DEAFENED, 0.0, 0.5], ["carried", EnemyRig.Action.CARRIED, 0.0, 0.5]]:
 		await _pose(pose[0], pose[1], pose[2], pose[3])
 	for rig: EnemyRig in _rigs:
 		rig.reset()

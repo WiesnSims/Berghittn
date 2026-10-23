@@ -180,7 +180,7 @@ effects, see section 6a), `secondary` (what right click does, see the rules belo
 | `pistole` | Dienstpistole | semi-auto pistol | 25 | up to 10 (as fast as you click) | 8 / 64 | start weapon |
 | `jagdflinte` | Jagdflinte | double-barrel shotgun | 20 x 8 pellets | 3.3 (the recoil settles in 0.3 s) | 2 / 24 | 500 (wall-buy, Stube) |
 | `stutzen` | Stutzen | bolt-action rifle | 120 | 1.33 (the bolt is worked in 0.75 s) | 5 / 40 | 750 (wall-buy, Skiraum) |
-| `repetierer` | Repetierer | lever/repeater rifle | 90 (two shots for small enemies, play-test 2026-10-17) | 3 (5.5 fanned) | 10 / 80 | 1000 (wall-buy, Terrasse; it was chest only until the chest went specials-only, #52) |
+| `repetierer` | Repetierer | lever/repeater rifle | 90 (two shots for small enemies, play-test 2026-10-17) | 3 | 10 / 80 | 1000 (wall-buy, Terrasse; it was chest only until the chest went specials-only, #52) |
 | `schaufel` | Schneeschaufel | melee | 70 | 1.2 | – | 0 (always equipped) |
 | `alphorn` | Alphorn | wonder weapon | 200 area | 0.5 | 6 / 18 | chest (rare); from wave 10 also 4000 at the Seilbahn wall (user decision, 2026-10-17) |
 | `knoedelwerfer` | Knödelwerfer | wonder weapon | 180 area | 1.0 | 12 / 36 | chest only, rare |
@@ -199,6 +199,10 @@ Rules:
   round still chambered loads mag + 1, reloading from empty loads mag (the rack chambers one
   from the new mag). Weapons start fully loaded and chambered. Guns without a chamber
   (`chamber_time` 0) stay at mag size.
+- The Repetierer's tube is loaded a round at a time through the gate (user request, 2026-10-24):
+  the reload takes 0.5 s to bring the gun up and back plus 0.22 s for each round missing (three
+  after two shots: 1.16 s; from empty ten and the lever worked: 3.05 s). Each round counts the
+  moment it is in, so a reload cut short (a swing, a switch) keeps what went in.
 - **Right click = the weapon's secondary mode** (user decision, 2026-10-16). Every weapon gets
   one that suits it, chosen per weapon in `WeaponData.secondary`; not every gun just aims.
   Every new weapon, including the wonder weapons and melee weapons of section 6a, must get its own
@@ -210,8 +214,14 @@ Rules:
     almost no spread, a slow sway of the aim while scoped.
   - `jagdflinte`: fire both barrels at once (press): all loaded shells in one blast, recoil per
     shell; the gun is then empty.
-  - `repetierer`: fan the lever (hold): fires from the hip on its own as fast as the lever can be
-    worked (5.5 shots/s instead of 3), +4° spread and harder kick.
+  - `repetierer`: the Ehrensalve (press; user request 2026-10-24, replacing fanning the lever,
+    which was only faster, wilder shooting): the rifle goes up to the sky like at a Schützen salute
+    and every loaded round goes off, one every 0.11 s, the lever flung between them. Nobody is hit,
+    but every enemy within 10 m (all around; walls shield) claps its hands over its ears and cowers
+    on the spot, attacking nobody, for 0.25 s a round of the salve (2.75 s with a full tube of 11),
+    and is then deaf to the next salve for 6 s, so it cannot be kept cowering. Bosses do not care.
+    The gun is empty after it: buys the time for a reload or for a teammate, where the Alphorn's
+    Echo kills.
   - `alphorn`: the Echo (press): the bell swings up to the sky and the note comes down all around
     the player, 200 damage within 6 m in every direction and a harder shove; uses two notes. The
     panic button when surrounded.

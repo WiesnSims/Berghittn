@@ -18,7 +18,7 @@ const LEAN_SCALE: float = 40.0
 ## Enemy methods a guest may ask the host to call, with their argument counts (the host adds the
 ## hitting player as `source` to those that take one).
 const RELAYED: Dictionary = {&"receive_hit": 3, &"scorch": 1, &"ignite": 2, &"dance": 2,
-		&"apply_slow": 2, &"stun": 1, &"flee": 2, &"apply_knockback": 1,
+		&"apply_slow": 2, &"stun": 1, &"deafen": 1, &"flee": 2, &"apply_knockback": 1,
 		&"lift": 0, &"carry_to": 2, &"hurl": 1}
 const WITH_SOURCE: Array[StringName] = [&"receive_hit", &"scorch", &"ignite", &"dance"]
 

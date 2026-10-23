@@ -74,6 +74,10 @@ var _knock: Vector3
 # Stunned by the Goaßl (standing dazed), or fleeing from the Krampus-Rute: seconds left, and where
 # from.
 var _stun_left: float = 0.0
+# The stun is the Ehrensalve's (ears covered, not dazed); once it wears off, seconds it stays deaf to
+# the next one.
+var _deafened: bool = false
+var _deaf_left: float = 0.0
 var _flee_left: float = 0.0
 var _flee_from: Vector3
 # Lifted on the Mistgabel (carried, no will of its own), then hurled: flying until it lands, when
@@ -136,6 +140,8 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 	_lunge_cooldown_left = 0.0
 	_dance_left = 0.0
 	_stun_left = 0.0
+	_deafened = false
+	_deaf_left = 0.0
 	_flee_left = 0.0
 	if _lifted or _hurled:
 		_lifted = false
@@ -278,8 +284,28 @@ func stun(duration: float) -> void:
 		_relay(&"stun", [duration])
 		return
 	_stun_left = maxf(_stun_left, duration)
+	_deafened = false
 	_drop_swing()
 	_pose(EnemyRig.Action.DAZED)
+
+
+## The Repetierer's Ehrensalve: hands over the ears, cowering on the spot for `duration` (no walking,
+## no attacks), then deaf to the next salve for Constants.DEAF_TIME. Bosses shrug it off.
+func deafen(duration: float) -> void:
+	if not is_alive() or data.is_boss or _deaf_left > 0.0:
+		return
+	if puppet:
+		_relay(&"deafen", [duration])
+		return
+	if not (_deafened and _stun_left > 0.0):
+		_deafened = true
+		_drop_swing()
+		_pose(EnemyRig.Action.DEAFENED)
+	_stun_left = maxf(_stun_left, duration)
+
+
+func is_deafened() -> bool:
+	return _deafened and is_stunned()
 
 
 func is_stunned() -> bool:
@@ -457,6 +483,7 @@ func _step(delta: float) -> void:
 		if _slow_left <= 0.0:
 			_slow_factor = 1.0
 	_scorch_paid_left -= delta
+	_deaf_left -= delta
 	if not _dots.is_empty() and is_alive():
 		_tick_dots(delta)
 	if _knock != Vector3.ZERO and (_state == State.CHASING or _state == State.ATTACKING or _state == State.QUEUED):
@@ -480,11 +507,14 @@ func _step(delta: float) -> void:
 		_stun_left -= delta
 		if _can_dance() and is_alive():
 			_halt(delta)
-			# Dazed: swaying on the spot.
-			_visual.rotation.z = sin(_stun_left * 9.0) * 0.12
+			# Dazed: swaying on the spot; deafened: a quick shudder.
+			_visual.rotation.z = sin(_stun_left * 22.0) * 0.04 if _deafened else sin(_stun_left * 9.0) * 0.12
 			if _stun_left <= 0.0:
 				_visual.rotation.z = 0.0
 				_pose(EnemyRig.Action.NONE)
+				if _deafened:
+					_deafened = false
+					_deaf_left = Constants.DEAF_TIME
 			return
 	if _flee_left > 0.0:
 		_flee_left -= delta

@@ -73,19 +73,27 @@ var _reload_total: float = 0.0
 # A click that came in while the gun was still cycling; it fires as soon as it can, so fast clicking
 # is never swallowed.
 var _fire_buffer_left: float = 0.0
-# After a reload, a trigger (or fanning right click) still held from before does not fire until it is
-# let go: only a new pull once the gun is ready shoots (play-test 2026-10-18).
+# After a reload, a trigger still held from before does not fire until it is let go: only a new
+# pull once the gun is ready shoots (play-test 2026-10-18).
 var _fire_locked: bool = false
-var _fan_locked: bool = false
 var _reload_left: float = 0.0
 # What the running reload fills the gun to.
 var _reload_target: int = 0
+# Loading round by round (reload_round_time): rounds to load, rounds in so far, seconds until the
+# gun is up to load and per round (after perks).
+var _reload_rounds: int = 0
+var _reload_loaded: int = 0
+var _reload_lift: float = 0.0
+var _reload_per_round: float = 0.0
 var _switch_left: float = 0.0
 # Seconds until the gun is back up after a sprint and may fire.
 var _sprint_left: float = 0.0
 var _aiming: bool = false
-# Right click held on a gun that fans its action (FAN secondary).
-var _fanning: bool = false
+# The Ehrensalve (SALVE secondary) under way: rounds still to go off, of how many in all, and
+# seconds until the next.
+var _salve_left: int = 0
+var _salve_rounds: int = 0
+var _salve_next: float = 0.0
 # Playing the held secondary (PLAY) this frame, and seconds left of the round it is on.
 var _playing: bool = false
 var _play_left: float = 0.0
@@ -364,9 +372,9 @@ func is_scoped() -> bool:
 	return weapon != null and weapon.secondary == WeaponData.Secondary.SCOPE and aim_amount >= Constants.SCOPE_SHOW_AT
 
 
-## Fanning the action right now (FAN secondary): faster, wilder shots that kick harder.
-func is_fanning() -> bool:
-	return _fanning
+## Firing the Ehrensalve into the sky right now (SALVE secondary): each round kicks the view less.
+func is_saluting() -> bool:
+	return _salve_left > 0
 
 
 ## Right click held on a PLAY weapon (a held tune): walking slows, no sprinting.
@@ -376,17 +384,12 @@ func is_playing() -> bool:
 
 ## Cone half-angle in degrees the next shot can stray: base spread plus bloom, tightened by aiming.
 func current_spread() -> float:
-	return (weapon.spread + bloom + _fan_spread()) * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
+	return (weapon.spread + bloom) * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
 
 
 ## Bloom as it would widen the next shot (aiming tightens it like the base spread), for the crosshair.
-## Fanning counts as bloom, so the crosshair shows how wild it gets.
 func current_bloom() -> float:
-	return (bloom + _fan_spread()) * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
-
-
-func _fan_spread() -> float:
-	return weapon.rapid_spread if _fanning else 0.0
+	return bloom * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
 
 
 ## Aim blend eased, for the camera zoom and the gun pose.
@@ -418,8 +421,6 @@ func _physics_process(delta: float) -> void:
 		_fire_loop_left -= delta
 		if _fire_loop_left <= 0.0:
 			_stop_loop()
-	# Set again below once the hands are free to work the action.
-	_fanning = false
 	var was_playing: bool = _playing
 	_playing = false
 	# Reloading on the run is fine, shooting is not: the gun is lowered until the sprint ends.
@@ -450,11 +451,14 @@ func _physics_process(delta: float) -> void:
 		return
 	if is_reloading():
 		_reload_left -= delta
+		_load_rounds()
 		if _reload_left <= 0.0:
 			_finish_reload()
 		return
+	if _salve_left > 0:
+		_salve(delta)
+		return
 	_fire_locked = _fire_locked and Input.is_action_pressed("fire")
-	_fan_locked = _fan_locked and Input.is_action_pressed("secondary")
 	# An empty gun reloads by itself once its last shot has cycled (play-test 2026-10-17: a click on
 	# the empty gun during the cycle could run out before it counted, so R was needed).
 	# (Not while the last round of a held tune still plays: that one ends first.)
@@ -474,13 +478,11 @@ func _physics_process(delta: float) -> void:
 		return
 	if was_playing:
 		_stop_playing()
-	_fanning = weapon.secondary == WeaponData.Secondary.FAN and (force_aim or Input.is_action_pressed("secondary")) and not _fan_locked
-	if _fanning:
-		if _cooldown <= 0.0:
-			if mag > 0:
-				_fire()
-			else:
-				start_reload()
+	if weapon.secondary == WeaponData.Secondary.SALVE and Input.is_action_just_pressed("secondary") and _cooldown <= 0.0:
+		if mag > 0:
+			start_salve()
+		else:
+			start_reload()
 		return
 	if weapon.secondary == WeaponData.Secondary.ALL_BARRELS and Input.is_action_just_pressed("secondary") and _cooldown <= 0.0:
 		if mag > 0:
@@ -557,17 +559,38 @@ func start_reload() -> void:
 	# Empty mag means the slide is locked back: chamber a round after the new mag is in.
 	var speed: float = _perks().reload_time_multiplier() if _perks() else 1.0
 	var chamber: float = weapon.chamber_time * speed if mag == 0 else 0.0
-	_reload_left = weapon.reload_time * speed + chamber
+	var loading: float = weapon.reload_time * speed
+	# Loaded round by round: as long as the rounds that are missing.
+	_reload_rounds = mini(target - mag, reserve) if weapon.reload_round_time > 0.0 else 0
+	_reload_loaded = 0
+	_reload_per_round = weapon.reload_round_time * speed
+	_reload_lift = loading * Constants.RELOAD_LIFT_SHARE
+	loading += _reload_per_round * _reload_rounds
+	_reload_left = loading + chamber
 	_reload_total = _reload_left
 	# A click from before the reload (still buffered from the last shot's cycle) must not fire after it.
 	_fire_buffer_left = 0.0
 	_fire_locked = true
-	_fan_locked = true
 	reload_started.emit(_reload_left)
 	_stop_loop()
 	Sound.play(weapon.reload_sound)
 	if _viewmodel:
-		_viewmodel.play_reload(weapon.reload_time * speed, chamber)
+		_viewmodel.reload_rounds = _reload_rounds
+		_viewmodel.reload_round_time = _reload_per_round
+		_viewmodel.play_reload(loading, chamber)
+
+
+## Loading round by round: every round that is in by now counts at once (a reload cut short keeps them).
+func _load_rounds() -> void:
+	var done: float = _reload_total - _reload_left
+	var moved: bool = false
+	while _reload_loaded < _reload_rounds and reserve > 0 and done >= _reload_lift + _reload_per_round * (_reload_loaded + Constants.RELOAD_ROUND_IN_AT):
+		_reload_loaded += 1
+		mag += 1
+		reserve -= 1
+		moved = true
+	if moved:
+		ammo_changed.emit(mag, reserve)
 
 
 func _finish_reload() -> void:
@@ -581,6 +604,7 @@ func _finish_reload() -> void:
 
 
 func _cancel_reload() -> void:
+	_salve_left = 0
 	if is_reloading():
 		_reload_left = 0.0
 		reload_finished.emit()
@@ -637,6 +661,54 @@ func _select(index: int) -> void:
 ## Both barrels (ALL_BARRELS secondary): every loaded round in one blast.
 func fire_all() -> void:
 	_fire(mag)
+
+
+## The Ehrensalve (SALVE secondary): the gun goes up to the sky and every loaded round goes off, one
+## every secondary_round_time (see _salve).
+func start_salve() -> void:
+	if mag <= 0:
+		return
+	_salve_rounds = mag
+	_salve_left = mag
+	_salve_next = Constants.SALVE_RAISE_TIME
+	_fire_buffer_left = 0.0
+	if _viewmodel:
+		_viewmodel.play_salve_raise(Constants.SALVE_RAISE_TIME)
+
+
+## One round of the salve into the sky: no hit, but everyone within secondary_range (walls shield)
+## covers their ears for secondary_stun a round of the whole salve. Then the gun comes down, empty.
+func _salve(delta: float) -> void:
+	_salve_next -= delta
+	if _salve_next > 0.0:
+		return
+	_salve_next += weapon.secondary_round_time
+	_salve_left -= 1
+	mag -= 1
+	Sound.play(weapon.fire_sound, 0.0, _rng.randf_range(0.94, 1.08))
+	deafen_around(weapon.secondary_range, weapon.secondary_stun * _salve_rounds)
+	fired.emit(1)
+	acted.emit(Act.SECONDARY, 1)
+	ammo_changed.emit(mag, reserve)
+	if _viewmodel:
+		_viewmodel.play_salve_shot(weapon.secondary_round_time)
+	if _salve_left <= 0 or mag <= 0:
+		_salve_left = 0
+		_set_cooldown(Constants.SALVE_LOWER_TIME)
+		if _viewmodel:
+			_viewmodel.play_salve_lower(Constants.SALVE_LOWER_TIME)
+
+
+## Every enemy within `reach` (walls shielding) cowers with its ears covered for `duration`. Returns
+## how many.
+func deafen_around(reach: float, duration: float) -> int:
+	var reached: int = 0
+	for body: Dictionary in _bodies_in(global_position, -global_basis.z, 180.0, reach):
+		var enemy := (body.hurtbox as Hurtbox).receiver as Enemy
+		if enemy and enemy.is_alive():
+			enemy.deafen(duration)
+			reached += 1
+	return reached
 
 
 ## A special weapon's own second shot (BEHAVIOR secondary), using secondary_rounds at once.
@@ -880,7 +952,7 @@ func _fire(rounds: int = 1) -> void:
 	rounds = mini(rounds, mag)
 	mag -= rounds
 	bloom = minf(bloom + weapon.bloom_per_shot * rounds, weapon.bloom_max)
-	_set_cooldown(1.0 / (weapon.rapid_fire_rate if _fanning else weapon.fire_rate))
+	_set_cooldown(1.0 / weapon.fire_rate)
 	# Pellets that hit the same enemy land as one hit: one flinch, one hit marker and one set of
 	# points per shot, not one per pellet.
 	if _behavior:
@@ -1122,6 +1194,9 @@ func replay(action: Act, data: WeaponData, rounds: int, aim: Transform3D) -> voi
 			weapon = data
 			if behavior:
 				behavior.fire_secondary()
+			else:
+				# The Ehrensalve: a round into the sky.
+				_flash()
 			play_sound(data.secondary_sound if data.secondary_sound != &"" else data.fire_sound)
 		Act.SWING:
 			play_sound(data.swing_sound)

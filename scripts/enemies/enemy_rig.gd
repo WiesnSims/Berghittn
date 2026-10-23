@@ -2,11 +2,11 @@ class_name EnemyRig
 extends Node3D
 ## The skeleton of an enemy model (M6 part 4, built by tools/models): poses its bones in code (the
 ## stance it stands in, the walk, and one action at a time: a swing, ripping a board out, a dive
-## through a window, the Perchte's crouch and leap, a dance, being dazed or carried), and turns it
+## through a window, the Perchte's crouch and leap, a dance, being dazed, deafened or carried), and turns it
 ## into a ragdoll when it dies. Bones rotate around the model's own axes (their rest has no turn):
 ## +X swings a limb forward, -X leans the chest forward, Z spreads an arm.
 
-enum Action { NONE, STRIKE, PULL, CLIMB, CROUCH, LEAP, DANCE, DAZED, CARRIED }
+enum Action { NONE, STRIKE, PULL, CLIMB, CROUCH, LEAP, DANCE, DAZED, CARRIED, DEAFENED }
 
 ## Degrees per bone that it stands in (a zombie's arms forward, a hunch).
 @export var stance: Dictionary = {}
@@ -188,6 +188,8 @@ func _drop() -> float:
 			return 0.22
 		Action.DANCE:
 			return 0.1 * (0.5 + 0.5 * sin(_action_time * 12.0))
+		Action.DEAFENED:
+			return 0.08
 	return 0.0
 
 
@@ -195,7 +197,7 @@ func _target(bone: StringName) -> Vector3:
 	var angle: Vector3 = _stance(bone)
 	var s: float = sin(_phase)
 	var walk: float = _walk
-	if _action in [Action.CLIMB, Action.CARRIED, Action.DANCE, Action.LEAP, Action.CROUCH]:
+	if _action in [Action.CLIMB, Action.CARRIED, Action.DANCE, Action.LEAP, Action.CROUCH, Action.DEAFENED]:
 		walk = 0.0
 	var side: float = -1.0 if String(bone).ends_with("_r") else 1.0
 	var limb: String = String(bone).trim_suffix("_l").trim_suffix("_r")
@@ -283,6 +285,22 @@ func _target(bone: StringName) -> Vector3:
 					angle = Vector3(deg_to_rad(-25.0), 0.0, deg_to_rad(25.0) * sway)
 				"chest":
 					angle = Vector3(deg_to_rad(-10.0), 0.0, deg_to_rad(6.0) * sway)
+		Action.DEAFENED:
+			# The Ehrensalve: hands clapped over the ears, hunched, knees bent, the head shaking.
+			var shake: float = sin(_action_time * 16.0)
+			match limb:
+				"arm":
+					angle = Vector3(deg_to_rad(30.0), 0.0, deg_to_rad(-80.0) * side)
+				"forearm":
+					angle = Vector3(0.0, 0.0, deg_to_rad(-150.0) * side)
+				"chest":
+					angle = Vector3(deg_to_rad(-22.0), 0.0, 0.0)
+				"head":
+					angle = Vector3(deg_to_rad(-15.0), deg_to_rad(18.0) * shake, 0.0)
+				"thigh":
+					angle = Vector3(deg_to_rad(25.0), 0.0, deg_to_rad(-4.0) * side)
+				"shin":
+					angle = Vector3(deg_to_rad(-40.0), 0.0, 0.0)
 		Action.CARRIED:
 			# Flailing on the fork.
 			var flail: float = sin(_action_time * 14.0 + side)

@@ -291,7 +291,7 @@ func _apply_height(height: float) -> void:
 
 
 func _on_fired(rounds: int) -> void:
-	var strength: float = rounds * (weapons.weapon.rapid_recoil_multiplier if weapons.is_fanning() else 1.0)
+	var strength: float = rounds * (Constants.SALVE_RECOIL if weapons.is_saluting() else 1.0)
 	_camera.kick(weapons.weapon.recoil_pitch * strength, weapons.weapon.recoil_yaw * strength)
 
 

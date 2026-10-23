@@ -5,13 +5,15 @@ extends Resource
 ## What right click does (section 6): every weapon gets a mode that suits it.
 ## AIM: down the sights (hold). SCOPE: through a scope with an overlay (hold).
 ## ALL_BARRELS: every loaded round in one blast (press).
-## FAN: work the action as fast as the hand can, firing from the hip (hold); see rapid_*.
+## SALVE: the Ehrensalve (press): every loaded round fired into the sky, one every
+## secondary_round_time; whoever is within secondary_range (walls shield) covers their ears and
+## cowers for secondary_stun a round. The gun is then empty.
 ## BEHAVIOR: the special weapon's own second shot from its behavior script (press); see secondary_*.
 ## BLOCK (melee): melee lives on V, not in hand, so its mode is holding V past the blow: the weapon
 ## stays up as a guard against hits from the front; see block_*.
 ## PLAY: the special weapon's own held mode (hold): its behavior plays on for as long as right click
 ## is held, one round per secondary_round_time, walking at aim_move_multiplier (the Harmonika).
-enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR, BLOCK, PLAY }
+enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, SALVE, BEHAVIOR, BLOCK, PLAY }
 
 @export var id: StringName
 ## Goes in the melee slot (quick melee on V) instead of a gun slot.
@@ -24,8 +26,11 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR, BLOCK, PLAY }
 @export var fire_rate: float = 1.0
 @export var mag_size: int = 1
 @export var reserve_ammo: int = 0
-## Seconds.
+## Seconds. With reload_round_time, only the time to bring the gun up to load and back.
 @export var reload_time: float = 1.0
+## Loaded a round at a time (the Repetierer's tube): seconds per round on top of reload_time, so a
+## reload takes as long as the rounds missing; each counts the moment it is in.
+@export var reload_round_time: float = 0.0
 ## Extra seconds to chamber a round when reloading from an empty mag. 0 = this weapon has no chamber.
 ## With a chamber, a reload while a round is still chambered loads mag_size + 1.
 @export var chamber_time: float = 0.0
@@ -98,12 +103,8 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR, BLOCK, PLAY }
 @export var aim_time: float = 0.18
 @export var aim_spread_multiplier: float = 0.3
 @export var aim_move_multiplier: float = 0.6
-## Fanning (FAN): shots per second while right click is held, degrees of spread it adds, and how much
-## harder each shot kicks.
-@export var rapid_fire_rate: float = 0.0
-@export var rapid_spread: float = 0.0
-@export var rapid_recoil_multiplier: float = 1.0
 ## Behavior secondary (BEHAVIOR): rounds it uses, and its damage, reach (m), knockback (m/s) and shake.
+## The Ehrensalve (SALVE) uses secondary_range for its reach.
 @export var secondary_rounds: int = 1
 @export var secondary_damage: int = 0
 @export var secondary_range: float = 0.0
@@ -113,7 +114,10 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, FAN, BEHAVIOR, BLOCK, PLAY }
 ## the loaded one plus a second measure of powder poured in).
 @export var secondary_from_reserve: bool = false
 ## Held secondary (PLAY): seconds of playing that one round lasts (the first is taken on the press).
+## The Ehrensalve (SALVE): seconds between its shots.
 @export var secondary_round_time: float = 1.0
+## The Ehrensalve (SALVE): seconds an enemy cowers for each round of the salve.
+@export var secondary_stun: float = 0.0
 ## Guard (BLOCK): half-angle (degrees) of the front it covers, and the share of a hit that still gets
 ## through. The attacker is shoved back by secondary_knockback; walking slows to aim_move_multiplier.
 @export var block_angle: float = 60.0
