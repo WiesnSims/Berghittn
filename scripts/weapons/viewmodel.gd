@@ -39,6 +39,14 @@ extends Node3D
 @onready var _mag: Node3D = get_node_or_null("Model/Grip/Magazine")
 @onready var _mag_rest: Vector3 = _mag.position if _mag else Vector3.ZERO
 
+## Seconds from this shot to the next one (set by the WeaponHolder before play_fire): a gun worked
+## between shots fits its action into it, e.g. the Repetierer.
+var cycle_time: float = 0.0
+## A gun loaded round by round (set by the WeaponHolder before play_reload): rounds going in, and
+## seconds each takes. 0 rounds = a magazine.
+var reload_rounds: int = 0
+var reload_round_time: float = 0.0
+
 var _rest: Transform3D
 var _tween: Tween
 # Moving parts (slide, bolt, barrels) animate on their own tween, alongside the kick.
@@ -126,16 +134,20 @@ func set_aim(amount: float) -> void:
 
 
 func _flash_and_kick(strength: float = 1.0) -> void:
+	_muzzle_flash()
+	_restart_tween()
+	var kicked: Transform3D = _rest.translated_local(Vector3(0, 0, kick_distance * strength)).rotated_local(Vector3.RIGHT, deg_to_rad(kick_angle * strength))
+	_model.transform = kicked
+	_tween.tween_property(_model, "transform", _rest, kick_time).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+
+func _muzzle_flash() -> void:
 	_flash_left = Constants.MUZZLE_FLASH_TIME
 	_flash.visible = true
 	_flash.rotation.z = randf() * TAU
 	# Aimed, the flash sits right in front of the sights: keep it small there.
 	_flash.scale = Vector3.ONE * lerpf(1.0, Constants.AIM_FLASH_SCALE, _aim)
 	_flash_light.light_energy = _flash_energy * lerpf(1.0, Constants.AIM_FLASH_LIGHT, _aim)
-	_restart_tween()
-	var kicked: Transform3D = _rest.translated_local(Vector3(0, 0, kick_distance * strength)).rotated_local(Vector3.RIGHT, deg_to_rad(kick_angle * strength))
-	_model.transform = kicked
-	_tween.tween_property(_model, "transform", _rest, kick_time).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 
 func _eject_casing() -> void:

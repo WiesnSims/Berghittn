@@ -2,7 +2,7 @@ extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/m5_core.tscn
 ## Headless M5 check on the real main scene: the enemy mix per wave, boss waves, the Perchte lunge,
 ## bullet penetration, the four Schnaps and their effects, the Hüttentruhe (take, let sink, swap),
-## the Repetierer's fanning, the Lager's ammo crate, every Schnaps perk and the Brettljause.
+## the Repetierer's Querschläger (set up; m9_repetierer tries it), the Lager's ammo crate, every Schnaps perk and the Brettljause.
 
 # Open pasture in front of the hut, clear of furniture.
 const FIELD: Vector3 = Vector3(10.0, -0.3, 31.0)
@@ -96,7 +96,7 @@ func _run() -> void:
 	await _lunge()
 	await _perks()
 	await _chest()
-	await _fanning()
+	await _repetierer()
 	await _ammo_crate()
 	await _boss_wave()
 
@@ -549,20 +549,12 @@ func _chest() -> void:
 	pool.entries = all_entries
 
 
-func _fanning() -> void:
+func _repetierer() -> void:
 	var rep: WeaponData = load("res://data/weapons/repetierer.tres")
 	player.weapons.give_weapon(rep)
 	await _seconds(0.6)
-	var holder: WeaponHolder = player.weapons
-	holder.bloom = 0.0
-	var hip: float = holder.current_spread()
-	holder._fanning = true
-	var fanned: float = holder.current_spread()
-	holder._fire()
-	var cooldown: float = holder._cooldown
-	holder._fanning = false
-	_check(is_equal_approx(cooldown, 1.0 / rep.rapid_fire_rate) and fanned > hip + rep.rapid_spread - 0.01, "Repetierer fanning: %.2f s between shots (normal %.2f), spread %.1f -> %.1f" % [cooldown, 1.0 / rep.fire_rate, hip, fanned])
-	_check(rep.secondary == WeaponData.Secondary.FAN and rep.penetration == 1, "Repetierer: right click fans the lever, goes through one body")
+	_check(rep.secondary == WeaponData.Secondary.RICOCHET and rep.secondary_rounds == 3 and rep.ricochet_damage.size() == 5, "Repetierer: right click fires the Querschläger")
+	_check(rep.penetration == 1 and rep.reload_round_time > 0.0, "Repetierer: goes through one body, loads round by round")
 
 
 func _ammo_crate() -> void:

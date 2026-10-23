@@ -23,6 +23,9 @@ signal acted(action: Act, rounds: int)
 ## landing, and V held past the blow (guard or held mode) and let go.
 enum Act { SHOT, SECONDARY, SWING, MELEE, HOLD, RELEASE }
 
+# The Querschläger's streak from hop to hop.
+const RICOCHET_TRAIL: Script = preload("res://scripts/effects/ricochet_trail.gd")
+
 ## One carried gun and the ammo it had when it was put away.
 class GunSlot:
 	var data: WeaponData
@@ -69,23 +72,28 @@ var _current: int = -1
 var _cooldown: float = 0.0
 # How long the current cooldown and reload are in all, for the ready ring at the crosshair.
 var _cooldown_total: float = 0.0
+# The ready ring shows the current cycle (set by the shot that started it).
+var _ring_cycle: bool = false
 var _reload_total: float = 0.0
 # A click that came in while the gun was still cycling; it fires as soon as it can, so fast clicking
 # is never swallowed.
 var _fire_buffer_left: float = 0.0
-# After a reload, a trigger (or fanning right click) still held from before does not fire until it is
-# let go: only a new pull once the gun is ready shoots (play-test 2026-10-18).
+# After a reload, a trigger still held from before does not fire until it is let go: only a new
+# pull once the gun is ready shoots (play-test 2026-10-18).
 var _fire_locked: bool = false
-var _fan_locked: bool = false
 var _reload_left: float = 0.0
 # What the running reload fills the gun to.
 var _reload_target: int = 0
+# Loading round by round (reload_round_time): rounds to load, rounds in so far, seconds until the
+# gun is up to load and per round (after perks).
+var _reload_rounds: int = 0
+var _reload_loaded: int = 0
+var _reload_lift: float = 0.0
+var _reload_per_round: float = 0.0
 var _switch_left: float = 0.0
 # Seconds until the gun is back up after a sprint and may fire.
 var _sprint_left: float = 0.0
 var _aiming: bool = false
-# Right click held on a gun that fans its action (FAN secondary).
-var _fanning: bool = false
 # Playing the held secondary (PLAY) this frame, and seconds left of the round it is on.
 var _playing: bool = false
 var _play_left: float = 0.0
@@ -349,6 +357,12 @@ func reload_progress() -> float:
 	return 1.0 - _reload_left / _reload_total if is_reloading() and _reload_total > 0.0 else -1.0
 
 
+## The ready ring shows the cycle after this shot: guns with long gaps (WeaponData.cycle_ring), and
+## the long wait after the Querschläger.
+func shows_cycle_ring() -> bool:
+	return weapon != null and (weapon.cycle_ring or _ring_cycle)
+
+
 ## Share of the gun's cycle after a shot done (0..1), or -1 when it is ready to fire again.
 func cycle_progress() -> float:
 	return 1.0 - _cooldown / _cooldown_total if _cooldown > 0.0 and _cooldown_total > 0.0 else -1.0
@@ -364,11 +378,6 @@ func is_scoped() -> bool:
 	return weapon != null and weapon.secondary == WeaponData.Secondary.SCOPE and aim_amount >= Constants.SCOPE_SHOW_AT
 
 
-## Fanning the action right now (FAN secondary): faster, wilder shots that kick harder.
-func is_fanning() -> bool:
-	return _fanning
-
-
 ## Right click held on a PLAY weapon (a held tune): walking slows, no sprinting.
 func is_playing() -> bool:
 	return _playing
@@ -376,17 +385,12 @@ func is_playing() -> bool:
 
 ## Cone half-angle in degrees the next shot can stray: base spread plus bloom, tightened by aiming.
 func current_spread() -> float:
-	return (weapon.spread + bloom + _fan_spread()) * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
+	return (weapon.spread + bloom) * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
 
 
 ## Bloom as it would widen the next shot (aiming tightens it like the base spread), for the crosshair.
-## Fanning counts as bloom, so the crosshair shows how wild it gets.
 func current_bloom() -> float:
-	return (bloom + _fan_spread()) * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
-
-
-func _fan_spread() -> float:
-	return weapon.rapid_spread if _fanning else 0.0
+	return bloom * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
 
 
 ## Aim blend eased, for the camera zoom and the gun pose.
@@ -418,8 +422,6 @@ func _physics_process(delta: float) -> void:
 		_fire_loop_left -= delta
 		if _fire_loop_left <= 0.0:
 			_stop_loop()
-	# Set again below once the hands are free to work the action.
-	_fanning = false
 	var was_playing: bool = _playing
 	_playing = false
 	# Reloading on the run is fine, shooting is not: the gun is lowered until the sprint ends.
@@ -450,11 +452,11 @@ func _physics_process(delta: float) -> void:
 		return
 	if is_reloading():
 		_reload_left -= delta
+		_load_rounds()
 		if _reload_left <= 0.0:
 			_finish_reload()
 		return
 	_fire_locked = _fire_locked and Input.is_action_pressed("fire")
-	_fan_locked = _fan_locked and Input.is_action_pressed("secondary")
 	# An empty gun reloads by itself once its last shot has cycled (play-test 2026-10-17: a click on
 	# the empty gun during the cycle could run out before it counted, so R was needed).
 	# (Not while the last round of a held tune still plays: that one ends first.)
@@ -474,13 +476,11 @@ func _physics_process(delta: float) -> void:
 		return
 	if was_playing:
 		_stop_playing()
-	_fanning = weapon.secondary == WeaponData.Secondary.FAN and (force_aim or Input.is_action_pressed("secondary")) and not _fan_locked
-	if _fanning:
-		if _cooldown <= 0.0:
-			if mag > 0:
-				_fire()
-			else:
-				start_reload()
+	if weapon.secondary == WeaponData.Secondary.RICOCHET and Input.is_action_just_pressed("secondary") and _cooldown <= 0.0:
+		if mag >= weapon.secondary_rounds:
+			fire_ricochet()
+		else:
+			start_reload()
 		return
 	if weapon.secondary == WeaponData.Secondary.ALL_BARRELS and Input.is_action_just_pressed("secondary") and _cooldown <= 0.0:
 		if mag > 0:
@@ -557,17 +557,38 @@ func start_reload() -> void:
 	# Empty mag means the slide is locked back: chamber a round after the new mag is in.
 	var speed: float = _perks().reload_time_multiplier() if _perks() else 1.0
 	var chamber: float = weapon.chamber_time * speed if mag == 0 else 0.0
-	_reload_left = weapon.reload_time * speed + chamber
+	var loading: float = weapon.reload_time * speed
+	# Loaded round by round: as long as the rounds that are missing.
+	_reload_rounds = mini(target - mag, reserve) if weapon.reload_round_time > 0.0 else 0
+	_reload_loaded = 0
+	_reload_per_round = weapon.reload_round_time * speed
+	_reload_lift = loading * Constants.RELOAD_LIFT_SHARE
+	loading += _reload_per_round * _reload_rounds
+	_reload_left = loading + chamber
 	_reload_total = _reload_left
 	# A click from before the reload (still buffered from the last shot's cycle) must not fire after it.
 	_fire_buffer_left = 0.0
 	_fire_locked = true
-	_fan_locked = true
 	reload_started.emit(_reload_left)
 	_stop_loop()
 	Sound.play(weapon.reload_sound)
 	if _viewmodel:
-		_viewmodel.play_reload(weapon.reload_time * speed, chamber)
+		_viewmodel.reload_rounds = _reload_rounds
+		_viewmodel.reload_round_time = _reload_per_round
+		_viewmodel.play_reload(loading, chamber)
+
+
+## Loading round by round: every round that is in by now counts at once (a reload cut short keeps them).
+func _load_rounds() -> void:
+	var done: float = _reload_total - _reload_left
+	var moved: bool = false
+	while _reload_loaded < _reload_rounds and reserve > 0 and done >= _reload_lift + _reload_per_round * (_reload_loaded + Constants.RELOAD_ROUND_IN_AT):
+		_reload_loaded += 1
+		mag += 1
+		reserve -= 1
+		moved = true
+	if moved:
+		ammo_changed.emit(mag, reserve)
 
 
 func _finish_reload() -> void:
@@ -637,6 +658,82 @@ func _select(index: int) -> void:
 ## Both barrels (ALL_BARRELS secondary): every loaded round in one blast.
 func fire_all() -> void:
 	_fire(mag)
+
+
+## The Querschläger (RICOCHET secondary): one shot for secondary_rounds, then a long lever cycle.
+## Returns how many bodies it hit.
+func fire_ricochet() -> int:
+	if mag < weapon.secondary_rounds:
+		return 0
+	mag -= weapon.secondary_rounds
+	_set_cooldown(weapon.ricochet_cycle)
+	_ring_cycle = true
+	var hit: int = _ricochet()
+	Sound.play(weapon.fire_sound)
+	fired.emit(1)
+	acted.emit(Act.SECONDARY, weapon.secondary_rounds)
+	ammo_changed.emit(mag, reserve)
+	if _viewmodel:
+		_viewmodel.cycle_time = _cooldown_total
+		_viewmodel.play_secondary(weapon.secondary_rounds)
+	return hit
+
+
+## The bullet's path: along the aim to the first body or wall, then glancing off on to the nearest
+## enemy it can see within secondary_range that it has not hit yet, and on, through ricochet_damage
+## bodies or ricochet_reach metres flown from hop to hop. A head hit first counts double; the hops
+## strike bodies.
+func _ricochet() -> int:
+	var query := PhysicsRayQueryParameters3D.create(global_position, global_position + _spread_direction() * weapon.range, Constants.LAYER_WORLD | Constants.LAYER_HITBOX, _exclude)
+	query.collide_with_areas = true
+	var first: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
+	if first.is_empty():
+		return 0
+	var path := PackedVector3Array([global_transform * Constants.MUZZLE_OFFSET, first.position])
+	var struck: Dictionary = {}
+	var at: Vector3 = first.position
+	var hurtbox := first.collider as Hurtbox
+	if hurtbox:
+		struck[hurtbox.receiver] = true
+		_ricochet_hit(hurtbox, first.position, first.normal, 0)
+	else:
+		_impact_marks.place(first.position, first.normal)
+		_impact_puffs.play(first.position, first.normal)
+		# Off the wall, from just in front of it.
+		at += first.normal * 0.1
+	var left: float = weapon.ricochet_reach
+	while struck.size() < weapon.ricochet_damage.size() and left > 0.0:
+		var next: Dictionary = {}
+		for body: Dictionary in _bodies_in(at, Vector3.FORWARD, 180.0, minf(weapon.secondary_range, left)):
+			var receiver: Node = (body.hurtbox as Hurtbox).receiver
+			var enemy := receiver as Enemy
+			if struck.has(receiver) or (enemy and not enemy.is_alive()):
+				continue
+			if next.is_empty() or body.distance < next.distance:
+				next = body
+		if next.is_empty():
+			break
+		left -= next.distance
+		at = next.target
+		struck[(next.hurtbox as Hurtbox).receiver] = true
+		path.append(at)
+		_ricochet_hit(next.hurtbox, at, -(next.to_target as Vector3).normalized(), struck.size() - 1)
+	if path.size() > 2 or hurtbox == null:
+		Sound.play(&"ricochet", 0.0, _rng.randf_range(0.9, 1.1))
+	var trail := Node3D.new()
+	trail.set_script(RICOCHET_TRAIL)
+	trail.set("points", path)
+	_shooter.get_parent().add_child(trail)
+	return struck.size()
+
+
+## The `index`-th body the Querschläger hits: less with every hop (ricochet_damage).
+func _ricochet_hit(hurtbox: Hurtbox, at: Vector3, normal: Vector3, index: int) -> void:
+	var amount: int = hurtbox.damage_for(_damage(weapon.ricochet_damage[index]), weapon.headshot_multiplier)
+	var result: Hurtbox.Result = hurtbox.receiver.receive_hit(amount, hurtbox.is_head, false, _shooter)
+	if result != Hurtbox.Result.IGNORED:
+		_hit_puffs.play(at, normal)
+		hit_confirmed.emit(hurtbox.is_head, result == Hurtbox.Result.KILLED)
 
 
 ## A special weapon's own second shot (BEHAVIOR secondary), using secondary_rounds at once.
@@ -880,7 +977,7 @@ func _fire(rounds: int = 1) -> void:
 	rounds = mini(rounds, mag)
 	mag -= rounds
 	bloom = minf(bloom + weapon.bloom_per_shot * rounds, weapon.bloom_max)
-	_set_cooldown(1.0 / (weapon.rapid_fire_rate if _fanning else weapon.fire_rate))
+	_set_cooldown(1.0 / weapon.fire_rate)
 	# Pellets that hit the same enemy land as one hit: one flinch, one hit marker and one set of
 	# points per shot, not one per pellet.
 	if _behavior:
@@ -914,12 +1011,14 @@ func _after_shot(rounds: int) -> void:
 	acted.emit(Act.SHOT, rounds)
 	ammo_changed.emit(mag, reserve)
 	if _viewmodel:
+		_viewmodel.cycle_time = _cooldown_total
 		_viewmodel.play_fire(rounds)
 
 
 func _set_cooldown(time: float) -> void:
 	_cooldown = time
 	_cooldown_total = time
+	_ring_cycle = false
 
 
 func _start_melee() -> void:
@@ -1121,6 +1220,9 @@ func replay(action: Act, data: WeaponData, rounds: int, aim: Transform3D) -> voi
 			weapon = data
 			if behavior:
 				behavior.fire_secondary()
+			else:
+				# The Querschläger.
+				_flash()
 			play_sound(data.secondary_sound if data.secondary_sound != &"" else data.fire_sound)
 		Act.SWING:
 			play_sound(data.swing_sound)

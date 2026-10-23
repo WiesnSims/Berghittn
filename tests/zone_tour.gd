@@ -7,7 +7,7 @@ extends Node
 ## aim: the crosshair opening up under rapid fire, then the right-click modes: pistol down the sights,
 ## both barrels of the Jagdflinte, the Stutzen scope.
 ## m5: the enemy line-up, the Schnaps shrine, the Hüttentruhe closed and offering, the ammo crate,
-## the boss bar, and the Repetierer firing, fanning and reloading.
+## the boss bar, and the Repetierer firing, its Querschläger and reloading.
 ## boeller: the Seilbahn wall-buys (Handböller, Alphorn from wave 10), the Handböller in hand, a shell
 ## into a crowd, the Doppelladung, the reload.
 ## fladen: the Kuhfladen wall-buy in the Schuppen, one placed in the doorway, a wanderer stepping in.
@@ -495,14 +495,11 @@ func _m5(main: Node) -> void:
 	weapons._fire()
 	await _save_series("m5_rep_fire", 4, 0.05)
 	await get_tree().create_timer(0.4).timeout
-	weapons.force_aim = true
-	await get_tree().create_timer(0.1).timeout
-	await _save("m5_rep_fan")
-	weapons.force_aim = false
-	await get_tree().create_timer(0.4).timeout
+	weapons.fire_ricochet()
+	await _save_series("m5_rep_ricochet", 4, 0.25)
 	weapons.mag = 0
 	weapons.start_reload()
-	await _save_series("m5_rep_reload", 8, (weapons.weapon.reload_time + weapons.weapon.chamber_time) / 8.0)
+	await _save_series("m5_rep_reload", 8, weapons._reload_total / 8.0)
 
 
 func _alphorn_tour(main: Node) -> void:

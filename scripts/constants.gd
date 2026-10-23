@@ -251,11 +251,17 @@ const AIM_FLASH_LIGHT: float = 0.5
 
 # Seconds a semi-auto click is remembered while the gun still cycles, so fast clicking always fires.
 const FIRE_BUFFER_TIME: float = 0.12
+# Loading round by round (WeaponData.reload_round_time): the share of the reload's own time spent
+# bringing the gun up to load (the rest takes it back), and of each round's time until it is in.
+const RELOAD_LIFT_SHARE: float = 0.45
+const RELOAD_ROUND_IN_AT: float = 0.65
 # Most bodies plus the wall one shot's ray is traced through (penetration).
 const MAX_RAY_STEPS: int = 12
 
 # Weapon feedback.
 const MUZZLE_FLASH_TIME: float = 0.07
+# Where a streak drawn from the gun starts, from the eye (right, up, ahead; metres).
+const MUZZLE_OFFSET: Vector3 = Vector3(0.15, -0.15, -0.8)
 # Camera recoil: how fast the kick snaps in and how fast the view settles back (per second).
 # Ejected casings: how many can be in the air at once, and seconds each one flies.
 const CASING_POOL_SIZE: int = 8
