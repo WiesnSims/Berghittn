@@ -839,7 +839,8 @@ Perchte and Krampus as first sampled). First draft of the lines (all our own):
   Setting "Enemy chatter" / "Gegner reden", on by default. Co-op: the host sends the line index
   (CoopEnemies._said) before the enemy's death. Lines added to the draft (our own, play-test
   them): Wanderer hit "Mei Fuaß…"; Tourist at a barricade "Hallo? Is des Zimmer no frei?", hit
-  "Aua! Des gibt a schlechte Bewertung!", dying "Null Sterne…"; Knappe hit "Des kitzlt nur.", dying
+  "Aua! Des gibt a schlechte Bewertung!", dying "Tschüss!" (the German goodbye every Austrian winces at); Knappe hit "Geh bitte…",
+  dying
   "Schicht is…"; Krampus hit "Des wirst ma büßn!", dying "I kimm wieder… nächsts Joahr!". Tests:
   tests/m9_gredn, tests/net_specials.
 
