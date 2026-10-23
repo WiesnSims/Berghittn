@@ -914,6 +914,7 @@ func _after_shot(rounds: int) -> void:
 	acted.emit(Act.SHOT, rounds)
 	ammo_changed.emit(mag, reserve)
 	if _viewmodel:
+		_viewmodel.cycle_time = _cooldown_total
 		_viewmodel.play_fire(rounds)
 
 

@@ -39,6 +39,10 @@ extends Node3D
 @onready var _mag: Node3D = get_node_or_null("Model/Grip/Magazine")
 @onready var _mag_rest: Vector3 = _mag.position if _mag else Vector3.ZERO
 
+## Seconds from this shot to the next one (set by the WeaponHolder before play_fire): a gun worked
+## between shots fits its action into it, e.g. the Repetierer when fanned.
+var cycle_time: float = 0.0
+
 var _rest: Transform3D
 var _tween: Tween
 # Moving parts (slide, bolt, barrels) animate on their own tween, alongside the kick.
