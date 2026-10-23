@@ -228,5 +228,12 @@ messages = {
 [&"", &"UI_PLAY_WITH_FRIENDS"]: [&"Mit Freunden spielen"],
 [&"", &"UI_WERTUNG_NAME"]: [&"Spieler"],
 [&"", &"UI_WERTUNG_POINTS"]: [&"Punkte"],
-[&"", &"UI_LOBBY_MATCH_RUNNING"]: [&"Das Spiel läuft grad, du bist bei der nächsten Runde dabei."]
+[&"", &"UI_LOBBY_MATCH_RUNNING"]: [&"Das Spiel läuft grad, du bist bei der nächsten Runde dabei."],
+[&"", &"UI_STREAK"]: [&"%s  +%d"],
+[&"", &"STREAK_DREIERPACK"]: [&"Dreierlei!"],
+[&"", &"STREAK_GMETZL"]: [&"Gmetzl!"],
+[&"", &"STREAK_BLUATBAD"]: [&"A echtes Kroatenjoahr!"],
+[&"", &"STREAK_ZWOA"]: [&"Zwoa Detschn mid oamoi aushoin!"],
+[&"", &"STREAK_SCHAEDLWEH"]: [&"Schädlweh!"],
+[&"", &"UI_SET_DAMAGE_NUMBERS"]: [&"Schadenszahlen"]
 }

@@ -132,6 +132,17 @@ def headshot(v):
     return d.mix(x * 0.7, click(6000, 0.002, 0.5))
 
 
+def kill_thock(v):
+    """A kill (M9): a dull wooden thock under the hit marker's click."""
+    return d.mix(thud(170, 0.05, 1.0), click(900, 0.004, 0.35))
+
+
+def kill_bumm(v):
+    """A headshot kill (M9): a deep "Bumm" with a little bell on top; it rises through a streak."""
+    x = bell(0.4, 1300, [1, 2.4], [0.08, 0.04], [1, 0.4])
+    return d.mix(thud(85, 0.12, 1.0), x * 0.3, click(3000, 0.002, 0.4))
+
+
 def bellows(v):
     """The Harmonika's air button: bellows pulled open, then pressed shut."""
     air = d.bandpass(d.noise(2.6), 300, 2500)
@@ -686,7 +697,7 @@ SOUNDS = {
     "break_close": (break_close, 1), "bolt_open": (bolt_open, 1), "bolt_close": (bolt_close, 1),
     "lever_open": (lever_open, 1), "lever_close": (lever_close, 1), "load_clunk": (load_clunk, 1),
     "load_ready": (load_ready, 1), "weapon_raise": (weapon_raise, 1), "hitmarker": (hitmarker, 1),
-    "headshot": (headshot, 1), "bellows": (bellows, 1), "alphorn_load": (alphorn_load, 1),
+    "headshot": (headshot, 1), "kill_thock": (kill_thock, 1), "kill_bumm": (kill_bumm, 1), "bellows": (bellows, 1), "alphorn_load": (alphorn_load, 1),
     "swing": (swing, 3), "throw": (throw, 1), "schaufel_hit": (schaufel_hit, 2),
     "pfanne_bonk": (pfanne_bonk, 2), "goassl_crack": (goassl_crack, 2), "mistgabel_stab": (mistgabel_stab, 2),
     "rute_hit": (rute_hit, 2), "block_hit": (block_hit, 1),

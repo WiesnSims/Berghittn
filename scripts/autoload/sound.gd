@@ -21,7 +21,7 @@ const MIX: Dictionary = {
 	&"shot_repetierer": 1.0, &"dry_click": -6.0, &"mag_out": -8.0, &"mag_in": -6.0, &"break_open": -6.0,
 	&"break_close": -6.0, &"bolt_open": -6.0, &"bolt_close": -6.0, &"lever_open": -4.0,
 	&"lever_close": -6.0, &"load_clunk": -8.0, &"load_ready": -8.0, &"weapon_raise": -10.0,
-	&"hitmarker": -12.0, &"headshot": -9.0, &"bellows": -8.0, &"alphorn_load": -8.0,
+	&"hitmarker": -12.0, &"headshot": -9.0, &"kill_thock": -8.0, &"kill_bumm": -6.0, &"bellows": -8.0, &"alphorn_load": -8.0,
 	&"swing": -9.0, &"throw": -8.0, &"schaufel_hit": -3.0, &"pfanne_bonk": -2.0, &"goassl_crack": 2.0,
 	&"mistgabel_stab": -2.0, &"rute_hit": 0.0, &"block_hit": -3.0,
 	&"alphorn_blast": -1.0, &"alphorn_echo": -1.0, &"knoedel_launch": -5.0, &"knoedel_splat": -4.0, &"knoedel_ready": -8.0,

@@ -51,6 +51,7 @@ func _build() -> void:
 	_add_slider("UI_SET_AIM_SENSITIVITY", Constants.AIM_SENSITIVITY_MIN, Constants.AIM_SENSITIVITY_MAX,
 			Settings.aim_sensitivity, func(v: float) -> void: Settings.aim_sensitivity = v, _percent)
 	_add_toggle("UI_SET_INVERT_Y", Settings.invert_y, func(on: bool) -> void: Settings.invert_y = on)
+	_add_toggle("UI_SET_DAMAGE_NUMBERS", Settings.damage_numbers, func(on: bool) -> void: Settings.damage_numbers = on)
 	for bus: StringName in Settings.BUSES:
 		_add_slider(VOLUME_KEYS[bus], 0.0, 1.0, Settings.volume(bus),
 				func(v: float) -> void: Settings.set_volume(bus, v), _percent)

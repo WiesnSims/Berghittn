@@ -1,6 +1,7 @@
 class_name Crosshair
 extends Control
-## Drawn crosshair plus a hit marker that flashes on confirmed hits (red on kills). The arms move apart
+## Drawn crosshair plus a hit marker that flashes on confirmed hits, and on every kill of ours a
+## bigger X (M9 part 2): red, gold for a headshot kill. The arms move apart
 ## with the gun's bloom, so rapid fire visibly loosens the aim; the base gap stays small.
 ## A ring around it fills while the gun reloads or, for the Alphorn, between notes, and pulses
 ## once when it is ready again (play-test, Alphorn), so the wait can be read without looking away.
@@ -13,6 +14,9 @@ extends Control
 @export var kill_color: Color = Color(1, 0.25, 0.2, 1)
 @export var hit_inner: float = 7.0
 @export var hit_outer: float = 14.0
+@export var head_kill_color: Color = Color(1.0, 0.8, 0.25, 1)
+@export var kill_inner: float = 9.0
+@export var kill_outer: float = 22.0
 
 ## Most the arms may move out, in pixels.
 @export var max_spread: float = 28.0
@@ -28,6 +32,8 @@ extends Control
 var _hit_left: float = 0.0
 var _spread: float = 0.0
 var _hit_is_kill: bool = false
+var _kill_left: float = 0.0
+var _kill_is_head: bool = false
 # Ring fill (0..1, -1 = no ring), whether it is a reload, and seconds left of the ready pulse.
 var _progress: float = -1.0
 var _reloading: bool = false
@@ -65,7 +71,17 @@ func show_hit(_is_headshot: bool, killed: bool) -> void:
 	queue_redraw()
 
 
+## A kill of ours, whatever did it (KillFeedback): the big X.
+func show_kill(is_headshot: bool) -> void:
+	_kill_left = Constants.KILL_MARKER_TIME
+	_kill_is_head = is_headshot
+	queue_redraw()
+
+
 func _process(delta: float) -> void:
+	if _kill_left > 0.0:
+		_kill_left -= delta
+		queue_redraw()
 	if _hit_left > 0.0:
 		_hit_left -= delta
 		queue_redraw()
@@ -89,6 +105,16 @@ func _draw() -> void:
 		var pulse: Color = cycle_color
 		pulse.a *= 1.0 - t
 		draw_arc(c, radius + pulse_grow * t, 0.0, TAU, 48, pulse, ring_width, true)
+	if _kill_left > 0.0:
+		var kill: Color = head_kill_color if _kill_is_head else kill_color
+		var share: float = clampf(_kill_left / Constants.KILL_MARKER_TIME, 0.0, 1.0)
+		kill.a = share
+		# Pops out a little as it fades.
+		var grow: float = (1.0 - share) * 4.0
+		for dir: Vector2 in [Vector2(1, 1), Vector2(-1, 1), Vector2(1, -1), Vector2(-1, -1)]:
+			var d: Vector2 = dir.normalized()
+			draw_line(c + d * (kill_inner + grow), c + d * (kill_outer + grow), kill, thickness + 2.0)
+		return
 	if _hit_left <= 0.0:
 		return
 	var marker: Color = kill_color if _hit_is_kill else hit_color
