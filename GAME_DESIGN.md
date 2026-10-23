@@ -748,18 +748,19 @@ going down). Each screen counts only its own player's run. The personal best (fu
 more points on the same wave) is kept in this browser, solo and co-op alike; a better run says
 "New personal best!", otherwise the best is shown below.
 
-**M9 — Hüttenabend (plan, proposed 2026-10-23, waiting for the user's approval)**
+**M9 — Hüttenabend (plan, proposed 2026-10-23; Q1-Q3, Q5, Q6 answered the same day, Q4 open)**
 User request 2026-10-23: a "play again" button for easier co-op sharing, hit and kill feedback,
 talking enemies and weapon upgrades, and room for more ideas. Four parts, one PR each, play-tested
-after each one, cheapest first. Open questions are Q1 to Q6 at the end; nothing is built before
+after each one, cheapest first. The user's answers are worked in below; nothing is built before
 the plan is approved.
 
 *Part 1 — "Nomoi!": play again and sharing*
-- Co-op game over: the host's end screen gets **Nomoi!** (play again) next to Back to lobby. It
-  starts the next match at once with everyone still in the room (Net.start_match from the end
-  screen; guests already follow a host restart through GameState.pending_match). Guests see
-  "Waiting for <host>…" and can go back to the lobby or leave. With nobody else left in the room,
-  Nomoi! is greyed out.
+- Co-op game over: every player's end screen shows **Nomoi!** (play again) at once, next to Back to
+  lobby (Q1). Each player who presses it is ready ("2 / 3 wolln nomoi"); once everyone still in the
+  room is ready, the host starts the next match by itself (Net.start_match; guests already follow
+  a host restart through GameState.pending_match). Whoever presses Back to lobby or leaves no
+  longer counts, so the rest are not held up; with nobody else left in the room, Nomoi! is greyed
+  out.
 - The co-op end screen shows a **Hüttenwertung**: one row per player (name, wave, points, kills,
   headshots, favourite weapon, Schnaps) from the PlayerStats of #86, sent once at game over.
 - Sharing: the room code and **Copy invite link** on the co-op end screen and in the pause menu
@@ -772,12 +773,14 @@ the plan is approved.
 Today: a hit marker cross, a headshot sound and the points popups. Added:
 - Kill marker: a bigger red X on a kill, gold for a headshot kill, each with its own short
   sound (a dull "thock"; a "Bumm" for the headshot, rising in pitch through a streak).
-- Kill streaks in dialect, a small banner under the crosshair (feedback only, no points):
-  3 kills within 4 s "Dreierpack!", 5 "Gmetzl!", 8 "Bluatbad am Berg!"; two or more with one shot
-  or blast "Zwoa auf oan Streich!"; three headshot kills in a row "Schädlweh!".
+- Kill streaks in dialect, a small banner under the crosshair, each with bonus points (Q3; first
+  numbers, tuned by play-test, in constants.gd): 3 kills within 4 s "Dreierpack!" +50, 5
+  "Gmetzl!" +150, 8 "Bluatbad am Berg!" +300; two or more with one shot or blast "Zwoa auf oan
+  Streich!" +50 for each enemy after the first; three headshot kills in a row "Schädlweh!" +100.
+  The bonus shows in the points popup like any other gain.
 - A little punch: the camera kicks on a headshot kill, the viewmodel bumps on any kill, and hit
   enemies flash briefly (only where that stays cheap in the Compatibility renderer).
-- Damage numbers over the enemy as a setting (Q2).
+- Damage numbers over the enemy, off by default, with a setting to turn them on (Q2).
 - Each screen shows only its own player's feedback; co-op hits are already confirmed by the host.
 
 *Part 3 — Talking enemies ("Gredn")*
@@ -786,7 +789,7 @@ barricade, when hit hard and when dying. The line shows as text over the head (L
 at most two at a time, nearest within 15 m) with a voice (Q4). At most one line per enemy every
 20 s and one every ~3 s overall, and a setting turns the chatter off. In co-op the host picks the
 line and sends a 1-byte line id with the actions it already relays. Lines stay in dialect in both
-languages. First draft (all our own):
+languages. How the voices are made is still open (Q4). First draft (all our own):
 - Wanderer: "Griaß di… griaß di…", "Is no weit bis zur Hüttn?", "Mei Fuaß…", "I hob an Hunger…";
   at a barricade "Mach auf, i bin's, da Hüttnwirt!"; dying "Servas…"
 - Tourist: "Nur no a Foto!", "Hashtag Gipfelglück!", "Wo is des WLAN?"
@@ -797,12 +800,18 @@ languages. First draft (all our own):
 *Part 4 — Weapon upgrades: da Dengelstock*
 Our own take on the upgrade machine of zombie modes. A Dengelstock is the little anvil an Alm
 farmer hammers his scythe sharp on; here it is the Schmied's corner (anvil, hammer, glowing forge)
-in the Skiraum (Q5), which has only the Stutzen so far.
+up in the Holzschuppen's hay loft (Q5): reached by its one ramp and with no rail, so standing at
+it means being seen from the whole Schuppen. The forge needs a fire-safe corner: a stone slab and
+a sheet-metal hood, so it reads as safe in a hay loft.
 - It is cold until wave 5 ("Da Schmied is wieder nüchtern!", banner and light column like the
   events), then open for the rest of the match.
 - 5000 points: hand over the gun in your hand. Ten seconds of hammering (sparks, clanging, you
   hold only your melee weapon), then take it back within 30 s or it is gone. One gun at a time per
   player.
+- A second upgrade, **doppelt dengelt** (Q6), for 10000 on a gun already upgraded once: it doubles
+  every effect of the first one (damage x4 against the base gun, bosses x2.25; magazine +100 %;
+  reserve x4; a special's twist twice as strong, e.g. the Alphorn's four rings, Knödel bursting
+  into six) and a brighter forged look. No third level.
 - Upgraded guns: double damage (bosses x1.5), +50 % magazine, double reserve, a full refill, a
   dialect name ("Jagdflinte" -> "Wilderer-Flinte", "Stutzen" -> "Kaiserjäger-Stutzen",
   "Dienstpistole" -> "Gendarmen-Pistole", …), a forged look (dark-gold tint and engraving, a
@@ -831,15 +840,15 @@ new ones are added here)*
 - Bergtour, a procedural mode reshuffling the rooms (needs section 15 changed first).
 
 *Questions for the user*
-- Q1: Nomoi! starts at once (proposed), or after a 10 s countdown guests can leave in?
-- Q2: Damage numbers: off by default with a setting (proposed), on by default, or not at all?
-- Q3: Kill streaks give no points (proposed), or a small bonus?
-- Q4: Voices for the talking enemies: (A) a synthesised mumble per enemy type, words only in the
+- Q1 (answered): Nomoi! shows at once on every end screen; the match restarts when everyone in
+  the room pressed it.
+- Q2 (answered): damage numbers off by default, with a setting.
+- Q3 (answered): kill streaks give bonus points.
+- Q4 (open): Voices for the talking enemies: (A) a synthesised mumble per enemy type, words only in the
   text bubble (proposed; ~0.3 MB, all our own); (B) you and friends record the lines and I process
   them (trim, undead filter); or (C) text only.
-- Q5: The Dengelstock in the Skiraum (proposed), the Holzschuppen's hay loft, or the
-  Seilbahn-Station?
-- Q6: One upgrade per gun (proposed), or a second, pricier "doppelt dengelt" level?
+- Q5 (answered): the Dengelstock is up in the Holzschuppen's hay loft.
+- Q6 (answered): a second upgrade that doubles the effect of the first.
 
 
 ## 13. Project structure
