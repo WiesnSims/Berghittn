@@ -51,7 +51,7 @@ func _physics_process(delta: float) -> void:
 	if has_id(GMIATLICHKEIT):
 		var moving: float = Vector2(_player.velocity.x, _player.velocity.z).length()
 		_cosy_time = _cosy_time + delta if moving < Constants.PERK_COSY_STILL_SPEED or _player.is_crouching() else 0.0
-		cosy = _cosy_time >= Constants.PERK_COSY_TIME
+		cosy = _cosy_time >= Constants.PERK_COSY_TIME and not _health.is_swarmed()
 	_health.regen_multiplier = Constants.PERK_COSY_REGEN_MULTIPLIER if cosy else 1.0
 	_health.regen_skips_delay = cosy
 	_grumps = _count_close_enemies() if has_id(GRANTLER) else 0

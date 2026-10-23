@@ -369,6 +369,24 @@ func _gmiatlichkeit() -> void:
 	await _seconds(Constants.PERK_COSY_TIME + 1.0)
 	# Without it nothing would heal for 5 s; cosy it heals 30/s after 2 s.
 	_check(player.health.current() >= 60, "Gmiatlichkeit: standing still heals at once and fast (40 -> %d in 3 s)" % player.health.current())
+	# One enemy hitting keeps it; a second one within the window switches it off (play-test, wave 42).
+	var first := Node3D.new()
+	var second := Node3D.new()
+	add_child(first)
+	add_child(second)
+	player.health._health = 40.0
+	player.take_damage(1, first)
+	await _seconds(0.2)
+	_check(player.perks.is_cosy(), "one attacker: still cosy")
+	player.take_damage(1, second)
+	await _seconds(0.2)
+	var swarmed_hp: int = player.health.current()
+	await _seconds(1.0)
+	_check(not player.perks.is_cosy() and player.health.current() == swarmed_hp, "two attackers within %.0f s: no bonus, no healing (%d -> %d)" % [Constants.PERK_COSY_SWARM_WINDOW, swarmed_hp, player.health.current()])
+	await _seconds(Constants.PERK_COSY_SWARM_WINDOW)
+	_check(player.perks.is_cosy() and player.health.current() > swarmed_hp, "cosy again once they let up (%d)" % player.health.current())
+	first.queue_free()
+	second.queue_free()
 	player.health.heal_full()
 
 
