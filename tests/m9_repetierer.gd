@@ -174,8 +174,15 @@ func _ricochet() -> void:
 		bunch.append(_spawn(data, offset))
 	await _frames(3)
 	var hit: int = await _ricochet_at(bunch[0].global_position + Vector3.UP * 1.0)
-	_check(hit == gun.ricochet_hits and _hurt(bunch) == gun.ricochet_hits, "close together: %d of 6 hit (%d)" % [_hurt(bunch), gun.ricochet_hits])
-	_check(bunch[1].health == 10000 - gun.secondary_damage, "each hop hits for %d" % gun.secondary_damage)
+	var most: int = gun.ricochet_damage.size()
+	_check(hit == most and _hurt(bunch) == most, "close together: %d of 6 hit (%d)" % [_hurt(bunch), most])
+	var dealt: Array[int] = []
+	for e: Enemy in bunch:
+		if e.health < 10000:
+			dealt.append(10000 - e.health)
+	dealt.sort()
+	dealt.reverse()
+	_check(dealt == Array(gun.ricochet_damage), "less with every hop: %s" % [dealt])
 	_check(holder.mag == gun.mag_size - gun.secondary_rounds and is_equal_approx(holder._cooldown, gun.ricochet_cycle), "uses %d rounds, then the lever takes %.1f s" % [gun.secondary_rounds, gun.ricochet_cycle])
 	await _clear(bunch)
 

@@ -6,7 +6,7 @@ extends Resource
 ## AIM: down the sights (hold). SCOPE: through a scope with an overlay (hold).
 ## ALL_BARRELS: every loaded round in one blast (press).
 ## RICOCHET: the Querschläger (press): one shot for secondary_rounds that glances off whatever it hits
-## (a body or a wall) on to the next enemy, and on, until ricochet_hits bodies or ricochet_reach
+## (a body or a wall) on to the next enemy, and on, while ricochet_damage lasts or until ricochet_reach
 ## metres of flying between them; see ricochet_*.
 ## BEHAVIOR: the special weapon's own second shot from its behavior script (press); see secondary_*.
 ## BLOCK (melee): melee lives on V, not in hand, so its mode is holding V past the blow: the weapon
@@ -104,8 +104,7 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, RICOCHET, BEHAVIOR, BLOCK, PLAY 
 @export var aim_spread_multiplier: float = 0.3
 @export var aim_move_multiplier: float = 0.6
 ## Behavior secondary (BEHAVIOR): rounds it uses, and its damage, reach (m), knockback (m/s) and shake.
-## The Querschläger (RICOCHET) uses secondary_rounds, secondary_damage (each body it hits) and
-## secondary_range (the longest single hop).
+## The Querschläger (RICOCHET) uses secondary_rounds and secondary_range (the longest single hop).
 @export var secondary_rounds: int = 1
 @export var secondary_damage: int = 0
 @export var secondary_range: float = 0.0
@@ -116,9 +115,10 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, RICOCHET, BEHAVIOR, BLOCK, PLAY 
 @export var secondary_from_reserve: bool = false
 ## Held secondary (PLAY): seconds of playing that one round lasts (the first is taken on the press).
 @export var secondary_round_time: float = 1.0
-## The Querschläger (RICOCHET): most bodies one shot hits, metres it may fly from body to body in all
-## (so far-apart enemies get fewer hits), and seconds the lever is worked after it.
-@export var ricochet_hits: int = 5
+## The Querschläger (RICOCHET): the damage to the first body it hits, the second, ... (as many bodies
+## as entries, at most), metres it may fly from body to body in all (so far-apart enemies get fewer
+## hits), and seconds the lever is worked after it.
+@export var ricochet_damage: PackedInt32Array = PackedInt32Array()
 @export var ricochet_reach: float = 0.0
 @export var ricochet_cycle: float = 1.0
 ## Guard (BLOCK): half-angle (degrees) of the front it covers, and the share of a hit that still gets

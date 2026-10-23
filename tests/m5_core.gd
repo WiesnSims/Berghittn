@@ -553,7 +553,7 @@ func _repetierer() -> void:
 	var rep: WeaponData = load("res://data/weapons/repetierer.tres")
 	player.weapons.give_weapon(rep)
 	await _seconds(0.6)
-	_check(rep.secondary == WeaponData.Secondary.RICOCHET and rep.secondary_rounds == 3 and rep.ricochet_hits == 5, "Repetierer: right click fires the Querschläger")
+	_check(rep.secondary == WeaponData.Secondary.RICOCHET and rep.secondary_rounds == 3 and rep.ricochet_damage.size() == 5, "Repetierer: right click fires the Querschläger")
 	_check(rep.penetration == 1 and rep.reload_round_time > 0.0, "Repetierer: goes through one body, loads round by round")
 
 

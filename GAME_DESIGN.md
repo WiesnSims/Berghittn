@@ -217,8 +217,9 @@ Rules:
   - `repetierer`: the Querschläger (press, 3 rounds; user request 2026-10-24, replacing fanning the
     lever, which was only faster, wilder shooting): one shot that glances off whatever it hits, a
     body or a wall, on to the nearest enemy it can see within 8 m that it has not hit yet, and on,
-    90 a body (a head hit first counts double; the hops strike bodies). It stops after 5 bodies or
-    once it has flown 12 m from body to body: a bunch close together takes all five, enemies 6 m
+    less with every body: 90, 75, 60, 55, 50 (user request 2026-10-24; a head hit first counts
+    double, the hops strike bodies). It stops after 5 bodies or once it has flown 12 m from body to
+    body: a bunch close together takes all five, enemies 6 m
     apart three. Needs 3 rounds in the gun; the lever is then worked slowly (1.1 s until the next
     shot). A bright streak shows the path and the bullet whines off ("pjiuu").
   - `alphorn`: the Echo (press): the bell swings up to the sky and the note comes down all around

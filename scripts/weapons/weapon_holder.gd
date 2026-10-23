@@ -671,7 +671,7 @@ func fire_ricochet() -> int:
 
 
 ## The bullet's path: along the aim to the first body or wall, then glancing off on to the nearest
-## enemy it can see within secondary_range that it has not hit yet, and on, until ricochet_hits
+## enemy it can see within secondary_range that it has not hit yet, and on, through ricochet_damage
 ## bodies or ricochet_reach metres flown from hop to hop. A head hit first counts double; the hops
 ## strike bodies.
 func _ricochet() -> int:
@@ -685,15 +685,15 @@ func _ricochet() -> int:
 	var at: Vector3 = first.position
 	var hurtbox := first.collider as Hurtbox
 	if hurtbox:
-		_ricochet_hit(hurtbox, first.position, first.normal)
 		struck[hurtbox.receiver] = true
+		_ricochet_hit(hurtbox, first.position, first.normal, 0)
 	else:
 		_impact_marks.place(first.position, first.normal)
 		_impact_puffs.play(first.position, first.normal)
 		# Off the wall, from just in front of it.
 		at += first.normal * 0.1
 	var left: float = weapon.ricochet_reach
-	while struck.size() < weapon.ricochet_hits and left > 0.0:
+	while struck.size() < weapon.ricochet_damage.size() and left > 0.0:
 		var next: Dictionary = {}
 		for body: Dictionary in _bodies_in(at, Vector3.FORWARD, 180.0, minf(weapon.secondary_range, left)):
 			var receiver: Node = (body.hurtbox as Hurtbox).receiver
@@ -708,7 +708,7 @@ func _ricochet() -> int:
 		at = next.target
 		struck[(next.hurtbox as Hurtbox).receiver] = true
 		path.append(at)
-		_ricochet_hit(next.hurtbox, at, -(next.to_target as Vector3).normalized())
+		_ricochet_hit(next.hurtbox, at, -(next.to_target as Vector3).normalized(), struck.size() - 1)
 	if path.size() > 2 or hurtbox == null:
 		Sound.play(&"ricochet", 0.0, _rng.randf_range(0.9, 1.1))
 	var trail := Node3D.new()
@@ -718,8 +718,9 @@ func _ricochet() -> int:
 	return struck.size()
 
 
-func _ricochet_hit(hurtbox: Hurtbox, at: Vector3, normal: Vector3) -> void:
-	var amount: int = hurtbox.damage_for(_damage(weapon.secondary_damage), weapon.headshot_multiplier)
+## The `index`-th body the Querschläger hits: less with every hop (ricochet_damage).
+func _ricochet_hit(hurtbox: Hurtbox, at: Vector3, normal: Vector3, index: int) -> void:
+	var amount: int = hurtbox.damage_for(_damage(weapon.ricochet_damage[index]), weapon.headshot_multiplier)
 	var result: Hurtbox.Result = hurtbox.receiver.receive_hit(amount, hurtbox.is_head, false, _shooter)
 	if result != Hurtbox.Result.IGNORED:
 		_hit_puffs.play(at, normal)
