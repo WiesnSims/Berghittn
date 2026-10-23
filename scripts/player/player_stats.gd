@@ -12,7 +12,8 @@ var headshots: int = 0
 ## Every Schnaps that went down, bought at the shrine or tapped from the Bierfassl; a Schnaps had again
 ## after going down counts again.
 var schnaps: int = 0
-# WeaponData id -> kills with it, and id -> the WeaponData (for its name).
+# Base weapon id -> kills with it (a dengelt one counts for its base), and id -> the highest version
+# of it that made a kill (its name is the one shown).
 var _weapon_kills: Dictionary = {}
 var _weapons: Dictionary = {}
 @onready var _player: Node3D = get_parent()
@@ -34,7 +35,7 @@ func favourite() -> WeaponData:
 
 
 func kills_with(data: WeaponData) -> int:
-	return _weapon_kills.get(data.id, 0) if data else 0
+	return _weapon_kills.get(data.family_id(), 0) if data else 0
 
 
 ## This run as one row of the co-op Hüttenwertung (Net.share_run); `fav` is a translation key.
@@ -68,8 +69,11 @@ func _on_enemy_killed(_enemy: Node3D, is_headshot: bool, is_melee: bool, source:
 	var data: WeaponData = weapons.melee_weapon if is_melee else weapons.weapon
 	if data == null:
 		return
-	_weapon_kills[data.id] = int(_weapon_kills.get(data.id, 0)) + 1
-	_weapons[data.id] = data
+	var key: StringName = data.family_id()
+	_weapon_kills[key] = int(_weapon_kills.get(key, 0)) + 1
+	var known: WeaponData = _weapons.get(key)
+	if known == null or data.level > known.level:
+		_weapons[key] = data
 
 
 func _on_drunk(_perk: PerkData) -> void:

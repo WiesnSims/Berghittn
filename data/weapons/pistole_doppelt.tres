@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/pistole_viewmodel.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"pistole_doppelt"
+level = 2
+family = &"pistole"
+boss_multiplier = 0.5625
+sound_pitch = 0.75
+display_name = "WEAPON_PISTOLE_2"
+damage = 100
+headshot_multiplier = 2.0
+fire_rate = 10.0
+mag_size = 16
+reserve_ammo = 256
+reload_time = 1.4
+chamber_time = 0.35
+recoil_pitch = 2.2
+recoil_yaw = 0.6
+spread = 0.8
+range = 60.0
+is_auto = false
+bloom_per_shot = 1.5
+bloom_max = 6.0
+bloom_recover = 4.0
+pellets = 1
+cost = 0
+ammo_cost = 0
+behavior = &""
+viewmodel = ExtResource("2")
+secondary = 1
+aim_fov = 58.0
+aim_time = 0.16
+aim_spread_multiplier = 0.25
+aim_move_multiplier = 0.65
+fire_sound = &"shot_pistole"
+reload_sound = &"mag_out"
+reload_end_sound = &"mag_in"

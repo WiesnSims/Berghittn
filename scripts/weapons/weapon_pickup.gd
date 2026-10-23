@@ -36,6 +36,7 @@ static func model_of(data: WeaponData) -> Node3D:
 	viewmodel.free()
 	model.transform = Transform3D.IDENTITY
 	model.visible = true
+	ForgedLook.apply(model, data.level)
 	return model
 
 

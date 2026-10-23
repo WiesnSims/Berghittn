@@ -537,6 +537,24 @@ def chest_reveal(v):
     return d.normalize(d.fade(d.reverb(x, 1.2, 0.3)), 0.8)
 
 
+def anvil_clang(v):
+    """The Dengelstock (M9 part 4): a hammer blow on the anvil, a bright ring over a hard knock."""
+    f = [1180, 1260, 1110][v % 3]
+    ring = bell(1.3, f, [1, 2.76, 5.4, 8.9], [0.35, 0.2, 0.1, 0.05], [1, 0.7, 0.4, 0.25])
+    return d.normalize(d.mix(click(4200, 0.002, 1.0), thud(220, 0.02, 0.8), ring * 0.9))
+
+
+def dengel_quench(v):
+    """The forged weapon dipped in water: a fierce hiss that settles into bubbling."""
+    hiss = d.bandpass(d.noise(1.6), 2500, 9000) * d.env_exp(1.6, 0.45)
+    bubbles = np.zeros(d.n_of(1.6))
+    for _ in range(30):
+        i = d.n_of(d.rng.uniform(0.1, 1.4))
+        b = d.sine(d.glide(0.03, d.rng.uniform(500, 900), d.rng.uniform(1000, 1600)), 0.03) * d.env_exp(0.03, 0.01)
+        bubbles[i:i + len(b)] += b[: len(bubbles) - i] * 0.3
+    return d.normalize(d.fade(d.mix(hiss, bubbles), 0.01, 0.3), 0.8)
+
+
 def perk_drink(v):
     cork = d.mix(d.sine(d.glide(0.08, 700, 1400), 0.08) * d.env_exp(0.08, 0.02), click(2500, 0.003, 0.5))
     glug = np.zeros(d.n_of(1.2))
@@ -727,6 +745,7 @@ SOUNDS = {
     "step_snow": (step_snow, 5), "step_wood": (step_wood, 5), "land": (land, 1),
     "buy": (buy, 1), "deny": (deny, 1), "door_open": (door_open, 1), "creak": (creak, 5),
     "chest_open": (chest_open, 1), "chest_tick": (chest_tick, 6), "chest_reveal": (chest_reveal, 1),
+    "anvil_clang": (anvil_clang, 3), "dengel_quench": (dengel_quench, 1),
     "perk_drink": (perk_drink, 1), "jause_eat": (jause_eat, 1), "ammo_crate": (ammo_crate, 1),
     "ui_click": (ui_click, 1), "wave_start": (wave_start, 1), "boss_wave": (boss_wave, 1),
     "resi_moo": (resi_moo, 3), "milk": (milk, 1), "fassl_roll": (fassl_roll, 1), "fassl_tap": (fassl_tap, 1),

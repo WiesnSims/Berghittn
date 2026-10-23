@@ -136,10 +136,15 @@ func _on_ammo_changed(mag: int, reserve: int) -> void:
 
 
 func _on_weapon_changed(data: WeaponData) -> void:
-	_weapon_label.text = tr(data.display_name)
+	# Nothing in hand while the gun is at the Dengelstock.
+	_weapon_label.text = tr(data.display_name) if data else ""
+	_update_status()
 
 
 func _on_melee_changed(data: WeaponData) -> void:
+	if data == null:
+		_melee_label.text = ""
+		return
 	_melee_label.text = tr("UI_MELEE") % tr(data.display_name)
 	_show_banner(tr("UI_MELEE_TAKEN") % tr(data.display_name))
 
@@ -149,7 +154,9 @@ func _on_reload_changed() -> void:
 
 
 func _update_status() -> void:
-	if _weapons.is_reloading():
+	if _weapons.weapon == null:
+		_status_label.text = ""
+	elif _weapons.is_reloading():
 		_status_label.text = tr("UI_RELOADING")
 	elif _weapons.mag == 0:
 		_status_label.text = tr("UI_RELOAD_HINT") if _weapons.reserve > 0 else tr("UI_NO_AMMO")

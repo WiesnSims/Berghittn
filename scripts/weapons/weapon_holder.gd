@@ -122,6 +122,8 @@ var _ghost_behaviors: Dictionary = {}
 var _ghost_loop: AudioStreamPlayer3D
 var _ghost_flame: CPUParticles3D
 var _ghost_flash: OmniLight3D
+# Seconds the hands hold only the melee weapon after a gun went to the Dengelstock (M9 part 4).
+var _hands_free_left: float = 0.0
 
 
 func _ready() -> void:
@@ -167,14 +169,24 @@ func give_weapon(data: WeaponData) -> void:
 		set_melee(data)
 		return
 	var owned: int = _slot_of(data)
+	_hands_free_left = 0.0
+	if owned >= 0 and _slots[owned].data.level < data.level:
+		# A dengelt one for the plain one carried: it takes its slot.
+		_select(owned)
+		_replace_current(_new_slot(data))
+		return
 	if owned >= 0:
 		_select(owned)
 		return
 	var slot: GunSlot = _new_slot(data)
-	if _slots.size() < Constants.GUN_SLOTS:
+	if _slots.size() < Constants.GUN_SLOTS or _current < 0:
 		_slots.append(slot)
 		_select(_slots.size() - 1)
 		return
+	_replace_current(slot)
+
+
+func _replace_current(slot: GunSlot) -> void:
 	var old: GunSlot = _slots[_current]
 	if old.viewmodel:
 		old.viewmodel.queue_free()
@@ -191,6 +203,7 @@ func _new_slot(data: WeaponData) -> GunSlot:
 	if data.viewmodel:
 		# Built once per gun and kept: instancing on every switch would hitch in the middle of a fight.
 		slot.viewmodel = data.viewmodel.instantiate() as Viewmodel
+		ForgedLook.apply(slot.viewmodel, data.level)
 		slot.viewmodel.visible = false
 		_motion.add_child(slot.viewmodel)
 	slot.behavior = WeaponBehavior.create(data, self)
@@ -209,6 +222,7 @@ func set_downed(on: bool, pistol: WeaponData) -> void:
 	_stop_playing_if_needed()
 	if on:
 		_before_down = _current
+		_hands_free_left = 0.0
 		var index: int = _slot_of(pistol)
 		if index < 0:
 			_slots.append(_new_slot(pistol))
@@ -223,6 +237,10 @@ func set_downed(on: bool, pistol: WeaponData) -> void:
 		_borrowed = false
 		if _current >= _slots.size():
 			_current = -1
+	if _before_down < 0 or _before_down >= _slots.size():
+		# Their gun was at the Dengelstock when they went down.
+		_put_away()
+		return
 	_select(_before_down)
 
 
@@ -236,10 +254,70 @@ func reset_loadout() -> void:
 	_slots.clear()
 	_current = -1
 	weapon = null
+	_hands_free_left = 0.0
 	if starting_weapon:
 		give_weapon(starting_weapon)
+	restore_melee()
+
+
+## The melee weapon a match starts with back in the slot, if another one (or none) is there.
+func restore_melee() -> void:
 	if _starting_melee and melee_weapon != _starting_melee:
 		set_melee(_starting_melee)
+
+
+## The Dengelstock (M9 part 4): the gun `data` (or its dengelt version) leaves its slot to be forged.
+## For DENGEL_TIME the hands hold only the melee weapon; then the other gun comes up, if there is one.
+## False if it is not carried.
+func hand_over(data: WeaponData) -> bool:
+	var index: int = _slot_of(data)
+	if index < 0:
+		return false
+	var resume: GunSlot = _slots[_current] if _current >= 0 and _current != index else null
+	_put_away()
+	var slot: GunSlot = _slots[index]
+	if slot.viewmodel:
+		slot.viewmodel.queue_free()
+	_slots.remove_at(index)
+	if resume:
+		# It comes up first once the hands are free again.
+		_slots.erase(resume)
+		_slots.push_front(resume)
+	_hands_free_left = Constants.DENGEL_TIME
+	return true
+
+
+## The Dengelstock: the melee weapon leaves its slot to be forged; until it comes back, V does nothing.
+func hand_over_melee() -> void:
+	set_melee(null)
+
+
+## Seconds left with only the melee weapon in hand (a gun at the Dengelstock), 0 when the hands are free.
+func hands_free_time() -> float:
+	return _hands_free_left
+
+
+## Puts the gun in hand away (its ammo kept in its slot): nothing in hand, only the melee weapon.
+func _put_away() -> void:
+	_cancel_reload()
+	_stop_playing_if_needed()
+	_stop_loop()
+	if _current >= 0 and _current < _slots.size():
+		var old: GunSlot = _slots[_current]
+		old.mag = mag
+		old.reserve = reserve
+		if old.viewmodel:
+			old.viewmodel.visible = false
+	_current = -1
+	weapon = null
+	_viewmodel = null
+	_behavior = null
+	mag = 0
+	reserve = 0
+	aim_amount = 0.0
+	_aiming = false
+	weapon_changed.emit(null)
+	ammo_changed.emit(mag, reserve)
 
 
 ## The trigger counts as held until it is let go (a menu click that took the mouse).
@@ -255,13 +333,15 @@ func _stop_playing_if_needed() -> void:
 		_stop_playing()
 
 
+## Carried, as it is or dengelt.
 func has_weapon(data: WeaponData) -> bool:
 	if data.is_melee:
-		return melee_weapon != null and melee_weapon.id == data.id
+		return melee_weapon != null and melee_weapon.family_id() == data.family_id()
 	return _slot_of(data) >= 0
 
 
-## Puts a melee weapon in the melee slot (section 6), in place of the one carried (the shovel).
+## Puts a melee weapon in the melee slot (section 6), in place of the one carried (the shovel); null
+## empties it (it is at the Dengelstock).
 func set_melee(data: WeaponData) -> void:
 	_end_block()
 	_melee_left = 0.0
@@ -270,9 +350,10 @@ func set_melee(data: WeaponData) -> void:
 		_melee_viewmodel.queue_free()
 		_melee_viewmodel = null
 	melee_weapon = data
-	_melee_behavior = WeaponBehavior.create(data, self)
-	if data.viewmodel:
+	_melee_behavior = WeaponBehavior.create(data, self) if data else null
+	if data and data.viewmodel:
 		_melee_viewmodel = data.viewmodel.instantiate() as MeleeViewmodel
+		ForgedLook.apply(_melee_viewmodel, data.level)
 		_motion.add_child(_melee_viewmodel)
 	melee_changed.emit(data)
 
@@ -306,21 +387,23 @@ func block(attacker: Node3D) -> bool:
 
 
 ## True when the gun is carried and its reserve is not full, so buying ammo would do something.
+## (A dengelt gun counts for its base: its own, larger reserve is what gets filled.)
 func needs_ammo(data: WeaponData) -> bool:
 	var index: int = _slot_of(data)
 	if index < 0:
 		return false
 	var spare: int = reserve if index == _current else _slots[index].reserve
-	return spare < data.reserve_ammo
+	return spare < _slots[index].data.reserve_ammo
 
 
 func refill_ammo(data: WeaponData) -> void:
 	var index: int = _slot_of(data)
 	if index < 0:
 		return
-	_slots[index].reserve = data.reserve_ammo
+	var full: int = _slots[index].data.reserve_ammo
+	_slots[index].reserve = full
 	if index == _current:
-		reserve = data.reserve_ammo
+		reserve = full
 		ammo_changed.emit(mag, reserve)
 
 
@@ -385,11 +468,15 @@ func is_playing() -> bool:
 
 ## Cone half-angle in degrees the next shot can stray: base spread plus bloom, tightened by aiming.
 func current_spread() -> float:
+	if weapon == null:
+		return 0.0
 	return (weapon.spread + bloom) * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
 
 
 ## Bloom as it would widen the next shot (aiming tightens it like the base spread), for the crosshair.
 func current_bloom() -> float:
+	if weapon == null:
+		return 0.0
 	return bloom * lerpf(1.0, weapon.aim_spread_multiplier, aim_amount)
 
 
@@ -400,7 +487,7 @@ func aim_eased() -> float:
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Here and not in _physics_process: wheel "presses" are released in the same frame and would be missed.
-	if ghost or Input.mouse_mode != Input.MOUSE_MODE_CAPTURED or _melee_left > 0.0 or _slots.size() < 2 or downed:
+	if ghost or Input.mouse_mode != Input.MOUSE_MODE_CAPTURED or _melee_left > 0.0 or _slots.size() < 2 or downed or weapon == null:
 		return
 	if event.is_action_pressed("weapon_next") or event.is_action_pressed("weapon_previous"):
 		_select((_current + 1) % _slots.size())
@@ -415,6 +502,7 @@ func _physics_process(delta: float) -> void:
 		_ghost_step(delta)
 		return
 	if weapon == null:
+		_without_gun(delta)
 		return
 	_cooldown = maxf(_cooldown - delta, 0.0)
 	bloom = move_toward(bloom, 0.0, weapon.bloom_recover * delta)
@@ -437,15 +525,7 @@ func _physics_process(delta: float) -> void:
 	_was_captured = captured
 	_capture_grace = maxf(_capture_grace - delta, 0.0)
 	_update_aim(delta, force_aim or (captured and Input.is_action_pressed("secondary")))
-	if _blocking:
-		if not _melee_held() or (_melee_behavior and melee_weapon.secondary == WeaponData.Secondary.BEHAVIOR and not _melee_behavior.hold(delta)):
-			_end_block()
-		return
-	if _melee_left > 0.0:
-		_update_melee(delta)
-		return
-	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Input.is_action_just_pressed("melee") and melee_weapon and not downed:
-		_start_melee()
+	if _melee_step(delta):
 		return
 	if _switch_left > 0.0:
 		_switch_left -= delta
@@ -512,6 +592,33 @@ func _physics_process(delta: float) -> void:
 			start_reload()
 			if reserve <= 0 and Input.is_action_just_pressed("fire"):
 				Sound.play(&"dry_click")
+
+
+## The melee weapon's part of a frame: a guard or held mode, a swing, or V pressed. True if it took
+## the frame (the gun waits).
+func _melee_step(delta: float) -> bool:
+	if _blocking:
+		if not _melee_held() or (_melee_behavior and melee_weapon.secondary == WeaponData.Secondary.BEHAVIOR and not _melee_behavior.hold(delta)):
+			_end_block()
+		return true
+	if _melee_left > 0.0:
+		_update_melee(delta)
+		return true
+	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Input.is_action_just_pressed("melee") and melee_weapon and not downed:
+		_start_melee()
+		return true
+	return false
+
+
+## No gun in hand (it went to the Dengelstock): the melee weapon still works, and once the hands are
+## free again the other gun comes up, if there is one.
+func _without_gun(delta: float) -> void:
+	_hands_free_left = maxf(_hands_free_left - delta, 0.0)
+	_was_captured = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+	if _melee_step(delta):
+		return
+	if _hands_free_left <= 0.0 and not _slots.is_empty():
+		_select(0)
 
 
 func _play(delta: float, was_playing: bool) -> void:
@@ -617,11 +724,18 @@ func _damage(base: int) -> int:
 	return roundi(base * _perks().damage_multiplier()) if _perks() else base
 
 
+## The slot of `data` or of a dengelt version of it.
 func _slot_of(data: WeaponData) -> int:
 	for i: int in _slots.size():
-		if _slots[i].data.id == data.id:
+		if _slots[i].data.family_id() == data.family_id():
 			return i
 	return -1
+
+
+## A dengelt weapon hits bosses for less of its extra damage (WeaponData.boss_multiplier).
+func _boss_share(receiver: Node, data: WeaponData) -> float:
+	var enemy := receiver as Enemy
+	return data.boss_multiplier if enemy and enemy.data and enemy.data.is_boss else 1.0
 
 
 func _select(index: int) -> void:
@@ -669,7 +783,7 @@ func fire_ricochet() -> int:
 	_set_cooldown(weapon.ricochet_cycle)
 	_ring_cycle = true
 	var hit: int = _ricochet()
-	Sound.play(weapon.fire_sound)
+	Sound.play(weapon.fire_sound, 0.0, weapon.sound_pitch)
 	fired.emit(1)
 	acted.emit(Act.SECONDARY, weapon.secondary_rounds)
 	ammo_changed.emit(mag, reserve)
@@ -729,7 +843,7 @@ func _ricochet() -> int:
 
 ## The `index`-th body the Querschläger hits: less with every hop (ricochet_damage).
 func _ricochet_hit(hurtbox: Hurtbox, at: Vector3, normal: Vector3, index: int) -> void:
-	var amount: int = hurtbox.damage_for(_damage(weapon.ricochet_damage[index]), weapon.headshot_multiplier)
+	var amount: int = roundi(hurtbox.damage_for(_damage(weapon.ricochet_damage[index]), weapon.headshot_multiplier) * _boss_share(hurtbox.receiver, weapon))
 	var result: Hurtbox.Result = hurtbox.receiver.receive_hit(amount, hurtbox.is_head, false, _shooter)
 	if result != Hurtbox.Result.IGNORED:
 		_hit_puffs.play(at, normal)
@@ -747,7 +861,7 @@ func fire_secondary() -> void:
 	reserve -= from_reserve
 	_set_cooldown(1.0 / weapon.fire_rate)
 	_behavior.fire_secondary()
-	Sound.play(weapon.secondary_sound if weapon.secondary_sound != &"" else weapon.fire_sound)
+	Sound.play(weapon.secondary_sound if weapon.secondary_sound != &"" else weapon.fire_sound, 0.0, weapon.sound_pitch)
 	fired.emit(rounds)
 	acted.emit(Act.SECONDARY, rounds)
 	ammo_changed.emit(mag, reserve)
@@ -927,11 +1041,11 @@ func melee_viewmodel() -> MeleeViewmodel:
 
 
 ## A sound from the guns: in the ears for our own, from where they are for a ghost.
-func play_sound(id: StringName) -> void:
+func play_sound(id: StringName, pitch: float = 1.0) -> void:
 	if ghost:
-		Sound.play_at(id, global_position)
+		Sound.play_at(id, global_position, 0.0, pitch)
 	else:
-		Sound.play(id)
+		Sound.play(id, 0.0, pitch)
 
 
 ## A jolt of the shooter's view that is not recoil (a blast going off).
@@ -1000,13 +1114,13 @@ func _after_shot(rounds: int) -> void:
 	if weapon.fire_loop_sound != &"":
 		# Held fire: the start once, then the loop for as long as the shots keep coming.
 		if not _loop_sound.playing:
-			Sound.play(weapon.fire_sound)
+			Sound.play(weapon.fire_sound, 0.0, weapon.sound_pitch)
 			_start_loop(weapon.fire_loop_sound)
 		_fire_loop_left = 2.0 / weapon.fire_rate
 	elif rounds > 1 and weapon.secondary_sound != &"":
-		Sound.play(weapon.secondary_sound)
+		Sound.play(weapon.secondary_sound, 0.0, weapon.sound_pitch)
 	else:
-		Sound.play(weapon.fire_sound)
+		Sound.play(weapon.fire_sound, 0.0, weapon.sound_pitch)
 	fired.emit(rounds)
 	acted.emit(Act.SHOT, rounds)
 	ammo_changed.emit(mag, reserve)
@@ -1130,7 +1244,8 @@ func _melee_hit() -> void:
 		if line.collider != null:
 			continue
 		struck[hurtbox.receiver] = true
-		var result: Hurtbox.Result = hurtbox.take_hit(_damage(melee_weapon.damage), melee_weapon.headshot_multiplier, true, _shooter)
+		var amount: int = roundi(_damage(melee_weapon.damage) * _boss_share(hurtbox.receiver, melee_weapon))
+		var result: Hurtbox.Result = hurtbox.take_hit(amount, melee_weapon.headshot_multiplier, true, _shooter)
 		if result != Hurtbox.Result.IGNORED:
 			_hit_puffs.play(target, -to_target.normalized())
 			hit_confirmed.emit(false, result == Hurtbox.Result.KILLED)
@@ -1138,6 +1253,9 @@ func _melee_hit() -> void:
 			var enemy := hurtbox.receiver as Enemy
 			if enemy and enemy.is_alive() and melee_weapon.knockback > 0.0:
 				enemy.apply_knockback(flat.normalized() * melee_weapon.knockback * sqrt(enemy.data.flinch_multiplier))
+			# The Totngraber-Schaufl's twist: the survivor stands dazed.
+			if enemy and enemy.is_alive() and melee_weapon.stun_time > 0.0:
+				enemy.stun(melee_weapon.stun_time)
 
 
 func _cast(offset: Vector3, mask: int = Constants.LAYER_WORLD | Constants.LAYER_HITBOX) -> Dictionary:
@@ -1171,7 +1289,7 @@ func _fire_ray(hits: Dictionary) -> void:
 		if hurtbox.receiver == last:
 			continue
 		last = hurtbox.receiver
-		var amount: int = roundi(hurtbox.damage_for(_damage(weapon.damage), weapon.headshot_multiplier) * share)
+		var amount: int = roundi(hurtbox.damage_for(_damage(weapon.damage), weapon.headshot_multiplier) * share * _boss_share(hurtbox.receiver, weapon))
 		var total: Dictionary = hits.get(hurtbox.receiver, {"amount": 0, "head": false})
 		total.amount += amount
 		total.head = total.head or hurtbox.is_head
@@ -1223,7 +1341,7 @@ func replay(action: Act, data: WeaponData, rounds: int, aim: Transform3D) -> voi
 			else:
 				# The Querschläger.
 				_flash()
-			play_sound(data.secondary_sound if data.secondary_sound != &"" else data.fire_sound)
+			play_sound(data.secondary_sound if data.secondary_sound != &"" else data.fire_sound, data.sound_pitch)
 		Act.SWING:
 			play_sound(data.swing_sound)
 		Act.MELEE:
@@ -1258,7 +1376,7 @@ func _ghost_step(delta: float) -> void:
 
 func _ghost_shot_sound(data: WeaponData, rounds: int) -> void:
 	if data.fire_loop_sound == &"":
-		play_sound(data.secondary_sound if rounds > 1 and data.secondary_sound != &"" else data.fire_sound)
+		play_sound(data.secondary_sound if rounds > 1 and data.secondary_sound != &"" else data.fire_sound, data.sound_pitch)
 		return
 	# Held fire (the flame): the start once, the loop and the stream of flame while the shots come.
 	if not is_instance_valid(_ghost_loop):

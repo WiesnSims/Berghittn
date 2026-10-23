@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/weapons/stutzen_viewmodel.tscn" id="2"]
+[ext_resource type="Resource" path="res://data/weapons/stutzen_dengelt.tres" id="up"]
 
 [resource]
 script = ExtResource("1")
@@ -29,6 +30,7 @@ cost = 750
 ammo_cost = 375
 behavior = &""
 viewmodel = ExtResource("2")
+upgrade = ExtResource("up")
 secondary = 2
 aim_fov = 22.0
 aim_time = 0.28

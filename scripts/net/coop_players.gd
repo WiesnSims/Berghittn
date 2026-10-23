@@ -41,7 +41,7 @@ func setup(player: Player) -> void:
 	Net.roster_changed.connect(_sync_roster)
 	Events.wave_started.connect(_on_wave_started.unbind(2))
 	_player.life_changed.connect(_on_own_life_changed)
-	_player.weapons.weapon_changed.connect(func(data: WeaponData) -> void: _held.rpc(String(data.id)))
+	_player.weapons.weapon_changed.connect(func(data: WeaponData) -> void: _held.rpc(String(data.id) if data else ""))
 	_player.weapons.acted.connect(_on_acted)
 	_player.equipment.threw.connect(_on_threw)
 	_player.perks.triggered.connect(_on_perk)
@@ -278,16 +278,16 @@ func _on_perk(id: StringName, _text: String) -> void:
 
 @rpc("any_peer", "call_remote", "reliable")
 func _ask_held() -> void:
-	if _player.weapons.weapon:
-		_held.rpc_id(multiplayer.get_remote_sender_id(), String(_player.weapons.weapon.id))
+	var weapon: WeaponData = _player.weapons.weapon
+	_held.rpc_id(multiplayer.get_remote_sender_id(), String(weapon.id) if weapon else "")
 
 
 @rpc("any_peer", "call_remote", "reliable")
 func _held(weapon_id: String) -> void:
 	var remote: Remote = _remotes.get(multiplayer.get_remote_sender_id())
-	var data := _load(WEAPONS, weapon_id) as WeaponData
-	if remote and data:
-		remote.hiker.hold(data)
+	# Empty hands ("" or anything that is not a gun): their gun is at the Dengelstock.
+	if remote:
+		remote.hiker.hold(_load(WEAPONS, weapon_id) as WeaponData)
 
 
 ## Their gun went off (or their melee weapon swung, struck, or went into its held mode), from `aim`.

@@ -1136,8 +1136,12 @@ func _face(direction: Vector3, delta: float) -> void:
 
 func _groan() -> void:
 	_groan_left = randf_range(Constants.GROAN_MIN, Constants.GROAN_MAX)
-	# Now and then a line instead (Gredn); never a groan over one.
-	if _speaking_left > 0.0 or Gredn.moment(self, Gredn.Moment.IDLE) >= 0:
+	# Never a groan over a line; now and then a line instead (Gredn), if it is heard here (with the
+	# chatter off the groan stays).
+	if _speaking_left > 0.0:
+		return
+	Gredn.moment(self, Gredn.Moment.IDLE)
+	if _speaking_left > 0.0:
 		return
 	if not data.groan_sounds.is_empty():
 		Sound.play_at(data.groan_sounds.pick_random(), mouth())

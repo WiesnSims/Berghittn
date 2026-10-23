@@ -38,6 +38,9 @@ func setup(main: Node, waves: WaveManager, zones: ZoneMap) -> void:
 		for node: Node in get_tree().get_nodes_in_group("chests"):
 			var chest := node as Huettentruhe
 			chest.rolled.connect(func(buyer: Node3D, weapon: WeaponData) -> void: _chest_rolled.rpc(_path(chest), Coop.peer_of(buyer), String(weapon.id)))
+		for node: Node in get_tree().get_nodes_in_group("dengelstocks"):
+			var stock := node as Dengelstock
+			stock.started.connect(func(owner: Node3D, result: WeaponData) -> void: _dengel_started.rpc(_path(stock), Coop.peer_of(owner), String(result.id), stock.melee))
 		# Everyone gets a moment to click into the match before the first wave.
 		_waves.begin_break(Constants.COOP_FIRST_WAVE_DELAY)
 
@@ -104,6 +107,16 @@ func chest_taken(chest: Huettentruhe) -> void:
 	_chest_taken.rpc(_path(chest))
 
 
+## A guest paid the Dengelstock to forge `result` (into the melee slot with `melee`).
+func request_dengel(stock: Dengelstock, result: WeaponData, melee: bool, cost: int) -> void:
+	_ask_dengel.rpc_id(1, _path(stock), String(result.id), melee, cost)
+
+
+## We took our forged weapon: the anvil is free everywhere.
+func dengel_taken(stock: Dengelstock) -> void:
+	_dengel_taken.rpc(_path(stock))
+
+
 @rpc("any_peer", "call_remote", "reliable")
 func _ask_unlock(zone: StringName, cost: int) -> void:
 	var sender: int = multiplayer.get_remote_sender_id()
@@ -125,6 +138,14 @@ func _ask_chest(path: NodePath, weapon_id: String, cost: int) -> void:
 	var sender: int = multiplayer.get_remote_sender_id()
 	var chest := _node(path) as Huettentruhe
 	if chest == null or not chest.roll_for(Coop.node_of(sender), StringName(weapon_id)):
+		_refund.rpc_id(sender, cost)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _ask_dengel(path: NodePath, weapon_id: String, melee: bool, cost: int) -> void:
+	var sender: int = multiplayer.get_remote_sender_id()
+	var stock := _node(path) as Dengelstock
+	if stock == null or not stock.start_for(Coop.node_of(sender), StringName(weapon_id), melee):
 		_refund.rpc_id(sender, cost)
 
 
@@ -222,6 +243,20 @@ func _chest_taken(path: NodePath) -> void:
 	var chest := _node(path) as Huettentruhe
 	if chest:
 		chest.taken()
+
+
+@rpc("authority", "call_remote", "reliable")
+func _dengel_started(path: NodePath, peer: int, weapon_id: String, melee: bool) -> void:
+	var stock := _node(path) as Dengelstock
+	if stock:
+		stock.start_for(Coop.node_of(peer), StringName(weapon_id), melee)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _dengel_taken(path: NodePath) -> void:
+	var stock := _node(path) as Dengelstock
+	if stock:
+		stock.taken()
 
 
 @rpc("authority", "call_remote", "reliable")

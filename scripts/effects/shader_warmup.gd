@@ -31,6 +31,7 @@ const EFFECTS: Array[Script] = [
 	preload("res://scripts/perks/boeller_blast.gd"),
 	preload("res://scripts/effects/damage_number.gd"),
 	preload("res://scripts/effects/gredn_line.gd"),
+	preload("res://scripts/effects/dengel_sparks.gd"),
 ]
 
 ## The world this warms up for (main's World); its materials are collected from it.
@@ -136,6 +137,8 @@ func _collect() -> void:
 			continue
 		var model: Node3D = _model_of(weapon)
 		if model:
+			# Dengelt weapons draw with forged copies of the materials (the same shaders, but drawn once).
+			ForgedLook.apply(model, weapon.level)
 			_items.append(model)
 	for file: String in DirAccess.get_files_at(ENEMIES_DIR):
 		var enemy := load(ENEMIES_DIR.path_join(file.trim_suffix(".remap"))) as EnemyData

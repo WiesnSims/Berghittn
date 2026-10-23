@@ -6,12 +6,15 @@ extends Node
 ## guest's Mistgabel lifts, carries and hurls the host's enemy; the Krampus-Rute drop is the guest's
 ## alone; and every event comes to the guest: the Murmeltier caught, die Resi milked, the Bierfassl
 ## tapped, the Tourist's Eisstöcke, each paid in the guest's own game, with the host's banners; an
-## enemy's line (Gredn) picked by the host is heard and shown on the guest.
+## enemy's line (Gredn) picked by the host is heard and shown on the guest; the guest's gun goes on
+## the Dengelstock with the host's word, the anvil is busy for the host meanwhile, and the guest's
+## hiker shows empty hands, then the Gendarmen-Pistole.
 
 const TIMEOUT: float = 25.0
 const ALPHORN: WeaponData = preload("res://data/weapons/alphorn.tres")
 const RUTE: WeaponData = preload("res://data/weapons/krampusrute.tres")
 const KUHGLOCKE: EquipmentData = preload("res://data/equipment/kuhglocke.tres")
+const PISTOLE: WeaponData = preload("res://data/weapons/pistole.tres")
 
 var _main: Node
 var _player: Player
@@ -147,6 +150,39 @@ func _run() -> bool:
 			if enemy and enemy.is_alive():
 				enemy.receive_hit(99999, false, false, null)
 	await get_tree().create_timer(0.5).timeout
+	# --- the Dengelstock: the guest's pistol, with the host's word on the anvil ---
+	var stock := get_tree().get_first_node_in_group("dengelstocks") as Dengelstock
+	stock.open()
+	if not await _sync("lit"):
+		return false
+	if not host:
+		_player.weapons.give_weapon(PISTOLE)
+		await get_tree().create_timer(0.5).timeout
+		_player.points.add(Constants.DENGEL_COST[0])
+		stock.use(_player, false)
+		if not await _until(func() -> bool: return stock.state == Dengelstock.State.FORGING and _player.weapons.weapon == null):
+			return _fail("the host never put the guest's pistol on the anvil")
+		if _player.points.total != 0 and _player.points.total >= Constants.DENGEL_COST[0]:
+			return _fail("the guest did not pay")
+		if not await _until(func() -> bool: return stock.state == Dengelstock.State.READY):
+			return _fail("the guest's pistol was never forged")
+		stock.use(_player, false)
+		if _player.weapons.melee_weapon == null or not _player.weapons.has_weapon(PISTOLE) or _player.weapons.weapon == null or _player.weapons.weapon.id != &"pistole_dengelt":
+			return _fail("the guest did not get the Gendarmen-Pistole")
+	else:
+		if not await _until(func() -> bool: return stock.state == Dengelstock.State.FORGING and stock.owner_of_work() == other):
+			return _fail("the guest's pistol never went on the host's anvil")
+		if stock.prompt_for(_player, false) != tr("UI_DENGEL_BUSY"):
+			return _fail("the anvil is not busy for the host: \"%s\"" % stock.prompt_for(_player, false))
+		if not await _until(func() -> bool: return other._gun == null):
+			return _fail("the guest's hiker still holds a gun")
+		if not await _until(func() -> bool: return stock.state == Dengelstock.State.OPEN):
+			return _fail("the anvil never came free after the guest took the pistol")
+		if not await _until(func() -> bool: return other._gun != null and other._guns.get(&"pistole_dengelt") == other._gun):
+			return _fail("the guest's hiker does not hold the Gendarmen-Pistole")
+	print("dengelstock: the guest's pistol forged with the host's word, busy for the host, back as the Gendarmen-Pistole")
+	if not await _sync("dengel"):
+		return false
 	# --- the Krampus-Rute drop: one, for whoever is first ---
 	if host:
 		WeaponPickup.spawn(RUTE, _player.global_position + Vector3.FORWARD * 3.0, _main)
