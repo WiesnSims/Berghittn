@@ -7,6 +7,8 @@ extends Node
 signal changed(perks: Array[PerkData])
 ## A signature effect went off; `text` is a translation key for the HUD banner.
 signal triggered(id: StringName, text: String)
+## A Schnaps went down (shrine or Freibier): the death screen counts them.
+signal drunk(perk: PerkData)
 
 const DURCHSCHLAG: StringName = &"zirbenschnaps"
 const BOELLERSCHUSS: StringName = &"marillenbrand"
@@ -76,6 +78,7 @@ func add(perk: PerkData) -> void:
 		herbs = 0
 	if perk.id == STURSCHAEDL:
 		_stur_used = false
+	drunk.emit(perk)
 	changed.emit(owned)
 
 

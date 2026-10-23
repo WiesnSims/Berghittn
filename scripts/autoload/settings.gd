@@ -28,6 +28,10 @@ var profile: Dictionary = {}
 ## Earned hats (HatUnlocks): their unlock ids, and how many Perchten have fallen in our matches.
 var unlocks: Array[String] = []
 var perchten: int = 0
+## Personal best (death screen): the furthest wave, and the points of that run. Solo and co-op alike,
+## in this browser only.
+var best_wave: int = 0
+var best_points: int = 0
 
 
 func _ready() -> void:
@@ -87,6 +91,19 @@ func _load() -> void:
 			if id is String and not (id as String) in unlocks:
 				unlocks.append(id)
 	perchten = maxi(int(file.get_value(SECTION, "perchten", 0)), 0)
+	best_wave = maxi(int(file.get_value(SECTION, "best_wave", 0)), 0)
+	best_points = maxi(int(file.get_value(SECTION, "best_points", 0)), 0)
+
+
+## Keeps the run if it beats the personal best: a further wave, or the same wave with more points.
+## True when it did (and is saved).
+func record_run(wave: int, points: int) -> bool:
+	if wave < best_wave or (wave == best_wave and points <= best_points):
+		return false
+	best_wave = wave
+	best_points = points
+	save()
+	return true
 
 
 ## Our hiker as peer `peer` wears it: the one dressed in the lobby, or that peer's default, so
@@ -116,4 +133,6 @@ func save() -> void:
 	file.set_value(SECTION, "profile", profile)
 	file.set_value(SECTION, "unlocks", unlocks)
 	file.set_value(SECTION, "perchten", perchten)
+	file.set_value(SECTION, "best_wave", best_wave)
+	file.set_value(SECTION, "best_points", best_points)
 	file.save(SAVE_PATH)
