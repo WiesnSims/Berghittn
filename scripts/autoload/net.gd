@@ -10,6 +10,10 @@ signal match_started
 ## The session is over; `reason` is a relay reason (host_left, kicked, full, started, version,
 ## no_room, lost) or "left" when we left ourselves.
 signal ended(reason: String)
+## Co-op game over (M9 "Nomoi!"): a player's run for the Hüttenwertung arrived.
+signal runs_changed
+## Someone on the end screen asked for another round, or stopped counting.
+signal nomoi_changed
 
 enum State { OFFLINE, CONNECTING, LOBBY, MATCH }
 
@@ -22,8 +26,18 @@ var code: String = ""
 var roster: Dictionary = {}
 ## Must match the host's: the relay refuses a browser running another build (stale cache).
 var build_id: String = "dev"
+## Everyone's run of the match that just ended, peer -> PlayerStats.row(); the Hüttenwertung.
+var runs: Dictionary = {}
+## "2 / 3 wolln nomoi": who still counts (on the end screen, in the room) and how many of them want
+## another round. Zero total outside a game over.
+var nomoi_ready: int = 0
+var nomoi_total: int = 0
+## This match was started by everyone pressing Nomoi!, not by the host's click (no pointer-lock gesture).
+var auto_started: bool = false
 
 var _peer: RelayPeer
+# Host: peer -> wants another round, for everyone still on the end screen.
+var _nomoi: Dictionary = {}
 
 
 func _ready() -> void:
@@ -88,9 +102,10 @@ func can_start() -> bool:
 	return is_host() and state == State.LOBBY and roster.size() >= Constants.NET_MIN_PLAYERS
 
 
-func start_match() -> void:
+func start_match(auto: bool = false) -> void:
 	if not can_start():
 		return
+	auto_started = auto
 	_peer.send_control({"t": "start"})
 	_start.rpc()
 	_begin_match()
@@ -103,6 +118,34 @@ func back_to_lobby() -> void:
 	_peer.send_control({"t": "lobby"})
 	_to_lobby.rpc()
 	_to_lobby()
+	# Everyone who played is on the end screen now, nobody wants another round yet.
+	_nomoi.clear()
+	for peer: int in roster:
+		_nomoi[peer] = false
+	_count_nomoi()
+
+
+## Our run, for everyone's Hüttenwertung (sent once at game over).
+func share_run(row: Dictionary) -> void:
+	runs[my_id()] = row
+	_run.rpc(row)
+	runs_changed.emit()
+
+
+## Nomoi! pressed: we want another round with the same people.
+func want_nomoi() -> void:
+	if is_host():
+		_on_nomoi(my_id(), true)
+	elif state != State.OFFLINE:
+		_nomoi_vote.rpc_id(1, true)
+
+
+## Back to lobby pressed: we no longer count, so the rest are not held up.
+func skip_nomoi() -> void:
+	if is_host():
+		_on_nomoi(my_id(), false)
+	elif state != State.OFFLINE:
+		_nomoi_vote.rpc_id(1, false)
 
 
 @rpc("authority", "call_remote", "reliable")
@@ -183,6 +226,7 @@ func _end(reason: String) -> void:
 		peer.close()
 	roster.clear()
 	code = ""
+	_clear_round()
 	_set_state(State.OFFLINE)
 	ended.emit(reason)
 
@@ -197,6 +241,8 @@ func _on_peer_left(peer: int) -> void:
 		if is_host():
 			_send_roster()
 		roster_changed.emit()
+	if is_host() and _nomoi.erase(peer):
+		_count_nomoi()
 
 
 func _send_roster() -> void:
@@ -204,8 +250,54 @@ func _send_roster() -> void:
 
 
 func _begin_match() -> void:
+	_clear_round()
 	_set_state(State.MATCH)
 	match_started.emit()
+
+
+func _clear_round() -> void:
+	runs.clear()
+	_nomoi.clear()
+	nomoi_ready = 0
+	nomoi_total = 0
+
+
+# Host: tells everyone the count, and starts the next match once all who still count want one.
+func _count_nomoi() -> void:
+	var wanting: int = _nomoi.values().count(true)
+	_nomoi_count.rpc(wanting, _nomoi.size())
+	_nomoi_count(wanting, _nomoi.size())
+	if wanting > 0 and wanting == _nomoi.size() and can_start():
+		start_match(true)
+
+
+func _on_nomoi(peer: int, wants: bool) -> void:
+	if not _nomoi.has(peer):
+		return
+	if wants:
+		_nomoi[peer] = true
+	else:
+		_nomoi.erase(peer)
+	_count_nomoi()
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _nomoi_vote(wants: bool) -> void:
+	if is_host() and state == State.LOBBY:
+		_on_nomoi(multiplayer.get_remote_sender_id(), wants)
+
+
+@rpc("authority", "call_remote", "reliable")
+func _nomoi_count(wanting: int, total: int) -> void:
+	nomoi_ready = wanting
+	nomoi_total = total
+	nomoi_changed.emit()
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _run(row: Dictionary) -> void:
+	runs[multiplayer.get_remote_sender_id()] = PlayerStats.sanitize_row(row)
+	runs_changed.emit()
 
 
 ## A guest's name and hiker, to the host.

@@ -465,6 +465,9 @@ const NET_CODE_LENGTH: int = 4
 ## The host can start once this many are in the lobby.
 const NET_MIN_PLAYERS: int = 2
 const NET_MAX_PLAYERS: int = 4
+## A friend whose invite link finds the match running knocks again this often (s) until the room is
+## a lobby again (M9 "Nomoi!"); each knock is one request to the relay.
+const NET_KNOCK_INTERVAL: float = 4.0
 ## Queued packets go out at most this long after they were queued: about 20 frames a second, which
 ## is what the Free plan's quota is planned around (NETWORKING.md section 7).
 const NET_FLUSH_INTERVAL_MS: int = 50

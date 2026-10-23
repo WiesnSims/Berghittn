@@ -33,7 +33,7 @@ mouse_filter = 2
 [node name="Box" type="VBoxContainer" parent="Center"]
 custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
-theme_override_constants/separation = 18
+theme_override_constants/separation = 14
 
 [node name="Title" type="Label" parent="Center/Box"]
 layout_mode = 2
@@ -67,6 +67,7 @@ text = "UI_DEATH_NEW_BEST"
 horizontal_alignment = 1
 
 [node name="Run" type="GridContainer" parent="Center/Box"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/h_separation = 28
@@ -121,6 +122,15 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.92, 0.85, 1)
 theme_override_font_sizes/font_size = 20
 
+[node name="Wertung" type="GridContainer" parent="Center/Box"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 22
+theme_override_constants/v_separation = 4
+columns = 6
+
 [node name="Best" type="Label" parent="Center/Box"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -128,12 +138,72 @@ theme_override_colors/font_color = Color(0.75, 0.7, 0.62, 1)
 theme_override_font_sizes/font_size = 18
 horizontal_alignment = 1
 
-[node name="RestartButton" type="Button" parent="Center/Box"]
+[node name="Buttons" type="HBoxContainer" parent="Center/Box"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="NomoiButton" type="Button" parent="Center/Box/Buttons"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "UI_NOMOI"
+
+[node name="RestartButton" type="Button" parent="Center/Box/Buttons"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 28
 text = "UI_RESTART"
+
+[node name="FriendsButton" type="Button" parent="Center/Box/Buttons"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "UI_PLAY_WITH_FRIENDS"
+
+[node name="NomoiCount" type="Label" parent="Center/Box"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.45, 1)
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+
+[node name="Invite" type="HBoxContainer" parent="Center/Box"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 14
+
+[node name="Room" type="Label" parent="Center/Box/Invite"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.92, 0.85, 1)
+theme_override_font_sizes/font_size = 20
+
+[node name="CopyLinkButton" type="Button" parent="Center/Box/Invite"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "UI_LOBBY_COPY_LINK"
+
+[node name="InviteHint" type="Label" parent="Center/Box"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.76, 0.86, 1)
+theme_override_font_sizes/font_size = 16
+text = "UI_LOBBY_COPIED"
+horizontal_alignment = 1
 
 [node name="EnableTimer" type="Timer" parent="."]
 wait_time = 0.8

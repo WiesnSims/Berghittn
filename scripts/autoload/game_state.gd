@@ -11,3 +11,5 @@ var invite_used: bool = false
 ## next one) goes straight into the new match.
 var open_lobby: bool = false
 var pending_match: bool = false
+## Play with friends (solo end screen): the reloaded scene opens a new room's lobby.
+var create_room: bool = false

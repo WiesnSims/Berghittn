@@ -48,6 +48,11 @@ var _status: Label
 var _players: VBoxContainer
 var _stage_root: Node3D
 var _stage_hikers: Dictionary = {}
+# The code we last tried to join, and (its match running) the one we keep knocking at until the
+# room is a lobby again: the friend from the invite link plays from the next Nomoi! (M9).
+var _joining_code: String = ""
+var _waiting_code: String = ""
+var _knock_timer: Timer
 
 
 ## Text for a relay reason, for the lobby and the title screen.
@@ -59,6 +64,11 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_profile = Settings.profile_for(Net.my_id())
 	_build()
+	_knock_timer = Timer.new()
+	_knock_timer.wait_time = Constants.NET_KNOCK_INTERVAL
+	_knock_timer.one_shot = true
+	_knock_timer.timeout.connect(_knock)
+	add_child(_knock_timer)
 	Net.state_changed.connect(_refresh)
 	Net.roster_changed.connect(_refresh)
 	Net.ended.connect(_on_ended)
@@ -329,6 +339,7 @@ func _join() -> void:
 		_status.text = tr("UI_NET_NO_ROOM")
 		return
 	_status.text = ""
+	_joining_code = code
 	Net.join_room(code)
 
 
@@ -338,14 +349,30 @@ func _copy_link() -> void:
 
 
 func _close() -> void:
+	_stop_waiting()
 	Net.leave()
 	hide()
 	closed.emit()
 
 
 func _on_ended(reason: String) -> void:
-	_status.text = "" if reason == "left" else reason_text(reason)
+	if reason == "started" and visible and _joining_code != "":
+		_waiting_code = _joining_code
+		_knock_timer.start()
+	elif reason != "started" or not visible:
+		_stop_waiting()
+	_status.text = tr("UI_LOBBY_MATCH_RUNNING") if _waiting_code != "" else ("" if reason == "left" else reason_text(reason))
 	_refresh()
+
+
+func _knock() -> void:
+	if visible and _waiting_code != "" and Net.state == Net.State.OFFLINE:
+		Net.join_room(_waiting_code)
+
+
+func _stop_waiting() -> void:
+	_waiting_code = ""
+	_knock_timer.stop()
 
 
 func _my_key() -> int:
@@ -362,7 +389,11 @@ func _refresh() -> void:
 	_offline_box.visible = not online
 	_room_box.visible = Net.in_lobby()
 	_leave_button.visible = online
-	if Net.state == Net.State.CONNECTING:
+	if Net.in_lobby() and _waiting_code != "":
+		# In at last: the match we waited for is over.
+		_stop_waiting()
+		_status.text = ""
+	if Net.state == Net.State.CONNECTING and _waiting_code == "":
 		_status.text = tr("UI_LOBBY_CONNECTING")
 	elif Net.in_lobby() and _status.text == tr("UI_LOBBY_CONNECTING"):
 		_status.text = ""

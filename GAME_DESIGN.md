@@ -768,6 +768,13 @@ worked in below; nothing is built before the plan is approved.
   the lobby ("Match running, you're in the next one") and plays from the next Nomoi!.
 - Solo end screen: **Play with friends** next to Try again, which creates a room and opens its
   lobby with the invite link ready.
+- Built (2026-10-23, branch m9-nomoi): the wave is shown once above the Hüttenwertung (it is the
+  same for everyone), rows sorted by points, ours in gold. The room becomes a lobby again at the
+  moment of game over, and the host stops spawning behind the end screen. A friend whose link finds
+  the match running knocks again every 4 s (NET_KNOCK_INTERVAL) until it is let in; the relay is
+  unchanged. A match started by Nomoi! opens behind "Join match" for everyone (the host has no
+  click to lock the pointer with). Tests: tests/death_stats, tests/net_nomoi (host, guest and a
+  late friend over the local relay).
 
 *Part 2 — Hit and kill feedback*
 Today: a hit marker cross, a headshot sound and the points popups. Added:
