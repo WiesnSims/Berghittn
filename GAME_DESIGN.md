@@ -750,9 +750,9 @@ more points on the same wave) is kept in this browser, solo and co-op alike; a b
 
 **M9 — Hüttenabend (plan, proposed 2026-10-23; Q1-Q6 answered the same day, Q7 open)**
 User request 2026-10-23: a "play again" button for easier co-op sharing, hit and kill feedback,
-talking enemies, weapon upgrades and two new enemies, and room for more ideas. Five parts, one PR each, play-tested
-after each one, cheapest first. The user's answers are worked in below; nothing is built before
-the plan is approved.
+talking enemies, weapon upgrades and two new enemies, and room for more ideas. Five parts, one PR
+each (parts 4 and 5 two each), play-tested after each one, cheapest first. The user's answers are
+worked in below; nothing is built before the plan is approved.
 
 *Part 1 — "Nomoi!": play again and sharing*
 - Co-op game over: every player's end screen shows **Nomoi!** (play again) at once, next to Back to
