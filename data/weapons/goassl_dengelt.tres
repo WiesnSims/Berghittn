@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/goassl_viewmodel.tscn" id="2"]
+[ext_resource type="Resource" path="res://data/weapons/goassl_doppelt.tres" id="up"]
+
+[resource]
+script = ExtResource("1")
+id = &"goassl_dengelt"
+level = 1
+family = &"goassl"
+boss_multiplier = 0.75
+sound_pitch = 0.85
+twist = 3.0
+is_melee = true
+display_name = "WEAPON_GOASSL_1"
+damage = 80
+headshot_multiplier = 1.0
+fire_rate = 1.5
+mag_size = 0
+reserve_ammo = 0
+reload_time = 0.0
+range = 3.5
+area_angle = 30.0
+cost = 0
+ammo_cost = 0
+behavior = &"goassl"
+viewmodel = ExtResource("2")
+upgrade = ExtResource("up")
+secondary = 5
+secondary_range = 7.0
+secondary_knockback = 5.0
+aim_move_multiplier = 0.6
+hit_sound = &"goassl_crack"

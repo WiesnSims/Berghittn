@@ -5,6 +5,10 @@ extends WeaponBehavior
 ## over the player's head (3 s at most); let go and it is hurled where the player looks, and where it
 ## comes down it bowls over everything within 2 m (80, thrown back; itself included). Bosses are too
 ## heavy to lift.
+## Dengelt (M9 part 4b): where a hurled body lands it leaves data.twist Kuhfladen (the Fladen-Gabel:
+## one, doppelt two).
+
+const KUHFLADEN: PackedScene = preload("res://scenes/equipment/kuhfladen.tscn")
 
 var _skewered: Enemy
 var _lifted: Enemy
@@ -59,6 +63,13 @@ func _landed(enemy: Enemy) -> void:
 	var at: Vector3 = enemy.global_position + Vector3.UP * 0.5
 	holder.area_hit(at, Vector3.FORWARD, 180.0, data.secondary_range, data.secondary_damage, data.secondary_knockback)
 	Sound.play_at(&"land", at)
+	var count: int = roundi(data.twist)
+	for i: int in count:
+		var fladen := KUHFLADEN.instantiate() as Kuhfladen
+		fladen.harmless = holder.ghost
+		holder.world_root().add_child(fladen)
+		var side: Vector2 = Vector2.from_angle(TAU * i / count) * (0.0 if count == 1 else 0.9)
+		fladen.lay_at(at + Vector3(side.x, 0.0, side.y), holder.shooter())
 
 
 func _flat_forward() -> Vector3:

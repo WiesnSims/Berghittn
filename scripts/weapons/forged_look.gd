@@ -1,12 +1,15 @@
 class_name ForgedLook
 extends RefCounted
-## The look of a dengelt weapon (M9 part 4): its steel dark gold with engraved scrollwork, its wood
+## The look of a dengelt weapon (M9 part 4): its steel and paint dark gold with engraved scrollwork, its wood
 ## darker and redder; doppelt dengelt brighter and more polished. Only colours, numbers and the
 ## steel's texture change, never the material's setup, so no new shader has to be built in the
 ## browser. One forged copy per material and level, shared by every model (kept on the material).
 
 const ENGRAVED: Texture2D = preload("res://assets/textures/gun_forged.png")
 const STEEL: String = "gun_steel"
+# Painted parts (the Alphorn's bands, the Harmonika's case, the Rodel) are gilded like the steel, so
+# the mostly wooden special weapons show it too.
+const PAINTED: String = "painted_wood"
 
 
 ## Dresses every mesh under `model` for `level` (0 leaves it as it is).
@@ -52,7 +55,8 @@ static func forged(material: StandardMaterial3D, level: int, golden: bool = fals
 		copy.roughness = Constants.FORGED_ROUGHNESS[1]
 		material.set_meta(key, copy)
 		return copy
-	var steel: bool = material.albedo_texture != null and material.albedo_texture.resource_path.contains(STEEL)
+	var texture: String = material.albedo_texture.resource_path if material.albedo_texture else ""
+	var steel: bool = texture.contains(STEEL) or texture.contains(PAINTED)
 	var metal: bool = steel or material.metallic >= 0.3
 	var gold: Color = Constants.FORGED_GOLD[level - 1]
 	if metal:

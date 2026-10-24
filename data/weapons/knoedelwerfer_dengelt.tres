@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/knoedelwerfer_viewmodel.tscn" id="2"]
+[ext_resource type="Resource" path="res://data/weapons/knoedelwerfer_doppelt.tres" id="up"]
+
+[resource]
+script = ExtResource("1")
+id = &"knoedelwerfer_dengelt"
+level = 1
+family = &"knoedelwerfer"
+boss_multiplier = 0.75
+sound_pitch = 0.85
+twist = 3.0
+display_name = "WEAPON_KNOEDELWERFER_1"
+damage = 360
+headshot_multiplier = 1.0
+fire_rate = 1.0
+mag_size = 18
+reserve_ammo = 72
+reload_time = 3.0
+recoil_pitch = 4.0
+recoil_yaw = 1.0
+range = 40.0
+cost = 0
+ammo_cost = 0
+behavior = &"knoedelwerfer"
+area_angle = 9.0
+knockback = 6.0
+projectile_speed = 20.0
+projectile_gravity = 9.8
+area_radius = 3.0
+pile_radius = 2.0
+pile_time = 6.0
+slow_factor = 0.5
+slow_time = 4.0
+viewmodel = ExtResource("2")
+upgrade = ExtResource("up")
+secondary = 5
+secondary_rounds = 3
+secondary_damage = 200
+secondary_range = 2.0
+fire_sound = &"knoedel_launch"
+secondary_sound = &"knoedel_launch"
+hit_sound = &"knoedel_splat"
+reload_sound = &"load_clunk"
+reload_end_sound = &"load_ready"
+cycle_ring = true

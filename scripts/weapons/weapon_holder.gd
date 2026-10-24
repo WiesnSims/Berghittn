@@ -381,6 +381,9 @@ func block(attacker: Node3D) -> bool:
 	var enemy := attacker as Enemy
 	if enemy and enemy.is_alive():
 		enemy.apply_knockback(flat.normalized() * melee_weapon.secondary_knockback * sqrt(enemy.data.flinch_multiplier))
+		# The Kaiserschmarrn-Pfanne's twist: the bonked attacker stands dazed.
+		if melee_weapon.twist > 0.0:
+			enemy.stun(melee_weapon.twist)
 	_hit_puffs.play(global_position + forward * 0.5 + Vector3.DOWN * 0.3, -forward)
 	Sound.play(&"block_hit")
 	if _melee_viewmodel:
@@ -773,6 +776,12 @@ func _whole_health(receiver: Node, amount: int) -> int:
 	return maxi(amount, maxi(enemy.health, enemy.max_health)) if enemy else amount
 
 
+## A special weapon's own hits (area, strike), by the weapon in hand or the melee weapon.
+func _special_boss_share(receiver: Node, is_melee: bool) -> float:
+	var data: WeaponData = melee_weapon if is_melee else weapon
+	return _boss_share(receiver, data) if data else 1.0
+
+
 ## A dengelt weapon hits bosses for less of its extra damage (WeaponData.boss_multiplier).
 func _boss_share(receiver: Node, data: WeaponData) -> float:
 	var enemy := receiver as Enemy
@@ -931,7 +940,7 @@ func area_hit(center: Vector3, forward: Vector3, half_angle: float, reach: float
 	for body: Dictionary in _bodies_in(center, forward, half_angle, reach):
 		var hurtbox: Hurtbox = body.hurtbox
 		var to_target: Vector3 = body.to_target
-		var result: Hurtbox.Result = hurtbox.take_hit(_damage(amount), 1.0, false, _shooter)
+		var result: Hurtbox.Result = hurtbox.take_hit(roundi(_damage(amount) * _special_boss_share(hurtbox.receiver, false)), 1.0, false, _shooter)
 		if result == Hurtbox.Result.IGNORED:
 			continue
 		hit += 1
@@ -967,7 +976,9 @@ func dance_at(center: Vector3, reach: float, duration: float, dps: int) -> int:
 ## The Brennkessel's flame: every body within `reach` and `half_angle` degrees of the aim, walls
 ## shielding, takes `amount` (before perks) and catches fire, burning for `burn_dps` (before perks)
 ## a second for `burn_time`. Hit points are paid once a second per body, not per tick (Enemy.scorch).
-func scorch(half_angle: float, reach: float, amount: int, burn_dps: int, burn_time: float) -> int:
+## With `spread` (the Feuerwasser-Kessel's twist), the fire jumps from every body it catches to the
+## bodies within that many metres of it.
+func scorch(half_angle: float, reach: float, amount: int, burn_dps: int, burn_time: float, spread: float = 0.0) -> int:
 	var hit: int = 0
 	for body: Dictionary in _bodies_in(global_position, -global_basis.z, half_angle, reach):
 		var enemy := (body.hurtbox as Hurtbox).receiver as Enemy
@@ -980,6 +991,8 @@ func scorch(half_angle: float, reach: float, amount: int, burn_dps: int, burn_ti
 		hit_confirmed.emit(false, result == Hurtbox.Result.KILLED)
 		if enemy.is_alive():
 			enemy.ignite(burn_time, _damage(burn_dps), _shooter)
+		if spread > 0.0:
+			ignite_around(enemy.global_position + Vector3.UP * 0.5, spread, burn_dps, burn_time)
 	return hit
 
 
@@ -1041,7 +1054,7 @@ func _bodies_in(center: Vector3, forward: Vector3, half_angle: float, reach: flo
 func strike(hurtbox: Hurtbox, amount: int, push: Vector3, is_melee: bool = false) -> Hurtbox.Result:
 	if ghost:
 		return Hurtbox.Result.IGNORED
-	var result: Hurtbox.Result = hurtbox.take_hit(_damage(amount), 1.0, is_melee, _shooter)
+	var result: Hurtbox.Result = hurtbox.take_hit(roundi(_damage(amount) * _special_boss_share(hurtbox.receiver, is_melee)), 1.0, is_melee, _shooter)
 	if result == Hurtbox.Result.IGNORED:
 		return result
 	var target: Vector3 = hurtbox.global_position + Vector3.UP * Constants.AREA_AIM_HEIGHT * hurtbox.scale.y
@@ -1051,6 +1064,14 @@ func strike(hurtbox: Hurtbox, amount: int, push: Vector3, is_melee: bool = false
 	if enemy and enemy.is_alive():
 		enemy.apply_knockback(push * sqrt(enemy.data.flinch_multiplier))
 	return result
+
+
+## The bodies all around `center` within `reach` (walls shielding), nearest first; each as
+## {hurtbox, target, to_target, distance}.
+func bodies_near(center: Vector3, reach: float) -> Array[Dictionary]:
+	var bodies: Array[Dictionary] = _bodies_in(center, Vector3.FORWARD, 180.0, reach)
+	bodies.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.distance < b.distance)
+	return bodies
 
 
 ## The bodies in front of the shooter for a melee behavior: within `reach` and `half_angle` degrees of

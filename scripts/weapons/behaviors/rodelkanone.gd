@@ -4,6 +4,8 @@ extends WeaponBehavior
 ## in its lane aside for 300. At the end, or at the first wall, it breaks apart with a crash.
 ## Right click, the Kehre: a sled shot with more powder (two rounds) that banks off walls up to
 ## three times and runs 25 m, for rooms and corridors where a straight 15 m never fit.
+## Dengelt (M9 part 4b): data.twist more sleds go out beside the first, TWIST_SLED_ANGLE apart (the
+## Doppelsitzer-Kanone: two side by side, doppelt three).
 
 const SLED := preload("res://scripts/weapons/behaviors/rodel_sled.gd")
 # Walls the Kehre's sled banks off before it breaks on the next one.
@@ -39,8 +41,12 @@ func _launch(damage: int, distance: float, banks: int) -> void:
 	if flat.length() < 0.1:
 		var body: Vector3 = -holder.shooter().global_basis.z
 		flat = Vector3(body.x, 0.0, body.z)
-	var sled: Node3D = _free_sled()
-	sled.call("launch", self, start, look * data.projectile_speed, flat.normalized(), damage, distance, banks)
+	for i: int in roundi(data.twist) + 1:
+		# 0, then right, left, further right...: a fan round the aim.
+		var side: float = 0.0 if i == 0 else (1.0 if i % 2 == 1 else -1.0) * ceilf(i / 2.0)
+		var turn: float = deg_to_rad(Constants.TWIST_SLED_ANGLE * side)
+		var sled: Node3D = _free_sled()
+		sled.call("launch", self, start, look.rotated(Vector3.UP, turn) * data.projectile_speed, flat.normalized().rotated(Vector3.UP, turn), damage, distance, banks)
 
 
 ## Called by a sled for every body it runs into.

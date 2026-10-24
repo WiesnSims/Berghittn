@@ -6,6 +6,8 @@ extends WeaponBehavior
 ## player aims (up to TANZBODEN_REACH away). For TANZBODEN_TIME the Landler plays from it and whoever
 ## steps on it dances like at a polka (bosses take the damage only), so a doorway or window becomes a
 ## trap while the player fights elsewhere.
+## Dengelt (M9 part 4b): every enemy a polka sets dancing gives the player data.twist health (the
+## Musikantenstadl-Harmonika: 5, doppelt 10).
 
 const NOTES := preload("res://scripts/weapons/behaviors/harmonika_notes.gd")
 const FLOOR := preload("res://scripts/weapons/behaviors/tanzboden.gd")
@@ -15,7 +17,10 @@ var _next_floor: int = 0
 
 
 func fire(_rounds: int) -> void:
-	holder.dance_around(data.range, Constants.DANCE_TIME, data.damage)
+	var dancers: int = holder.dance_around(data.range, Constants.DANCE_TIME, data.damage)
+	var player := holder.shooter() as Player
+	if player and data.twist > 0.0:
+		player.health.heal(roundi(dancers * data.twist))
 	_show_notes(data.range, 1.0)
 	holder.shake_view(data.shake)
 

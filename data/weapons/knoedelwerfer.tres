@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/weapons/knoedelwerfer_viewmodel.tscn" id="2"]
+[ext_resource type="Resource" path="res://data/weapons/knoedelwerfer_dengelt.tres" id="up"]
 
 [resource]
 script = ExtResource("1")
@@ -29,6 +30,7 @@ pile_time = 6.0
 slow_factor = 0.5
 slow_time = 4.0
 viewmodel = ExtResource("2")
+upgrade = ExtResource("up")
 secondary = 5
 secondary_rounds = 3
 secondary_damage = 100

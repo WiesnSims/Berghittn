@@ -374,6 +374,22 @@ const DENGEL_FLOAT_HEIGHT: float = 1.0
 ## Weapons on the anvil are drawn this much larger than in hand, but at most this long (m).
 const DENGEL_SHOW_SCALE: float = 1.6
 const DENGEL_SHOW_MAX_LENGTH: float = 1.1
+## The special weapons' twists (M9 part 4b; how many or how long is WeaponData.twist):
+## seconds between the Alphorn's rings; the small Knödel a big one breaks into (share of its damage,
+## blast radius, drawn size, and how fast they fly apart, out and up); the Handböller's small bangs
+## (share of the damage, radius, seconds after the burst, how far around it); the Rodelkanone's extra
+## sleds' angle apart (degrees); how far the Goaßl's crack jumps from one body to the next (m).
+const TWIST_RING_GAP: float = 0.35
+const TWIST_KNOEDEL_SHARE: float = 0.5
+const TWIST_KNOEDEL_RADIUS: float = 1.8
+const TWIST_KNOEDEL_SIZE: float = 0.55
+const TWIST_KNOEDEL_SPEED: Vector2 = Vector2(3.5, 4.0)
+const TWIST_BANG_SHARE: float = 0.4
+const TWIST_BANG_RADIUS: float = 1.6
+const TWIST_BANG_DELAY: float = 0.3
+const TWIST_BANG_SPREAD: float = 3.0
+const TWIST_SLED_ANGLE: float = 8.0
+const TWIST_CRACK_JUMP: float = 5.0
 ## The forged look (ForgedLook) per level: the steel's colour (on the engraved texture), how metallic
 ## and how rough it is at most, and what the wood's colour is multiplied by.
 const FORGED_GOLD: Array[Color] = [Color(0.82, 0.52, 0.2), Color(1.0, 0.7, 0.28)]
@@ -425,13 +441,13 @@ const KUHFLADEN_LIFETIME: float = 120.0
 const KUHFLADEN_MAX_ACTIVE: int = 6
 # Knödelwerfer: dumplings and piles kept in pools (oldest reused when all are out). Lobbed shots
 # (Knödel, Böller shell): seconds one may fly before it bursts in the air.
-const KNOEDEL_POOL: int = 12
+const KNOEDEL_POOL: int = 24
 const KNOEDEL_PILE_POOL: int = 10
 const LOBBED_MAX_FLIGHT: float = 4.0
 # Rodelkanone: sleds kept in a pool; the lane a sled sweeps (metres either side of its runners' line,
 # measured at body height), how high a step or kerb it rides over, how far it can drop before
 # it is lost, and how hard it throws what it hits sideways out of its lane (times its forward push).
-const RODEL_POOL: int = 4
+const RODEL_POOL: int = 8
 const RODEL_LANE: float = 0.7
 const RODEL_STEP: float = 0.4
 const RODEL_MAX_DROP: float = 4.0

@@ -5,6 +5,8 @@ extends WeaponBehavior
 ## Hold V past the swat, the Larve: the rod raised high, rattling, the Krampus face put on; every
 ## enemy within 8 m and 35° either side of the aim (walls shield) flees for as long as it is held and
 ## a second after. The player walks slowly and cannot shoot meanwhile.
+## Dengelt (M9 part 4b): a body the swat strikes burns with hellfire for data.twist seconds (the
+## Höllen-Rute: 3 s, doppelt 6 s).
 
 var _scan_left: float = 0.0
 
@@ -20,6 +22,8 @@ func melee_hit() -> bool:
 		var enemy := hurtbox.receiver as Enemy
 		if enemy and enemy.is_alive():
 			struck.append(enemy)
+			if data.twist > 0.0:
+				enemy.ignite(data.twist, Constants.BURN_DPS, holder.shooter())
 	var from: Vector3 = holder.shooter().global_position
 	for node: Node in holder.get_tree().get_nodes_in_group("enemies"):
 		var other := node as Enemy

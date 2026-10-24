@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/schmarrnpfanne_viewmodel.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"schmarrnpfanne_doppelt"
+level = 2
+family = &"schmarrnpfanne"
+boss_multiplier = 0.5625
+sound_pitch = 0.75
+twist = 3.0
+is_melee = true
+display_name = "WEAPON_SCHMARRNPFANNE_2"
+damage = 360
+headshot_multiplier = 1.0
+fire_rate = 1.0
+mag_size = 0
+reserve_ammo = 0
+reload_time = 0.0
+range = 2.0
+cost = 400
+ammo_cost = 0
+knockback = 4.0
+viewmodel = ExtResource("2")
+secondary = 6
+secondary_knockback = 6.0
+aim_move_multiplier = 0.6
+block_angle = 60.0
+block_share = 0.0
+swing_sound = &"swing"
+hit_sound = &"pfanne_bonk"

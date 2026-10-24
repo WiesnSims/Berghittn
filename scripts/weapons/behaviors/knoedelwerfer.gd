@@ -2,6 +2,8 @@ extends WeaponBehavior
 ## Knödelwerfer (section 6a): lobs a giant Semmelknödel in a ball arc. Where it lands it bursts for
 ## area damage and leaves a sticky pile that slows enemies. Right click, the Knödeltris: three smaller
 ## dumplings in a fan for three rounds, to cover a doorway or a crowd's width.
+## Dengelt (M9 part 4b): a big Knödel bursts into data.twist small ones that fly apart and burst
+## again (the Knödelhagel-Werfer: three, doppelt six).
 
 const KNOEDEL := preload("res://scripts/weapons/behaviors/knoedel.gd")
 const PILE := preload("res://scripts/weapons/behaviors/knoedel_pile.gd")
@@ -37,6 +39,9 @@ func burst(at: Vector3, damage: int, radius: float, size: float) -> void:
 	# Measured from a little above the splat, so a bump in the alm between it and a body cannot hide it.
 	holder.area_hit(at + Vector3.UP * 0.5, Vector3.FORWARD, 180.0, radius, damage, data.knockback)
 	Sound.play_at(data.hit_sound, at)
+	# Only the big one breaks up (not the trio's, nor its own pieces).
+	if size >= 1.0 and data.twist > 0.0:
+		_hail(at, damage)
 	var space: PhysicsDirectSpaceState3D = holder.get_world_3d().direct_space_state
 	var down := PhysicsRayQueryParameters3D.create(at + Vector3.UP * 0.2, at + Vector3.DOWN * 3.0, Constants.LAYER_WORLD)
 	var floor_hit: Dictionary = space.intersect_ray(down)
@@ -45,6 +50,17 @@ func burst(at: Vector3, damage: int, radius: float, size: float) -> void:
 	var pile: Node3D = _pooled(_piles, Constants.KNOEDEL_PILE_POOL, PILE, false)
 	pile.set("harmless", holder.ghost)
 	pile.call("lay", floor_hit.position, data.pile_radius * radius / data.area_radius, data.pile_time, data.slow_factor, data.slow_time)
+
+
+## The twist: small dumplings flung out evenly all around, a little up.
+func _hail(at: Vector3, damage: int) -> void:
+	var count: int = roundi(data.twist)
+	var turn: float = randf() * TAU
+	for i: int in count:
+		var angle: float = turn + TAU * i / count
+		var out := Vector3(cos(angle), 0.0, sin(angle)) * Constants.TWIST_KNOEDEL_SPEED.x + Vector3.UP * Constants.TWIST_KNOEDEL_SPEED.y
+		var piece: Node3D = _pooled(_knoedel, Constants.KNOEDEL_POOL, KNOEDEL, true)
+		piece.call("launch", self, at + Vector3.UP * 0.4, out, roundi(damage * Constants.TWIST_KNOEDEL_SHARE), Constants.TWIST_KNOEDEL_RADIUS, Constants.TWIST_KNOEDEL_SIZE)
 
 
 ## A free node from the pool, building it on first use; with all of them out, the oldest is reused.

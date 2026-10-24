@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/alphorn_viewmodel.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"alphorn_doppelt"
+level = 2
+family = &"alphorn"
+boss_multiplier = 0.5625
+sound_pitch = 0.75
+twist = 2.0
+display_name = "WEAPON_ALPHORN_2"
+damage = 800
+headshot_multiplier = 1.0
+fire_rate = 0.5
+mag_size = 12
+reserve_ammo = 72
+reload_time = 2.5
+chamber_time = 0.0
+recoil_pitch = 2.5
+recoil_yaw = 0.6
+spread = 0.0
+range = 12.0
+is_auto = false
+pellets = 1
+cost = 4000
+ammo_cost = 2000
+behavior = &"alphorn"
+area_angle = 30.0
+knockback = 16.0
+shake = 1.2
+cycle_ring = true
+viewmodel = ExtResource("2")
+secondary = 5
+secondary_rounds = 2
+secondary_damage = 800
+secondary_range = 6.0
+secondary_knockback = 18.0
+secondary_shake = 2.0
+fire_sound = &"alphorn_blast"
+secondary_sound = &"alphorn_echo"
+reload_sound = &"alphorn_load"
