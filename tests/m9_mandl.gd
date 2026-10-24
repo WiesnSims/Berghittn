@@ -182,6 +182,9 @@ func _vanishes() -> void:
 	await _seconds(0.5)
 	_check(not mandl.is_alive() and vanished[0] == 1 and died[0] == 0, "gone after 10 s, not killed")
 	_check(gredn.last_heard >= 0 and Gredn.LINES[gredn.last_heard][1] == Gredn.Moment.VANISH, "\"Arrivederci!\" (%.1f m away)" % mandl.global_position.distance_to(player.global_position))
+	# Back on the open field (12 m from where he went can be off the ground) to look for a spot.
+	_place_player(FIELD)
+	await _frames(3)
 	_check(waves.send_mandl() != null, "and he can come again")
 	await _seconds(Constants.MANDL_LIFETIME + 0.5)
 

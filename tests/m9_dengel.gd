@@ -97,8 +97,10 @@ func _check_data() -> void:
 				and two.family_id() == base.id and base.family_id() == base.id
 		ok = ok and one.damage == base.damage * 2 and two.damage == base.damage * 4
 		ok = ok and is_equal_approx(one.damage * one.boss_multiplier, base.damage * 1.5) and is_equal_approx(two.damage * two.boss_multiplier, base.damage * 2.25)
-		ok = ok and one.mag_size == ceili(base.mag_size * 1.5) and two.mag_size == base.mag_size * 2
-		ok = ok and one.reserve_ammo == ceili(base.reserve_ammo * 1.25) and two.reserve_ammo == ceili(base.reserve_ammo * 1.5)
+		ok = ok and one.mag_size == ceili(base.mag_size * 1.5) and one.reserve_ammo == ceili(base.reserve_ammo * 1.25)
+		# The Golden Gun has its own (checked in _golden_gun).
+		if not two.golden:
+			ok = ok and two.mag_size == base.mag_size * 2 and two.reserve_ammo == ceili(base.reserve_ammo * 1.5)
 		if base.secondary_rounds > 1:
 			ok = ok and one.secondary_rounds == ceili(base.secondary_rounds * 1.5) and two.secondary_rounds == base.secondary_rounds * 2
 		ok = ok and one.sound_pitch < 1.0 and two.sound_pitch < one.sound_pitch
@@ -345,3 +347,12 @@ func _golden_gun() -> void:
 	await _frames(1)
 	_check(not boss.is_alive(), "one shot fells a Krampus with %d health" % boss.max_health)
 	weapons.force_aim = false
+	# Balance 1.1.2: one round in it, nine to spare, and nothing tops it up.
+	_check(gun.loaded_capacity(true) == 1 and gun.reserve_ammo == 9 and not gun.refillable, "1 round and 9 to spare (%d / %d)" % [gun.mag_size, gun.reserve_ammo])
+	weapons.reserve = 2
+	var crate := main.find_children("*", "AmmoCrate", true, false)[0] as AmmoCrate
+	_check(not weapons.needs_ammo(gun) and crate.get_interact_prompt(player) == "" or weapons.needs_any_ammo() and crate.price_for(player) == crate.cost,
+		"no wall-buy ammo and no Munitionskiste for it")
+	weapons.refill_all()
+	weapons.refill_current()
+	_check(weapons.reserve == 2, "and no Murmeltier: still %d to spare" % weapons.reserve)

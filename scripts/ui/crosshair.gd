@@ -40,6 +40,10 @@ var _reloading: bool = false
 var _pulse_left: float = 0.0
 
 
+func _ready() -> void:
+	Settings.changed.connect(queue_redraw)
+
+
 ## Extra gap in pixels (the bloom projected onto the screen).
 func set_spread(pixels: float) -> void:
 	pixels = minf(pixels, max_spread)
@@ -92,8 +96,12 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var c: Vector2 = size * 0.5
+	# The arms in the colour and size picked in Settings (1.1.2); the hit and kill marks stay as they are.
+	var scale_by: float = Settings.crosshair_size
+	var tint: Color = Constants.CROSSHAIR_COLORS[Settings.crosshair_color]
+	tint.a = color.a
 	for dir: Vector2 in [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]:
-		draw_line(c + dir * (gap + _spread), c + dir * (gap + _spread + arm_length), color, thickness)
+		draw_line(c + dir * (gap * scale_by + _spread), c + dir * ((gap + arm_length) * scale_by + _spread), tint, thickness * scale_by)
 	var radius: float = maxf(ring_radius, gap + _spread + arm_length + 4.0)
 	if _progress >= 0.0:
 		draw_arc(c, radius, 0.0, TAU, 48, track_color, ring_width + 2.0, true)

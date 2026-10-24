@@ -202,6 +202,12 @@ LINES = {
     "gredn_wilderer_hob_di": (wilderer, "Hob di!"),
     "gredn_wilderer_waidmannsheil": (wilderer, "Waidmannsheil!"),
     "gredn_wilderer_waidmannsdank": (wilderer, "Waidmannsdank."),
+    "gredn_wanderer_sitz": (wanderer, "Wurzln schlagst do, oder wos?"),
+    "gredn_tourist_sitz": (tourist, "Bist do festgwachsn?"),
+    "gredn_knappe_sitz": (knappe, "Do hockt oana wia a Schwammerl."),
+    "gredn_perchte_sitz": (perchte, "Hockn bleibn? Hö! Hö! Hö!"),
+    "gredn_krampus_sitz": (krampus, "Wer hockt, den hol i!"),
+    "gredn_wilderer_sitz": (wilderer, "Do hockt mei Wild."),
 }
 
 

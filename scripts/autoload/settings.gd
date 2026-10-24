@@ -44,6 +44,12 @@ var board: bool = true
 var board_ids: Array[int] = []
 ## Key bindings (Keys): each rebindable action's first key or button; empty means the defaults.
 var bindings: Dictionary = {}
+## The view (1.1.2): field of view in degrees, aiming by toggle (a click on, a click off) instead of
+## holding right click, and the crosshair's colour (Constants.CROSSHAIR_COLORS) and size.
+var fov: float = Constants.DEFAULT_FOV
+var toggle_aim: bool = false
+var crosshair_color: int = 0
+var crosshair_size: float = 1.0
 
 
 func _ready() -> void:
@@ -92,6 +98,10 @@ func _load() -> void:
 	damage_numbers = file.get_value(SECTION, "damage_numbers", damage_numbers)
 	chatter = file.get_value(SECTION, "chatter", chatter)
 	board = file.get_value(SECTION, "board", board)
+	fov = clampf(file.get_value(SECTION, "fov", fov), Constants.FOV_MIN, Constants.FOV_MAX)
+	toggle_aim = file.get_value(SECTION, "toggle_aim", toggle_aim)
+	crosshair_color = clampi(file.get_value(SECTION, "crosshair_color", crosshair_color), 0, Constants.CROSSHAIR_COLORS.size() - 1)
+	crosshair_size = clampf(file.get_value(SECTION, "crosshair_size", crosshair_size), Constants.CROSSHAIR_SIZE_MIN, Constants.CROSSHAIR_SIZE_MAX)
 	var keys: Variant = file.get_value(SECTION, "bindings", {})
 	if keys is Dictionary:
 		bindings = keys
@@ -156,6 +166,10 @@ func save() -> void:
 	file.set_value(SECTION, "board", board)
 	file.set_value(SECTION, "board_ids", board_ids)
 	file.set_value(SECTION, "bindings", bindings)
+	file.set_value(SECTION, "fov", fov)
+	file.set_value(SECTION, "toggle_aim", toggle_aim)
+	file.set_value(SECTION, "crosshair_color", crosshair_color)
+	file.set_value(SECTION, "crosshair_size", crosshair_size)
 	file.set_value(SECTION, "seen_version", seen_version)
 	file.set_value(SECTION, "locale", locale)
 	file.set_value(SECTION, "render_scale", render_scale)

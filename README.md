@@ -124,6 +124,9 @@ listens to `Events` and credits only its own player (`source` on every hit, kill
   saved to `user://settings.cfg` (IndexedDB in the browser). The menu
   (`scenes/ui/settings_menu.tscn`) opens from the start screen and the pause menu, applies changes
   live and saves on Back.
+- View (1.1.2): `Settings.fov` (the camera's field of view, `Player._process`), `toggle_aim`
+  (`WeaponHolder._aim_held`), `crosshair_color` and `crosshair_size` (`Crosshair._draw`). Test:
+  `tests/view_settings`.
 - Key bindings (1.1.2): `Keys` (`scripts/ui/keys.gd`) lists the rebindable actions, rebinds an
   action's first event (a key another action had is swapped), and saves them in
   `Settings.bindings`; `Keys.apply` puts them over the project's defaults at start. Texts that name
@@ -283,6 +286,15 @@ python tools/textures/engrave.py    # the engraved steel of the forged look (gun
 - A dengelt weapon keeps its base's `family`, so wall-buys, the chest and the slots count it as
   that gun. `ForgedLook` (`scripts/weapons/forged_look.gd`) dresses its model: copies of the same
   materials with gold steel on the engraved texture and darker wood, so no new shader is built.
+
+## Sitzfleisch (1.1.2)
+
+`WaveManager._watch_sitzfleisch` keeps, per player, where they settled and how long they stayed
+within `SITZ_RADIUS` of it during a wave (from `SITZ_FIRST_WAVE`). After `SITZ_TIME`,
+`sitzfleisch()` sends a Wilderer and `SITZ_FLOCK` Bergdohlen from `_spawn_point_near` (the nearest
+open point at least `SITZ_SPAWN_MIN` away). They are counted in the wave, with `Enemy.focus` on the
+camper, and the camper gets a banner (`Coop.announce` in co-op). The nearest enemy says its SITZ line
+(`Gredn.taunt`). Test: `tests/m9_sitz`.
 
 ## Das Venedigermandl (M9 part 5a)
 

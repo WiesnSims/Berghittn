@@ -1112,6 +1112,21 @@ Munitionskiste refilled all of it for a flat 1000.
 - Every text that names a key (prompts, the HUD, the controls line on the title and in the pause
   menu) names the key it is bound to now.
 
+*Added the same day (user request): Sitzfleisch, the Golden Gun, view settings*
+- Sitzfleisch, against camping:
+  - A player who stays within 5 m of one spot for 45 s of a wave (from wave 3, not in the break)
+    gets a Wilderer and three Bergdohlen sent after them. They come from the nearest open spawn
+    point at least 15 m away, count in the wave and go for that player over anyone nearer.
+  - A banner says so (in co-op naming the player), and the enemy nearest them mocks them with a
+    new dialect line (one per voice, Gredn moment SITZ).
+  - The clock starts over when they move, and after the visit.
+- The Golden Gun (the Dienstpistole doppelt dengelt, a secret easter egg: never in the patch notes):
+  - one round in it (no extra round in the chamber) and nine to spare
+  - never refilled: no wall-buy ammo, no Munitionskiste, no Murmeltier
+  - downed in co-op, a plain pistol is lent instead, so its rounds are kept
+- View settings: a field-of-view slider (70 to 100°, default 75), aiming by toggle instead of
+  holding right click, and the crosshair's colour (six) and size (50 to 200 %).
+
 Built (2026-10-24, branch dengel-balance, version 1.1.2):
 - Balance: tools/weapons/dengel.py (reserve and right-click rounds), Constants.DENGEL_AMMO_EXTRA,
   WeaponHolder.ammo_extra and crate_extra, AmmoCrate.price_for, WallBuy._ammo_price.
@@ -1120,7 +1135,12 @@ Built (2026-10-24, branch dengel-balance, version 1.1.2):
   Dengelstock.cost_for.
 - Key bindings: scripts/ui/keys.gd (Keys: names, {action} tokens in the string tables, rebinding
   with swaps, saved in Settings.bindings) and the Settings menu's section.
-- Tests: m9_dengel (the new rules), m9_stumpf, keys.
+- Sitzfleisch: WaveManager._watch_sitzfleisch, sitzfleisch() and _spawn_point_near; Enemy.focus;
+  Gredn.taunt with the SITZ lines (voices in tools/audio/voices.py); Constants.SITZ_*.
+- Golden Gun: WeaponData.refillable; dengel.py's LEVEL_2_ONLY (mag 1, reserve 9, no chamber).
+- View: Settings.fov, toggle_aim, crosshair_color and crosshair_size; Player reads the field of
+  view, WeaponHolder._aim_held and Crosshair._draw use the others. The Settings menu scrolls now.
+- Tests: m9_dengel (the new rules, the Golden Gun), m9_stumpf, m9_sitz, keys, view_settings.
 
 
 ## 13. Project structure

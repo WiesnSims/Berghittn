@@ -308,6 +308,8 @@ func _on_wave_cleared(wave: int) -> void:
 
 
 func _show_banner(text: String) -> void:
+	# A banner may name a key ("{throw}"): the one it is bound to now (Keys).
+	text = Keys.fill(text)
 	_banner.text = text
 	# Long event lines shrink to fit the screen, and wrap if even that is not enough.
 	var font: Font = _banner.get_theme_font("font")

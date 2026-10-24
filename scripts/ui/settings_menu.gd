@@ -82,6 +82,13 @@ func _build() -> void:
 	_add_slider("UI_SET_AIM_SENSITIVITY", Constants.AIM_SENSITIVITY_MIN, Constants.AIM_SENSITIVITY_MAX,
 			Settings.aim_sensitivity, func(v: float) -> void: Settings.aim_sensitivity = v, _percent)
 	_add_toggle("UI_SET_INVERT_Y", Settings.invert_y, func(on: bool) -> void: Settings.invert_y = on)
+	_add_toggle("UI_SET_TOGGLE_AIM", Settings.toggle_aim, func(on: bool) -> void: Settings.toggle_aim = on)
+	_add_slider("UI_SET_FOV", Constants.FOV_MIN, Constants.FOV_MAX, Settings.fov,
+			func(v: float) -> void: Settings.fov = roundf(v), func(v: float) -> String: return "%d°" % roundi(v))
+	_add_choice("UI_SET_CROSSHAIR_COLOR", Constants.CROSSHAIR_COLOR_KEYS, Settings.crosshair_color,
+			func(index: int) -> void: Settings.crosshair_color = index)
+	_add_slider("UI_SET_CROSSHAIR_SIZE", Constants.CROSSHAIR_SIZE_MIN, Constants.CROSSHAIR_SIZE_MAX, Settings.crosshair_size,
+			func(v: float) -> void: Settings.crosshair_size = v, _percent)
 	_add_toggle("UI_SET_DAMAGE_NUMBERS", Settings.damage_numbers, func(on: bool) -> void: Settings.damage_numbers = on)
 	_add_toggle("UI_SET_CHATTER", Settings.chatter, func(on: bool) -> void: Settings.chatter = on)
 	_add_toggle("UI_SET_BOARD", Settings.board, func(on: bool) -> void: Settings.board = on)
@@ -190,6 +197,19 @@ func _add_toggle(key: String, value: bool, assign: Callable) -> void:
 		assign.call(on)
 		Settings.apply(false))
 	row.add_child(toggle)
+
+
+func _add_choice(key: String, items: Array[String], selected: int, assign: Callable) -> void:
+	var row: HBoxContainer = _add_row(key)
+	var picker := OptionButton.new()
+	picker.add_theme_font_size_override("font_size", FONT_SIZE)
+	for item: String in items:
+		picker.add_item(item)
+	picker.selected = selected
+	picker.item_selected.connect(func(index: int) -> void:
+		assign.call(index)
+		Settings.apply(false))
+	row.add_child(picker)
 
 
 func _add_language() -> void:

@@ -136,6 +136,8 @@ var _ghost_flame: CPUParticles3D
 var _ghost_flash: OmniLight3D
 # Seconds the hands hold only the melee weapon after a gun went to the Dengelstock (M9 part 4).
 var _hands_free_left: float = 0.0
+# Aiming by toggle (Settings.toggle_aim): a right click puts the sights up, the next one down.
+var _aim_toggled: bool = false
 # Stumpf: kills left of the doppelt dengelt melee weapon's edge, and the families that went dull and
 # have not been sharpened again since (cheaper at the Dengelstock).
 var _melee_edge: int = 0
@@ -244,7 +246,8 @@ func set_downed(on: bool, pistol: WeaponData) -> void:
 		_before_down = _current
 		_hands_free_left = 0.0
 		var index: int = _slot_of(pistol)
-		if index < 0:
+		# The Golden Gun is not the pistol to crawl with: its few rounds are kept for later.
+		if index < 0 or not _slots[index].data.refillable:
 			_slots.append(_new_slot(pistol))
 			_borrowed = true
 			index = _slots.size() - 1
@@ -487,7 +490,7 @@ func block(attacker: Node3D) -> bool:
 ## (A dengelt gun counts for its base: its own, larger reserve is what gets filled.)
 func needs_ammo(data: WeaponData) -> bool:
 	var index: int = _slot_of(data)
-	if index < 0:
+	if index < 0 or not _slots[index].data.refillable:
 		return false
 	var spare: int = reserve if index == _current else _slots[index].reserve
 	return spare < _slots[index].data.reserve_ammo
@@ -495,7 +498,7 @@ func needs_ammo(data: WeaponData) -> bool:
 
 func refill_ammo(data: WeaponData) -> void:
 	var index: int = _slot_of(data)
-	if index < 0:
+	if index < 0 or not _slots[index].data.refillable:
 		return
 	var full: int = _slots[index].data.reserve_ammo
 	_slots[index].reserve = full
@@ -506,7 +509,7 @@ func refill_ammo(data: WeaponData) -> void:
 
 ## The gun in hand topped up completely, magazine and reserve (the Murmeltier's reward).
 func refill_current() -> void:
-	if weapon == null:
+	if weapon == null or not weapon.refillable:
 		return
 	_cancel_reload()
 	mag = maxi(mag, weapon.mag_size)
@@ -651,7 +654,7 @@ func _physics_process(delta: float) -> void:
 		lock_trigger()
 	_was_captured = captured
 	_capture_grace = maxf(_capture_grace - delta, 0.0)
-	_update_aim(delta, force_aim or (captured and Input.is_action_pressed("secondary")))
+	_update_aim(delta, force_aim or (captured and _aim_held(Input.is_action_pressed("secondary"), Input.is_action_just_pressed("secondary"))))
 	if _melee_step(delta):
 		return
 	if _switch_left > 0.0:
@@ -892,6 +895,7 @@ func _select(index: int) -> void:
 		if old.viewmodel:
 			old.viewmodel.visible = false
 	_current = index
+	_aim_toggled = false
 	var slot: GunSlot = _slots[index]
 	weapon = slot.data
 	bloom = 0.0
@@ -1225,6 +1229,18 @@ func shooter_exclude() -> Array[RID]:
 func add_effect(effect: Node3D) -> void:
 	effect.transform = global_transform
 	_shooter.get_parent().add_child(effect)
+
+
+# Right click held (`held`), or (Settings.toggle_aim) clicked on (`clicked` this frame) and not yet
+# off again. Only for a gun that aims: its right click is not a special mode of its own.
+func _aim_held(held: bool, clicked: bool) -> bool:
+	if not Settings.toggle_aim:
+		return held
+	if weapon == null or not weapon.can_aim():
+		_aim_toggled = false
+	elif clicked:
+		_aim_toggled = not _aim_toggled
+	return _aim_toggled
 
 
 func _update_aim(delta: float, held: bool) -> void:

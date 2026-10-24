@@ -11,12 +11,14 @@ const ENTRIES: Array[Dictionary] = [
 		"en": [
 			"Balance: forged guns carry less spare ammo, their right-click modes use more rounds, and their ammo costs more.",
 			"Stumpf: a doppelt dengelt weapon goes dull after 150 kills. Sharpen it again at the Dengelstock for half the price.",
-			"Key bindings in Settings: put every action on the key or mouse button you like.",
+			"Sitzfleisch: whoever stays in one spot too long during a wave gets visitors.",
+			"Settings: key bindings for every action, field of view, aiming by toggle, and the crosshair's colour and size.",
 		],
 		"de": [
 			"Balance: geschmiedete Waffen tragen weniger Reservemunition, ihr Rechtsklick braucht mehr Schuss, und ihre Munition kostet mehr.",
 			"Stumpf: eine doppelt dengelte Waffe wird nach 150 Abschüssen stumpf. Am Dengelstock um den halben Preis wieder schärfen lassen.",
-			"Tastenbelegung in den Einstellungen: jede Aktion auf die Taste oder Maustaste, die du willst.",
+			"Sitzfleisch: Wer während einer Welle zu lang an einem Fleck hockt, kriegt Besuch.",
+			"Einstellungen: Tastenbelegung für jede Aktion, Sichtfeld, Zielen per Umschalten, und Farbe und Größe des Fadenkreuzes.",
 		],
 	},
 	{

@@ -4,6 +4,8 @@ extends Node3D
 ## Enemies are pooled because instancing during combat causes hitches in web builds.
 ## Now and then the Venedigermandl (M9 part 5a) turns up as well, outside the wave count: the wave
 ## ends without him.
+## Sitzfleisch (1.1.2): a player who stays put too long in a wave gets a Wilderer and a few
+## Bergdohlen sent after them (on top of the wave), a banner and a taunt.
 
 enum Phase { BREAK, SPAWNING, CLEARING }
 
@@ -26,6 +28,10 @@ var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 # Seconds until the Venedigermandl comes this wave (below 0: not this wave), and the one about.
 var _mandl_left: float = -1.0
 var _mandl: Enemy
+# Sitzfleisch: per player, where they settled and seconds they have stayed within SITZ_RADIUS of it.
+var _sitz: Dictionary = {}
+const WILDERER: EnemyData = preload("res://data/enemies/wilderer.tres")
+const DOHLE: EnemyData = preload("res://data/enemies/bergdohle.tres")
 
 
 func _ready() -> void:
@@ -43,6 +49,7 @@ func begin_break(delay: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_watch_sitzfleisch(delta)
 	if _mandl_left > 0.0:
 		_mandl_left -= delta
 		if _mandl_left <= 0.0:
@@ -117,6 +124,87 @@ func send_mandl() -> Enemy:
 	_mandl = pool.pop_back() if not pool.is_empty() else _create_enemy()
 	_mandl.activate(data, maxi(wave, 1), Transform3D(Basis(Vector3.UP, _rng.randf() * TAU), at))
 	return _mandl
+
+
+# Sitzfleisch: who has stayed put long enough in this wave gets company.
+func _watch_sitzfleisch(delta: float) -> void:
+	if wave < Constants.SITZ_FIRST_WAVE or _phase == Phase.BREAK:
+		_sitz.clear()
+		return
+	for node: Variant in _sitz.keys():
+		if not is_instance_valid(node):
+			_sitz.erase(node)
+	for node: Node in get_tree().get_nodes_in_group("player"):
+		var player := node as Node3D
+		if player == null or not player.is_targetable():
+			_sitz.erase(node)
+			continue
+		var settled: Array = _sitz.get(player, [player.global_position, 0.0])
+		if player.global_position.distance_to(settled[0]) > Constants.SITZ_RADIUS:
+			settled = [player.global_position, 0.0]
+		else:
+			settled[1] += delta
+		if settled[1] >= Constants.SITZ_TIME:
+			settled = [player.global_position, 0.0]
+			sitzfleisch(player)
+		_sitz[player] = settled
+
+
+## A Wilderer and SITZ_FLOCK Bergdohlen go after `player` from the spawn point nearest them (at least
+## SITZ_SPAWN_MIN away), counted
+## in the wave; everyone sees a banner and the enemy nearest them mocks them. Returns who was sent.
+func sitzfleisch(player: Node3D) -> Array[Enemy]:
+	var sent: Array[Enemy] = []
+	var point: Node3D = _spawn_point_near(player.global_position)
+	if point == null:
+		return sent
+	sent.append(_send(WILDERER, point.global_transform, player))
+	for i: int in Constants.SITZ_FLOCK:
+		var angle: float = _rng.randf() * TAU
+		var offset := Vector3(cos(angle), 0.0, sin(angle)) * _rng.randf() * Constants.DOHLE_SPAWN_SCATTER + Vector3.UP * Constants.DOHLE_SPAWN_HEIGHT
+		sent.append(_send(DOHLE, point.global_transform.translated(offset), player))
+	if Net.in_match():
+		Coop.announce("EVENT_SITZ_COOP", [Coop.name_of(Coop.peer_of(player))])
+	else:
+		Events.event_announced.emit(tr("EVENT_SITZ"))
+	var mocker: Enemy = null
+	for child: Node in get_children():
+		var enemy := child as Enemy
+		if enemy == null or not enemy.is_alive() or enemy.data.treasure or enemy.data.flies or enemy in sent:
+			continue
+		if enemy.global_position.distance_to(player.global_position) > Constants.GREDN_REACH:
+			continue
+		if mocker == null or enemy.global_position.distance_to(player.global_position) < mocker.global_position.distance_to(player.global_position):
+			mocker = enemy
+	if mocker and Gredn.current:
+		Gredn.current.taunt(mocker)
+	return sent
+
+
+# One more enemy of the wave, out of the pool, going for `target`.
+func _send(data: EnemyData, at: Transform3D, target: Node3D) -> Enemy:
+	var pool: Array = _pools.get(data.id, [])
+	var enemy: Enemy = pool.pop_back() if not pool.is_empty() else _create_enemy()
+	enemy.activate(data, wave, at)
+	enemy.focus = target
+	_alive += 1
+	return enemy
+
+
+# The nearest open spawn point at least SITZ_SPAWN_MIN from `at`, else the nearest at all.
+func _spawn_point_near(at: Vector3) -> Node3D:
+	var best: Node3D = null
+	var closest: Node3D = null
+	for node: Node in get_tree().get_nodes_in_group("spawn_points"):
+		var point := node as SpawnPoint
+		if point == null or not zones.is_spawn_active(point.zone):
+			continue
+		var distance: float = point.global_position.distance_to(at)
+		if closest == null or distance < closest.global_position.distance_to(at):
+			closest = point
+		if distance >= Constants.SITZ_SPAWN_MIN and (best == null or distance < best.global_position.distance_to(at)):
+			best = point
+	return best if best else closest
 
 
 func _mandl_spot() -> Vector3:

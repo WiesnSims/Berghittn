@@ -43,8 +43,9 @@ LEVELS = {
 }
 SUFFIX = {1: "dengelt", 2: "doppelt"}
 # Base id -> fields of level 2 only. The Dienstpistole doppelt dengelt is the Golden Gun (an easter
-# egg, user request 2026-10-24): all gold, and every hit kills.
-LEVEL_2_ONLY = {"pistole": {"one_hit": "true", "golden": "true"}}
+# egg, user request 2026-10-24): all gold, and every hit kills. Balance 1.1.2: one round in it (no
+# extra one in the chamber) and nine to spare, never refilled.
+LEVEL_2_ONLY = {"pistole": {"one_hit": "true", "golden": "true", "mag_size": "1", "reserve_ammo": "9", "refillable": "false", "chamber_time": "0.0"}}
 
 
 def field(text, name):
