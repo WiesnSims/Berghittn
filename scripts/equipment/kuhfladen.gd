@@ -47,6 +47,16 @@ func launch(from: Vector3, direction: Vector3, thrower: Node3D) -> void:
 	Sound.play_at(&"kuhfladen_splat", global_position)
 
 
+## Laid right at `at` (on the floor below it), for the Fladen-Gabel's hurled bodies.
+func lay_at(at: Vector3, thrower: Node3D) -> void:
+	_thrower = thrower
+	var down := PhysicsRayQueryParameters3D.create(at + Vector3.UP * 0.6, at + Vector3.DOWN * 3.0, Constants.LAYER_WORLD)
+	var floor_hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(down)
+	global_position = floor_hit.position if not floor_hit.is_empty() else at
+	rotation.y = randf() * TAU
+	Sound.play_at(&"kuhfladen_splat", global_position)
+
+
 func catches() -> int:
 	return _catches
 

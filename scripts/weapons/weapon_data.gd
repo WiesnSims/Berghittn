@@ -138,6 +138,13 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, RICOCHET, BEHAVIOR, BLOCK, PLAY 
 @export var sound_pitch: float = 1.0
 ## Melee: seconds a survivor of the blow stands dazed (the Schneefräsn-Schaufl's twist; 0 = none).
 @export var stun_time: float = 0.0
+## A dengelt special weapon's twist (M9 part 4b), one number whose meaning is its behavior's:
+## Alphorn: rings after the first; Knödelwerfer and Handböller: small bursts the shot breaks into;
+## Rodelkanone: sleds beside the first; Goaßl: enemies the crack jumps on to; Mistgabel: Kuhfladen
+## left where a hurled body lands; Schmarrnpfanne: seconds a blocked attacker stands dazed;
+## Harmonika: health each dancer gives the player; Brennkessel: metres the fire jumps from a burning
+## body; Krampus-Rute: seconds a struck body burns. 0 = none (the base weapons).
+@export var twist: float = 0.0
 ## The Golden Gun (the Dienstpistole doppelt dengelt, an easter egg): every hit kills, bosses too,
 ## and the whole gun is gold, not only its steel.
 @export var one_hit: bool = false

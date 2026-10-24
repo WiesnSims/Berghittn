@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/weapons/harmonika_viewmodel.tscn" id="2"]
+[ext_resource type="Resource" path="res://data/weapons/harmonika_dengelt.tres" id="up"]
 
 [resource]
 script = ExtResource("1")
@@ -24,6 +25,7 @@ behavior = &"harmonika"
 shake = 0.3
 cycle_ring = true
 viewmodel = ExtResource("2")
+upgrade = ExtResource("up")
 secondary = 5
 aim_move_multiplier = 0.5
 secondary_rounds = 2

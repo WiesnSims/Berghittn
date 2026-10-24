@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/weapons/brennkessel_viewmodel.tscn" id="2"]
+[ext_resource type="Resource" path="res://data/weapons/brennkessel_dengelt.tres" id="up"]
 
 [resource]
 script = ExtResource("1")
@@ -26,6 +27,7 @@ area_angle = 12.0
 projectile_speed = 11.0
 projectile_gravity = 9.8
 viewmodel = ExtResource("2")
+upgrade = ExtResource("up")
 secondary = 5
 secondary_rounds = 20
 secondary_damage = 10

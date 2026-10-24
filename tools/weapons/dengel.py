@@ -6,7 +6,7 @@ and follow the base when it is tuned. Run it again after changing a base weapon:
 
 Level 1: damage x2 (bosses x1.5), magazine +50 % (rounded up), reserve x2, a deeper shot.
 Level 2 doubles every effect of level 1: damage x4 (bosses x2.25), magazine +100 %, reserve x4.
-Melee weapons: the damage, and the twist (stun_time) doubled from level 1 to level 2.
+Melee and special weapons: the damage, and the twist (stun_time, twist) doubled from level 1 to level 2.
 tests/m9_dengel checks the files against these rules."""
 import math
 import os
@@ -22,6 +22,17 @@ FORGE = {
     "stutzen": {},
     "repetierer": {},
     "schaufel": {"stun_time": 1.2},
+    # The special weapons (part 4b): each its own twist, see WeaponData.twist.
+    "alphorn": {"twist": 1.0},
+    "knoedelwerfer": {"twist": 3.0},
+    "handboeller": {"twist": 3.0},
+    "rodelkanone": {"twist": 1.0},
+    "harmonika": {"twist": 5.0},
+    "brennkessel": {"twist": 1.5},
+    "goassl": {"twist": 3.0},
+    "mistgabel": {"twist": 1.0},
+    "schmarrnpfanne": {"twist": 1.5},
+    "krampusrute": {"twist": 3.0},
 }
 # Per level: damage, boss share (of that damage), magazine, reserve, shot pitch.
 LEVELS = {

@@ -894,6 +894,17 @@ a sheet-metal hood, so it reads as safe in a hay loft.
   pitched down (x0.85, x0.75). Co-op: the host's word on the anvil (CoopWorld), the others see the
   owner's empty hands and then the forged gun. Tests: tests/m9_dengel, tests/net_specials.
 
+- Built 4b (2026-10-24, branch m9-dengel-specials): every special weapon can be dengelt too, with the
+  same numbers as the guns and one twist each (WeaponData.twist, doubled doppelt dengelt):
+  Großglockner-Alphorn (one more ring 0.35 s later that hits again; doppelt two), Knödelhagel-Werfer
+  (the big Knödel bursts into 3 small ones; 6), Pranger-Böller (3 small bangs round the burst; 6),
+  Doppelsitzer-Kanone (a second sled beside the first; 3 sleds), Musikantenstadl-Harmonika (each
+  dancer heals 5; 10), Feuerwasser-Kessel (the fire jumps 1.5 m from a burning body; 3 m),
+  Donner-Goaßl (the crack jumps on to 3 more enemies within 5 m; 6), Fladen-Gabel (a hurled body
+  leaves a Kuhfladen; 2), Kaiserschmarrn-Pfanne (a blocked attacker stands dazed 1.5 s; 3 s),
+  Höllen-Rute (a struck body burns 3 s; 6 s). Their area and melee hits pay bosses the boss share
+  too. Test: tests/m9_twists.
+
 *Part 5 — Neue Gäste: two new enemies (user request 2026-10-23)*
 Both are EnemyData resources on the shared Enemy scene, with their own model (tools/models), rig
 poses, ragdoll, voice lines (eSpeak NG, as in part 3) and a co-op puppet like the others. Three

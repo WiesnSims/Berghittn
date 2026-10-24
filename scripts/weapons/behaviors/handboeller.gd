@@ -3,6 +3,8 @@ extends WeaponBehavior
 ## Böller where it lands, then the long reload of powder, ball and ramrod. Right click, the
 ## Doppelladung: a second measure of powder poured in (the loaded round plus one from the reserve),
 ## so the shell flies faster and flatter, bursts bigger, and the kick shoves the shooter back.
+## Dengelt (M9 part 4b): data.twist small bangs go off around the burst a moment later, like the
+## last cracks of a Böllerschießen (the Pranger-Böller: three, doppelt six).
 
 const SHELL := preload("res://scripts/weapons/behaviors/handboeller_shell.gd")
 const BLAST := preload("res://scripts/perks/boeller_blast.gd")
@@ -44,6 +46,23 @@ func burst(at: Vector3, damage: int, radius: float, _size: float) -> void:
 	var blast := Node3D.new()
 	blast.set_script(BLAST)
 	blast.set("radius", radius)
+	holder.world_root().add_child(blast)
+	blast.global_position = at
+	for i: int in roundi(data.twist):
+		var off: Vector2 = Vector2.from_angle(TAU * i / data.twist + randf() * 0.5) * randf_range(0.5, 1.0) * Constants.TWIST_BANG_SPREAD
+		var spot: Vector3 = at + Vector3(off.x, 0.0, off.y)
+		holder.get_tree().create_timer(Constants.TWIST_BANG_DELAY + 0.12 * i, false).timeout.connect(_bang.bind(spot, damage))
+
+
+## One of the twist's small bangs.
+func _bang(at: Vector3, damage: int) -> void:
+	if not is_instance_valid(holder):
+		return
+	holder.area_hit(at + Vector3.UP * 0.5, Vector3.FORWARD, 180.0, Constants.TWIST_BANG_RADIUS, roundi(damage * Constants.TWIST_BANG_SHARE), _push * 0.5)
+	Sound.play_at(data.hit_sound, at, -6.0, 1.3)
+	var blast := Node3D.new()
+	blast.set_script(BLAST)
+	blast.set("radius", Constants.TWIST_BANG_RADIUS)
 	holder.world_root().add_child(blast)
 	blast.global_position = at
 

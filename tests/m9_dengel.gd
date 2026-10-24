@@ -9,7 +9,8 @@ extends Node
 ## Schneefräsn-Schaufl, whose blow leaves the survivor dazed; the Dienstpistole doppelt dengelt is
 ## the Golden Gun, all gold, killing whatever it hits (bosses too).
 
-const BASES: Array[String] = ["pistole", "jagdflinte", "stutzen", "repetierer", "schaufel"]
+const BASES: Array[String] = ["pistole", "jagdflinte", "stutzen", "repetierer", "schaufel", "alphorn", "knoedelwerfer",
+		"handboeller", "rodelkanone", "harmonika", "brennkessel", "goassl", "mistgabel", "schmarrnpfanne", "krampusrute"]
 const FIELD: Vector3 = Vector3(10.0, -0.3, 31.0)
 
 var main: Node
@@ -105,9 +106,10 @@ func _check_data() -> void:
 	var shovel: WeaponData = _weapon("schaufel")
 	_check(shovel.stun_time == 0.0 and shovel.upgrade.stun_time > 0.0 and is_equal_approx(shovel.upgrade.upgrade.stun_time, shovel.upgrade.stun_time * 2.0),
 			"the Schaufl's twist: dazed for %.1f s, doppelt %.1f s" % [shovel.upgrade.stun_time, shovel.upgrade.upgrade.stun_time])
-	# The special weapons get theirs in part 4b.
-	for id: String in ["alphorn", "knoedelwerfer", "goassl", "mistgabel"]:
-		_check(_weapon(id).upgrade == null, "%s waits for part 4b" % id)
+	# The special weapons' twists (part 4b), doubled doppelt.
+	for id: String in ["alphorn", "knoedelwerfer", "handboeller", "rodelkanone", "harmonika", "brennkessel", "goassl", "mistgabel", "schmarrnpfanne", "krampusrute"]:
+		var one: WeaponData = _weapon(id).upgrade
+		_check(_weapon(id).twist == 0.0 and one.twist > 0.0 and is_equal_approx(one.upgrade.twist, one.twist * 2.0), "%s: twist %s, doppelt %s" % [id, one.twist, one.upgrade.twist])
 
 
 func _at_the_anvil() -> void:

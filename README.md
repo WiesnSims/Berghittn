@@ -265,7 +265,8 @@ python tools/weapons/dengel.py      # every upgradable weapon, both levels
 python tools/textures/engrave.py    # the engraved steel of the forged look (gun_forged.png)
 ```
 
-- The rules (damage, magazine, reserve, boss share, shot pitch, a melee weapon's twist) are in
+- The rules (damage, magazine, reserve, boss share, shot pitch, a melee or special weapon's twist,
+  `WeaponData.twist`, its meaning per behavior) are in
   `dengel.py`; `tests/m9_dengel` checks the files against them.
 - A dengelt weapon keeps its base's `family`, so wall-buys, the chest and the slots count it as
   that gun. `ForgedLook` (`scripts/weapons/forged_look.gd`) dresses its model: copies of the same

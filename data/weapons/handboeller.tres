@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/weapons/handboeller_viewmodel.tscn" id="2"]
+[ext_resource type="Resource" path="res://data/weapons/handboeller_dengelt.tres" id="up"]
 
 [resource]
 script = ExtResource("1")
@@ -25,6 +26,7 @@ projectile_speed = 22.0
 projectile_gravity = 9.8
 area_radius = 3.0
 viewmodel = ExtResource("2")
+upgrade = ExtResource("up")
 secondary = 5
 secondary_rounds = 2
 secondary_damage = 260
