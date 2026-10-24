@@ -4,7 +4,7 @@
 locale = "de"
 messages = {
 [&"", &"UI_TITLE"]: [&"Berghittn"],
-[&"", &"UI_CONTROLS"]: [&"WASD gehen  ·  Maus schauen  ·  LMT schießen  ·  RMT Waffenmodus  ·  V Nahkampf  ·  G / MMT werfen  ·  R nachladen  ·  1 / 2 / Mausrad Waffe wechseln  ·  E benutzen  ·  Leertaste springen  ·  Shift sprinten  ·  C ducken  ·  Esc Pause  ·  F3 Debug"],
+[&"", &"UI_CONTROLS"]: [&"WASD gehen  ·  Maus schauen  ·  LMT schießen  ·  RMT Waffenmodus  ·  V Nahkampf  ·  G / MMT werfen  ·  R nachladen  ·  1 / 2 / 3 / Mausrad Waffe wechseln  ·  E benutzen  ·  Leertaste springen  ·  Shift sprinten  ·  C ducken  ·  Esc Pause  ·  F3 Debug"],
 [&"", &"UI_PAUSE_TITLE"]: [&"Pause"],
 [&"", &"UI_PAUSE_HINT"]: [&"A kurze Jausn, dann geht's weida."],
 [&"", &"UI_RESUME"]: [&"Weiter"],
@@ -254,5 +254,8 @@ messages = {
 [&"", &"UI_DENGEL_NEED"]: [&"%s dengeln: %d Punkte nötig"],
 [&"", &"UI_DENGEL_COLD"]: [&"Die Esse is kalt bis Welle %d"],
 [&"", &"UI_DENGEL_WORKING"]: [&"Dei Waffe wird dengelt…"],
-[&"", &"UI_DENGEL_BUSY"]: [&"Da Schmied is beschäftigt"]
+[&"", &"UI_DENGEL_BUSY"]: [&"Da Schmied is beschäftigt"],
+[&"", &"UI_KRAXN"]: [&"E drücken: Kraxn umschnallen, für a dritte Waffe (%d)"],
+[&"", &"UI_KRAXN_NEED"]: [&"Kraxn: %d Punkte nötig"],
+[&"", &"EVENT_KRAXN"]: [&"Jetzt bist a richtiger Tragl!"]
 }

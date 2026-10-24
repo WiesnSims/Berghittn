@@ -127,7 +127,7 @@ func prompt_for(player: Player, for_melee: bool) -> String:
 			if player != _owner or for_melee != melee:
 				return ""
 			# A gun comes back into a free slot, or in place of the one in hand.
-			var key: String = "UI_CHEST_TAKE" if melee or player.weapons.gun_count() < Constants.GUN_SLOTS else "UI_CHEST_SWAP"
+			var key: String = "UI_CHEST_TAKE" if melee or player.weapons.has_free_slot() else "UI_CHEST_SWAP"
 			return tr(key) % tr(result.display_name)
 	return ""
 

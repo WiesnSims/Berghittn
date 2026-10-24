@@ -41,7 +41,8 @@ func setup(player: Player) -> void:
 	Net.roster_changed.connect(_sync_roster)
 	Events.wave_started.connect(_on_wave_started.unbind(2))
 	_player.life_changed.connect(_on_own_life_changed)
-	_player.weapons.weapon_changed.connect(func(data: WeaponData) -> void: _held.rpc(String(data.id) if data else ""))
+	_player.weapons.weapon_changed.connect(_send_held.unbind(1))
+	_player.weapons.slots_changed.connect(_send_held.unbind(1))
 	_player.weapons.acted.connect(_on_acted)
 	_player.equipment.threw.connect(_on_threw)
 	_player.perks.triggered.connect(_on_perk)
@@ -278,16 +279,36 @@ func _on_perk(id: StringName, _text: String) -> void:
 
 @rpc("any_peer", "call_remote", "reliable")
 func _ask_held() -> void:
-	var weapon: WeaponData = _player.weapons.weapon
-	_held.rpc_id(multiplayer.get_remote_sender_id(), String(weapon.id) if weapon else "")
+	_send_held(multiplayer.get_remote_sender_id())
+
+
+## What our hiker carries, to everyone (or to `peer`): the gun in hand, and with the Kraxn (#95) the
+## Kraxn and the guns strapped to it (the others carried).
+func _send_held(peer: int = 0) -> void:
+	var weapons: WeaponHolder = _player.weapons
+	var stowed := PackedStringArray()
+	for data: WeaponData in weapons.stowed():
+		stowed.append(String(data.id))
+	var held: String = String(weapons.weapon.id) if weapons.weapon else ""
+	if peer == 0:
+		_held.rpc(held, weapons.has_kraxn(), ",".join(stowed))
+	else:
+		_held.rpc_id(peer, held, weapons.has_kraxn(), ",".join(stowed))
 
 
 @rpc("any_peer", "call_remote", "reliable")
-func _held(weapon_id: String) -> void:
+func _held(weapon_id: String, kraxn: bool, stowed_ids: String) -> void:
 	var remote: Remote = _remotes.get(multiplayer.get_remote_sender_id())
+	if remote == null:
+		return
 	# Empty hands ("" or anything that is not a gun): their gun is at the Dengelstock.
-	if remote:
-		remote.hiker.hold(_load(WEAPONS, weapon_id) as WeaponData)
+	remote.hiker.hold(_load(WEAPONS, weapon_id) as WeaponData)
+	var stowed: Array[WeaponData] = []
+	for id: String in stowed_ids.split(",", false).slice(0, Constants.GUN_SLOTS + 1):
+		var data := _load(WEAPONS, id) as WeaponData
+		if data:
+			stowed.append(data)
+	remote.hiker.carry(kraxn, stowed)
 
 
 ## Their gun went off (or their melee weapon swung, struck, or went into its held mode), from `aim`.

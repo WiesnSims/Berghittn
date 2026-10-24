@@ -8,7 +8,7 @@ extends Node
 ## tapped, the Tourist's Eisstöcke, each paid in the guest's own game, with the host's banners; an
 ## enemy's line (Gredn) picked by the host is heard and shown on the guest; the guest's gun goes on
 ## the Dengelstock with the host's word, the anvil is busy for the host meanwhile, and the guest's
-## hiker shows empty hands, then the Gendarmen-Pistole.
+## hiker shows empty hands, then the Gendarmen-Pistole; the guest's Kraxn shows on its back.
 
 const TIMEOUT: float = 25.0
 const ALPHORN: WeaponData = preload("res://data/weapons/alphorn.tres")
@@ -182,6 +182,19 @@ func _run() -> bool:
 			return _fail("the guest's hiker does not hold the Gendarmen-Pistole")
 	print("dengelstock: the guest's pistol forged with the host's word, busy for the host, back as the Gendarmen-Pistole")
 	if not await _sync("dengel"):
+		return false
+	# --- die Kraxn (#95): the guest's on its hiker's back, the guns not in hand strapped to it ---
+	if not host:
+		_player.weapons.add_kraxn()
+		_player.weapons.give_weapon(ALPHORN)
+		_player.weapons.give_weapon(preload("res://data/weapons/stutzen.tres"))
+		if _player.weapons.gun_count() != 3:
+			return _fail("the guest's Kraxn holds no third gun (%d)" % _player.weapons.gun_count())
+	else:
+		if not await _until(func() -> bool: return other._kraxn != null and other._kraxn.visible and other._stowed != null and other._stowed.get_child_count() == 2):
+			return _fail("the guest's hiker shows no Kraxn with two guns on it")
+	print("kraxn: on the guest's hiker, two guns strapped to it")
+	if not await _sync("kraxn"):
 		return false
 	# --- the Krampus-Rute drop: one, for whoever is first ---
 	if host:

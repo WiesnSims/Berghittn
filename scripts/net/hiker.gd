@@ -31,6 +31,9 @@ var _trousers: StandardMaterial3D
 var _hands: Node3D
 var _gun: Node3D
 var _guns: Dictionary = {}
+# Die Kraxn on their back (#95), with the guns they carry but do not hold strapped to it.
+var _kraxn: Node3D
+var _stowed: Node3D
 
 
 func _ready() -> void:
@@ -93,6 +96,34 @@ func hold(data: WeaponData) -> void:
 		_guns[data.id] = _gun
 	if _gun:
 		_gun.visible = true
+
+
+## Die Kraxn on their back (or not), with `stowed` strapped to it, barrels up.
+func carry(kraxn: bool, stowed: Array[WeaponData]) -> void:
+	if not kraxn:
+		if _kraxn:
+			_kraxn.visible = false
+		return
+	if _kraxn == null:
+		_kraxn = Kraxn.model()
+		_kraxn.position = Constants.HIKER_KRAXN_AT
+		# Straps to their back, the load side out.
+		_kraxn.rotation.y = PI
+		rig.add_child(_kraxn)
+	_kraxn.visible = true
+	if _stowed:
+		_stowed.queue_free()
+	_stowed = Node3D.new()
+	_kraxn.add_child(_stowed)
+	for i: int in stowed.size():
+		if stowed[i].viewmodel == null:
+			continue
+		var gun: Node3D = WeaponPickup.model_of(stowed[i])
+		gun.scale = Vector3.ONE * Constants.HIKER_STOWED_SCALE
+		# Standing on the foot board, muzzle up, one on each side.
+		gun.rotation = Vector3(PI * 0.5, 0.0, 0.0)
+		gun.position = Vector3(-0.12 + 0.24 * (i % 2), 0.1, -0.06)
+		_stowed.add_child(gun)
 
 
 ## Their look up or down (rad), for the gun in their hands.

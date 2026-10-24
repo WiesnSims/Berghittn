@@ -11,6 +11,7 @@
 [ext_resource type="Material" path="res://assets/materials/linen.tres" id="tex_linen"]
 [ext_resource type="Material" path="res://assets/materials/wool_green.tres" id="tex_wool_green"]
 [ext_resource type="Material" path="res://assets/materials/wool_red.tres" id="tex_wool_red"]
+[ext_resource type="Script" path="res://scripts/zones/kraxn.gd" id="kraxn"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_shy4f"]
 _surfaces = [{
@@ -324,6 +325,10 @@ transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 7.3, 7.3, -11.45)
 polygon = PackedVector2Array(-5.15, 0, 5.15, 0, 0, 2.9734)
 depth = 0.3
 material = ExtResource("1")
+
+[node name="Kraxn" type="Node3D" parent="."]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -10.95, 3.5, -9.3)
+script = ExtResource("kraxn")
 
 [node name="AmmoCrate" type="Node3D" parent="." unique_id=1820843952 instance=ExtResource("9")]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -11, 3.5, -7.6)

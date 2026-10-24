@@ -282,7 +282,11 @@ Rules:
   Exception, the pistol (play-test 2026-10-17): spam-clicking must cost accuracy, so each shot adds
   1.5° (up to 6°) and it settles at 4°/s. Clicking about twice a second stays precise, ten a
   second sprays.
-- Slots: 2 gun slots (wonder weapons and the hand mortar use a gun slot),
+- Slots: 2 gun slots (wonder weapons and the hand mortar use a gun slot); a third with **die Kraxn**
+  (#95, user request 2026-10-24): the Alm farmers' wooden carrying frame on a hook in the
+  Matratzenlager, 2500, bought once, any weapon in the third slot (key 3), never lost (not when
+  going down, not when bleeding out). In co-op the others see it on the hiker's back with the guns
+  not in hand strapped to it. Banner: "Jetzt bist a richtiger Tragl!".
   1 melee slot (starts with the shovel, can be replaced), 1 equipment slot
   (stackable throwables, see section 6a).
 - **Hüttentruhe (mystery chest):** costs 1500, gives a random special weapon from the

@@ -4,7 +4,7 @@
 locale = "en"
 messages = {
 [&"", &"UI_TITLE"]: [&"Berghittn"],
-[&"", &"UI_CONTROLS"]: [&"WASD move  ·  Mouse look  ·  LMB shoot  ·  RMB weapon mode  ·  V melee  ·  G / MMB throw  ·  R reload  ·  1 / 2 / wheel switch gun  ·  E use  ·  Space jump  ·  Shift sprint  ·  C crouch  ·  Esc pause  ·  F3 debug"],
+[&"", &"UI_CONTROLS"]: [&"WASD move  ·  Mouse look  ·  LMB shoot  ·  RMB weapon mode  ·  V melee  ·  G / MMB throw  ·  R reload  ·  1 / 2 / 3 / wheel switch gun  ·  E use  ·  Space jump  ·  Shift sprint  ·  C crouch  ·  Esc pause  ·  F3 debug"],
 [&"", &"UI_PAUSE_TITLE"]: [&"Paused"],
 [&"", &"UI_PAUSE_HINT"]: [&"A quick Jause, then back to it."],
 [&"", &"UI_RESUME"]: [&"Resume"],
@@ -254,5 +254,8 @@ messages = {
 [&"", &"UI_DENGEL_NEED"]: [&"Dengeln the %s: %d points needed"],
 [&"", &"UI_DENGEL_COLD"]: [&"The forge is cold until wave %d"],
 [&"", &"UI_DENGEL_WORKING"]: [&"Your weapon is being dengelt…"],
-[&"", &"UI_DENGEL_BUSY"]: [&"The Schmied is busy"]
+[&"", &"UI_DENGEL_BUSY"]: [&"The Schmied is busy"],
+[&"", &"UI_KRAXN"]: [&"Press E to strap on the Kraxn: a third gun (%d)"],
+[&"", &"UI_KRAXN_NEED"]: [&"Kraxn: %d points needed"],
+[&"", &"EVENT_KRAXN"]: [&"Jetzt bist a richtiger Tragl!"]
 }

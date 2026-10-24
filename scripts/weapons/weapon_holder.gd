@@ -13,6 +13,8 @@ signal weapon_changed(data: WeaponData)
 ## The melee weapon on V changed (a melee wall-buy or the Hüttentruhe). It is never in hand, so the HUD
 ## has to say so (play-test #65: a Goaßl from the chest seemed to vanish).
 signal melee_changed(data: WeaponData)
+## The Kraxn was strapped on: one gun slot more (#95).
+signal slots_changed(count: int)
 ## Emitted when a shot hit an enemy, for the hit marker.
 signal hit_confirmed(is_headshot: bool, killed: bool)
 ## Co-op (M7): something the others should see (a shot, a swing, a held mode), for CoopPlayers to
@@ -43,6 +45,9 @@ class GunSlot:
 @export var ghost: bool = false
 ## Co-op (M7): downed, only the pistol is in hand; no switching, no melee (set_downed).
 var downed: bool = false
+## Gun slots: GUN_SLOTS, one more with die Kraxn on the back (#95). Kept for the whole match, going
+## down or bleeding out included.
+var slots: int = Constants.GUN_SLOTS
 var _starting_melee: WeaponData
 var _before_down: int = -1
 var _borrowed: bool = false
@@ -179,7 +184,7 @@ func give_weapon(data: WeaponData) -> void:
 		_select(owned)
 		return
 	var slot: GunSlot = _new_slot(data)
-	if _slots.size() < Constants.GUN_SLOTS or _current < 0:
+	if _slots.size() < slots or _current < 0:
 		_slots.append(slot)
 		_select(_slots.size() - 1)
 		return
@@ -431,6 +436,32 @@ func gun_count() -> int:
 	return _slots.size()
 
 
+## A free slot for one more gun (a new one would not replace the one in hand).
+func has_free_slot() -> bool:
+	return _slots.size() < slots
+
+
+## Die Kraxn (#95): a third gun slot.
+func has_kraxn() -> bool:
+	return slots > Constants.GUN_SLOTS
+
+
+func add_kraxn() -> void:
+	if has_kraxn():
+		return
+	slots = Constants.GUN_SLOTS + 1
+	slots_changed.emit(slots)
+
+
+## The guns carried but not in hand, for the Kraxn on a hiker's back.
+func stowed() -> Array[WeaponData]:
+	var out: Array[WeaponData] = []
+	for i: int in _slots.size():
+		if i != _current:
+			out.append(_slots[i].data)
+	return out
+
+
 func is_reloading() -> bool:
 	return _reload_left > 0.0
 
@@ -489,12 +520,16 @@ func _unhandled_input(event: InputEvent) -> void:
 	# Here and not in _physics_process: wheel "presses" are released in the same frame and would be missed.
 	if ghost or Input.mouse_mode != Input.MOUSE_MODE_CAPTURED or _melee_left > 0.0 or _slots.size() < 2 or downed or weapon == null:
 		return
-	if event.is_action_pressed("weapon_next") or event.is_action_pressed("weapon_previous"):
+	if event.is_action_pressed("weapon_next"):
 		_select((_current + 1) % _slots.size())
+	elif event.is_action_pressed("weapon_previous"):
+		_select((_current + _slots.size() - 1) % _slots.size())
 	elif event.is_action_pressed("weapon_slot_1"):
 		_select(0)
 	elif event.is_action_pressed("weapon_slot_2"):
 		_select(1)
+	elif event.is_action_pressed("weapon_slot_3"):
+		_select(2)
 
 
 func _physics_process(delta: float) -> void:
