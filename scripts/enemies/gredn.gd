@@ -15,7 +15,8 @@ extends Node3D
 ## his goodbye even sooner), and is heard from MANDL_VOICE_REACH.
 
 ## APPEAR, RUN and VANISH are the Venedigermandl's: as he turns up, as he runs, as he vanishes.
-enum Moment { SPOT, IDLE, BARRICADE, HIT, LUNGE, DEATH, APPEAR, RUN, VANISH }
+## AIM and SHOT are the Wilderer's: as he starts to aim, and when his shot hits.
+enum Moment { SPOT, IDLE, BARRICADE, HIT, LUNGE, DEATH, APPEAR, RUN, VANISH, AIM, SHOT }
 
 const LINE: Script = preload("res://scripts/effects/gredn_line.gd")
 
@@ -53,12 +54,18 @@ const LINES: Array = [
 	[&"venedigermandl", Moment.HIT, "Au, mei Gold!", &"gredn_venedigermandl_au"],
 	[&"venedigermandl", Moment.VANISH, "Arrivederci!", &"gredn_venedigermandl_arrivederci"],
 	[&"venedigermandl", Moment.DEATH, "Porca miseria…", &"gredn_venedigermandl_porca"],
+	[&"wilderer", Moment.SPOT, "Des is mei Revier!", &"gredn_wilderer_revier"],
+	[&"wilderer", Moment.IDLE, "Des is mei Revier!", &"gredn_wilderer_revier"],
+	[&"wilderer", Moment.AIM, "Hob di!", &"gredn_wilderer_hob_di"],
+	[&"wilderer", Moment.SHOT, "Waidmannsheil!", &"gredn_wilderer_waidmannsheil"],
+	[&"wilderer", Moment.DEATH, "Waidmannsdank…", &"gredn_wilderer_waidmannsdank"],
 ]
 const CHANCE: Dictionary = {
 	Moment.SPOT: Constants.GREDN_CHANCE_SPOT, Moment.IDLE: Constants.GREDN_CHANCE_IDLE,
 	Moment.BARRICADE: Constants.GREDN_CHANCE_BARRICADE, Moment.HIT: Constants.GREDN_CHANCE_HIT,
 	Moment.LUNGE: Constants.GREDN_CHANCE_LUNGE, Moment.DEATH: Constants.GREDN_CHANCE_DEATH,
 	Moment.APPEAR: 1.0, Moment.RUN: 1.0, Moment.VANISH: 1.0,
+	Moment.AIM: Constants.GREDN_CHANCE_AIM, Moment.SHOT: Constants.GREDN_CHANCE_SHOT,
 }
 
 static var current: Gredn

@@ -2,6 +2,7 @@
 filter per enemy type. The filters are the ones the user approved from the samples (2026-10-23):
 the Wanderer and the Tourist clean (no breath hiss), the Knappe, the Perchte and the Krampus as first
 sampled. The Venedigermandl (M9 part 5a): quick, high and giggly, clean; his Italian in eSpeak's Italian.
+The Wilderer (M9 part 5b): low and gruff, a little rasp, out in the open (a short slap of echo).
 
 eSpeak NG (GPL-3) is only a tool on the dev machine, never shipped; the audio it makes is ours.
     winget install --id eSpeak-NG.eSpeak-NG -e      (or set ESPEAK to the espeak-ng executable)
@@ -128,6 +129,15 @@ def krampus(text):
 
 
 
+def wilderer(text):
+    """Low and gruff, some rasp and grit, a short echo off the mountainside."""
+    x, sr = speak(text, "de+m3", 135, 28)
+    x = at_pitch(x, sr, 0.8)
+    x = d.drive(d.normalize(rasp(x, 0.6)), 1.8)
+    x = d.lowpass(x, 3000)
+    return finish(d.echo(x, 0.28, 0.2, 2), 0.12, 0.8)
+
+
 def mandl(text, voice="de+m4"):
     """Quick and high, a giggly wobble on it, clean (no hiss), a small dry room."""
     x, sr = speak(text, voice, 185, 80)
@@ -188,6 +198,10 @@ LINES = {
     "gredn_venedigermandl_arrivederci": (mandl_it, "Arrivederci!"),
     "gredn_venedigermandl_porca": (mandl_it, "Porca miseria."),
     "gredn_venedigermandl_giggle": (giggle, ""),
+    "gredn_wilderer_revier": (wilderer, "Des is mei Revier!"),
+    "gredn_wilderer_hob_di": (wilderer, "Hob di!"),
+    "gredn_wilderer_waidmannsheil": (wilderer, "Waidmannsheil!"),
+    "gredn_wilderer_waidmannsdank": (wilderer, "Waidmannsdank."),
 }
 
 

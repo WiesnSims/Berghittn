@@ -37,6 +37,15 @@ extends Resource
 @export var lunge_speed: float = 11.0
 @export var lunge_time: float = 0.35
 @export var lunge_cooldown: float = 3.0
+## A gun (the Wilderer, M9 part 5b): with a player shot_range_min..shot_range_max m off in sight he
+## stops, aims for aim_time (a glint and a click: the moment to take cover) and fires once for
+## shot_damage, then moves on for shot_cooldown. Nearer than WILDERER_CLOSE he goes for them with the
+## stock (`damage`). 0 shot_damage: no gun.
+@export var shot_damage: int = 0
+@export var shot_range_min: float = 12.0
+@export var shot_range_max: float = 25.0
+@export var aim_time: float = 1.2
+@export var shot_cooldown: float = 3.0
 ## Boss (Krampus): announced, gets a health bar, and is immune to crowd control (section 6a).
 @export var is_boss: bool = false
 ## Treasure (the Venedigermandl, M9 part 5a): never attacks, runs from the players, vanishes after

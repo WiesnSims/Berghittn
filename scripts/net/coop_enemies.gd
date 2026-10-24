@@ -87,6 +87,7 @@ func _announce(enemy: Enemy) -> void:
 		enemy.posed.connect(_on_posed)
 		enemy.said.connect(_on_said)
 		enemy.vanished.connect(_on_vanished)
+		enemy.fired.connect(_on_fired)
 	_spawned.rpc(enemy.net_id, String(enemy.data.id), _waves.wave, enemy.global_transform, enemy.health)
 
 
@@ -146,6 +147,12 @@ func _on_killed(node: Node3D, is_headshot: bool, is_melee: bool, source: Node3D)
 	_killed.rpc(enemy.net_id, is_headshot, is_melee, Coop.peer_of(source), enemy.last_damage)
 	_by_id.erase(enemy.net_id)
 	enemy.net_id = 0
+
+
+## The Wilderer fired: the bang and the streak on every guest (the damage goes as usual).
+func _on_fired(enemy: Enemy, at: Vector3) -> void:
+	if enemy.net_id != 0:
+		_fired.rpc(enemy.net_id, at)
 
 
 ## The Venedigermandl vanished (after his last line went out).
@@ -261,6 +268,13 @@ func _damaged(id: int, amount: int, is_headshot: bool, peer: int, health_left: i
 	var puppet: Enemy = _by_id.get(id)
 	if puppet:
 		puppet.puppet_damaged(amount, is_headshot, Coop.node_of(peer), health_left, peer == Net.my_id())
+
+
+@rpc("authority", "call_remote", "reliable")
+func _fired(id: int, at: Vector3) -> void:
+	var puppet: Enemy = _by_id.get(id)
+	if puppet:
+		puppet.puppet_fire(at)
 
 
 @rpc("authority", "call_remote", "reliable")

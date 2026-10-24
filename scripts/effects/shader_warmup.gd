@@ -33,6 +33,7 @@ const EFFECTS: Array[Script] = [
 	preload("res://scripts/effects/gredn_line.gd"),
 	preload("res://scripts/effects/dengel_sparks.gd"),
 	preload("res://scripts/effects/mandl_gold.gd"),
+	preload("res://scripts/effects/scope_glint.gd"),
 ]
 
 ## The world this warms up for (main's World); its materials are collected from it.

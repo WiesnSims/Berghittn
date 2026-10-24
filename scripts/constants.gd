@@ -346,6 +346,9 @@ const GREDN_CHANCE_BARRICADE: float = 0.7
 const GREDN_CHANCE_HIT: float = 0.6
 const GREDN_CHANCE_LUNGE: float = 0.7
 const GREDN_CHANCE_DEATH: float = 0.5
+## The Wilderer (M9 part 5b): as he starts to aim, and when his shot hits.
+const GREDN_CHANCE_AIM: float = 0.5
+const GREDN_CHANCE_SHOT: float = 0.7
 ## A hit "hard" enough for a line takes at least this share of the enemy's health and leaves it alive.
 const GREDN_HARD_HIT: float = 0.3
 ## The text over the head: height over the feet (m, at model scale 1), size on screen, the seconds
@@ -690,3 +693,24 @@ const MANDL_GLOW_RANGE: float = 4.0
 ## Coins knocked out per hit, and spilt from the whole sack when he dies.
 const MANDL_HIT_COINS: int = 10
 const MANDL_KILL_COINS: int = 90
+
+# --- Da Wilderer (M9 part 5b, GAME_DESIGN section 12; the rest is in data/enemies/wilderer.tres) ---
+## Nearer than this (m) he comes for the player with the stock instead of shooting.
+const WILDERER_CLOSE: float = 6.0
+## His aim locks on where the target is this long (s) before the shot: moving then dodges it.
+const WILDERER_AIM_LOCK: float = 0.25
+## He aims at this height on the target (m, from its feet), and sees from this height.
+const WILDERER_AIM_HEIGHT: float = 1.2
+const WILDERER_EYE_HEIGHT: float = 1.5
+## The shot hits whoever is within this (m) of its line, nearest first, unless a wall is in the way.
+const WILDERER_HIT_RADIUS: float = 0.45
+## After a shot he moves on: to a spot this far (m) off, tried at these angles (degrees) from
+## straight away from the target, for at most this long (s).
+const WILDERER_MOVE: float = 6.0
+const WILDERER_MOVE_ANGLES: Array[float] = [90.0, -90.0, 60.0, -60.0, 120.0, -120.0, 30.0, -30.0]
+const WILDERER_MOVE_TIME: float = 2.5
+## The muzzle and the scope's lens on his model (built rest space, on the right hand bone).
+const WILDERER_MUZZLE: Vector3 = Vector3(0.26, 0.13, -0.075)
+const WILDERER_SCOPE: Vector3 = Vector3(0.26, 0.56, -0.125)
+## His old rifle: the Stutzen's shot, lower.
+const WILDERER_SHOT_PITCH: float = 0.78

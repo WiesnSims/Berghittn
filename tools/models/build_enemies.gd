@@ -35,6 +35,7 @@ func _init() -> void:
 	_perchte()
 	_krampus()
 	_mandl()
+	_wilderer()
 	_guest()
 	print("enemy models built")
 	quit()
@@ -378,6 +379,64 @@ func _krampus() -> void:
 				&"forearm_r": Vector3(25, 0, 0), &"chest": Vector3(-14, 0, 0), &"head": Vector3(10, 0, 0),
 				&"thigh_l": Vector3(8, 0, -6), &"thigh_r": Vector3(8, 0, 6), &"shin_l": Vector3(-14, 0, 0), &"shin_r": Vector3(-14, 0, 0)},
 		"stride": 22.0, "arm_swing": 12.0, "cadence": 1.1})
+
+
+## Da Wilderer (M9 part 5b): a dead poacher in a loden jacket, a wide hat with a Gamsbart, a
+## bandolier, and his old scoped rifle. The rifle lies along his right forearm (the hand bone): stock
+## up past the wrist, barrel down past the hand, so with the arm raised straight forward (the rig's
+## AIM) it points ahead and the stock comes back to the shoulder. Its muzzle and scope are
+## Constants.WILDERER_MUZZLE / WILDERER_SCOPE.
+func _wilderer() -> void:
+	var b := Builder.new(_scale("wilderer"))
+	_standard(b)
+	var loden := Color(0.27, 0.33, 0.22)
+	var breeches := Color(0.22, 0.17, 0.12)
+	var leather := Color(0.32, 0.2, 0.1)
+	var hat := Color(0.16, 0.15, 0.13)
+	_torso(b, [[0.78, 0.18, 0.13], [0.86, 0.175, 0.13], [1.0, 0.17, 0.125], [WAIST.y, 0.175, 0.125], [1.25, 0.21, 0.135], [1.4, 0.235, 0.135], [1.47, 0.17, 0.1], [1.5, 0.07, 0.06]], &"wool", loden, 9)
+	# Leather breeches, grey knee socks, heavy boots.
+	_torso(b, [[0.74, 0.18, 0.13], [0.88, 0.18, 0.135]], &"leather", breeches)
+	_legs(b, Vector2(0.088, 0.092), Vector2(0.055, 0.058), &"leather", breeches, &"wool", Color(0.5, 0.48, 0.44))
+	_boots(b, Color(0.14, 0.1, 0.07), Vector3(0.125, 0.18, 0.28))
+	_arms(b, Vector2(0.068, 0.068), Vector2(0.05, 0.05), &"wool", loden)
+	_hands(b, ZOMBIE_SKIN)
+	# Horn buttons, the bandolier across the chest with its cartridges, a game bag at the hip.
+	for i: int in 4:
+		b.box(Vector3(0.0, 1.36 - i * 0.11, -0.135), Vector3(0.028, 0.028, 0.02), &"wood", Color(0.3, 0.22, 0.14), &"chest" if 1.36 - i * 0.11 > WAIST.y else &"hips")
+	for i: int in 7:
+		var t: float = float(i) / 6.0
+		var at: Vector3 = Vector3(0.2, 1.42, -0.12).lerp(Vector3(-0.17, 1.0, -0.15), t) + Vector3(0, 0, -0.025 * sin(t * PI))
+		b.box(at, Vector3(0.055, 0.05, 0.03), &"leather", leather, &"chest" if at.y > WAIST.y else &"hips", Basis(Vector3.FORWARD, -0.85))
+		b.box(at + Vector3(0, 0.035, -0.012), Vector3(0.012, 0.03, 0.012), &"metal", Color(0.8, 0.62, 0.3), &"chest" if at.y > WAIST.y else &"hips")
+	b.box(Vector3(-0.2, 0.92, 0.04), Vector3(0.08, 0.2, 0.22), &"leather", leather.darkened(0.15), &"hips", Basis.IDENTITY, Vector2(0.8, 0.8))
+	# The rifle, along the right hand: stock up the forearm, barrel down past the hand, scope on top.
+	var hand_r := Vector3(-WRIST.x, WRIST.y - 0.07, 0.0)
+	var wood := Color(0.36, 0.22, 0.12)
+	var steel := Color(0.2, 0.2, 0.22)
+	b.box(hand_r + Vector3(0, 0.28, -0.03), Vector3(0.045, 0.34, 0.1), &"wood", wood, &"hand_r", Basis.IDENTITY, Vector2(0.8, 0.7))
+	b.box(hand_r + Vector3(0, 0.03, -0.045), Vector3(0.04, 0.2, 0.06), &"wood", wood, &"hand_r")
+	b.box(hand_r + Vector3(0, -0.28, -0.06), Vector3(0.042, 0.42, 0.045), &"wood", wood, &"hand_r", Basis.IDENTITY, Vector2(0.9, 0.9))
+	b.tube([hand_r + Vector3(0, -0.02, -0.075), hand_r + Vector3(0, -0.7, -0.075)], [Vector2(0.014, 0.014), Vector2(0.012, 0.012)], &"metal", steel, &"hand_r", 6, true, Vector3.FORWARD)
+	b.tube([hand_r + Vector3(0, 0.02, -0.125), hand_r + Vector3(0, -0.26, -0.125)], [Vector2(0.022, 0.022), Vector2(0.026, 0.026)], &"metal", Color(0.08, 0.08, 0.09), &"hand_r", 8, true, Vector3.FORWARD)
+	b.box(hand_r + Vector3(0, -0.12, -0.1), Vector3(0.015, 0.06, 0.03), &"metal", steel, &"hand_r")
+	_face(b, ZOMBIE_SKIN)
+	b.head(true)
+	# Grey stubble, a drooping moustache, the wide hat with its Gamsbart.
+	b.box(Vector3(0.0, 1.535, -0.09), Vector3(0.17, 0.06, 0.08), &"fur", Color(0.4, 0.4, 0.38), &"head", Basis.IDENTITY, Vector2(0.6, 0.6))
+	b.box(Vector3(0.0, 1.578, -0.142), Vector3(0.1, 0.022, 0.025), &"fur", Color(0.32, 0.3, 0.28), &"head")
+	b.tube([Vector3(0.0, 1.72, -0.02), Vector3(0.0, 1.735, -0.02)], [Vector2(0.24, 0.24), Vector2(0.23, 0.23)], &"wool", hat, &"head", 12)
+	b.tube([Vector3(0.0, 1.73, -0.02), Vector3(0.0, 1.8, -0.02), Vector3(0.0, 1.85, -0.02)], [Vector2(0.125, 0.13), Vector2(0.12, 0.125), Vector2(0.1, 0.105)], &"wool", hat, &"head", 10)
+	b.tube([Vector3(0.0, 1.74, -0.02), Vector3(0.0, 1.765, -0.02)], [Vector2(0.127, 0.132), Vector2(0.125, 0.13)], &"leather", leather, &"head", 10, false)
+	b.spike([Vector3(0.0, 1.78, 0.11), Vector3(0.015, 1.85, 0.15), Vector3(0.03, 1.9, 0.19)], 0.075, &"fur", Color(0.42, 0.36, 0.3), &"head", 6)
+	b.head(false)
+	b.ragdoll({&"arm_l": 0.068, &"forearm_l": 0.05, &"arm_r": 0.068, &"forearm_r": 0.05,
+			&"thigh_l": 0.088, &"shin_l": 0.058, &"thigh_r": 0.088, &"shin_r": 0.058},
+			Vector3(0.34, 0.22, 0.26), Vector3(0.42, 0.38, 0.28), 0.13)
+	b.save(OUT + "/wilderer.tscn", "WildererModel", RIG, {
+		"build_scale": b.scale, "one_handed": true,
+		"stance": {&"arm_r": Vector3(35, 0, 8), &"forearm_r": Vector3(45, 0, 0), &"arm_l": Vector3(45, 0, 22),
+				&"forearm_l": Vector3(45, 0, 0), &"chest": Vector3(-10, 0, 0), &"head": Vector3(8, 0, 0)},
+		"stride": 26.0, "arm_swing": 6.0, "cadence": 1.5})
 
 
 ## Das Venedigermandl (M9 part 5a): a small hunched man from Venice in a long dark coat and a pointed

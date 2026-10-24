@@ -252,6 +252,7 @@ messages = {
 [&"", &"EVENT_MANDL"]: [&"Do glanzt wos!"],
 [&"", &"MARKER_MANDL"]: [&"Venedigermandl"],
 [&"", &"ENEMY_VENEDIGERMANDL"]: [&"Venedigermandl"],
+[&"", &"ENEMY_WILDERER"]: [&"Wilderer"],
 [&"", &"UI_DENGEL"]: [&"Press E to have the %s dengelt (%d)"],
 [&"", &"UI_DENGEL_TWICE"]: [&"Press E to have the %s doppelt dengelt (%d)"],
 [&"", &"UI_DENGEL_NEED"]: [&"Dengeln the %s: %d points needed"],

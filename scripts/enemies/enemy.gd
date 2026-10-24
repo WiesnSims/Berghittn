@@ -12,10 +12,16 @@ signal posed(enemy: Enemy, action: EnemyRig.Action, length: float)
 signal said(enemy: Enemy, line: int)
 ## It vanished alive (the Venedigermandl, M9 part 5a; solo and host), for co-op to pass on.
 signal vanished(enemy: Enemy)
+## It fired its gun (the Wilderer, M9 part 5b; solo and host), the shot ending at `at`, for co-op.
+signal fired(enemy: Enemy, at: Vector3)
 
 ## QUEUED: waiting at a window another enemy is working. BREAKING: tearing boards off a barricade.
-## LUNGING: crouching for and then flying through a leap at the player (Perchte).
-enum State { INACTIVE, CHASING, QUEUED, BREAKING, CLIMBING, ATTACKING, LUNGING, DEAD }
+## LUNGING: crouching for and then flying through a leap at the player (Perchte). AIMING: standing
+## with the rifle up (Wilderer).
+enum State { INACTIVE, CHASING, QUEUED, BREAKING, CLIMBING, ATTACKING, LUNGING, DEAD, AIMING }
+
+## The Wilderer's shot, as a streak.
+const TRAIL: Script = preload("res://scripts/effects/ricochet_trail.gd")
 
 @onready var _agent: NavigationAgent3D = $NavigationAgent3D
 @onready var _visual: Node3D = $Visual
@@ -127,6 +133,15 @@ var _announced: bool = false
 var _glow: OmniLight3D
 var _marker: MapMarker
 var _gold: MandlGold
+# The Wilderer (EnemyData.shot_damage): seconds into the aim, the point aimed at and whether it is
+# locked, seconds before he may aim again, the spot he moves on to and for how long, his glint.
+var _aim_time: float = 0.0
+var _aim_point: Vector3
+var _aim_locked: bool = false
+var _shot_left: float = 0.0
+var _move_goal: Vector3
+var _move_left: float = 0.0
+var _glint: ScopeGlint
 ## The corpses being simulated now, oldest first (at most Constants.RAGDOLL_MAX).
 static var _ragdolls: Array[Enemy] = []
 
@@ -159,6 +174,8 @@ func activate(enemy_data: EnemyData, for_wave: int, at: Transform3D) -> void:
 	health = data.health_for_wave(wave)
 	max_health = health
 	_lunge_cooldown_left = 0.0
+	_shot_left = 0.0
+	_move_left = 0.0
 	_dance_left = 0.0
 	_stun_left = 0.0
 	_flee_left = 0.0
@@ -408,7 +425,7 @@ func _hurling(delta: float) -> void:
 
 
 func _drop_swing() -> void:
-	if _state == State.ATTACKING:
+	if _state == State.ATTACKING or _state == State.AIMING:
 		_kill_tween()
 		_visual.rotation.x = 0.0
 		_state = State.CHASING
@@ -420,7 +437,7 @@ func is_dancing() -> bool:
 
 
 func _can_dance() -> bool:
-	return _state == State.CHASING or _state == State.ATTACKING or _state == State.QUEUED
+	return _state == State.CHASING or _state == State.ATTACKING or _state == State.QUEUED or _state == State.AIMING
 
 
 func _flinch(is_headshot: bool) -> void:
@@ -472,6 +489,8 @@ func _physics_process(delta: float) -> void:
 		_step(delta)
 	if _rig == null:
 		return
+	if data.shot_damage > 0:
+		_update_glint()
 	if is_alive():
 		_rig.update(delta, Vector2(velocity.x, velocity.z).length())
 		# You hit what you see: the head hurtbox stays on the head as it hunches, swings and dives.
@@ -482,6 +501,7 @@ func _physics_process(delta: float) -> void:
 
 func _step(delta: float) -> void:
 	_lunge_cooldown_left -= delta
+	_shot_left -= delta
 	talk_left -= delta
 	_speaking_left -= delta
 	if data and data.treasure and is_alive():
@@ -504,7 +524,7 @@ func _step(delta: float) -> void:
 	_scorch_paid_left -= delta
 	if not _dots.is_empty() and is_alive():
 		_tick_dots(delta)
-	if _knock != Vector3.ZERO and (_state == State.CHASING or _state == State.ATTACKING or _state == State.QUEUED):
+	if _knock != Vector3.ZERO and (_state == State.CHASING or _state == State.ATTACKING or _state == State.QUEUED or _state == State.AIMING):
 		_knocked(delta)
 		return
 	if _lifted:
@@ -554,6 +574,8 @@ func _step(delta: float) -> void:
 			_attack(delta)
 		State.LUNGING:
 			_lunge(delta)
+		State.AIMING:
+			_aim(delta)
 		State.DEAD:
 			_fall(delta)
 
@@ -613,6 +635,8 @@ func apply_knockback(push: Vector3) -> void:
 	if puppet:
 		_relay(&"apply_knockback", [push])
 		return
+	if _state == State.AIMING:
+		_drop_swing()
 	_knock = _flat(push)
 	if is_on_floor():
 		velocity.y = Constants.ENEMY_KNOCKBACK_HOP
@@ -656,6 +680,8 @@ func _chase(delta: float) -> void:
 		Gredn.moment(self, Gredn.Moment.SPOT)
 	if _in_attack_range():
 		_start_attack()
+		return
+	if data.shot_damage > 0 and _ranged(delta):
 		return
 	if _can_lunge():
 		_start_lunge()
@@ -1251,6 +1277,14 @@ func puppet_pose(action: EnemyRig.Action, length: float) -> void:
 			_voice(&"enemy_attack")
 		EnemyRig.Action.CLIMB:
 			Sound.play_at(&"window_climb", global_position)
+		EnemyRig.Action.AIM:
+			Sound.play_at(&"bolt_open", mouth())
+
+
+## The host's Wilderer fired, the shot ending at `at`: the bang and the streak here.
+func puppet_fire(at: Vector3) -> void:
+	if is_alive():
+		_shot_fx(_muzzle(), at)
 
 
 ## On our fork or flying off it: we move it, not the host's snapshots.
@@ -1303,6 +1337,154 @@ func _puppet_step(delta: float) -> void:
 	_groan_left -= delta
 	if _groan_left <= 0.0:
 		_groan()
+
+
+# --- Da Wilderer (M9 part 5b, EnemyData.shot_damage) ------------------------------------------------
+
+## Between the stock (close) and too far: moving on after a shot, standing while he reloads, or
+## stopping to aim at a player he can see. False: he walks on (or in) as anyone would.
+func _ranged(delta: float) -> bool:
+	if _move_left > 0.0:
+		_move_left -= delta
+		if _flat(_move_goal - global_position).length() > 0.6:
+			_walk_towards(_move_goal, delta)
+			return true
+		_move_left = 0.0
+		_repath_left = 0.0
+	var distance: float = _flat(_target.global_position - global_position).length()
+	if distance < Constants.WILDERER_CLOSE or distance > data.shot_range_max or not is_on_floor() or not _gun_sees(_target):
+		return false
+	if _shot_left > 0.0:
+		_halt(delta)
+		_face(_flat(_target.global_position - global_position), delta)
+		return true
+	if distance < data.shot_range_min and _move_on(data.shot_range_min - distance):
+		return true
+	_start_aim()
+	return true
+
+
+## Off to a spot about WILDERER_MOVE (at least `at_least`) away, sideways or back from the target,
+## that keeps him in range and can be walked to without a window. False if there is none.
+func _move_on(at_least: float = 0.0) -> bool:
+	var world: World3D = get_world_3d()
+	var away: Vector3 = _flat(global_position - _target.global_position)
+	away = away.normalized() if away.length_squared() > 0.0001 else global_basis.z
+	var flip: float = 1.0 if randf() < 0.5 else -1.0
+	var reach: float = maxf(Constants.WILDERER_MOVE, at_least)
+	for angle: float in Constants.WILDERER_MOVE_ANGLES:
+		var spot: Vector3 = NavigationServer3D.map_get_closest_point(world.navigation_map,
+				global_position + away.rotated(Vector3.UP, deg_to_rad(angle * flip)) * reach)
+		if _flat(spot - global_position).length() < reach * 0.5:
+			continue
+		var off: float = _flat(spot - _target.global_position).length()
+		if off < Constants.WILDERER_CLOSE or off > data.shot_range_max:
+			continue
+		if not EventDirector.walkable(world, global_position, spot):
+			continue
+		_move_goal = spot
+		_move_left = Constants.WILDERER_MOVE_TIME
+		_repath_left = 0.0
+		return true
+	return false
+
+
+## No wall between his eyes and the target's chest.
+func _gun_sees(target: Node3D) -> bool:
+	var query := PhysicsRayQueryParameters3D.create(global_position + Vector3.UP * Constants.WILDERER_EYE_HEIGHT,
+			_aim_at(target), Constants.LAYER_WORLD)
+	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
+
+
+func _aim_at(target: Node3D) -> Vector3:
+	return target.global_position + Vector3.UP * Constants.WILDERER_AIM_HEIGHT
+
+
+func _start_aim() -> void:
+	_state = State.AIMING
+	_aim_time = 0.0
+	_aim_locked = false
+	_aim_point = _aim_at(_target)
+	_pose(EnemyRig.Action.AIM, data.aim_time)
+	# The bolt worked: the moment to get into cover.
+	Sound.play_at(&"bolt_open", mouth())
+	Gredn.moment(self, Gredn.Moment.AIM)
+
+
+## Standing, rifle up, following the target until the aim locks a moment before the shot.
+func _aim(delta: float) -> void:
+	_halt(delta)
+	if _target == null or not _target.is_targetable():
+		_drop_swing()
+		return
+	_aim_time += delta
+	if not _aim_locked:
+		_aim_point = _aim_at(_target)
+		_aim_locked = _aim_time >= data.aim_time - Constants.WILDERER_AIM_LOCK
+	_face(_flat(_aim_point - global_position), delta)
+	if _aim_time >= data.aim_time:
+		_fire()
+
+
+## One shot along the locked aim: walls stop it, the first player (or escort) within
+## WILDERER_HIT_RADIUS of its line takes it. Then he moves on.
+func _fire() -> void:
+	var from: Vector3 = _muzzle()
+	var direction: Vector3 = (_aim_point - from).normalized()
+	var to: Vector3 = from + direction * (data.shot_range_max + 10.0)
+	var query := PhysicsRayQueryParameters3D.create(from, to, Constants.LAYER_WORLD)
+	var wall: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
+	if not wall.is_empty():
+		to = wall.position
+	var best: float = from.distance_to(to)
+	var victim: Node3D = null
+	for node: Node in get_tree().get_nodes_in_group("player") + get_tree().get_nodes_in_group("escorts"):
+		var body := node as Node3D
+		if body == null or not body.is_targetable():
+			continue
+		# The nearest point of the line to the body's middle, inside its upright column.
+		var along: float = (body.global_position + Vector3.UP * 0.9 - from).dot(direction)
+		var point: Vector3 = from + direction * along
+		var height: float = point.y - body.global_position.y
+		if along > 0.0 and along < best and height > 0.0 and height < Constants.PLAYER_STAND_HEIGHT \
+				and _flat(point - body.global_position).length() <= Constants.WILDERER_HIT_RADIUS:
+			best = along
+			victim = body
+	if victim:
+		to = from + direction * best
+		victim.take_damage(data.shot_damage, self)
+		Gredn.moment(self, Gredn.Moment.SHOT)
+	_shot_fx(from, to)
+	fired.emit(self, to)
+	_pose(EnemyRig.Action.SHOOT, 0.5)
+	_state = State.CHASING
+	_shot_left = data.shot_cooldown
+	_move_on()
+
+
+func _shot_fx(from: Vector3, to: Vector3) -> void:
+	Sound.play_at(&"shot_stutzen", from, 0.0, Constants.WILDERER_SHOT_PITCH)
+	var trail := Node3D.new()
+	trail.set_script(TRAIL)
+	trail.set("points", PackedVector3Array([from, to]))
+	get_parent().add_child(trail)
+
+
+func _muzzle() -> Vector3:
+	return _rig.point_on(&"hand_r", Constants.WILDERER_MUZZLE * _rig.build_scale) if _rig else mouth()
+
+
+## The glint off his scope while he aims (here and on co-op puppets alike, from the rig's pose).
+func _update_glint() -> void:
+	var aiming: bool = is_alive() and _rig.action() == EnemyRig.Action.AIM
+	if not aiming:
+		if _glint:
+			_glint.visible = false
+		return
+	if _glint == null:
+		_glint = ScopeGlint.new()
+		_visual.add_child(_glint)
+	_glint.shine(_rig.point_on(&"hand_r", Constants.WILDERER_SCOPE * _rig.build_scale), _rig.action_share())
 
 
 # --- Das Venedigermandl (M9 part 5a, EnemyData.treasure) ------------------------------------------

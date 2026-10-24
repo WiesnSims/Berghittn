@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/wilderer.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"wilderer"
+display_name = "ENEMY_WILDERER"
+base_health = 250
+health_per_wave = 30
+speed = 3.0
+damage = 30
+attack_range = 1.5
+attack_windup = 0.5
+attack_cooldown = 1.2
+climb_time = 2.2
+board_break_time = 0.45
+head_pop_damage = 120
+model = ExtResource("2")
+shot_damage = 25
+shot_range_min = 12.0
+shot_range_max = 25.0
+aim_time = 1.2
+shot_cooldown = 3.0
+groan_sounds = Array[StringName]([&"groan_wanderer", &"groan_knappe"])
+voice_pitch = 0.85
