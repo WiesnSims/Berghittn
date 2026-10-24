@@ -116,6 +116,15 @@ const RESI_BOLT_SPEED: float = 6.0
 # Seconds between her moos (random in between).
 const RESI_MOO_MIN: float = 7.0
 const RESI_MOO_MAX: float = 15.0
+## Playing fair (#94, play-test 2026-10-24): her bell lures only this many seconds after a player first
+## came near; then she takes this many blows before she bolts, each enemy at her striking once every
+## RESI_HIT_INTERVAL seconds (the first one that long after it got to her).
+const RESI_NOTICE_GRACE: float = 5.0
+const RESI_HEALTH: int = 3
+const RESI_HIT_INTERVAL: float = 1.5
+## Her health bar over her back: how high (m), how wide and how tall.
+const RESI_BAR_HEIGHT: float = 2.0
+const RESI_BAR_SIZE: Vector2 = Vector2(0.9, 0.1)
 
 # Random events: from which wave, the chance per wave, and when in the wave (seconds).
 const RANDOM_EVENT_FIRST_WAVE: int = 2
