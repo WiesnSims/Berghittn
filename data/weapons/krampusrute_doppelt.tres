@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/krampusrute_viewmodel.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"krampusrute_doppelt"
+level = 2
+family = &"krampusrute"
+boss_multiplier = 0.5625
+sound_pitch = 0.75
+twist = 6.0
+is_melee = true
+display_name = "WEAPON_KRAMPUSRUTE_2"
+damage = 600
+headshot_multiplier = 1.0
+fire_rate = 1.4
+mag_size = 0
+reserve_ammo = 0
+reload_time = 0.0
+range = 2.0
+knockback = 3.0
+area_angle = 35.0
+cost = 0
+ammo_cost = 0
+behavior = &"krampusrute"
+viewmodel = ExtResource("2")
+secondary = 5
+secondary_range = 8.0
+aim_move_multiplier = 0.6
+swing_sound = &"swing"
+hit_sound = &"rute_hit"

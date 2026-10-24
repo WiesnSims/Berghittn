@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/rodelkanone_viewmodel.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"rodelkanone_doppelt"
+level = 2
+family = &"rodelkanone"
+boss_multiplier = 0.5625
+sound_pitch = 0.75
+twist = 2.0
+display_name = "WEAPON_RODELKANONE_2"
+damage = 1200
+headshot_multiplier = 1.0
+fire_rate = 0.4
+mag_size = 8
+reserve_ammo = 48
+reload_time = 3.5
+recoil_pitch = 6.0
+recoil_yaw = 1.5
+range = 15.0
+cost = 0
+ammo_cost = 0
+behavior = &"rodelkanone"
+knockback = 9.0
+shake = 0.8
+projectile_speed = 14.0
+projectile_gravity = 18.0
+cycle_ring = true
+viewmodel = ExtResource("2")
+secondary = 5
+secondary_rounds = 2
+secondary_damage = 1200
+secondary_range = 25.0
+secondary_shake = 1.4
+fire_sound = &"rodel_launch"
+secondary_sound = &"rodel_launch"
+hit_sound = &"rodel_hit"
+reload_sound = &"load_clunk"
+reload_end_sound = &"load_ready"

@@ -52,6 +52,14 @@ func revive(share: float) -> void:
 	changed.emit(current(), max_health)
 
 
+## Some health back, up to the maximum (the Musikantenstadl-Harmonika's dancers).
+func heal(amount: int) -> void:
+	if amount <= 0 or _health <= 0.0:
+		return
+	_health = minf(_health + amount, max_health)
+	changed.emit(current(), max_health)
+
+
 func heal_full() -> void:
 	_health = max_health
 	changed.emit(current(), max_health)

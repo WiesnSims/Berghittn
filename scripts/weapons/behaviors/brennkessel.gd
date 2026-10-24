@@ -5,6 +5,8 @@ extends WeaponBehavior
 ## 3 s after it last stood in the flame. Bosses burn too.
 ## Right click, the Brennlacke: a gulp of 20 fuel squirted in an arc; where it comes down it spreads
 ## into a burning puddle 4 m across that sets alight whatever walks through it for 6 s.
+## Dengelt (M9 part 4b): the fire jumps from every body the flame catches to those within data.twist
+## metres of it (the Feuerwasser-Kessel: 1.5 m, doppelt 3 m).
 
 const BLOB := preload("res://scripts/weapons/behaviors/schnaps_blob.gd")
 const LACKE := preload("res://scripts/weapons/behaviors/brennlacke.gd")
@@ -16,7 +18,7 @@ var _next_lacke: int = 0
 
 
 func fire(_rounds: int) -> void:
-	holder.scorch(data.area_angle, data.range, data.damage, Constants.BURN_DPS, Constants.BURN_TIME)
+	holder.scorch(data.area_angle, data.range, data.damage, Constants.BURN_DPS, Constants.BURN_TIME, data.twist)
 
 
 func fire_secondary() -> void:

@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/weapons/handboeller_viewmodel.tscn" id="2"]
+[ext_resource type="Resource" path="res://data/weapons/handboeller_doppelt.tres" id="up"]
+
+[resource]
+script = ExtResource("1")
+id = &"handboeller_dengelt"
+level = 1
+family = &"handboeller"
+boss_multiplier = 0.75
+sound_pitch = 0.85
+twist = 3.0
+display_name = "WEAPON_HANDBOELLER_1"
+damage = 300
+headshot_multiplier = 1.0
+fire_rate = 0.7
+mag_size = 2
+reserve_ammo = 20
+reload_time = 4.5
+recoil_pitch = 9.0
+recoil_yaw = 2.0
+range = 60.0
+cost = 1500
+ammo_cost = 750
+behavior = &"handboeller"
+knockback = 9.0
+shake = 1.5
+projectile_speed = 22.0
+projectile_gravity = 9.8
+area_radius = 3.0
+viewmodel = ExtResource("2")
+upgrade = ExtResource("up")
+secondary = 5
+secondary_rounds = 2
+secondary_damage = 520
+secondary_range = 4.5
+secondary_knockback = 14.0
+secondary_shake = 3.0
+secondary_from_reserve = true
+fire_sound = &"boeller_launch"
+secondary_sound = &"boeller_launch"
+reload_sound = &"load_clunk"
+reload_end_sound = &"load_ready"
