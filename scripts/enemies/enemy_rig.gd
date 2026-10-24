@@ -100,6 +100,12 @@ func head_position() -> Vector3:
 	return pose * (Vector3.UP * 0.12 * build_scale)
 
 
+## How the head bone has moved from its rest, in the world: what carries the head's shapes (the
+## hat's hit box rides on it, and a hat knocked off starts from it).
+func head_moved() -> Transform3D:
+	return skeleton.global_transform * skeleton.get_bone_global_pose(_head_index) * skeleton.get_bone_global_rest(_head_index).affine_inverse()
+
+
 ## Where `point` (in the built model's rest space, like the builder's shapes) on `bone` is now.
 func point_on(bone: StringName, point: Vector3) -> Vector3:
 	var index: int = _bones[bone]

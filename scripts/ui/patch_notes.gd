@@ -7,6 +7,15 @@ extends RefCounted
 
 const ENTRIES: Array[Dictionary] = [
 	{
+		"version": "1.1.3", "date": "2026-10-24",
+		"en": [
+			"Huat obschiaßn: shoot the hats off the Wanderer, Tourist, Knappe, Wilderer and Venedigermandl for 20 points. They won't be happy about it.",
+		],
+		"de": [
+			"Huat obschiaßn: Schieß dem Wanderer, Touristen, Knappen, Wilderer und Venedigermandl den Hut vom Kopf, für 20 Punkte. Begeistert sind sie davon nicht.",
+		],
+	},
+	{
 		"version": "1.1.2", "date": "2026-10-24",
 		"en": [
 			"Balance: forged guns carry less spare ammo, their right-click modes use more rounds, and their ammo costs more.",

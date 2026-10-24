@@ -1167,6 +1167,40 @@ Built (2026-10-24, branch dengel-balance, version 1.1.2):
 - Tests: m9_dengel (the new rules, the Golden Gun), m9_stumpf, m9_sitz, keys, view_settings,
   title_slides, main_menu.
 
+### Huat obschiaßn (user request 2026-10-24, version 1.1.3)
+
+Shoot an enemy's hat off. Five enemies wear one already: the Wanderer his Tirolerhut, the Tourist
+his bucket hat, the Bergknappe his helmet with the lamp, the Wilderer his wide hat with the
+Gamsbart, the Venedigermandl his pointed hat. (The Perchte's mask, the Krampus' horns and the
+Bergdohlen have nothing to knock off.)
+- A bullet through the hat knocks it off: +20 points (a popup like any other), a felt "flupp", and
+  the enemy complains, always and heard from 40 m: Wanderer "Mei Huat!" or "Der Huat woa vom
+  Opa!", Tourist "Mei Sonnenhuat!", Knappe "Mei Helm! Wo is mei Helm?", Wilderer "Mei Gamsbart!",
+  Venedigermandl "Il mio cappello!".
+- The bullet flies on through the hat, so a shot through the hat into the head is still a
+  headshot; a shot at the face leaves the hat on. Only bullets do it (every gun's shot and pellet),
+  not blasts or melee. Once a life: the hat stays off until the enemy comes again.
+- The hat spins away along the shot and up, bounces, lands upright (now and then upside down) and
+  lies there; 12 s after the shot it shrinks away. At most 8 lie about.
+- A head pop sends the hat flying too, without the 20 points (the head was the target).
+
+Built (2026-10-24, branch huat-obschiassn, version 1.1.3):
+- The models: tools/models/build_enemies.gd puts each hat in a part of its own, the "Hat" mesh
+  (<enemy>_hat.res), riding on the head bone like the head.
+- HatBox (scripts/enemies/hat_box.gd): the box round the hat mesh's bounds, following the head
+  bone (EnemyRig.head_moved), on its own physics layer 6 `hat` (Constants.LAYER_HAT), which only
+  WeaponHolder._fire_ray looks for: it calls Enemy.knock_hat and the ray goes on.
+- Enemy.knock_hat, puppet_hat, has_hat, the hat_lost signal; Events.hat_shot pays the shooter
+  (PlayerPoints, Constants.POINTS_HAT). FlyingHat (scripts/effects/flying_hat.gd) is the plain copy
+  of the mesh that flies, moved by hand (HAT_* in constants.gd); ShaderWarmup draws each hat plain
+  once.
+- Gredn: the moment HAT, said by Gredn.hat (blurt, like the Sitzfleisch taunt), heard from
+  GREDN_HAT_REACH. Voices in tools/audio/voices.py, the hat_off sound in sfx.py.
+- Co-op: a guest's shot knocks the puppet's hat off at once and asks the host (knock_hat in
+  CoopEnemies.RELAYED); the host's enemy loses it, says its line, and sends the hat to every guest
+  (CoopEnemies._hat_lost), whose own game pays the shooter.
+- Test: tests/huat.
+
 
 ## 13. Project structure
 

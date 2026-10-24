@@ -53,7 +53,8 @@ immediate re-lock.
 ## Physics layers
 
 1 `world`, 2 `player`, 3 `enemy`, 4 `player_blocker` (window openings: blocks players,
-lets enemies through), 5 `hitbox` (enemy body/head hurtboxes; hitscan rays test `world` + `hitbox`).
+lets enemies through), 5 `hitbox` (enemy body/head hurtboxes; hitscan rays test `world` + `hitbox`),
+6 `hat` (enemy hats; only bullet rays test it, and fly on through).
 
 ## Map and zones
 

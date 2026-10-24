@@ -1441,17 +1441,29 @@ func _fire_ray(hits: Dictionary) -> void:
 	var extra_pierce: int = _perks().extra_penetration() if _perks() else 0
 	var last: Node = null
 	for i: int in Constants.MAX_RAY_STEPS:
-		var query := PhysicsRayQueryParameters3D.create(global_position, global_position + offset, Constants.LAYER_WORLD | Constants.LAYER_HITBOX, exclude)
+		var query := PhysicsRayQueryParameters3D.create(global_position, global_position + offset, Constants.LAYER_WORLD | Constants.LAYER_HITBOX | Constants.LAYER_HAT, exclude)
 		query.collide_with_areas = true
 		var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
 		if hit.is_empty():
 			return
+		# Huat obschiaßn: a shot through a hat knocks it off and flies on, maybe into the head.
+		var hat := hit.collider as HatBox
+		if hat:
+			exclude.append(hat.get_rid())
+			hat.receiver.knock_hat(offset.normalized(), _shooter)
+			continue
 		var hurtbox := hit.collider as Hurtbox
 		if hurtbox == null:
 			_impact_marks.place(hit.position, hit.normal)
 			_impact_puffs.play(hit.position, hit.normal)
 			return
 		exclude.append(hurtbox.get_rid())
+		# A hat sitting low in the head's box is met only after the head: through the head, on through it.
+		if hurtbox.is_head:
+			var wearer := hurtbox.receiver as Enemy
+			var direction: Vector3 = offset.normalized()
+			if wearer and wearer.hat_in_line(hit.position, hit.position + direction * Constants.HAT_THROUGH_HEAD):
+				wearer.knock_hat(direction, _shooter)
 		# The ray can cross both boxes (head and body) of one enemy: that is still one body.
 		if hurtbox.receiver == last:
 			continue

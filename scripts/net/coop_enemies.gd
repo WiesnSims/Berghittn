@@ -19,8 +19,8 @@ const LEAN_SCALE: float = 40.0
 ## hitting player as `source` to those that take one).
 const RELAYED: Dictionary = {&"receive_hit": 3, &"scorch": 1, &"ignite": 2, &"dance": 2,
 		&"apply_slow": 2, &"stun": 1, &"flee": 2, &"apply_knockback": 1,
-		&"lift": 0, &"carry_to": 2, &"hurl": 1}
-const WITH_SOURCE: Array[StringName] = [&"receive_hit", &"scorch", &"ignite", &"dance"]
+		&"lift": 0, &"carry_to": 2, &"hurl": 1, &"knock_hat": 1}
+const WITH_SOURCE: Array[StringName] = [&"receive_hit", &"scorch", &"ignite", &"dance", &"knock_hat"]
 
 var _waves: WaveManager
 ## Net id -> Enemy: the host's live enemies, or a guest's puppets.
@@ -88,6 +88,7 @@ func _announce(enemy: Enemy) -> void:
 		enemy.said.connect(_on_said)
 		enemy.vanished.connect(_on_vanished)
 		enemy.fired.connect(_on_fired)
+		enemy.hat_lost.connect(_on_hat_lost)
 	_spawned.rpc(enemy.net_id, String(enemy.data.id), _waves.wave, enemy.global_transform, enemy.health)
 
 
@@ -153,6 +154,12 @@ func _on_killed(node: Node3D, is_headshot: bool, is_melee: bool, source: Node3D)
 func _on_fired(enemy: Enemy, at: Vector3) -> void:
 	if enemy.net_id != 0:
 		_fired.rpc(enemy.net_id, at)
+
+
+## Huat obschiaßn: the hat flies on every guest, and the shooter's own game pays for it.
+func _on_hat_lost(enemy: Enemy, direction: Vector3, source: Node3D) -> void:
+	if enemy.net_id != 0:
+		_hat_lost.rpc(enemy.net_id, direction, Coop.peer_of(source))
 
 
 ## The Venedigermandl vanished (after his last line went out).
@@ -275,6 +282,13 @@ func _fired(id: int, at: Vector3) -> void:
 	var puppet: Enemy = _by_id.get(id)
 	if puppet:
 		puppet.puppet_fire(at)
+
+
+@rpc("authority", "call_remote", "reliable")
+func _hat_lost(id: int, direction: Vector3, peer: int) -> void:
+	var puppet: Enemy = _by_id.get(id)
+	if puppet:
+		puppet.puppet_hat(direction, Coop.node_of(peer))
 
 
 @rpc("authority", "call_remote", "reliable")

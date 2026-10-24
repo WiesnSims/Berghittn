@@ -13,6 +13,7 @@ func _ready() -> void:
 	Events.enemy_damaged.connect(_on_enemy_damaged)
 	Events.enemy_killed.connect(_on_enemy_killed)
 	Events.board_repaired.connect(_on_board_repaired)
+	Events.hat_shot.connect(_on_hat_shot)
 
 
 func add(amount: int) -> void:
@@ -60,3 +61,8 @@ func _on_enemy_killed(enemy: Node3D, is_headshot: bool, is_melee: bool, source: 
 func _on_board_repaired(_barricade: Node3D, source: Node3D) -> void:
 	if source == _player:
 		add(Constants.POINTS_REPAIR_BOARD)
+
+
+func _on_hat_shot(_enemy: Node3D, source: Node3D) -> void:
+	if source == _player:
+		add(Constants.POINTS_HAT)

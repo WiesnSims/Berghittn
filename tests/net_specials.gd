@@ -12,7 +12,8 @@ extends Node
 ## host's Venedigermandl turns up on the guest with his banner, the guest's kill pays the guest the
 ## whole sack, and the next one vanishes on both; the host's Wilderer aims at the guest (the glint on the
 ## guest's screen) and his shot hurts the guest, with the streak there too; the host's Bergdohlen fly in
-## the air on the guest, peck the guest, and the guest's shot downs one.
+## the air on the guest, peck the guest, and the guest's shot downs one; the guest shoots a hat off
+## the host's enemy: it flies off on the host too, and the guest is paid 20 once, on the host's word.
 
 const TIMEOUT: float = 25.0
 const ALPHORN: WeaponData = preload("res://data/weapons/alphorn.tres")
@@ -120,6 +121,39 @@ func _run() -> bool:
 			return _fail("the hurled puppet never landed")
 	print("enemy: burning shown on the guest, lifted, carried and hurled by the guest's fork")
 	if not await _sync("fork"):
+		return false
+	# --- Huat obschiaßn: the guest knocks the hat off the host's enemy ---
+	if host:
+		var wearer: Enemy = null
+		for child: Node in waves.get_children():
+			var enemy := child as Enemy
+			if enemy and enemy.has_hat() and enemy.net_id != 0:
+				wearer = enemy
+		if wearer == null:
+			return _fail("no enemy with a hat")
+		_note.rpc("hat", wearer.net_id)
+		if not await _until(func() -> bool: return not wearer.has_hat()):
+			return _fail("the guest's shot never knocked the host's hat off")
+		if _actor(FlyingHat) == null:
+			return _fail("no hat flying on the host")
+	else:
+		if not await _until(func() -> bool: return _marks.has("hat")):
+			return _fail("host never picked a hat")
+		var puppet: Enemy = Coop.enemies.by_id(int(_marks["hat"]))
+		if puppet == null or not puppet.has_hat():
+			return _fail("no puppet with a hat")
+		var before: int = _player.points.total
+		puppet.knock_hat(Vector3.FORWARD, _player)
+		if not await _until(func() -> bool: return _player.points.total == before + Constants.POINTS_HAT):
+			return _fail("the guest was not paid for the hat (%d)" % (_player.points.total - before))
+		await get_tree().create_timer(0.5).timeout
+		if _player.points.total != before + Constants.POINTS_HAT:
+			return _fail("the hat was paid more than once (%d)" % (_player.points.total - before))
+		# Its complaint fades before the next line is looked for.
+		if not await _until(func() -> bool: return Gredn.current.shown() == 0):
+			return _fail("the hat's line never faded")
+	print("hat: the guest's shot knocked the host's hat off, paid 20 once")
+	if not await _sync("hat"):
 		return false
 	# --- a line (Gredn): picked by the host, its index sent, heard and shown on the guest ---
 	var gredn: Gredn = Gredn.current

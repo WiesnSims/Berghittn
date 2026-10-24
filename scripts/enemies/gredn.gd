@@ -17,7 +17,8 @@ extends Node3D
 ## APPEAR, RUN and VANISH are the Venedigermandl's: as he turns up, as he runs, as he vanishes.
 ## AIM and SHOT are the Wilderer's: as he starts to aim, and when his shot hits.
 ## SITZ is Sitzfleisch (1.1.2): the nearest enemy mocks a player who stays put too long (taunt).
-enum Moment { SPOT, IDLE, BARRICADE, HIT, LUNGE, DEATH, APPEAR, RUN, VANISH, AIM, SHOT, SITZ }
+## HAT is Huat obschiaßn: its hat was shot off (always said, and heard from GREDN_HAT_REACH).
+enum Moment { SPOT, IDLE, BARRICADE, HIT, LUNGE, DEATH, APPEAR, RUN, VANISH, AIM, SHOT, SITZ, HAT }
 
 const LINE: Script = preload("res://scripts/effects/gredn_line.gd")
 
@@ -66,6 +67,12 @@ const LINES: Array = [
 	[&"perchte", Moment.SITZ, "Hockn bleibn? Hö-hö-hö!", &"gredn_perchte_sitz"],
 	[&"krampus", Moment.SITZ, "Wer hockt, den hol i!", &"gredn_krampus_sitz"],
 	[&"wilderer", Moment.SITZ, "Do hockt mei Wild.", &"gredn_wilderer_sitz"],
+	[&"wanderer", Moment.HAT, "Mei Huat!", &"gredn_wanderer_huat"],
+	[&"wanderer", Moment.HAT, "Der Huat woa vom Opa!", &"gredn_wanderer_opa"],
+	[&"tourist", Moment.HAT, "Mei Sonnenhuat!", &"gredn_tourist_sonnenhuat"],
+	[&"knappe", Moment.HAT, "Mei Helm! Wo is mei Helm?", &"gredn_knappe_helm"],
+	[&"wilderer", Moment.HAT, "Mei Gamsbart!", &"gredn_wilderer_gamsbart"],
+	[&"venedigermandl", Moment.HAT, "Il mio cappello!", &"gredn_venedigermandl_cappello"],
 ]
 const CHANCE: Dictionary = {
 	Moment.SPOT: Constants.GREDN_CHANCE_SPOT, Moment.IDLE: Constants.GREDN_CHANCE_IDLE,
@@ -73,6 +80,7 @@ const CHANCE: Dictionary = {
 	Moment.LUNGE: Constants.GREDN_CHANCE_LUNGE, Moment.DEATH: Constants.GREDN_CHANCE_DEATH,
 	Moment.APPEAR: 1.0, Moment.RUN: 1.0, Moment.VANISH: 1.0,
 	Moment.AIM: Constants.GREDN_CHANCE_AIM, Moment.SHOT: Constants.GREDN_CHANCE_SHOT, Moment.SITZ: 1.0,
+	Moment.HAT: 1.0,
 }
 
 static var current: Gredn
@@ -129,14 +137,28 @@ func talk(enemy: Enemy, which: Moment) -> int:
 	return line
 
 
-## Sitzfleisch: `enemy` mocks a player who stays put, whatever the dice and the gaps say (solo, or
-## the host). Returns the line's index, or -1 if it has no such line.
+## Huat obschiaßn: `enemy` (solo, or the host's) lost its hat and says so. Returns the line's index,
+## or -1.
+static func hat(enemy: Enemy) -> int:
+	if current == null or enemy.puppet:
+		return -1
+	return current.blurt(enemy, Moment.HAT)
+
+
+## Sitzfleisch: `enemy` mocks a player who stays put (solo, or the host). Returns the line's index,
+## or -1 if it has no such line.
 func taunt(enemy: Enemy) -> int:
+	return blurt(enemy, Moment.SITZ)
+
+
+## A line for `enemy` at `which`, whatever the dice and the gaps say (solo, or the host). Returns
+## its index, or -1 if it has no such line.
+func blurt(enemy: Enemy, which: Moment) -> int:
 	if enemy.puppet:
 		return -1
 	var choices: Array[int] = []
 	for i: int in LINES.size():
-		if LINES[i][0] == enemy.data.id and LINES[i][1] == Moment.SITZ:
+		if LINES[i][0] == enemy.data.id and LINES[i][1] == which:
 			choices.append(i)
 	if choices.is_empty():
 		return -1
@@ -157,7 +179,7 @@ func say(enemy: Enemy, line: int) -> void:
 	if camera == null:
 		return
 	var distance: float = camera.global_position.distance_to(enemy.global_position)
-	if distance > _reach(enemy):
+	if distance > _reach(enemy, line):
 		return
 	_shown = _shown.filter(func(s: Array) -> bool: return is_instance_valid(s[1]))
 	if _shown.size() >= Constants.GREDN_SHOWN:
@@ -200,7 +222,9 @@ static func _distance(camera: Camera3D, node: Variant) -> float:
 	return camera.global_position.distance_to((node as Node3D).global_position) if is_instance_valid(node) else INF
 
 
-static func _reach(enemy: Enemy) -> float:
+static func _reach(enemy: Enemy, line: int = -1) -> float:
+	if line >= 0 and LINES[line][1] == Moment.HAT:
+		return Constants.GREDN_HAT_REACH
 	return Constants.MANDL_VOICE_REACH if enemy.data.treasure else Constants.GREDN_REACH
 
 
