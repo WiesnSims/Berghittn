@@ -29,7 +29,7 @@ Needs `DecompressionStream` (Chrome 80+, Firefox 113+, Safari 16.4+).
 ## Controls
 
 WASD / arrows move, mouse look, left click shoot, right click the gun's secondary mode (pistol: aim
-down the sights, Stutzen: scope, Jagdflinte: both barrels), V melee (shovel), R reload, 1 / 2 / Q / mouse wheel
+down the sights, Stutzen: scope, Jagdflinte: both barrels), V melee (shovel), R reload, 1 / 2 / 3 (with the Kraxn) / Q / mouse wheel
 switch gun, Space jump, Shift sprint (forward only; the gun is lowered and cannot fire until 0.2 s after), C crouch (not Ctrl: Ctrl+W closes the browser tab),
 E interact (hold at a window to board it up; press at a door or wall-buy to buy), Esc or P pause,
 F3 debug overlay (FPS and position). While the overlay is on, F4 adds 1000 points (testing doors and

@@ -233,6 +233,14 @@ const DEBUG_POINTS: int = 1000
 
 # Weapons: carried gun slots (section 6) and the time to draw a gun after switching or buying.
 const GUN_SLOTS: int = 2
+## Die Kraxn in the Matratzenlager (#95): one gun slot more, for this many points.
+const KRAXN_COST: int = 2500
+## How high its foot board hangs on the wall (m).
+const KRAXN_HOOK_HEIGHT: float = 0.45
+## Where a hiker carries it (m, from their feet; +Z is their back), and how big the guns strapped
+## to it are drawn.
+const HIKER_KRAXN_AT: Vector3 = Vector3(0.0, 0.62, 0.2)
+const HIKER_STOWED_SCALE: float = 1.1
 const WEAPON_SWITCH_TIME: float = 0.45
 # Seconds from the end of a sprint until the raised gun can fire again (section 5: slower aiming).
 const SPRINT_TO_FIRE_TIME: float = 0.2
