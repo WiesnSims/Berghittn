@@ -16,6 +16,9 @@ uniform vec3 frost_color : source_color = vec3(0.82, 0.9, 1.0);
 uniform float frost_reach = 0.24;
 // Most the ice covers what is behind it, at its thickest at the very edge.
 uniform float frost_opacity = 0.55;
+// Settings: FXAA (1.1.2). The Compatibility renderer has no screen-space AA of its own, so it is done
+// here, in the pass the picture takes anyway (a uniform, so no second shader to build).
+uniform bool fxaa = false;
 
 float hash(vec2 p) {
 	p = fract(p * vec2(443.897, 441.423));
@@ -42,6 +45,31 @@ float fbm(vec2 p) {
 	return sum;
 }
 
+// FXAA (after Timothy Lottes' FXAA 3.11, the light version): where the brightness changes across
+// a few pixels, blend along the edge instead of across it.
+vec3 antialiased(vec2 uv, vec2 px) {
+	vec3 m = texture(screen_tex, uv).rgb;
+	vec3 luma_of = vec3(0.299, 0.587, 0.114);
+	float nw = dot(texture(screen_tex, uv + vec2(-1.0, -1.0) * px).rgb, luma_of);
+	float ne = dot(texture(screen_tex, uv + vec2(1.0, -1.0) * px).rgb, luma_of);
+	float sw = dot(texture(screen_tex, uv + vec2(-1.0, 1.0) * px).rgb, luma_of);
+	float se = dot(texture(screen_tex, uv + vec2(1.0, 1.0) * px).rgb, luma_of);
+	float lm = dot(m, luma_of);
+	float low = min(lm, min(min(nw, ne), min(sw, se)));
+	float high = max(lm, max(max(nw, ne), max(sw, se)));
+	// Flat areas stay as they are (and sharp).
+	if (high - low < max(0.0312, high * 0.125)) {
+		return m;
+	}
+	vec2 dir = vec2(-((nw + ne) - (sw + se)), (nw + sw) - (ne + se));
+	float reduce = max((nw + ne + sw + se) * 0.25 * 0.125, 1.0 / 128.0);
+	dir = clamp(dir / (min(abs(dir.x), abs(dir.y)) + reduce), vec2(-8.0), vec2(8.0)) * px;
+	vec3 a = 0.5 * (texture(screen_tex, uv + dir * (1.0 / 3.0 - 0.5)).rgb + texture(screen_tex, uv + dir * (2.0 / 3.0 - 0.5)).rgb);
+	vec3 b = a * 0.5 + 0.25 * (texture(screen_tex, uv - dir * 0.5).rgb + texture(screen_tex, uv + dir * 0.5).rgb);
+	float lb = dot(b, luma_of);
+	return (lb < low || lb > high) ? a : b;
+}
+
 void fragment() {
 	vec2 uv = SCREEN_UV;
 	// Frost first, since it also bends the view a little where the ice is thick.
@@ -59,7 +87,7 @@ void fragment() {
 	float ice = smoothstep(threshold, threshold + 0.18, edge + (n - 0.5) * 0.18 + wobble * 0.3) * step(0.001, frost);
 	uv += (vec2(n, fbm(p + 3.1)) - 0.5) * 0.006 * ice;
 
-	vec3 c = texture(screen_tex, uv).rgb;
+	vec3 c = fxaa ? antialiased(uv, SCREEN_PIXEL_SIZE) : texture(screen_tex, uv).rgb;
 	float luma = dot(c, vec3(0.299, 0.587, 0.114));
 	c = mix(vec3(luma), c, saturation);
 	c = (c - 0.5) * contrast + 0.5;

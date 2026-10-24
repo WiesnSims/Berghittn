@@ -28,6 +28,8 @@ var locale: String = Constants.DEFAULT_LOCALE
 var volumes: Dictionary = {}
 ## Share of the window resolution the 3D view renders at; lower helps weak laptops.
 var render_scale: float = 1.0
+## Constants.Antialiasing. MSAA is the window's; FXAA is the post pass's switch (main.gd sets it).
+var antialiasing: int = Constants.DEFAULT_ANTIALIASING
 ## Co-op name and hiker (HikerStyle profile), chosen in the lobby; empty until the player changes
 ## something there, and until then each player wears their peer's default (profile_for).
 var profile: Dictionary = {}
@@ -83,6 +85,8 @@ func apply(and_save: bool = true) -> void:
 		AudioServer.set_bus_mute(index, linear <= 0.0)
 		AudioServer.set_bus_volume_db(index, linear_to_db(maxf(linear, 0.0001)))
 	get_tree().root.scaling_3d_scale = render_scale
+	var msaa: Dictionary = {Constants.Antialiasing.MSAA_2X: Viewport.MSAA_2X, Constants.Antialiasing.MSAA_4X: Viewport.MSAA_4X}
+	get_tree().root.msaa_3d = msaa.get(antialiasing, Viewport.MSAA_DISABLED)
 	if and_save:
 		save()
 	changed.emit()
@@ -115,6 +119,7 @@ func _load() -> void:
 	if saved_locale in LOCALES:
 		locale = saved_locale
 	render_scale = clampf(file.get_value(SECTION, "render_scale", render_scale), Constants.RENDER_SCALE_MIN, 1.0)
+	antialiasing = clampi(file.get_value(SECTION, "antialiasing", antialiasing), 0, Constants.ANTIALIASING_KEYS.size() - 1)
 	for bus: StringName in BUSES:
 		set_volume(bus, file.get_value(SECTION, "volume_" + bus, volume(bus)))
 	var saved: Variant = file.get_value(SECTION, "profile", {})
@@ -173,6 +178,7 @@ func save() -> void:
 	file.set_value(SECTION, "seen_version", seen_version)
 	file.set_value(SECTION, "locale", locale)
 	file.set_value(SECTION, "render_scale", render_scale)
+	file.set_value(SECTION, "antialiasing", antialiasing)
 	for bus: StringName in BUSES:
 		file.set_value(SECTION, "volume_" + bus, volume(bus))
 	file.set_value(SECTION, "profile", profile)

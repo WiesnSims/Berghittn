@@ -349,5 +349,10 @@ messages = {
 [&"", &"UI_COLOR_PINK"]: [&"Pink"],
 [&"", &"UI_COLOR_RED"]: [&"Red"],
 [&"", &"UI_MAIN_MENU"]: [&"Main menu"],
-[&"", &"UI_MAIN_MENU_SURE"]: [&"End this run? Click again"]
+[&"", &"UI_MAIN_MENU_SURE"]: [&"End this run? Click again"],
+[&"", &"UI_SET_ANTIALIASING"]: [&"Antialiasing"],
+[&"", &"UI_AA_OFF"]: [&"Off"],
+[&"", &"UI_AA_FXAA"]: [&"FXAA (fast)"],
+[&"", &"UI_AA_MSAA_2X"]: [&"MSAA 2×"],
+[&"", &"UI_AA_MSAA_4X"]: [&"MSAA 4×"]
 }

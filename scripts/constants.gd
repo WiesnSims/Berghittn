@@ -29,6 +29,11 @@ const AIM_SENSITIVITY_MIN: float = 0.2
 const AIM_SENSITIVITY_MAX: float = 1.0
 const DEFAULT_VOLUME: float = 0.8
 const RENDER_SCALE_MIN: float = 0.5
+## Antialiasing (Settings, 1.1.2): off, FXAA (our own pass in post_fx, nearly free), MSAA 2x or 4x
+## (the renderer's, smoother edges but more for the GPU to do). FXAA by default.
+enum Antialiasing { OFF, FXAA, MSAA_2X, MSAA_4X }
+const ANTIALIASING_KEYS: Array[String] = ["UI_AA_OFF", "UI_AA_FXAA", "UI_AA_MSAA_2X", "UI_AA_MSAA_4X"]
+const DEFAULT_ANTIALIASING: int = Antialiasing.FXAA
 ## Field of view (degrees, vertical) the player can pick in Settings (1.1.2); 75 was the fixed one.
 const DEFAULT_FOV: float = 75.0
 const FOV_MIN: float = 70.0

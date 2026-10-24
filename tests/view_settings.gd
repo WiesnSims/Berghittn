@@ -3,7 +3,8 @@ extends Node
 ## Headless check of the view settings (1.1.2): the field of view is the camera's and aiming still
 ## narrows it to the gun's; aiming by toggle puts the sights up with one right click and down with
 ## the next (a gun switch drops it), holding works as before with it off; the crosshair takes the
-## colour and size picked; the Settings menu has a row for each. The player's settings are put back.
+## colour and size picked; antialiasing (FXAA in the post pass, or MSAA 2x/4x on the window); the
+## Settings menu has a row for each. The player's settings are put back.
 
 const STUTZEN := preload("res://data/weapons/stutzen.tres")
 const HARMONIKA := preload("res://data/weapons/harmonika.tres")
@@ -18,7 +19,7 @@ func _check(ok: bool, what: String) -> void:
 
 
 func _ready() -> void:
-	var saved: Array = [Settings.fov, Settings.toggle_aim, Settings.crosshair_color, Settings.crosshair_size]
+	var saved: Array = [Settings.fov, Settings.toggle_aim, Settings.crosshair_color, Settings.crosshair_size, Settings.antialiasing]
 	var main: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
 	add_child(main)
 	await get_tree().physics_frame
@@ -67,7 +68,7 @@ func _ready() -> void:
 	for row: Node in menu._rows.get_children():
 		if row is HBoxContainer and row.get_child_count() > 0 and row.get_child(0) is Label:
 			keys.append((row.get_child(0) as Label).text)
-	for key: String in ["UI_SET_FOV", "UI_SET_TOGGLE_AIM", "UI_SET_CROSSHAIR_COLOR", "UI_SET_CROSSHAIR_SIZE"]:
+	for key: String in ["UI_SET_FOV", "UI_SET_TOGGLE_AIM", "UI_SET_CROSSHAIR_COLOR", "UI_SET_CROSSHAIR_SIZE", "UI_SET_ANTIALIASING"]:
 		_check(key in keys and tr(key) != key, "the menu: %s" % tr(key))
 	for row: Node in menu._rows.get_children():
 		if row is HBoxContainer and (row.get_child(0) as Label).text == "UI_SET_CROSSHAIR_COLOR":
@@ -75,10 +76,23 @@ func _ready() -> void:
 			_check(picker.item_count == Constants.CROSSHAIR_COLORS.size(), "%d colours to pick" % picker.item_count)
 			picker.item_selected.emit(3)
 	_check(Settings.crosshair_color == 3, "picking one sets it")
+	# Antialiasing.
+	var post := (main.get_node("PostFX/Grade") as ColorRect).material as ShaderMaterial
+	var root: Window = get_tree().root
+	var expect: Array = [[Viewport.MSAA_DISABLED, false], [Viewport.MSAA_DISABLED, true], [Viewport.MSAA_2X, false], [Viewport.MSAA_4X, false]]
+	for row: Node in menu._rows.get_children():
+		if row is HBoxContainer and (row.get_child(0) as Label).text == "UI_SET_ANTIALIASING":
+			var picker := row.get_child(1) as OptionButton
+			_check(picker.item_count == 4 and picker.selected == Settings.antialiasing, "antialiasing: 4 to pick, the current one shown")
+			for mode: int in 4:
+				picker.item_selected.emit(mode)
+				_check(Settings.antialiasing == mode and root.msaa_3d == expect[mode][0] and post.get_shader_parameter("fxaa") == expect[mode][1],
+					"%s: MSAA %d, FXAA %s" % [tr(Constants.ANTIALIASING_KEYS[mode]), root.msaa_3d, post.get_shader_parameter("fxaa")])
 	Settings.fov = saved[0]
 	Settings.toggle_aim = saved[1]
 	Settings.crosshair_color = saved[2]
 	Settings.crosshair_size = saved[3]
+	Settings.antialiasing = saved[4]
 	Settings.save()
 	print("RESULT: %s" % ("PASS" if failures.is_empty() else "%d FAILED" % failures.size()))
 	get_tree().quit(1 if failures.size() > 0 else 0)

@@ -98,6 +98,8 @@ func _build() -> void:
 	_add_language()
 	_add_slider("UI_SET_RENDER_SCALE", Constants.RENDER_SCALE_MIN, 1.0, Settings.render_scale,
 			func(v: float) -> void: Settings.render_scale = v, _percent)
+	_add_choice("UI_SET_ANTIALIASING", Constants.ANTIALIASING_KEYS, Settings.antialiasing,
+			func(index: int) -> void: Settings.antialiasing = index)
 	_add_keys()
 
 

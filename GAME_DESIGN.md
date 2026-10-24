@@ -1141,6 +1141,9 @@ Munitionskiste refilled all of it for a flat 1000.
     entries highlighted) and a Main menu button (co-op: leaves the room)
   - the solo pause menu has Main menu; it asks once more ("End this run?"), and a run ended that
     way does not go into the Gipfelbuch
+- Antialiasing (Settings → graphics, user request): Off, FXAA (default), MSAA 2x, MSAA 4x. The
+  Compatibility renderer has MSAA but no screen-space AA, so FXAA is a switch in our own post pass
+  (post_fx.gdshader), which the picture takes anyway: nearly free, and no extra shader to build.
 
 Built (2026-10-24, branch dengel-balance, version 1.1.2):
 - Balance: tools/weapons/dengel.py (reserve and right-click rounds), Constants.DENGEL_AMMO_EXTRA,
@@ -1157,6 +1160,8 @@ Built (2026-10-24, branch dengel-balance, version 1.1.2):
   view, WeaponHolder._aim_held and Crosshair._draw use the others. The Settings menu scrolls now.
 - Title pictures: tools/teaser renders each scene (`-- <scene>`) and prints its spots;
   TeaserBackdrop.SCENES holds the pictures and effects, its Slide, Effect and Flock classes run them.
+- Antialiasing: Settings.antialiasing (Constants.Antialiasing), the window's msaa_3d, the post
+  shader's `fxaa` uniform (main._apply_fxaa).
 - Main menu: DeathScreen._build_more (Gipfelbuch and Main menu, menu_requested), BoardPanel.open(mode),
   PauseMenu.menu_requested (solo, after a second click), main._to_title.
 - Tests: m9_dengel (the new rules, the Golden Gun), m9_stumpf, m9_sitz, keys, view_settings,

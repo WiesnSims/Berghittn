@@ -13,6 +13,7 @@ enum State { MENU, CAPTURING, PLAYING, DEAD }
 @onready var _waves: WaveManager = $WaveManager
 @onready var _lobby: Lobby = $UI/Lobby
 @onready var _warmup: ShaderWarmup = $ShaderWarmup
+@onready var _post_fx: ColorRect = $PostFX/Grade
 
 var _state: State = State.MENU
 # This scene runs (or ran) a co-op match: Net.in_match() turns false the moment the session ends.
@@ -28,6 +29,8 @@ func _ready() -> void:
 	_hud.bind_player(_player)
 	_warmup.progress.connect(_start_screen.set_ready)
 	_player.died.connect(_on_player_died)
+	Settings.changed.connect(_apply_fxaa)
+	_apply_fxaa()
 	_start_screen.play_requested.connect(_request_play)
 	_pause_menu.resume_requested.connect(_request_play)
 	_death_screen.restart_requested.connect(_restart)
@@ -255,6 +258,11 @@ func _restart() -> void:
 	# Request the lock inside the click so the reloaded scene can skip the menus.
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	get_tree().reload_current_scene()
+
+
+## FXAA is the post pass's (the renderer has none of its own); MSAA is set on the window by Settings.
+func _apply_fxaa() -> void:
+	(_post_fx.material as ShaderMaterial).set_shader_parameter("fxaa", Settings.antialiasing == Constants.Antialiasing.FXAA)
 
 
 ## Back to the title screen, in a fresh scene: the run (if any) ends there, not into the Gipfelbuch.
