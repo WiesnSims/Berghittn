@@ -17,6 +17,14 @@ node tools/build_web.mjs       # headless export + wasm packing, prints every fi
 
 Output goes to `export/` (gitignored). The script exits non-zero if any file is over 20 MiB.
 
+### Version and patch notes
+
+The version is `application/config/version` in `project.godot`; the title screen shows it and its
+patch notes (`scripts/ui/patch_notes.gd`, newest first, a short line per change in English and
+German). A release raises the version and adds its entry at the top; the title screen marks the
+notes "new" until a player opens them. 1.0 was the release, 1.0.1 the fixes before M9, and 1.1 is
+for M9 once it is finished.
+
 ### Why the wasm is packed
 
 The Godot 4.7 engine wasm is ~37.7 MiB, over Cloudflare Pages' 25 MiB per-file limit.

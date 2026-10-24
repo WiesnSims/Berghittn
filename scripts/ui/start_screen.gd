@@ -1,6 +1,7 @@
 class_name StartScreen
 extends Control
-## Title screen (#77): the game's teaser behind, Solo, Co-op and Settings. Solo's click doubles as the
+## Title screen (#77): the game's teaser behind, Solo, Co-op, Settings and the patch notes, with the
+## version in a corner. Solo's click doubles as the
 ## user gesture browsers require for pointer lock (and audio). Until the hut's shaders are built
 ## (#78, ShaderWarmup) it shows only the still picture and how far that is: each new shader blocks the
 ## browser for a moment, so a live menu would stutter. Then the menu comes in and the picture moves.
@@ -19,12 +20,27 @@ var _ready_share: float = 0.0
 var _revealed: bool = false
 # Co-op: the match started without us clicking in yet; the button joins it.
 var _join_mode: bool = false
+var _version: Label
+var _notes: PatchNotesPanel
 
 
 func _ready() -> void:
 	_solo.pressed.connect(play_requested.emit)
 	_coop.pressed.connect(coop_requested.emit)
 	(%SettingsButton as Button).pressed.connect(settings_requested.emit)
+	_version = Label.new()
+	_version.text = tr("UI_VERSION") % PatchNotes.current()
+	_version.add_theme_font_size_override("font_size", 16)
+	_version.add_theme_color_override("font_color", Color(0.82, 0.8, 0.76))
+	_version.add_theme_color_override("font_outline_color", Color.BLACK)
+	_version.add_theme_constant_override("outline_size", 4)
+	_version.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE, 16)
+	_version.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_version.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	add_child(_version)
+	_notes = PatchNotesPanel.new()
+	add_child(_notes)
+	(%PatchNotesButton as Button).pressed.connect(_open_notes)
 	set_ready(0.0)
 	if GameState.notice != "":
 		show_notice(GameState.notice)
@@ -67,7 +83,16 @@ func _reveal() -> void:
 
 
 func _menu_items() -> Array[Control]:
-	return [_solo, _coop, %SettingsButton, %Controls]
+	return [_solo, _coop, %SettingsButton, %PatchNotesButton, %Controls]
+
+
+## The patch notes; from now on this version counts as read.
+func _open_notes() -> void:
+	_notes.open()
+	if Settings.seen_version != PatchNotes.current():
+		Settings.seen_version = PatchNotes.current()
+		Settings.save()
+	_refresh()
 
 
 ## A co-op match started without our click (we are a guest): the button now joins it.
@@ -79,3 +104,6 @@ func set_join_mode(on: bool) -> void:
 
 func _refresh() -> void:
 	_solo.text = tr("UI_JOIN_MATCH") if _join_mode else tr("UI_SOLO")
+	# Marked until this version's notes were opened once.
+	var unread: bool = Settings.seen_version != PatchNotes.current()
+	(%PatchNotesButton as Button).text = tr("UI_PATCH_NOTES_NEW") if unread else tr("UI_PATCH_NOTES")

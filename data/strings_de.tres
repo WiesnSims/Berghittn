@@ -277,5 +277,8 @@ messages = {
 [&"", &"WEAPON_SCHMARRNPFANNE_1"]: [&"Kaiserschmarrn-Pfanne"],
 [&"", &"WEAPON_SCHMARRNPFANNE_2"]: [&"Kaiserschmarrn-Pfanne, doppelt dengelt"],
 [&"", &"WEAPON_KRAMPUSRUTE_1"]: [&"Höllen-Rute"],
-[&"", &"WEAPON_KRAMPUSRUTE_2"]: [&"Höllen-Rute, doppelt dengelt"]
+[&"", &"WEAPON_KRAMPUSRUTE_2"]: [&"Höllen-Rute, doppelt dengelt"],
+[&"", &"UI_PATCH_NOTES"]: [&"Patch Notes"],
+[&"", &"UI_PATCH_NOTES_NEW"]: [&"Patch Notes · neu!"],
+[&"", &"UI_VERSION"]: [&"Version %s"]
 }
