@@ -971,6 +971,21 @@ gold, glowing faintly gold so he is easy to spot in the storm.
   They make you look and shoot up. They fly outdoors and through open doors and windows, not on
   the navmesh (a simple steering flight with ceiling and wall checks). They count towards the
   24 alive at once, so a flock is a few of the slots.
+  Built (2026-10-24, branch m9-bergdohlen): EnemyData.flies and flock_min/max (3 to 5) on the shared
+  Enemy; the wave manager sends a flock as one pick (weight 0.5 from wave 6), 3 m over the spawn
+  point, each bird one of the wave and of the alive. A bird is a small ball against the world only.
+  It flies straight at the player when its body fits all the way (a swept ball, so it does not catch
+  on window frames) and no shut window is in the way; else along the navmesh's way, 1.6 m over it
+  and kept under ceilings, as far as it can see. A window on the way: through it if broken (from in
+  line in front of it); if shut, through the nearest broken window instead; with none it circles in
+  front until one breaks. It never tears at boards. A peck: 8 when 0.8 m from the player's head with
+  nothing between, then 1 s fluttering up and away. Stunned or dancing it hangs in the air; dead it
+  falls. Caught on an edge it goes back over the floor below. Health 60 + 8·wave (one Stutzen hit at
+  wave 6), 6 m/s. Model: the skeleton laid out as a bird (the arms are the wings, beating in the rig,
+  EnemyRig.flap), yellow beak, red legs, white eyes; ragdoll as usual. Its voice is a synthesised
+  chough's call (sfx dohle_caw: groans, peck, death), not lines. Co-op: puppets as usual. Tests:
+  tests/m9_dohlen, tests/net_specials, m5_waves (no bird stuck).
+- M9 is finished with part 5: the game is version 1.1 (project.godot), with its patch notes entry.
 
 *Open pool: more ideas (not planned; any of these can become a part once the user picks it, and
 new ones are added here)*

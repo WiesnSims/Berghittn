@@ -34,7 +34,7 @@ const MIX: Dictionary = {
 	&"board_pull": -4.0, &"board_nail": -6.0, &"window_climb": -7.0,
 	&"player_hurt": -4.0, &"player_death": -2.0, &"step_snow": -17.0, &"step_wood": -15.0, &"land": -5.0,
 	&"buy": -7.0, &"deny": -9.0, &"door_open": -2.0, &"creak": -12.0, &"chest_open": -4.0,
-	&"chest_tick": -10.0, &"chest_reveal": -6.0, &"anvil_clang": -6.0, &"dengel_quench": -6.0, &"mandl_jingle": -4.0, &"mandl_coins": -8.0, &"mandl_fountain": -3.0, &"mandl_poof": -5.0, &"perk_drink": -4.0, &"jause_eat": -4.0,
+	&"chest_tick": -10.0, &"chest_reveal": -6.0, &"anvil_clang": -6.0, &"dengel_quench": -6.0, &"dohle_caw": -7.0, &"mandl_jingle": -4.0, &"mandl_coins": -8.0, &"mandl_fountain": -3.0, &"mandl_poof": -5.0, &"perk_drink": -4.0, &"jause_eat": -4.0,
 	&"ammo_crate": -4.0, &"ui_click": -12.0, &"wave_start": -5.0, &"boss_wave": -2.0,
 	&"resi_moo": -2.0, &"milk": -6.0, &"fassl_roll": -3.0, &"fassl_tap": -4.0,
 	&"murmeltier_scream": 1.0, &"murmeltier_pop": -6.0, &"murmeltier_hit": -4.0, &"camera": -6.0,
@@ -47,7 +47,7 @@ const MIX: Dictionary = {
 ## drowning out everything else.
 const DEFAULT_VOICES: int = 4
 const VOICES: Dictionary = {
-	&"groan_wanderer": 2, &"groan_knappe": 2, &"groan_perchte": 2, &"groan_tourist": 2,
+	&"dohle_caw": 3, &"groan_wanderer": 2, &"groan_knappe": 2, &"groan_perchte": 2, &"groan_tourist": 2,
 	&"krampus_roar": 1, &"enemy_death": 3, &"enemy_attack": 2, &"hitmarker": 2, &"step_snow": 1,
 	&"step_wood": 1, &"creak": 1, &"board_pull": 2,
 }

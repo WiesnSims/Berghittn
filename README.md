@@ -307,6 +307,18 @@ so the `AIM` pose (arm straight ahead) shoulders it; `EnemyRig.point_on` finds t
 scope. Co-op: the pose carries the glint; `CoopEnemies._fired` plays the bang and the streak on the
 guests. Tests: `tests/m9_wilderer`, `tests/net_specials`.
 
+## Die Bergdohlen (M9 part 5c)
+
+Flying enemies: `data/enemies/bergdohle.tres` (`EnemyData.flies`, `flock_min/max`), from wave 6, sent
+by `WaveManager._spawn` as a flock of 3 to 5 at once. A bird swaps the walkers' capsule for a small
+ball (`Enemy._fit_body`) that only minds the world, and steers (`_fly_to`, `_waypoint_to`): straight
+at the player when a swept ball of its size fits the way (`_air_clear`) and no shut window is on it,
+else along the navmesh's path raised 1.6 m (`_raised`, under ceilings). Window links on that path are
+flown through when broken; a shut one sends it to the nearest broken window, or it circles in front.
+It pecks (`_peck`, 8) and flutters off, and hangs in the air while stunned. The model is the standard
+skeleton laid out as a bird; `EnemyRig.flap` beats the wings. Constants: `DOHLE_*`. Tests:
+`tests/m9_dohlen`, `tests/net_specials`.
+
 ## Prop models (M6)
 
 ```

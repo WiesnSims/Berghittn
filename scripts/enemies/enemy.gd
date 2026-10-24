@@ -142,6 +142,19 @@ var _shot_left: float = 0.0
 var _move_goal: Vector3
 var _move_left: float = 0.0
 var _glint: ScopeGlint
+# A Bergdohle (EnemyData.flies): where it flies to now and when it looks again, its flutter after a
+# peck (seconds left, which way), and the walkers' body shape it swapped for its own small one.
+var _waypoint: Vector3
+var _route_left: float = 0.0
+var _flutter_left: float = 0.0
+var _flutter_dir: Vector3
+var _walk_shape: Shape3D
+static var _wing_shape: SphereShape3D
+# The bird's body, swept along a way to see if it fits.
+static var _sweep: PhysicsShapeQueryParameters3D
+# The Wilderer has backed off once since his last shot (he only does so once, or in a small room
+# he would go on backing off and never aim).
+var _backed_off: bool = false
 ## The corpses being simulated now, oldest first (at most Constants.RAGDOLL_MAX).
 static var _ragdolls: Array[Enemy] = []
 
@@ -170,12 +183,16 @@ func activate(enemy_data: EnemyData, for_wave: int, at: Transform3D) -> void:
 		_meshes.assign(_model.find_children("*", "MeshInstance3D", true, false))
 		_head_parts.assign(_model.find_children("*", "Node3D", true, false).filter(func(n: Node) -> bool: return n.is_in_group("head_part")))
 	data = enemy_data
+	_fit_body()
 	wave = for_wave
 	health = data.health_for_wave(wave)
 	max_health = health
 	_lunge_cooldown_left = 0.0
 	_shot_left = 0.0
 	_move_left = 0.0
+	_backed_off = false
+	_route_left = 0.0
+	_flutter_left = 0.0
 	_dance_left = 0.0
 	_stun_left = 0.0
 	_flee_left = 0.0
@@ -652,6 +669,8 @@ func _knocked(delta: float) -> void:
 	else:
 		velocity.y = 0.0
 	move_and_slide()
+	if data.flies:
+		velocity.y = 0.0
 	_knock = _knock.move_toward(Vector3.ZERO, Constants.ENEMY_KNOCKBACK_DECAY * delta)
 	_reset_stuck()
 
@@ -678,6 +697,9 @@ func _chase(delta: float) -> void:
 	if not _spotted and _sees_target():
 		_spotted = true
 		Gredn.moment(self, Gredn.Moment.SPOT)
+	if data.flies:
+		_fly_at_target(delta)
+		return
 	if _in_attack_range():
 		_start_attack()
 		return
@@ -690,6 +712,9 @@ func _chase(delta: float) -> void:
 
 
 func _walk_towards(goal: Vector3, delta: float) -> void:
+	if data.flies:
+		_fly_to(goal + Vector3.UP * Constants.DOHLE_HEIGHT, delta)
+		return
 	_repath_left -= delta
 	if _repath_left <= 0.0:
 		_repath_left = Constants.ENEMY_REPATH_INTERVAL
@@ -788,7 +813,7 @@ func _start_attack() -> void:
 	_state = State.ATTACKING
 	_attack_time = 0.0
 	_has_swung = false
-	_voice(&"enemy_attack")
+	_voice(data.attack_sound)
 	# Arms up through the windup and down as the hit lands (the rig's swing peaks at 65 %).
 	_pose(EnemyRig.Action.STRIKE, data.attack_windup / 0.65)
 	_kill_tween()
@@ -809,7 +834,7 @@ func _start_lunge() -> void:
 	_state = State.LUNGING
 	_lunge_time = 0.0
 	if Gredn.moment(self, Gredn.Moment.LUNGE) < 0:
-		_voice(&"enemy_attack")
+		_voice(data.attack_sound)
 	_lunge_struck = false
 	_pose(EnemyRig.Action.CROUCH, data.lunge_windup)
 	_kill_tween()
@@ -1114,6 +1139,9 @@ func _set_active(active: bool) -> void:
 
 
 func _movement_mask() -> int:
+	# A bird only minds walls and floors.
+	if data and data.flies:
+		return Constants.LAYER_WORLD
 	# No player_blocker: window openings are how enemies get in.
 	return Constants.LAYER_WORLD | Constants.LAYER_PLAYER | Constants.LAYER_ENEMY
 
@@ -1187,6 +1215,10 @@ func _halt(delta: float) -> void:
 
 
 func _apply_gravity(delta: float) -> void:
+	# A bird hangs in the air while it is alive.
+	if data.flies and is_alive():
+		velocity.y = 0.0
+		return
 	if is_on_floor():
 		velocity.y = 0.0
 	else:
@@ -1274,7 +1306,7 @@ func puppet_pose(action: EnemyRig.Action, length: float) -> void:
 	_pose(action, length)
 	match action:
 		EnemyRig.Action.STRIKE, EnemyRig.Action.CROUCH:
-			_voice(&"enemy_attack")
+			_voice(data.attack_sound)
 		EnemyRig.Action.CLIMB:
 			Sound.play_at(&"window_climb", global_position)
 		EnemyRig.Action.AIM:
@@ -1339,6 +1371,185 @@ func _puppet_step(delta: float) -> void:
 		_groan()
 
 
+# --- Die Bergdohlen (M9 part 5c, EnemyData.flies) ---------------------------------------------------
+
+## A bird's body is a small ball where its body is drawn; a walker's the shared capsule.
+func _fit_body() -> void:
+	var shape := $CollisionShape3D as CollisionShape3D
+	if _walk_shape == null:
+		_walk_shape = shape.shape
+	if data.flies:
+		if _wing_shape == null:
+			_wing_shape = SphereShape3D.new()
+			_wing_shape.radius = Constants.DOHLE_RADIUS
+		shape.shape = _wing_shape
+		shape.position.y = Constants.DOHLE_BODY_HEIGHT
+	else:
+		shape.shape = _walk_shape
+		shape.position.y = 0.9
+
+
+## At the target: flutter off after a peck, peck when near with nothing between, else fly at it.
+func _fly_at_target(delta: float) -> void:
+	if _flutter_left > 0.0:
+		_flutter_left -= delta
+		_steer(_flutter_dir * data.speed * Constants.DOHLE_FLUTTER_SPEED, delta)
+		return
+	var aim: Vector3 = _target.global_position + Vector3.UP * (Constants.DOHLE_ATTACK_HEIGHT - Constants.DOHLE_BODY_HEIGHT)
+	if global_position.distance_to(aim) <= Constants.DOHLE_PECK_RANGE and _air_clear(global_position, aim):
+		_peck()
+		return
+	_fly_to(aim, delta)
+
+
+func _peck() -> void:
+	_target.take_damage(data.damage, self)
+	_voice(data.attack_sound)
+	_pose(EnemyRig.Action.STRIKE, 0.35)
+	_flutter_left = Constants.DOHLE_FLUTTER_TIME
+	var away: Vector3 = _flat(global_position - _target.global_position)
+	away = away.normalized() if away.length_squared() > 0.0001 else global_basis.z
+	_flutter_dir = (away + Vector3.UP * 0.7).normalized()
+
+
+## Flies towards `goal` (where its origin should get to) by the way _waypoint_to finds.
+func _fly_to(goal: Vector3, delta: float) -> void:
+	_route_left -= delta
+	if global_position.distance_to(_stuck_anchor) > Constants.DOHLE_STUCK_MOVE:
+		_reset_stuck()
+	else:
+		_stuck_time += delta
+	if _stuck_time > Constants.DOHLE_STUCK_TIME:
+		# Caught on an edge or in a corner: back over the floor below at flying height, a little aside,
+		# for a moment, then the way again.
+		_reset_stuck()
+		var below: Vector3 = NavigationServer3D.map_get_closest_point(get_world_3d().navigation_map, global_position)
+		_waypoint = _raised(below) + Vector3.FORWARD.rotated(Vector3.UP, randf() * TAU) * 0.8
+		_route_left = 0.8
+	elif _route_left <= 0.0 or global_position.distance_to(_waypoint) < 0.5:
+		_route_left = Constants.DOHLE_REPATH
+		_waypoint = _waypoint_to(goal)
+	var to: Vector3 = _waypoint - global_position
+	_steer(to.normalized() * data.speed * _slow_factor if to.length() > 0.05 else Vector3.ZERO, delta)
+
+
+func _steer(wanted: Vector3, delta: float) -> void:
+	velocity = velocity.lerp(wanted, minf(Constants.DOHLE_STEER * delta, 1.0))
+	move_and_slide()
+	_face(_flat(velocity), delta)
+	# Nose up when climbing, down when diving.
+	_visual.rotation.x = clampf(velocity.y * 0.08, -0.5, 0.5)
+
+
+## The next point to fly to on the way to `goal`: straight there if the air is clear; else along
+## the navmesh's way, high over it, as far as it can see, up to the next window. A broken window is
+## flown through (from in front of it); a shut one sends it to the nearest broken one instead, and
+## with none it waits in front, circling.
+func _waypoint_to(goal: Vector3) -> Vector3:
+	return _route(goal, true)
+
+
+## As _waypoint_to; with `windows` false a window on the way is not gone into (the way stops there).
+func _route(goal: Vector3, windows: bool) -> Vector3:
+	if _air_clear(global_position, goal):
+		return goal
+	var map: RID = get_world_3d().navigation_map
+	var query := NavigationPathQueryParameters3D.new()
+	query.map = map
+	query.navigation_layers = _agent.navigation_layers
+	query.start_position = NavigationServer3D.map_get_closest_point(map, global_position)
+	query.target_position = NavigationServer3D.map_get_closest_point(map, goal)
+	var result := NavigationPathQueryResult3D.new()
+	NavigationServer3D.query_path(query, result)
+	var path: PackedVector3Array = result.path
+	if path.size() < 2:
+		return goal
+	var best: Vector3 = _raised(path[1])
+	for i: int in range(1, path.size()):
+		if result.path_types[i] == NavigationPathQueryResult3D.PATH_SEGMENT_TYPE_LINK:
+			var link := instance_from_id(result.path_owner_ids[i]) as NavigationLink3D
+			if link and windows:
+				return _window_step(link, path[i - 1])
+			break
+		var point: Vector3 = _raised(path[i])
+		if not _air_clear(global_position, point):
+			break
+		best = point
+	return best
+
+
+## The way through the window of `link`, coming from `coming_from`: through it if it is broken,
+## else through the nearest broken window (the same way, in or out), else wait in front of it.
+func _window_step(link: NavigationLink3D, coming_from: Vector3) -> Vector3:
+	var a: Vector3 = link.to_global(link.start_position)
+	var b: Vector3 = link.to_global(link.end_position)
+	var entry: Vector3 = a if a.distance_to(coming_from) <= b.distance_to(coming_from) else b
+	var through: Vector3 = _flat((b if entry == a else a) - entry).normalized()
+	var window: Barricade = _find_barricade(_flat((a + b) * 0.5))
+	if window == null:
+		return _pass_window((a + b) * 0.5 + Vector3.UP * 1.3, through)
+	if window.is_open():
+		return _pass_window(window.global_position, through)
+	# Into the room is -Z of a window.
+	var going_in: bool = through.dot(-window.global_basis.z) > 0.0
+	var other: Barricade = null
+	for node: Node in get_tree().get_nodes_in_group("barricades"):
+		var open := node as Barricade
+		if open and open.is_open() and (other == null or open.global_position.distance_to(global_position) < other.global_position.distance_to(global_position)):
+			other = open
+	if other:
+		var inward: Vector3 = _flat(-other.global_basis.z).normalized()
+		return _pass_window(other.global_position, inward if going_in else -inward)
+	var front: Vector3 = window.global_position - Vector3.UP * Constants.DOHLE_BODY_HEIGHT - through * Constants.DOHLE_WINDOW_LEAD
+	var t: float = Time.get_ticks_msec() * 0.001 * 1.5 + get_instance_id() % 7
+	return front - through * Constants.DOHLE_WAIT_CIRCLE + Vector3(cos(t), 0.2 * sin(t * 2.0), sin(t)) * Constants.DOHLE_WAIT_CIRCLE
+
+
+## Through the opening at `opening` (its centre) along `through`: first in line in front of it.
+func _pass_window(opening: Vector3, through: Vector3) -> Vector3:
+	var centre: Vector3 = opening - Vector3.UP * Constants.DOHLE_BODY_HEIGHT
+	var front: Vector3 = centre - through * Constants.DOHLE_WINDOW_LEAD
+	var past: float = (global_position - centre).dot(through)
+	var off_line: float = _flat(global_position - centre - through * past).length()
+	if past < -0.2 and (off_line > 0.35 or absf(global_position.y - centre.y) > 0.35):
+		return _route(front, false)
+	return centre + through * (Constants.DOHLE_WINDOW_LEAD + 0.5)
+
+
+## `point` on the ground, raised to flying height, but kept under any ceiling over it.
+func _raised(point: Vector3) -> Vector3:
+	var height: float = Constants.DOHLE_HEIGHT
+	var up := PhysicsRayQueryParameters3D.create(point + Vector3.UP * 0.3, point + Vector3.UP * (height + 1.0), Constants.LAYER_WORLD)
+	var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(up)
+	if not hit.is_empty():
+		height = clampf(hit.position.y - point.y - Constants.DOHLE_CEILING_GAP - Constants.DOHLE_BODY_HEIGHT, 0.5, height)
+	return point + Vector3.UP * height
+
+
+## Nothing between `from` and `to` for a bird: its body swept along the way touches no wall (a thin
+## line would slip past a window frame its body then catches on), and no shut window is on it (a
+## player blocker in a window whose boards are not all gone; other blockers, the garden gates, are
+## open to it).
+func _air_clear(from: Vector3, to: Vector3) -> bool:
+	var lift := Vector3.UP * Constants.DOHLE_BODY_HEIGHT
+	var space: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
+	if _sweep == null:
+		_sweep = PhysicsShapeQueryParameters3D.new()
+		var ball := SphereShape3D.new()
+		ball.radius = Constants.DOHLE_RADIUS * 1.15
+		_sweep.shape = ball
+		_sweep.collision_mask = Constants.LAYER_WORLD
+	_sweep.transform = Transform3D(Basis.IDENTITY, from + lift)
+	_sweep.motion = to - from
+	if space.cast_motion(_sweep)[0] < 1.0:
+		return false
+	var blocker: Dictionary = space.intersect_ray(PhysicsRayQueryParameters3D.create(from + lift, to + lift, Constants.LAYER_PLAYER_BLOCKER))
+	if blocker.is_empty():
+		return true
+	var window: Barricade = _find_barricade(_flat(blocker.position))
+	return window == null or window.is_open()
+
+
 # --- Da Wilderer (M9 part 5b, EnemyData.shot_damage) ------------------------------------------------
 
 ## Between the stock (close) and too far: moving on after a shot, standing while he reloads, or
@@ -1358,7 +1569,8 @@ func _ranged(delta: float) -> bool:
 		_halt(delta)
 		_face(_flat(_target.global_position - global_position), delta)
 		return true
-	if distance < data.shot_range_min and _move_on(data.shot_range_min - distance):
+	if distance < data.shot_range_min and not _backed_off and _move_on(data.shot_range_min - distance):
+		_backed_off = true
 		return true
 	_start_aim()
 	return true
@@ -1459,6 +1671,7 @@ func _fire() -> void:
 	_pose(EnemyRig.Action.SHOOT, 0.5)
 	_state = State.CHASING
 	_shot_left = data.shot_cooldown
+	_backed_off = false
 	_move_on()
 
 

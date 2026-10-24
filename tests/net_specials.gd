@@ -11,7 +11,8 @@ extends Node
 ## hiker shows empty hands, then the Gendarmen-Pistole; the guest's Kraxn shows on its back; the
 ## host's Venedigermandl turns up on the guest with his banner, the guest's kill pays the guest the
 ## whole sack, and the next one vanishes on both; the host's Wilderer aims at the guest (the glint on the
-## guest's screen) and his shot hurts the guest, with the streak there too.
+## guest's screen) and his shot hurts the guest, with the streak there too; the host's Bergdohlen fly in
+## the air on the guest, peck the guest, and the guest's shot downs one.
 
 const TIMEOUT: float = 25.0
 const ALPHORN: WeaponData = preload("res://data/weapons/alphorn.tres")
@@ -280,6 +281,42 @@ func _run() -> bool:
 	if not await _sync("wilderer_done"):
 		return false
 	print("wilderer: the host's Wilderer aimed (glint on the guest), his shot hurt the guest, the streak shown there")
+	# --- the Bergdohlen (M9 part 5c): the host's flock at the guest ---
+	if host:
+		var birds: Array[Enemy] = []
+		for i: int in 3:
+			var bird: Enemy = waves._create_enemy()
+			bird.activate(load("res://data/enemies/bergdohle.tres"), 6, Transform3D(Basis.IDENTITY, Vector3(-4.0 + i, 3.0, 28.0)))
+			bird.process_mode = Node.PROCESS_MODE_PAUSABLE
+			birds.append(bird)
+		if not await _until(func() -> bool: return birds.all(func(b: Enemy) -> bool: return b.net_id != 0)):
+			return _fail("the Bergdohlen never went to the guest")
+		_note.rpc("birds", birds[0].net_id)
+		if not await _until(func() -> bool: return not birds[0].is_alive()):
+			return _fail("the guest never downed the first Bergdohle")
+		for bird: Enemy in birds:
+			bird.receive_hit(99999, false, false, null)
+	else:
+		_player.health.invincible_left = 0.0
+		if not await _until(func() -> bool: return _marks.has("birds")):
+			return _fail("the host sent no Bergdohlen")
+		var bird: Enemy = Coop.enemies.by_id(int(_marks["birds"]))
+		if bird == null or not bird.data.flies:
+			return _fail("no Bergdohle puppet")
+		var health: int = _player.health.current()
+		var pecked: bool = await _until(func() -> bool: return _player.health.current() <= health - 8)
+		_player.health.invincible_left = 9999.0
+		if not pecked:
+			return _fail("the Bergdohlen never pecked the guest")
+		var ground: float = _player.global_position.y
+		if bird.global_position.y < ground + 0.6:
+			return _fail("the Bergdohle is not in the air on the guest (%.1f m)" % (bird.global_position.y - ground))
+		bird.receive_hit(99999, false, false, _player)
+		if not await _until(func() -> bool: return not bird.is_alive()):
+			return _fail("the guest's shot did not down the Bergdohle")
+	if not await _sync("birds_done"):
+		return false
+	print("bergdohlen: the host's flock in the air on the guest, pecked the guest, the guest downed one")
 	# --- the Krampus-Rute drop: one, for whoever is first ---
 	if host:
 		WeaponPickup.spawn(RUTE, _player.global_position + Vector3.FORWARD * 3.0, _main)

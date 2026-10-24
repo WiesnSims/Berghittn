@@ -36,6 +36,7 @@ func _init() -> void:
 	_krampus()
 	_mandl()
 	_wilderer()
+	_dohle()
 	_guest()
 	print("enemy models built")
 	quit()
@@ -379,6 +380,50 @@ func _krampus() -> void:
 				&"forearm_r": Vector3(25, 0, 0), &"chest": Vector3(-14, 0, 0), &"head": Vector3(10, 0, 0),
 				&"thigh_l": Vector3(8, 0, -6), &"thigh_r": Vector3(8, 0, 6), &"shin_l": Vector3(-14, 0, 0), &"shin_r": Vector3(-14, 0, 0)},
 		"stride": 22.0, "arm_swing": 12.0, "cadence": 1.1})
+
+
+## Die Bergdohle (M9 part 5c): an Alpine chough, black with a yellow beak, red legs and dead white
+## eyes. Built on the standard skeleton laid out as a bird (the body along Z, facing -Z; the arms
+## are the wings, spread in the rest pose; the legs tucked under), drawn large and built at its small
+## model_scale, so its body sits where the shared body hurtbox is.
+func _dohle() -> void:
+	var b := Builder.new(_scale("bergdohle"))
+	b.skeleton(Vector3(0.0, 0.72, 0.25), Vector3(0.0, 0.75, -0.05), Vector3(0.0, 0.82, -0.42),
+			Vector3(-0.12, 0.82, -0.12), Vector3(-0.6, 0.82, -0.06), Vector3(-1.05, 0.82, 0.02),
+			Vector3(-0.1, 0.62, 0.12), Vector3(-0.1, 0.45, 0.12), Vector3(-0.1, 0.3, 0.1))
+	var black := Color(0.07, 0.07, 0.09)
+	var sheen := Color(0.1, 0.11, 0.16)
+	# The body, from the tail end (hips) to the breast (chest), and the fanned tail.
+	b.tube([Vector3(0.0, 0.72, 0.45), Vector3(0.0, 0.74, 0.2), Vector3(0.0, 0.76, -0.05), Vector3(0.0, 0.79, -0.3), Vector3(0.0, 0.83, -0.42)],
+			[Vector2(0.06, 0.05), Vector2(0.16, 0.15), Vector2(0.2, 0.19), Vector2(0.16, 0.16), Vector2(0.09, 0.09)],
+			&"plain", black, [&"hips", &"hips", [&"hips", &"chest", 0.5], &"chest", &"chest"], 9, true, Vector3.UP)
+	b.box(Vector3(0.0, 0.71, 0.7), Vector3(0.26, 0.03, 0.55), &"plain", sheen, &"hips", Basis(Vector3.RIGHT, 0.08), Vector2(0.7, 0.9))
+	# The wings: upper and lower, and the long fingered primaries at the tip.
+	_both(func(m: Vector3, s: String) -> void:
+		b.box(Vector3(-0.36, 0.82, -0.03) * m, Vector3(0.5, 0.035, 0.4), &"plain", black, StringName("arm" + s), Basis.IDENTITY, Vector2(0.9, 0.85))
+		b.box(Vector3(-0.83, 0.82, 0.04) * m, Vector3(0.46, 0.03, 0.36), &"plain", sheen, StringName("forearm" + s), Basis.IDENTITY, Vector2(0.9, 0.85))
+		for k: int in 4:
+			var z: float = -0.08 + k * 0.1
+			b.spike([Vector3(-1.02, 0.82, z) * m, Vector3(-1.25, 0.82, z + 0.03) * m, Vector3(-1.42 + k * 0.05, 0.82, z + 0.08) * m], 0.05, &"plain", black, StringName("hand" + s), 4))
+	# Red legs, tucked, and the little feet.
+	_both(func(m: Vector3, s: String) -> void:
+		b.tube([Vector3(-0.1, 0.64, 0.12) * m, Vector3(-0.1, 0.45, 0.12) * m], [Vector2(0.025, 0.025), Vector2(0.02, 0.02)], &"plain", Color(0.75, 0.12, 0.1), [[&"hips", StringName("thigh" + s), 0.5], StringName("thigh" + s)], 5)
+		b.tube([Vector3(-0.1, 0.45, 0.12) * m, Vector3(-0.1, 0.31, 0.1) * m], [Vector2(0.02, 0.02), Vector2(0.018, 0.018)], &"plain", Color(0.75, 0.12, 0.1), StringName("shin" + s), 5)
+		b.box(Vector3(-0.1, 0.3, 0.04) * m, Vector3(0.08, 0.02, 0.14), &"plain", Color(0.6, 0.1, 0.08), StringName("foot" + s)))
+	b.head(true)
+	# The head, the yellow beak, dead white eyes.
+	b.ball(Vector3(0.0, 0.9, -0.55), Vector3(0.15, 0.15, 0.17), &"plain", black, &"head", 9, 6)
+	b.spike([Vector3(0.0, 0.88, -0.68), Vector3(0.0, 0.86, -0.82), Vector3(0.0, 0.82, -0.94)], 0.06, &"plain", Color(0.95, 0.8, 0.15), &"head", 5)
+	for x: float in [-1.0, 1.0]:
+		b.box(Vector3(0.1 * x, 0.94, -0.62), Vector3(0.03, 0.05, 0.05), &"glow", Color(0.92, 0.94, 0.95), &"head")
+	b.head(false)
+	b.ragdoll({&"arm_l": 0.04, &"forearm_l": 0.035, &"arm_r": 0.04, &"forearm_r": 0.035,
+			&"thigh_l": 0.03, &"shin_l": 0.025, &"thigh_r": 0.03, &"shin_r": 0.025},
+			Vector3(0.3, 0.3, 0.4), Vector3(0.36, 0.34, 0.4), 0.15)
+	b.save(OUT + "/bergdohle.tscn", "BergdohleModel", RIG, {
+		"build_scale": b.scale, "one_handed": false,
+		"stance": {&"thigh_l": Vector3(-50, 0, 0), &"thigh_r": Vector3(-50, 0, 0), &"shin_l": Vector3(60, 0, 0), &"shin_r": Vector3(60, 0, 0)},
+		"stride": 0.0, "arm_swing": 0.0, "cadence": 1.0, "flap": 38.0, "flap_rate": 4.5})
 
 
 ## Da Wilderer (M9 part 5b): a dead poacher in a loden jacket, a wide hat with a Gamsbart, a
