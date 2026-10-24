@@ -1,9 +1,11 @@
 class_name Resi
 extends CharacterBody3D
 ## Die Resi (section 8a): a lost Almkuh who wanders down into the beer garden for a while. Hold E to
-## milk her (full heal and a free Brettljause helping). Once a player has come near her, her bell draws
-## the enemies around her (group "lures", see Enemy), and if one reaches her she bolts. Until then they
-## leave her alone, so she is not chased off before anyone got to her. The EventDirector sends her in.
+## milk her (full heal and a free Brettljause helping). RESI_NOTICE_GRACE seconds after a player first
+## came near her, her bell draws the enemies around her (group "lures", see Enemy); each that reaches
+## her strikes her now and then, and after RESI_HEALTH blows (a bar over her back) she bolts. Until
+## then they leave her alone, so she is not chased off before anyone got to her (#94: before, the
+## first touch made her bolt the moment a player came near). The EventDirector sends her in.
 ## Co-op (M7, CoopEvents): she walks on the host; a guest's copy only shows her, and a guest's milking
 ## is the host's to allow (then the guest's own game heals them and serves the Jause).
 
@@ -15,6 +17,8 @@ const HIP_HEIGHT: float = 0.78
 const NECK: Vector3 = Vector3(0.0, 1.3, -0.72)
 const STRAP: Vector3 = Vector3(0.0, 1.08, -0.86)
 const TAIL: Vector3 = Vector3(0.0, 1.38, 0.86)
+const BAR_BACK: Material = preload("res://assets/materials/resi_bar_back.tres")
+const BAR_FILL: Material = preload("res://assets/materials/resi_bar_fill.tres")
 
 ## Seconds between milking pulls while E is held (Interactor).
 var interact_repeat: float = 0.1
@@ -37,8 +41,16 @@ var _wait_left: float = 0.0
 var _leg_time: float = 0.0
 var _milk: float = 0.0
 var _milk_since: float = INF
-# Whether a player has come near her yet; only from then on does her bell lure (and stays luring).
+# Whether a player has come near her yet, and seconds since; RESI_NOTICE_GRACE later her bell lures
+# (and stays luring).
 var _noticed: bool = false
+var _near_since: float = -1.0
+## Blows she can still take before she bolts (#94); a copy has the host's.
+var health: int = Constants.RESI_HEALTH
+# Enemy -> seconds until it strikes her again, for those at her now.
+var _strikers: Dictionary = {}
+var _bar: Node3D
+var _bar_fill: QuadMesh
 var _walk_phase: float = 0.0
 var _moving: float = 0.0
 var _head_down: float = 0.0
@@ -58,6 +70,37 @@ func _ready() -> void:
 	_rng.randomize()
 	for child: Node in _model.get_children():
 		_rest[child] = (child as Node3D).transform
+	_build_bar()
+
+
+func _build_bar() -> void:
+	_bar = Node3D.new()
+	_bar.position = Vector3.UP * Constants.RESI_BAR_HEIGHT
+	add_child(_bar)
+	var back := MeshInstance3D.new()
+	var quad := QuadMesh.new()
+	quad.size = Constants.RESI_BAR_SIZE + Vector2(0.04, 0.04)
+	back.mesh = quad
+	back.material_override = BAR_BACK
+	back.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_bar.add_child(back)
+	var fill := MeshInstance3D.new()
+	_bar_fill = QuadMesh.new()
+	fill.mesh = _bar_fill
+	fill.material_override = BAR_FILL
+	fill.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_bar.add_child(fill)
+	_show_health()
+
+
+## The bar: her blows left, from the left (the quad is turned to the camera, so it is shaped in its
+## own space: the fill a little in front of the back).
+func _show_health() -> void:
+	var share: float = clampf(float(health) / Constants.RESI_HEALTH, 0.0, 1.0)
+	var width: float = Constants.RESI_BAR_SIZE.x
+	_bar_fill.size = Vector2(maxf(width * share, 0.001), Constants.RESI_BAR_SIZE.y)
+	_bar_fill.center_offset = Vector3(-width * (1.0 - share) * 0.5, 0.0, 0.01)
+	_bar.visible = is_milkable() and health > 0
 
 
 ## Walks in through the garden gate, down the ramp, and then between the spots, always by way of the
@@ -85,12 +128,17 @@ func start_copy() -> void:
 
 
 func net_state() -> Array:
-	return [int(_state), not _route.is_empty()]
+	return [int(_state), not _route.is_empty(), health]
 
 
 func net_apply(state: Array) -> void:
 	var new_state: State = int(state[0]) as State
 	_copy_walking = bool(state[1])
+	if state.size() > 2 and int(state[2]) != health:
+		if int(state[2]) < health:
+			_moo()
+		health = int(state[2])
+		_show_health()
 	if new_state == _state:
 		return
 	if new_state in [State.MILKED, State.LEAVING, State.BOLTING]:
@@ -98,6 +146,7 @@ func net_apply(state: Array) -> void:
 	if new_state == State.MILKED:
 		_milk = 0.0
 	_state = new_state
+	_show_health()
 
 
 ## Host: a guest milked their copy of her to the end.
@@ -132,8 +181,26 @@ func pulls_inside() -> bool:
 	return false
 
 
-func lure_reached(_enemy: Node3D) -> void:
-	if is_luring():
+## An enemy at her: it strikes her every RESI_HIT_INTERVAL; out of blows, she bolts.
+func lure_reached(enemy: Node3D) -> void:
+	if not is_luring():
+		return
+	if not _strikers.has(enemy):
+		_strikers[enemy] = Constants.RESI_HIT_INTERVAL
+		return
+	if _strikers[enemy] > 0.0:
+		return
+	_strikers[enemy] = Constants.RESI_HIT_INTERVAL
+	struck()
+
+
+## A blow: one less, and a moo; the last one sends her off.
+func struck() -> void:
+	health -= 1
+	Sound.play_at(&"enemy_attack", global_position + Vector3.UP * 1.0)
+	_moo()
+	_show_health()
+	if health <= 0:
 		_leave(true)
 
 
@@ -172,8 +239,17 @@ func _physics_process(delta: float) -> void:
 		_copy_step(delta)
 		return
 	_milk_since += delta
-	if not _noticed:
-		_noticed = _player_near()
+	if _near_since < 0.0 and _player_near():
+		_near_since = 0.0
+	if _near_since >= 0.0 and not _noticed:
+		_near_since += delta
+		_noticed = _near_since >= Constants.RESI_NOTICE_GRACE
+	# Enemies at her count down to their next blow; those gone are forgotten.
+	for enemy: Node3D in _strikers.keys():
+		if not is_instance_valid(enemy) or not (enemy as Enemy).is_alive() or _flat_distance(enemy) > Constants.ENEMY_LURE_REACH + 0.5:
+			_strikers.erase(enemy)
+		else:
+			_strikers[enemy] -= delta
 	_moo_left -= delta
 	if _moo_left <= 0.0:
 		_moo()
@@ -228,12 +304,17 @@ func _treat(player: Player) -> void:
 	Events.event_announced.emit(text)
 
 
+func _flat_distance(node: Node3D) -> float:
+	return Vector2(node.global_position.x - global_position.x, node.global_position.z - global_position.z).length()
+
+
 func _milked() -> void:
 	_moo()
 	_milk = 0.0
 	_state = State.MILKED
 	_wait_left = 1.5
 	_drop_marker()
+	_show_health()
 
 
 func _leave(bolt: bool) -> void:
@@ -243,6 +324,7 @@ func _leave(bolt: bool) -> void:
 		Coop.announce("EVENT_RESI_BOLTED")
 		_moo()
 	_drop_marker()
+	_show_health()
 
 
 func _moo() -> void:

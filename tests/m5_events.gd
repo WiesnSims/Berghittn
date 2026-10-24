@@ -1,8 +1,9 @@
 extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/m5_events.tscn
 ## Section 8a events on the real main scene. Die Resi: only with the Terrasse open, walks into the
-## beer garden, is marked map-wide, once a player comes near her bell pulls outside enemies to her (they
-## make her bolt; before that they leave her alone), and
+## beer garden, is marked map-wide, 5 s after a player comes near her bell pulls outside enemies to her
+## (#94: they strike her, and after 3 blows, shown on a bar over her, she bolts; before that they leave
+## her alone), and
 ## milking her heals fully and gives a free Brettljause helping. The Bierfassl rolls down off the alm
 ## into the garden, flattens what is in its way, stops at a wall or a player, and tapping it gives a Schnaps.
 ## The Murmeltier pops up near the player where players can walk, screams, hops, and pays out when hit.
@@ -370,17 +371,27 @@ func _resi_lures() -> void:
 		await get_tree().physics_frame
 		left_alone = left_alone and enemy._find_lure() == null and resi._state != Resi.State.BOLTING
 	_check(left_alone and not resi._noticed, "with no player near, her bell lures nobody and she stays")
-	enemy.set_physics_process(true)
-	# A player walks out to her: from now on the bell pulls.
+	# A player walks out to her: RESI_NOTICE_GRACE later the bell pulls.
 	player.global_position = resi.global_position + Vector3(0.0, 0.3, -Constants.RESI_NOTICE_RADIUS + 2.0)
 	player.velocity = Vector3.ZERO
+	await _seconds(Constants.RESI_NOTICE_GRACE - 0.5)
+	_check(not resi._noticed and enemy._find_lure() == null, "for %.0f s after a player came near, still nobody goes for her" % Constants.RESI_NOTICE_GRACE)
+	await _seconds(0.6)
+	_check(resi._noticed and resi._bar.visible, "then her bell pulls; her bar shows %d blows" % resi.health)
+	# (Held still until now: left to itself it would be in through a window, past her pull.)
+	enemy.set_physics_process(true)
 	var bolted: bool = false
-	for i: int in 60 * 20:
+	var blows: Array[int] = []
+	for i: int in 60 * 30:
 		await get_tree().physics_frame
 		if not is_instance_valid(resi) or resi._state == Resi.State.BOLTING:
 			bolted = true
 			break
+		if blows.is_empty() or blows.back() != resi.health:
+			blows.append(resi.health)
 	_check(start <= Constants.RESI_LURE_RADIUS and bolted, "her bell pulls an outside enemy (%.0f m off) to her, and she bolts" % start)
+	_check(blows == [3, 2, 1] and is_instance_valid(resi) and resi.health == 0 and not resi._bar.visible,
+			"only after %d blows (%s), each %.1f s apart" % [Constants.RESI_HEALTH, blows, Constants.RESI_HIT_INTERVAL])
 	_check(_banners.back() == "Die Resi is davon!", "announced: %s" % _banners.back())
 	_check(get_tree().get_nodes_in_group("map_markers").is_empty(), "the marker goes with her")
 	await _frames(2)

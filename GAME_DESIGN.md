@@ -491,10 +491,11 @@ waves from wave 3 (never on a boss wave: then she comes the wave after), arrives
 and stays 45 s.
 - Hold E next to her to milk her: fresh Almmilch heals fully and gives a free helping from the
   Brettljause (one not yet at five).
-- Once a player has come within 10 m of her, her bell draws every enemy within 20 m to her, so
-  getting the milk is a fight. Until then the enemies leave her alone, so she is never chased off
-  before anyone got to her (play-test #70).
-- If enemies reach her, she bolts off mooing and the milk is gone.
+- 5 s after a player first came within 10 m of her, her bell draws every enemy within 20 m to her,
+  so getting the milk is a fight. Until then the enemies leave her alone, so she is never chased off
+  before anyone got to her (play-test #70; the 5 s grace #94).
+- Enemies that reach her strike her, each once every 1.5 s; after 3 blows (a bar over her back) she
+  bolts off mooing and the milk is gone (#94: before, the first touch did it, so she was unwinnable).
 
 **Random events.** At most one per wave, a 30 % chance each wave from wave 2, 8 to 35 s into it (not
 every wave, never on a boss wave or a wave Resi comes); the same one does not come twice in a row
