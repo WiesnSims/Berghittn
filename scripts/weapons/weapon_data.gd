@@ -136,8 +136,12 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, RICOCHET, BEHAVIOR, BLOCK, PLAY 
 @export var boss_multiplier: float = 1.0
 ## Pitch of its shot sounds (a forged gun sounds deeper).
 @export var sound_pitch: float = 1.0
-## Melee: seconds a survivor of the blow stands dazed (the Totngraber-Schaufl's twist; 0 = none).
+## Melee: seconds a survivor of the blow stands dazed (the Schneefräsn-Schaufl's twist; 0 = none).
 @export var stun_time: float = 0.0
+## The Golden Gun (the Dienstpistole doppelt dengelt, an easter egg): every hit kills, bosses too,
+## and the whole gun is gold, not only its steel.
+@export var one_hit: bool = false
+@export var golden: bool = false
 
 
 ## The base weapon's id: the same for a gun and its dengelt versions.

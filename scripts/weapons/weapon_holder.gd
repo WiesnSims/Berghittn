@@ -203,7 +203,7 @@ func _new_slot(data: WeaponData) -> GunSlot:
 	if data.viewmodel:
 		# Built once per gun and kept: instancing on every switch would hitch in the middle of a fight.
 		slot.viewmodel = data.viewmodel.instantiate() as Viewmodel
-		ForgedLook.apply(slot.viewmodel, data.level)
+		ForgedLook.dress(slot.viewmodel, data)
 		slot.viewmodel.visible = false
 		_motion.add_child(slot.viewmodel)
 	slot.behavior = WeaponBehavior.create(data, self)
@@ -353,7 +353,7 @@ func set_melee(data: WeaponData) -> void:
 	_melee_behavior = WeaponBehavior.create(data, self) if data else null
 	if data and data.viewmodel:
 		_melee_viewmodel = data.viewmodel.instantiate() as MeleeViewmodel
-		ForgedLook.apply(_melee_viewmodel, data.level)
+		ForgedLook.dress(_melee_viewmodel, data)
 		_motion.add_child(_melee_viewmodel)
 	melee_changed.emit(data)
 
@@ -730,6 +730,12 @@ func _slot_of(data: WeaponData) -> int:
 		if _slots[i].data.family_id() == data.family_id():
 			return i
 	return -1
+
+
+## The Golden Gun: enough to kill whatever it hits, whatever its health (at least `amount`).
+func _whole_health(receiver: Node, amount: int) -> int:
+	var enemy := receiver as Enemy
+	return maxi(amount, maxi(enemy.health, enemy.max_health)) if enemy else amount
 
 
 ## A dengelt weapon hits bosses for less of its extra damage (WeaponData.boss_multiplier).
@@ -1253,7 +1259,7 @@ func _melee_hit() -> void:
 			var enemy := hurtbox.receiver as Enemy
 			if enemy and enemy.is_alive() and melee_weapon.knockback > 0.0:
 				enemy.apply_knockback(flat.normalized() * melee_weapon.knockback * sqrt(enemy.data.flinch_multiplier))
-			# The Totngraber-Schaufl's twist: the survivor stands dazed.
+			# The Schneefräsn-Schaufl's twist: the survivor stands dazed.
 			if enemy and enemy.is_alive() and melee_weapon.stun_time > 0.0:
 				enemy.stun(melee_weapon.stun_time)
 
@@ -1290,6 +1296,8 @@ func _fire_ray(hits: Dictionary) -> void:
 			continue
 		last = hurtbox.receiver
 		var amount: int = roundi(hurtbox.damage_for(_damage(weapon.damage), weapon.headshot_multiplier) * share * _boss_share(hurtbox.receiver, weapon))
+		if weapon.one_hit:
+			amount = _whole_health(hurtbox.receiver, amount)
 		var total: Dictionary = hits.get(hurtbox.receiver, {"amount": 0, "head": false})
 		total.amount += amount
 		total.head = total.head or hurtbox.is_head

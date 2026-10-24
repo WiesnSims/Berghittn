@@ -29,6 +29,9 @@ LEVELS = {
     2: {"damage": 4.0, "boss": 0.5625, "mag": 2.0, "reserve": 4.0, "pitch": 0.75},
 }
 SUFFIX = {1: "dengelt", 2: "doppelt"}
+# Base id -> fields of level 2 only. The Dienstpistole doppelt dengelt is the Golden Gun (an easter
+# egg, user request 2026-10-24): all gold, and every hit kills.
+LEVEL_2_ONLY = {"pistole": {"one_hit": "true", "golden": "true"}}
 
 
 def field(text, name):
@@ -67,6 +70,9 @@ def forged(base_text, base_id, level, extras):
         text = set_field(text, "reserve_ammo", str(int(reserve * k["reserve"])))
     for name, value in extras.items():
         text = set_field(text, name, repr(value * level) if isinstance(value, float) else str(value * level))
+    if level == 2:
+        for name, value in LEVEL_2_ONLY.get(base_id, {}).items():
+            text = set_field(text, name, value)
     text = set_field(text, "sound_pitch", repr(k["pitch"]))
     text = set_field(text, "boss_multiplier", repr(k["boss"]))
     text = set_field(text, "family", '&"%s"' % base_id)

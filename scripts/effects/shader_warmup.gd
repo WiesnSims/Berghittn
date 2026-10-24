@@ -138,7 +138,7 @@ func _collect() -> void:
 		var model: Node3D = _model_of(weapon)
 		if model:
 			# Dengelt weapons draw with forged copies of the materials (the same shaders, but drawn once).
-			ForgedLook.apply(model, weapon.level)
+			ForgedLook.dress(model, weapon)
 			_items.append(model)
 	for file: String in DirAccess.get_files_at(ENEMIES_DIR):
 		var enemy := load(ENEMIES_DIR.path_join(file.trim_suffix(".remap"))) as EnemyData

@@ -6,7 +6,8 @@ extends Node
 ## 30 s, forged, with full ammo, double damage (bosses x1.5) and the forged look; a wall-buy refills
 ## its own reserve; doppelt dengelt for 10000, then no more; not taken in time it is gone (and with no
 ## gun left, the pistol comes back); the shovel at the grindstone comes back as the
-## Totngraber-Schaufl, whose blow leaves the survivor dazed.
+## Schneefräsn-Schaufl, whose blow leaves the survivor dazed; the Dienstpistole doppelt dengelt is
+## the Golden Gun, all gold, killing whatever it hits (bosses too).
 
 const BASES: Array[String] = ["pistole", "jagdflinte", "stutzen", "repetierer", "schaufel"]
 const FIELD: Vector3 = Vector3(10.0, -0.3, 31.0)
@@ -72,6 +73,7 @@ func _run() -> void:
 	await _doppelt()
 	await _not_taken()
 	await _the_schaufel()
+	await _golden_gun()
 	_finish()
 
 
@@ -294,3 +296,35 @@ func _the_schaufel() -> void:
 	weapons._start_melee()
 	await _seconds(1.0 / shovel.fire_rate)
 	_check(before - enemy.health == shovel.damage and enemy.is_stunned(), "its blow: %d and the survivor dazed" % (before - enemy.health))
+	enemy._take_hit(10000000, false, false, null)
+	await _seconds(0.2)
+
+
+func _golden_gun() -> void:
+	var gun: WeaponData = _weapon("pistole").upgrade.upgrade
+	_check(gun.one_hit and gun.golden and tr(gun.display_name) == "Golden Gun" and not _weapon("pistole").upgrade.one_hit,
+			"the Dienstpistole doppelt dengelt is the %s" % tr(gun.display_name))
+	weapons.give_weapon(gun)
+	await _seconds(Constants.WEAPON_SWITCH_TIME + 0.1)
+	var gold: bool = true
+	# (Its model, not the muzzle flash or the brass casings it throws.)
+	for mesh: Node in weapons._viewmodel.get_node("Model").find_children("*", "MeshInstance3D", true, false):
+		var surface := mesh as MeshInstance3D
+		if String(weapons._viewmodel.get_node("Model").get_path_to(surface)).begins_with("MuzzleFlash"):
+			continue
+		for i: int in surface.mesh.get_surface_count():
+			var material := surface.get_active_material(i) as StandardMaterial3D
+			gold = gold and material != null and material.albedo_color.is_equal_approx(Constants.FORGED_GOLD[1])
+	_check(gold, "every part of it is gold, the grip too")
+	player.global_position = FIELD
+	weapons.force_aim = true
+	await _seconds(gun.aim_time + 0.1)
+	var boss: Enemy = _spawn("krampus", Vector3(0, 0, -6))
+	await _frames(3)
+	_look_at(boss.global_position + Vector3.UP * 1.0)
+	await _frames(1)
+	weapons._cooldown = 0.0
+	weapons._fire()
+	await _frames(1)
+	_check(not boss.is_alive(), "one shot fells a Krampus with %d health" % boss.max_health)
+	weapons.force_aim = false

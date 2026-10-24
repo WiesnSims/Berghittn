@@ -879,7 +879,9 @@ a sheet-metal hood, so it reads as safe in a hay loft.
   not taken in 30 s is gone: with no gun left the plain Dienstpistole comes back, and the melee
   slot gets the Schneeschaufel. Names: Gendarmen-Pistole, Wilderer-Flinte (three shells, four
   doppelt), Kaiserjäger-Stutzen, Oberförster-Repetierer (its Querschläger hops hit twice as hard),
-  Totngraber-Schaufl; doppelt dengelt adds ", doppelt dengelt". The Schaufl's twist: a survivor of
+  Schneefräsn-Schaufl; doppelt dengelt adds ", doppelt dengelt". Easter egg (user, 2026-10-24): the
+  Dienstpistole doppelt dengelt is the **Golden Gun**, gold all over, and every hit kills (bosses
+  too), since nobody would otherwise put 15000 into the pistol. The Schaufl's twist: a survivor of
   its blow stands dazed 1.2 s (2.4 s doppelt). The numbers are written by tools/weapons/dengel.py
   from the base .tres. Wall-buys and the Munitionskiste fill a dengelt gun's own reserve at the
   usual price; the chest and wall-buys count it as its base gun. Forged look: the steel gold on an
