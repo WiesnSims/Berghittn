@@ -244,6 +244,8 @@ const DEBUG_POINTS: int = 1000
 const GUN_SLOTS: int = 2
 ## Die Kraxn in the Matratzenlager (#95): one gun slot more, for this many points.
 const KRAXN_COST: int = 2500
+## The patch notes' text box on the title screen (px).
+const PATCH_NOTES_SIZE: Vector2 = Vector2(820, 460)
 ## How high its foot board hangs on the wall (m).
 const KRAXN_HOOK_HEIGHT: float = 0.45
 ## Where a hiker carries it (m, from their feet; +Z is their back), and how big the guns strapped

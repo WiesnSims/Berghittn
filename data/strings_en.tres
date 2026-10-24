@@ -257,5 +257,8 @@ messages = {
 [&"", &"UI_DENGEL_BUSY"]: [&"The Schmied is busy"],
 [&"", &"UI_KRAXN"]: [&"Press E to strap on the Kraxn: a third gun (%d)"],
 [&"", &"UI_KRAXN_NEED"]: [&"Kraxn: %d points needed"],
-[&"", &"EVENT_KRAXN"]: [&"Jetzt bist a richtiger Tragl!"]
+[&"", &"EVENT_KRAXN"]: [&"Jetzt bist a richtiger Tragl!"],
+[&"", &"UI_PATCH_NOTES"]: [&"Patch notes"],
+[&"", &"UI_PATCH_NOTES_NEW"]: [&"Patch notes · new!"],
+[&"", &"UI_VERSION"]: [&"Version %s"]
 }

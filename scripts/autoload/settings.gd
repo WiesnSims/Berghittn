@@ -21,6 +21,8 @@ var invert_y: bool = false
 var damage_numbers: bool = false
 ## Enemies say their lines (M9 part 3, Gredn): on by default.
 var chatter: bool = true
+## The newest version whose patch notes this player has opened; the title screen marks newer ones.
+var seen_version: String = ""
 var locale: String = Constants.DEFAULT_LOCALE
 ## Linear 0..1 per bus name.
 var volumes: Dictionary = {}
@@ -82,6 +84,7 @@ func _load() -> void:
 	invert_y = file.get_value(SECTION, "invert_y", invert_y)
 	damage_numbers = file.get_value(SECTION, "damage_numbers", damage_numbers)
 	chatter = file.get_value(SECTION, "chatter", chatter)
+	seen_version = str(file.get_value(SECTION, "seen_version", seen_version))
 	var saved_locale: String = file.get_value(SECTION, "locale", locale)
 	if saved_locale in LOCALES:
 		locale = saved_locale
@@ -134,6 +137,7 @@ func save() -> void:
 	file.set_value(SECTION, "invert_y", invert_y)
 	file.set_value(SECTION, "damage_numbers", damage_numbers)
 	file.set_value(SECTION, "chatter", chatter)
+	file.set_value(SECTION, "seen_version", seen_version)
 	file.set_value(SECTION, "locale", locale)
 	file.set_value(SECTION, "render_scale", render_scale)
 	for bus: StringName in BUSES:
