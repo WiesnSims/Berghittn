@@ -16,6 +16,8 @@ signal vanished(enemy: Enemy)
 signal fired(enemy: Enemy, at: Vector3)
 ## Its hat was shot off by `source`, along `direction` (Huat obschiaßn; solo and host), for co-op.
 signal hat_lost(enemy: Enemy, direction: Vector3, source: Node3D)
+## Its variant's trick has something every screen must see (Die Bsundan; solo and host), for co-op.
+signal cued(enemy: Enemy, cue: StringName, arg: Variant)
 
 ## QUEUED: waiting at a window another enemy is working. BREAKING: tearing boards off a barricade.
 ## LUNGING: crouching for and then flying through a leap at the player (Perchte). AIMING: standing
@@ -165,6 +167,14 @@ static var _sweep: PhysicsShapeQueryParameters3D
 # The Wilderer has backed off once since his last shot (he only does so once, or in a small room
 # he would go on backing off and never aim).
 var _backed_off: bool = false
+## Die Bsundan (1.2): a rare variant's trick (EnemyData.variant), or null.
+var variant: EnemyVariant
+## Its own walking pace on top of slows (a variant's trick sets it; activate resets it).
+var speed_scale: float = 1.0
+## Da Bergführer's Seilschaft: the one this plain enemy is roped on behind, or null.
+var roped_to: Enemy
+# Seconds left of the Influencer's Likes (faster meanwhile).
+var _hype_left: float = 0.0
 ## The corpses being simulated now, oldest first (at most Constants.RAGDOLL_MAX).
 static var _ragdolls: Array[Enemy] = []
 
@@ -197,6 +207,13 @@ func activate(enemy_data: EnemyData, for_wave: int, at: Transform3D) -> void:
 		_hat = _model.find_child("Hat", true, false) as MeshInstance3D
 		if _hat:
 			_hat_box.fit(_hat.mesh.get_aabb(), Constants.HAT_BOX_FLOOR * enemy_data.model_scale)
+		if variant:
+			variant.queue_free()
+			variant = null
+		if enemy_data.variant:
+			variant = enemy_data.variant.new() as EnemyVariant
+			variant.enemy = self
+			add_child(variant)
 	data = enemy_data
 	_fit_body()
 	focus = null
@@ -224,6 +241,9 @@ func activate(enemy_data: EnemyData, for_wave: int, at: Transform3D) -> void:
 		_burn_fx.emitting = false
 	_slow_left = 0.0
 	_slow_factor = 1.0
+	speed_scale = 1.0
+	_hype_left = 0.0
+	roped_to = null
 	global_transform = at
 	velocity = Vector3.ZERO
 	_visual.transform = Transform3D.IDENTITY
@@ -256,6 +276,8 @@ func activate(enemy_data: EnemyData, for_wave: int, at: Transform3D) -> void:
 		Events.boss_spawned.emit(self)
 	if data.treasure:
 		_appear()
+	if variant:
+		variant.activated()
 
 
 func is_alive() -> bool:
@@ -544,6 +566,8 @@ func knock_hat(direction: Vector3, source: Node3D) -> bool:
 		if hit_relay.is_valid():
 			hit_relay.call(self, &"knock_hat", [direction])
 		return true
+	if variant:
+		variant.hat_lost()
 	hat_lost.emit(self, direction, source)
 	Events.hat_shot.emit(self, source)
 	Gredn.hat(self)
@@ -611,6 +635,9 @@ func _step(delta: float) -> void:
 		_groan_left -= delta
 		if _groan_left <= 0.0:
 			_groan()
+		if variant:
+			variant.tick(delta)
+	_hype_left -= delta
 	if _slow_left > 0.0:
 		_slow_left -= delta
 		if _slow_left <= 0.0:
@@ -777,6 +804,10 @@ func _chase(delta: float) -> void:
 	if data.flies:
 		_fly_at_target(delta)
 		return
+	if variant and variant.chase(delta):
+		return
+	if _follow_rope(delta):
+		return
 	if _in_attack_range():
 		_start_attack()
 		return
@@ -804,11 +835,33 @@ func _walk_towards(goal: Vector3, delta: float) -> void:
 	if direction.length_squared() < 0.0001:
 		direction = _flat(goal - global_position)
 	direction = _unstick(direction.normalized(), delta)
-	velocity.x = direction.x * data.speed * _slow_factor
-	velocity.z = direction.z * data.speed * _slow_factor
+	velocity.x = direction.x * data.speed * _slow_factor * pace()
+	velocity.z = direction.z * data.speed * _slow_factor * pace()
 	_apply_gravity(delta)
 	_face(direction, delta)
 	move_and_slide()
+
+
+## Its own pace on top of slows: a variant's trick, and the Influencer's Likes.
+func pace() -> float:
+	return speed_scale * (Constants.INFLU_HYPE if _hype_left > 0.0 else 1.0)
+
+
+## Da Bergführer's Seilschaft: roped on, it walks SEIL_GAP behind the one before it, unless a player
+## is within SEIL_FREE. False: it is free (or near a player) and chases as usual.
+func _follow_rope(delta: float) -> bool:
+	if not is_instance_valid(roped_to) or not roped_to.is_alive():
+		return false
+	if _flat(_target.global_position - global_position).length() <= Constants.SEIL_FREE:
+		return false
+	# Models face -Z: behind is +Z.
+	var behind: Vector3 = roped_to.global_position + _flat(roped_to.global_basis.z).normalized() * Constants.SEIL_GAP
+	if _flat(behind - global_position).length() < 0.4:
+		_halt(delta)
+		_face(_flat(roped_to.global_position - global_position), delta)
+		return true
+	_walk_towards(behind, delta)
+	return true
 
 
 ## Steering while chasing: the path direction, or a sidestep when the body has stopped making headway.
@@ -881,9 +934,16 @@ func _attack(delta: float) -> void:
 		_has_swung = true
 		# Only lands if the player is still there: backing off during the windup is a real dodge.
 		if _target and _target.is_targetable() and _in_attack_range():
-			_target.take_damage(data.damage, self)
+			_strike(_target)
 	if _attack_time >= data.attack_windup + data.attack_cooldown:
 		_state = State.CHASING
+
+
+## Its blow (or leap) hits `target` for its damage.
+func _strike(target: Node3D) -> void:
+	target.take_damage(data.damage, self)
+	if variant:
+		variant.landed(target)
 
 
 func _start_attack() -> void:
@@ -904,6 +964,8 @@ func _can_lunge() -> bool:
 	if data.lunge_range <= 0.0 or _lunge_cooldown_left > 0.0 or not is_on_floor():
 		return false
 	var offset: Vector3 = _target.global_position - global_position
+	if variant and not variant.may_lunge(_flat(offset).length()):
+		return false
 	return absf(offset.y) <= Constants.ENEMY_ATTACK_MAX_HEIGHT and _flat(offset).length() <= data.lunge_range and _clear_line_to_target()
 
 
@@ -941,11 +1003,31 @@ func _lunge(delta: float) -> void:
 	velocity.z = _lunge_direction.z * data.lunge_speed
 	_apply_gravity(delta)
 	move_and_slide()
+	if variant:
+		variant.lunge_moved()
+		if _state != State.LUNGING:
+			return
 	if not _lunge_struck and _target and _target.is_targetable() and _in_attack_range():
 		_lunge_struck = true
-		_target.take_damage(data.damage, self)
+		_strike(_target)
 	if _lunge_struck or _lunge_time >= data.lunge_windup + data.lunge_time:
 		_end_lunge()
+
+
+## In the leap of a lunge (past the crouch).
+func leaping() -> bool:
+	return _state == State.LUNGING and _lunge_time >= data.lunge_windup
+
+
+## Its lunge ran into a wall (the Trailrunner): it ends, and down it goes, dazed for `stun_time`.
+func crash(stun_time: float) -> void:
+	if _state != State.LUNGING:
+		return
+	_end_lunge()
+	_kill_tween()
+	_visual.transform = Transform3D.IDENTITY
+	velocity = Vector3.ZERO
+	stun(stun_time)
 
 
 func _end_lunge() -> void:
@@ -1140,6 +1222,10 @@ func _die(is_headshot: bool, is_melee: bool, source: Node3D, amount: int = 100) 
 	# Co-op: the host's drop is the one everyone sees (CoopWorld); a puppet leaves none of its own.
 	if data.drop and not puppet:
 		WeaponPickup.spawn(data.drop, global_position, get_parent())
+	roped_to = null
+	# Before the kill goes out: the Sprengmeister's blast, its kills paid as his.
+	if variant:
+		variant.died(source)
 	# Points first, then the wave manager: the last kill of a wave is paid out before "wave cleared".
 	Events.enemy_killed.emit(self, is_headshot, is_melee, source)
 	died.emit(self)
@@ -1923,6 +2009,99 @@ func _gold_fx() -> MandlGold:
 
 func _chest() -> Vector3:
 	return global_position + Vector3.UP * 1.1 * data.model_scale
+
+
+# --- Die Bsundan (1.2, EnemyData.variant): what the variants' tricks use -----------------------------
+
+## A cue of its variant for co-op guests (solo and host; a puppet sends none).
+func send_cue(cue: StringName, arg: Variant = null) -> void:
+	if not puppet:
+		cued.emit(self, cue, arg)
+
+
+## The host's variant cued: its puppet shows it. Any enemy may be told it was healed (blessed by the
+## Schönperchte), to its new health.
+func puppet_cue(cue: StringName, arg: Variant) -> void:
+	if cue == &"healed":
+		if is_alive():
+			health = arg
+			sparkle()
+		return
+	if variant:
+		variant.cue(cue, arg)
+
+
+## The Influencer's Likes: faster for `duration` seconds.
+func hype(duration: float) -> void:
+	_hype_left = maxf(_hype_left, duration)
+
+
+func is_hyped() -> bool:
+	return _hype_left > 0.0 and is_alive()
+
+
+## `amount` health back, up to what it came with; a gold sparkle (every screen, by the cue the
+## blessing sends).
+func heal(amount: int) -> void:
+	if not is_alive() or amount <= 0:
+		return
+	health = mini(health + amount, max_health)
+
+
+## A gold sparkle round its head.
+func sparkle() -> void:
+	_gold_fx().spark(_chest() + Vector3.UP * 0.6 * data.model_scale)
+
+
+## Spills coins (a hit on the Kassa), or the whole Kassa (`all`).
+func spill(all: bool) -> void:
+	if all:
+		_gold_fx().fountain(_chest())
+	else:
+		_gold_fx().coins(_chest())
+
+
+## Dies by its own doing (the Sprengmeister's fuse ran out): nobody is paid.
+func kill_self() -> void:
+	if is_alive() and not puppet:
+		_take_hit(maxi(health, 1), false, false, null)
+
+
+## Its skeleton (null if the model has none), for points on its bones.
+func rig() -> EnemyRig:
+	return _rig
+
+
+## Starts an action on its model (and co-op guests' puppets).
+func pose(action: EnemyRig.Action, length: float = 1.0) -> void:
+	_pose(action, length)
+
+
+## Where its Visual (the model, bobbing and leaning) is; a variant hops it.
+func visual() -> Node3D:
+	return _visual
+
+
+## In a state it can be dazed or dance in (walking, swinging, waiting, aiming): free to do a trick.
+func free_to_act() -> bool:
+	return is_alive() and _can_dance() and not _lifted and not _hurled and _stun_left <= 0.0 \
+			and _dance_left <= 0.0 and _flee_left <= 0.0 and _knock == Vector3.ZERO
+
+
+## Stands still this step, facing `toward`.
+func hold(toward: Vector3, delta: float) -> void:
+	_halt(delta)
+	_face(_flat(toward - global_position), delta)
+
+
+## Walks towards `goal` this step (the navmesh way).
+func walk(goal: Vector3, delta: float) -> void:
+	_walk_towards(goal, delta)
+
+
+## The target it is chasing now (a player or an escort), or null.
+func target() -> Node3D:
+	return _target
 
 
 func _kill_tween() -> void:

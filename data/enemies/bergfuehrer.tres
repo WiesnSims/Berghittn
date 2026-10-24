@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/bergfuehrer.tscn" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/wanderer.tres" id="3"]
+[ext_resource type="Script" path="res://scripts/enemies/variants/bergfuehrer.gd" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"bergfuehrer"
+display_name = "ENEMY_BERGFUEHRER"
+base_health = 180
+health_per_wave = 25
+speed = 2.3
+damage = 20
+attack_range = 1.4
+attack_windup = 0.45
+attack_cooldown = 1.1
+climb_time = 2.2
+board_break_time = 0.5
+head_pop_damage = 60
+model = ExtResource("2")
+model_scale = 1.0
+flinch_multiplier = 0.8
+lunge_range = 0.0
+variant_of = ExtResource("3")
+variant = ExtResource("4")
+points_multiplier = 3.0
+is_boss = false
+groan_sounds = Array[StringName]([&"groan_wanderer"])
+voice_pitch = 0.95

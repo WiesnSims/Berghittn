@@ -155,6 +155,53 @@ func _run() -> bool:
 	print("hat: the guest's shot knocked the host's hat off, paid 20 once")
 	if not await _sync("hat"):
 		return false
+	# --- Die Bsundan (1.2): the host's Kassier takes the guest's fee, the guest's kill gets it back;
+	# the host's Bergführer's rope shows on the guest ---
+	if host:
+		var guest: Node3D = Coop.node_of(multiplayer.get_peers()[0])
+		var at := Transform3D(Basis.IDENTITY, guest.global_position + Vector3(0.0, 0.0, -3.0))
+		var kassier: Enemy = waves.send_variant(load("res://data/enemies/kassier.tres"), at)[0]
+		kassier.process_mode = Node.PROCESS_MODE_PAUSABLE
+		kassier.set_physics_process(false)
+		var seil: Array[Enemy] = waves.send_variant(load("res://data/enemies/bergfuehrer.tres"), at.translated(Vector3(4.0, 0.0, 0.0)), 2)
+		for enemy: Enemy in seil:
+			enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
+		if not await _until(func() -> bool: return kassier.net_id != 0 and seil.all(func(e: Enemy) -> bool: return e.net_id != 0)):
+			return _fail("the variants never went to the guest")
+		_note.rpc("kassier", kassier.net_id)
+		_note.rpc("bergfuehrer", seil[0].net_id)
+		if not await _until(func() -> bool: return _marks.has("ready_to_pay")):
+			return _fail("the guest never got ready")
+		kassier._strike(guest)
+		if not await _until(func() -> bool: return not kassier.is_alive()):
+			return _fail("the guest never killed the Kassier")
+		for enemy: Enemy in seil:
+			enemy.receive_hit(99999, false, false, null)
+	else:
+		if not await _until(func() -> bool: return _marks.has("kassier") and _marks.has("bergfuehrer")):
+			return _fail("the host sent no variants")
+		var puppet: Enemy = Coop.enemies.by_id(int(_marks["kassier"]))
+		if puppet == null or puppet.variant == null or not _banners.has(tr("EVENT_VARIANT_KASSIER")):
+			return _fail("no Kassier puppet with his banner on the guest")
+		var guide: Enemy = Coop.enemies.by_id(int(_marks["bergfuehrer"]))
+		if guide == null or not await _until(func() -> bool: return guide.variant.chain.size() == 2):
+			return _fail("the Bergführer's rope never showed on the guest")
+		_player.points.total = 1000
+		_mark.rpc("ready_to_pay")
+		if not await _until(func() -> bool: return _player.points.total == 1000 - Constants.KASSIER_FEE):
+			return _fail("the Kassier's blow took no fee from the guest (%d)" % _player.points.total)
+		if not await _until(func() -> bool: return puppet.variant.box == Constants.KASSIER_FEE):
+			return _fail("the puppet's Kassa never heard of the fee")
+		var points: int = _player.points.total
+		puppet.receive_hit(99999, false, false, _player)
+		var pay: int = roundi(Constants.POINTS_KILL_BODY * 3.0) + Constants.KASSIER_KILL + Constants.KASSIER_FEE
+		if not await _until(func() -> bool: return _player.points.total == points + pay):
+			return _fail("the guest's Kassier kill paid %d, not %d" % [_player.points.total - points, pay])
+		if not await _until(func() -> bool: return Gredn.current.shown() == 0):
+			return _fail("the variants' lines never faded")
+	print("variants: the Kassier's fee taken from the guest and paid back with his kill; the rope on the guest")
+	if not await _sync("variants"):
+		return false
 	# --- a line (Gredn): picked by the host, its index sent, heard and shown on the guest ---
 	var gredn: Gredn = Gredn.current
 	if host:

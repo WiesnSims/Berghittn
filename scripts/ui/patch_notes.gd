@@ -7,6 +7,25 @@ extends RefCounted
 
 const ENTRIES: Array[Dictionary] = [
 	{
+		"version": "1.2", "date": "2026-10-25",
+		"en": [
+			"Die Bsundan: six rare special enemies, each with its own look, hat and trick, worth 3× the points.",
+			"Da Vereinskassier collects your membership fee with every blow. Get it back from his Kassa!",
+			"Da Sprengmeister carries dynamite: shoot him early, or in the middle of a crowd.",
+			"Die Schönperchte blesses the enemies around her. Shoot her Tafel off!",
+			"Da Influencer goes live: the enemies near him get faster, and his ring light dazzles.",
+			"Da Bergführer brings his Seilschaft on a rope, and da Trailrunner charges straight at you.",
+		],
+		"de": [
+			"Die Bsundan: sechs seltene Spezialgegner mit eigenem Aussehen, Hut und Trick, für die dreifachen Punkte.",
+			"Da Vereinskassier kassiert mit jedem Schlag den Mitgliedsbeitrag. Hol ihn dir aus seiner Kassa zurück!",
+			"Da Sprengmeister hat Dynamit dabei: früh erwischen, oder mitten in der Menge.",
+			"Die Schönperchte segnet die Gegner um sie herum. Schieß ihr die Tafel runter!",
+			"Da Influencer geht live: die Gegner bei ihm werden schneller, und sein Ringlicht blendet.",
+			"Da Bergführer bringt seine Seilschaft am Seil mit, und da Trailrunner rennt geradewegs auf dich zu.",
+		],
+	},
+	{
 		"version": "1.1.3", "date": "2026-10-24",
 		"en": [
 			"Huat obschiaßn: shoot the hats off the Wanderer, Tourist, Knappe, Wilderer and Venedigermandl for 20 points. They won't be happy about it.",

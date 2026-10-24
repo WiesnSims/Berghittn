@@ -6,6 +6,8 @@ extends Node3D
 ## ends without him.
 ## Sitzfleisch (1.1.2): a player who stays put too long in a wave gets a Wilderer and a few
 ## Bergdohlen sent after them (on top of the wave), a banner and a taunt.
+## Die Bsundan (1.2): from VARIANT_FIRST_WAVE a normal spawn is now and then a rare variant instead,
+## at most one alive; the Bergführer brings his Seilschaft from the wave along.
 
 enum Phase { BREAK, SPAWNING, CLEARING }
 
@@ -32,6 +34,9 @@ var _mandl: Enemy
 var _sitz: Dictionary = {}
 const WILDERER: EnemyData = preload("res://data/enemies/wilderer.tres")
 const DOHLE: EnemyData = preload("res://data/enemies/bergdohle.tres")
+# The variant about now (if it still lives), and the last one sent (not twice in a row).
+var _variant: Enemy
+var _last_variant: EnemyData
 
 
 func _ready() -> void:
@@ -88,11 +93,21 @@ func _start_wave(number: int) -> void:
 
 func _spawn() -> void:
 	var point: Node3D = _pick_spawn_point()
-	var data: EnemyData = _queue.pop_front() if not _queue.is_empty() else wave_table.pick_enemy(wave, _rng)
+	var queued: bool = not _queue.is_empty()
+	var data: EnemyData = _queue.pop_front() if queued else wave_table.pick_enemy(wave, _rng)
 	if point == null or data == null:
 		push_warning("Wave %d: no spawn point or no enemy type; skipping a spawn." % wave)
 		_count_spawned()
 		return
+	if not queued and not data.flies:
+		var variant: EnemyData = _roll_variant()
+		if variant:
+			var angle: float = _rng.randf() * TAU
+			var at: Transform3D = point.global_transform.translated(Vector3(cos(angle), 0.0, sin(angle)) * _rng.randf() * Constants.SPAWN_SCATTER_RADIUS)
+			var room: int = mini(_to_spawn, Constants.MAX_ALIVE_ENEMIES - _alive)
+			for i: int in send_variant(variant, at, room - 1).size():
+				_count_spawned()
+			return
 	# A flock of birds (the Bergdohlen) comes at once, high up, each one of the wave and of the alive.
 	var count: int = 1
 	if data.flies:
@@ -107,6 +122,48 @@ func _spawn() -> void:
 		enemy.activate(data, wave, point.global_transform.translated(scatter))
 		_alive += 1
 		_count_spawned()
+
+
+# A rare variant instead of this spawn, now and then (null: not this time).
+func _roll_variant() -> EnemyData:
+	if wave < Constants.VARIANT_FIRST_WAVE or wave_table.is_boss_wave(wave) or variant_about():
+		return null
+	if _rng.randf() >= Constants.VARIANT_CHANCE:
+		return null
+	var data: EnemyData = wave_table.pick_variant(wave, _last_variant, _rng)
+	if data:
+		_last_variant = data
+	return data
+
+
+## A rare variant is alive now.
+func variant_about() -> bool:
+	return is_instance_valid(_variant) and _variant.is_alive() and _variant.data.variant != null
+
+
+## Sends the variant `data` in at `at` (also used by tests), with up to `room` of its base enemy along
+## if it brings any (the Bergführer's Seilschaft, lined up behind him). Returns everyone sent, the
+## variant first; each counts as alive in the wave.
+func send_variant(data: EnemyData, at: Transform3D, room: int = 0) -> Array[Enemy]:
+	var sent: Array[Enemy] = [_take(data, at)]
+	_variant = sent[0]
+	var along: Array[Enemy] = []
+	var behind: Vector3 = at.basis.z.normalized()
+	for i: int in mini(_variant.variant.followers(), maxi(room, 0)):
+		along.append(_take(data.variant_of, at.translated(behind * Constants.SEIL_GAP * (i + 1))))
+	if not along.is_empty():
+		_variant.variant.escort(along)
+	sent.append_array(along)
+	return sent
+
+
+# One more enemy of the wave, out of the pool.
+func _take(data: EnemyData, at: Transform3D) -> Enemy:
+	var pool: Array = _pools.get(data.id, [])
+	var enemy: Enemy = pool.pop_back() if not pool.is_empty() else _create_enemy()
+	enemy.activate(data, wave, at)
+	_alive += 1
+	return enemy
 
 
 ## The Venedigermandl turns up now (also used by tests), at a spawn point of an open zone at least

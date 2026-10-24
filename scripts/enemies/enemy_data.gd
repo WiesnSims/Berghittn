@@ -57,6 +57,13 @@ extends Resource
 ## Treasure (the Venedigermandl, M9 part 5a): never attacks, runs from the players, vanishes after
 ## a while, pays a fortune; outside the wave count, and lures do not pull it.
 @export var treasure: bool = false
+## A rare variant (Die Bsundan, 1.2) of this base enemy: it talks with the base's lines where it has
+## none of its own. null = no variant.
+@export var variant_of: EnemyData
+## The variant's trick: an EnemyVariant script, put on the enemy as a node of its own.
+@export var variant: Script
+## Its kill pays this many times the usual kill points.
+@export var points_multiplier: float = 1.0
 ## Left behind where it dies, for a player to pick up (the Krampus drops his Rute); null = nothing.
 @export var drop: WeaponData
 ## Sounds (Sound ids, M6 part 2): groans now and then while it is about (one picked at random), its

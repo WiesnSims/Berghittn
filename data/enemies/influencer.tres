@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/influencer.tscn" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/tourist.tres" id="3"]
+[ext_resource type="Script" path="res://scripts/enemies/variants/influencer.gd" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"influencer"
+display_name = "ENEMY_INFLUENCER"
+base_health = 90
+health_per_wave = 12
+speed = 4.5
+damage = 15
+attack_range = 1.4
+attack_windup = 0.35
+attack_cooldown = 0.9
+climb_time = 1.6
+board_break_time = 0.6
+head_pop_damage = 40
+model = ExtResource("2")
+model_scale = 0.97
+flinch_multiplier = 1.0
+lunge_range = 0.0
+variant_of = ExtResource("3")
+variant = ExtResource("4")
+points_multiplier = 3.0
+is_boss = false
+groan_sounds = Array[StringName]([&"groan_tourist"])
+voice_pitch = 1.25

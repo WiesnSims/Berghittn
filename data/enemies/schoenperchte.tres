@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/schoenperchte.tscn" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/perchte.tres" id="3"]
+[ext_resource type="Script" path="res://scripts/enemies/variants/schoenperchte.gd" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"schoenperchte"
+display_name = "ENEMY_SCHOENPERCHTE"
+base_health = 220
+health_per_wave = 25
+speed = 3.6
+damage = 20
+attack_range = 1.4
+attack_windup = 0.4
+attack_cooldown = 1.0
+climb_time = 1.8
+board_break_time = 0.45
+head_pop_damage = 90
+model = ExtResource("2")
+model_scale = 1.06
+flinch_multiplier = 0.6
+lunge_range = 0.0
+variant_of = ExtResource("3")
+variant = ExtResource("4")
+points_multiplier = 3.0
+is_boss = false
+groan_sounds = Array[StringName]([&"groan_perchte"])
+voice_pitch = 1.45

@@ -18,7 +18,12 @@ extends Node3D
 ## AIM and SHOT are the Wilderer's: as he starts to aim, and when his shot hits.
 ## SITZ is Sitzfleisch (1.1.2): the nearest enemy mocks a player who stays put too long (taunt).
 ## HAT is Huat obschiaßn: its hat was shot off (always said, and heard from GREDN_HAT_REACH).
-enum Moment { SPOT, IDLE, BARRICADE, HIT, LUNGE, DEATH, APPEAR, RUN, VANISH, AIM, SHOT, SITZ, HAT }
+## FEE, FUSE, BLESS, LIVE and CRASH are the rare variants' tricks (Die Bsundan, 1.2; always said): the
+## Kassier's blow, the Sprengmeister's fuse, the Schönperchte's blessing, the Influencer going live,
+## the Trailrunner running into a wall. A variant has the lines of its base enemy for the moments it
+## has none of its own.
+enum Moment { SPOT, IDLE, BARRICADE, HIT, LUNGE, DEATH, APPEAR, RUN, VANISH, AIM, SHOT, SITZ, HAT,
+		FEE, FUSE, BLESS, LIVE, CRASH }
 
 const LINE: Script = preload("res://scripts/effects/gredn_line.gd")
 
@@ -73,6 +78,39 @@ const LINES: Array = [
 	[&"knappe", Moment.HAT, "Mei Helm! Wo is mei Helm?", &"gredn_knappe_helm"],
 	[&"wilderer", Moment.HAT, "Mei Gamsbart!", &"gredn_wilderer_gamsbart"],
 	[&"venedigermandl", Moment.HAT, "Il mio cappello!", &"gredn_venedigermandl_cappello"],
+	[&"kassier", Moment.SPOT, "Ihr Beitrag is fällig!", &"gredn_kassier_faellig"],
+	[&"kassier", Moment.IDLE, "Wer hot no ned zoit?", &"gredn_kassier_zoit"],
+	[&"kassier", Moment.FEE, "Mitgliedsbeitrag!", &"gredn_kassier_beitrag"],
+	[&"kassier", Moment.FEE, "Danke, des wär's!", &"gredn_kassier_danke"],
+	[&"kassier", Moment.HIT, "Mei Kassa!", &"gredn_kassier_kassa"],
+	[&"kassier", Moment.HAT, "Mei Vereinshuat!", &"gredn_kassier_vereinshuat"],
+	[&"kassier", Moment.DEATH, "Die Kassa stimmt ned…", &"gredn_kassier_stimmt_ned"],
+	[&"sprengmeister", Moment.SPOT, "Glück auf… und Obacht!", &"gredn_sprengmeister_obacht"],
+	[&"sprengmeister", Moment.IDLE, "Wo is mei Zündholz?", &"gredn_sprengmeister_zuendholz"],
+	[&"sprengmeister", Moment.FUSE, "Obacht, gleich tuat's an Tuscher!", &"gredn_sprengmeister_tuscher"],
+	[&"sprengmeister", Moment.HAT, "Mei Sprenghelm!", &"gredn_sprengmeister_helm"],
+	[&"schoenperchte", Moment.SPOT, "Glück und Segen!", &"gredn_schoenperchte_segen"],
+	[&"schoenperchte", Moment.BLESS, "Glück und Segen!", &"gredn_schoenperchte_segen"],
+	[&"schoenperchte", Moment.BLESS, "Auf geht's, ihr Schiachn!", &"gredn_schoenperchte_schiachn"],
+	[&"schoenperchte", Moment.HAT, "Mei Tafel!", &"gredn_schoenperchte_tafel"],
+	[&"schoenperchte", Moment.DEATH, "Des bringt Unglück…", &"gredn_schoenperchte_unglueck"],
+	[&"influencer", Moment.SPOT, "Servus Leute!", &"gredn_influencer_servus"],
+	[&"influencer", Moment.IDLE, "Hashtag Hüttnzauber!", &"gredn_influencer_huettnzauber"],
+	[&"influencer", Moment.LIVE, "Servus Leute, mia san live vom Berg!", &"gredn_influencer_live"],
+	[&"influencer", Moment.LIVE, "Lasst's a Like do!", &"gredn_influencer_like"],
+	[&"influencer", Moment.HIT, "Des schneid i raus!", &"gredn_influencer_raus"],
+	[&"influencer", Moment.HAT, "Mei Kappl!", &"gredn_influencer_kappl"],
+	[&"influencer", Moment.DEATH, "Abonniert's mi…", &"gredn_influencer_abonniert"],
+	[&"bergfuehrer", Moment.SPOT, "Seilschaft, auf geht's!", &"gredn_bergfuehrer_seilschaft"],
+	[&"bergfuehrer", Moment.IDLE, "Bleibt's beinand!", &"gredn_bergfuehrer_beinand"],
+	[&"bergfuehrer", Moment.HAT, "Ohne Helm geh i ned weiter!", &"gredn_bergfuehrer_helm"],
+	[&"bergfuehrer", Moment.DEATH, "Seilriss!", &"gredn_bergfuehrer_seilriss"],
+	[&"trailrunner", Moment.SPOT, "Kurz Platz macha!", &"gredn_trailrunner_platz"],
+	[&"trailrunner", Moment.LUNGE, "Bahn frei!", &"gredn_trailrunner_bahn_frei"],
+	[&"trailrunner", Moment.LUNGE, "Achtung, Bestzeit!", &"gredn_trailrunner_bestzeit"],
+	[&"trailrunner", Moment.CRASH, "Au! Mei Bestzeit!", &"gredn_trailrunner_au"],
+	[&"trailrunner", Moment.HAT, "Mei Laufkappl!", &"gredn_trailrunner_kappl"],
+	[&"trailrunner", Moment.DEATH, "Ziel… erreicht…", &"gredn_trailrunner_ziel"],
 ]
 const CHANCE: Dictionary = {
 	Moment.SPOT: Constants.GREDN_CHANCE_SPOT, Moment.IDLE: Constants.GREDN_CHANCE_IDLE,
@@ -80,7 +118,8 @@ const CHANCE: Dictionary = {
 	Moment.LUNGE: Constants.GREDN_CHANCE_LUNGE, Moment.DEATH: Constants.GREDN_CHANCE_DEATH,
 	Moment.APPEAR: 1.0, Moment.RUN: 1.0, Moment.VANISH: 1.0,
 	Moment.AIM: Constants.GREDN_CHANCE_AIM, Moment.SHOT: Constants.GREDN_CHANCE_SHOT, Moment.SITZ: 1.0,
-	Moment.HAT: 1.0,
+	Moment.HAT: 1.0, Moment.FEE: 1.0, Moment.FUSE: 1.0, Moment.BLESS: 1.0, Moment.LIVE: 1.0,
+	Moment.CRASH: 1.0,
 }
 
 static var current: Gredn
@@ -120,10 +159,7 @@ func talk(enemy: Enemy, which: Moment) -> int:
 			return -1
 	elif _gap_left > 0.0 or enemy.talk_left > 0.0 or (not always and randf() >= CHANCE[which]):
 		return -1
-	var choices: Array[int] = []
-	for i: int in LINES.size():
-		if LINES[i][0] == enemy.data.id and LINES[i][1] == which:
-			choices.append(i)
+	var choices: Array[int] = lines_for(enemy.data, which)
 	if choices.is_empty() or not _player_near(enemy):
 		return -1
 	var line: int = choices.pick_random()
@@ -145,6 +181,25 @@ static func hat(enemy: Enemy) -> int:
 	return current.blurt(enemy, Moment.HAT)
 
 
+## A rare variant's trick (Die Bsundan): `enemy` (solo, or the host's) says its line for `which`,
+## whatever the dice and the gaps say. Returns the line's index, or -1.
+static func now(enemy: Enemy, which: Moment) -> int:
+	if current == null or enemy.puppet:
+		return -1
+	return current.blurt(enemy, which)
+
+
+## The lines `data` has for `which`: its own, or (a variant) its base enemy's.
+static func lines_for(data: EnemyData, which: Moment) -> Array[int]:
+	var choices: Array[int] = []
+	for i: int in LINES.size():
+		if LINES[i][0] == data.id and LINES[i][1] == which:
+			choices.append(i)
+	if choices.is_empty() and data.variant_of:
+		return lines_for(data.variant_of, which)
+	return choices
+
+
 ## Sitzfleisch: `enemy` mocks a player who stays put (solo, or the host). Returns the line's index,
 ## or -1 if it has no such line.
 func taunt(enemy: Enemy) -> int:
@@ -156,10 +211,7 @@ func taunt(enemy: Enemy) -> int:
 func blurt(enemy: Enemy, which: Moment) -> int:
 	if enemy.puppet:
 		return -1
-	var choices: Array[int] = []
-	for i: int in LINES.size():
-		if LINES[i][0] == enemy.data.id and LINES[i][1] == which:
-			choices.append(i)
+	var choices: Array[int] = lines_for(enemy.data, which)
 	if choices.is_empty():
 		return -1
 	var line: int = choices.pick_random()

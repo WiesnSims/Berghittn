@@ -776,6 +776,49 @@ def fire_crackle(v):
 
 
 # name: (recipe, variants, folder). Folder picks the import loop flag in build.py.
+# --- Die Bsundan, the rare variants (1.2) ------------------------------------------------------------
+
+def kassa_ching(v):
+    """The Kassier's till: a drawer thump and the cash register's bell, a few coins after."""
+    x = np.zeros(d.n_of(1.2))
+    drawer = thud(140, 0.05, 0.8)
+    x[:len(drawer)] += drawer
+    ding = bell(1.0, 2350, [1, 2.76, 5.4], [0.35, 0.15, 0.06], [1, 0.4, 0.15])
+    at = d.n_of(0.06)
+    x[at:at + len(ding)] += ding[: len(x) - at] * 0.8
+    for _ in range(3):
+        c = bell(0.25, d.rng.uniform(2800, 4200), [1, 2.7], [0.05, 0.02], [1, 0.3])
+        at = d.n_of(d.rng.uniform(0.25, 0.6))
+        x[at:at + len(c)] += c[: len(x) - at] * 0.4
+    return d.normalize(d.fade(x), 0.8)
+
+
+def fuse_hiss(v):
+    """The Sprengmeister's fuse: a match strike, then three seconds of spitting hiss."""
+    s = 3.0
+    strike = d.bandpass(d.noise(0.15), 1500, 6000) * d.env_exp(0.15, 0.04)
+    hiss = d.bandpass(d.noise(s), 2500, 9000) * (0.6 + 0.4 * d.smooth_noise(s, 25))
+    crackle = np.zeros(d.n_of(s))
+    for _ in range(40):
+        c = click(d.rng.uniform(2000, 5000), 0.002, d.rng.uniform(0.3, 0.8))
+        at = d.n_of(d.rng.uniform(0.0, s - 0.05))
+        crackle[at:at + len(c)] += c[: len(crackle) - at]
+    body = (hiss * 0.5 + crackle) * d.env_points(s, [(0, 0), (0.1, 1), (s - 0.1, 1), (s, 0)])
+    return d.normalize(d.mix(strike, (0.08, body)), 0.75)
+
+
+def perchten_schellen(v):
+    """The Schönperchte jumps: a shake of bright little bells, twice."""
+    x = np.zeros(d.n_of(1.6))
+    for shake in (0.0, 0.45):
+        for _ in range(9):
+            f = d.rng.uniform(1800, 3200)
+            b = bell(0.5, f, [1, 2.3, 3.9], [0.15, 0.07, 0.03], [1, 0.4, 0.2])
+            at = d.n_of(shake + d.rng.uniform(0.0, 0.18))
+            x[at:at + len(b)] += b[: len(x) - at] * d.rng.uniform(0.4, 0.9)
+    return d.normalize(d.fade(d.reverb(x, 0.8, 0.2)), 0.8)
+
+
 SOUNDS = {
     # The gunshots and the Böller are recordings: see recordings.py.
     "dry_click": (dry_click, 1),
@@ -812,6 +855,7 @@ SOUNDS = {
     "murmeltier_scream": (murmeltier_scream, 2), "murmeltier_pop": (murmeltier_pop, 1),
     "murmeltier_hit": (murmeltier_hit, 1), "camera": (camera, 1),
     "wind_loop": (wind_loop, 1), "fire_crackle": (fire_crackle, 1),
+    "kassa_ching": (kassa_ching, 1), "fuse_hiss": (fuse_hiss, 1), "perchten_schellen": (perchten_schellen, 2),
 }
 
 LOOPS = {"flame_loop", "kuhglocke_ring", "resi_bell", "eisstock_slide", "fassl_roll", "wind_loop", "fire_crackle"}

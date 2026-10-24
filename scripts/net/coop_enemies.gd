@@ -89,6 +89,7 @@ func _announce(enemy: Enemy) -> void:
 		enemy.vanished.connect(_on_vanished)
 		enemy.fired.connect(_on_fired)
 		enemy.hat_lost.connect(_on_hat_lost)
+		enemy.cued.connect(_on_cued)
 	_spawned.rpc(enemy.net_id, String(enemy.data.id), _waves.wave, enemy.global_transform, enemy.health)
 
 
@@ -160,6 +161,16 @@ func _on_fired(enemy: Enemy, at: Vector3) -> void:
 func _on_hat_lost(enemy: Enemy, direction: Vector3, source: Node3D) -> void:
 	if enemy.net_id != 0:
 		_hat_lost.rpc(enemy.net_id, direction, Coop.peer_of(source))
+
+
+## A variant's trick has something to show (Die Bsundan): out to every guest. Enemies in it (the
+## Bergführer's rope) go as their net ids.
+func _on_cued(enemy: Enemy, cue: StringName, arg: Variant) -> void:
+	if enemy.net_id == 0:
+		return
+	if arg is Array:
+		arg = (arg as Array).map(func(item: Variant) -> Variant: return (item as Enemy).net_id if item is Enemy else item)
+	_cued.rpc(enemy.net_id, String(cue), arg)
 
 
 ## The Venedigermandl vanished (after his last line went out).
@@ -289,6 +300,13 @@ func _hat_lost(id: int, direction: Vector3, peer: int) -> void:
 	var puppet: Enemy = _by_id.get(id)
 	if puppet:
 		puppet.puppet_hat(direction, Coop.node_of(peer))
+
+
+@rpc("authority", "call_remote", "reliable")
+func _cued(id: int, cue: String, arg: Variant) -> void:
+	var puppet: Enemy = _by_id.get(id)
+	if puppet:
+		puppet.puppet_cue(StringName(cue), arg)
 
 
 @rpc("authority", "call_remote", "reliable")
