@@ -44,8 +44,12 @@ static func event_name(event: InputEvent) -> String:
 	var key := event as InputEventKey
 	if key:
 		var code: Key = key.physical_keycode if key.physical_keycode != KEY_NONE else key.keycode
-		# The key's label on this keyboard's layout (a German Z where a US keyboard has Y).
-		var label: Key = DisplayServer.keyboard_get_keycode_from_physical(code)
+		# The key's label on this keyboard's layout (a German Z where a US keyboard has Y), where the
+		# display server knows it; the browser's and the headless one do not (they log an error on
+		# every call).
+		var label: Key = KEY_NONE
+		if not DisplayServer.get_name() in ["Web", "headless"]:
+			label = DisplayServer.keyboard_get_keycode_from_physical(code)
 		return OS.get_keycode_string(label if label != KEY_NONE else code)
 	var button := event as InputEventMouseButton
 	if button:
