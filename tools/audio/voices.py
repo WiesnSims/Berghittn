@@ -208,6 +208,12 @@ LINES = {
     "gredn_perchte_sitz": (perchte, "Hockn bleibn? Hö! Hö! Hö!"),
     "gredn_krampus_sitz": (krampus, "Wer hockt, den hol i!"),
     "gredn_wilderer_sitz": (wilderer, "Do hockt mei Wild."),
+    "gredn_wanderer_huat": (wanderer, "Mei Huat!"),
+    "gredn_wanderer_opa": (wanderer, "Der Huat woa vom Opa!"),
+    "gredn_tourist_sonnenhuat": (tourist, "Mei Sonnenhuat!"),
+    "gredn_knappe_helm": (knappe, "Mei Helm! Wo is mei Helm?"),
+    "gredn_wilderer_gamsbart": (wilderer, "Mei Gamsbart!"),
+    "gredn_venedigermandl_cappello": (mandl_it, "Il mio cappello!"),
 }
 
 

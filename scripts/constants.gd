@@ -59,6 +59,8 @@ const LAYER_PLAYER: int = 2
 const LAYER_ENEMY: int = 4
 const LAYER_PLAYER_BLOCKER: int = 8
 const LAYER_HITBOX: int = 16
+## Enemy hats (Huat obschiaßn): only bullet rays look for them, and fly on through.
+const LAYER_HAT: int = 32
 
 # Player health.
 const PLAYER_MAX_HEALTH: int = 100
@@ -240,6 +242,25 @@ const POINTS_KILL_HEADSHOT: int = 100
 const POINTS_KILL_MELEE: int = 130
 const POINTS_REPAIR_BOARD: int = 10
 const POINTS_POPUP_TIME: float = 0.9
+# Huat obschiaßn (user request 2026-10-24): a bullet through an enemy's hat knocks it off for
+# POINTS_HAT. The hat spins away, thrown HAT_PUSH m/s along the shot and HAT_LIFT m/s up (more on a
+# head pop), lands, and HAT_LIFETIME s after the shot shrinks away; at most HAT_MAX at once.
+const POINTS_HAT: int = 20
+const HAT_PUSH: float = 2.5
+const HAT_LIFT: float = 3.5
+const HAT_POP_LIFT: float = 5.5
+const HAT_SPIN: float = 14.0
+const HAT_LIFETIME: float = 12.0
+const HAT_SHRINK_TIME: float = 0.4
+const HAT_MAX: int = 8
+## Grown on every side of the hat mesh's bounds for its hit box (m), so a near miss still counts.
+const HAT_BOX_MARGIN: float = 0.02
+## The hat's hit box starts this high (m, at model scale 1: just above the middle of the skull), so
+## a shot at the face is no hat shot even where a helmet comes down that low.
+const HAT_BOX_FLOOR: float = 1.68
+## A bullet in the head knocks off a hat it meets within this far on (m): one sitting low in the
+## head's box, behind the head's edge for the ray.
+const HAT_THROUGH_HEAD: float = 0.6
 
 # Barricades (section 4).
 const BARRICADE_MAX_BOARDS: int = 6
@@ -378,6 +399,8 @@ const GREDN_TIME_MIN: float = 1.6
 const GREDN_FADE_TIME: float = 0.5
 ## How loud the voices are (dB).
 const GREDN_VOLUME: float = -3.0
+## A hat shot off (Huat obschiaßn) is complained about loud enough for a rifleman to hear.
+const GREDN_HAT_REACH: float = 40.0
 
 # --- Da Dengelstock (M9 part 4): the weapon upgrade in the Holzschuppen's hay loft ---------------
 ## Cold until this wave starts, then open for the rest of the match.

@@ -6,6 +6,9 @@ extends Node
 signal enemy_damaged(enemy: Node3D, amount: int, is_headshot: bool, source: Node3D)
 @warning_ignore("unused_signal")
 signal enemy_killed(enemy: Node3D, is_headshot: bool, is_melee: bool, source: Node3D)
+## Huat obschiaßn: `source` shot `enemy`'s hat off.
+@warning_ignore("unused_signal")
+signal hat_shot(enemy: Node3D, source: Node3D)
 @warning_ignore("unused_signal")
 signal player_died(player: Node3D)
 @warning_ignore("unused_signal")

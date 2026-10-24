@@ -7,6 +7,7 @@ extends SceneTree
 ##
 ## Every figure stands on the standard skeleton (CharacterBuilder.skeleton); the skull sits at about
 ## 1.63 m (scale 1), where the head hurtbox is. Colours are the greybox ones, so they read the same.
+## A hat (or helmet) is a part of its own, "Hat", so it can be shot off (Huat obschiaßn).
 
 const Builder := preload("res://tools/models/character_builder.gd")
 const RIG := preload("res://scripts/enemies/enemy_rig.gd")
@@ -147,8 +148,8 @@ func _wanderer() -> void:
 	_both(func(m: Vector3, _s: String) -> void:
 		b.box(Vector3(-0.12, 1.25, -0.125) * m, Vector3(0.05, 0.42, 0.02), &"leather", Color(0.2, 0.14, 0.09), &"chest"))
 	_face(b, ZOMBIE_SKIN)
-	# Tyrolean felt hat with a band and a feather.
-	b.head(true)
+	# Tyrolean felt hat with a band and a feather, a part of its own so it can be shot off.
+	b.part(&"hat")
 	b.tube([Vector3(0.0, 1.735, -0.02), Vector3(0.0, 1.75, -0.02)], [Vector2(0.21, 0.21), Vector2(0.2, 0.2)], &"wool", felt, &"head", 10)
 	b.tube([Vector3(0.0, 1.74, -0.02), Vector3(0.0, 1.8, -0.02), Vector3(0.0, 1.88, -0.025)], [Vector2(0.125, 0.13), Vector2(0.115, 0.12), Vector2(0.085, 0.095)], &"wool", felt, &"head", 9)
 	b.tube([Vector3(0.0, 1.75, -0.02), Vector3(0.0, 1.78, -0.02)], [Vector2(0.127, 0.132), Vector2(0.124, 0.13)], &"leather", Color(0.15, 0.1, 0.06), &"head", 9, false)
@@ -196,6 +197,7 @@ func _tourist() -> void:
 	b.head(true)
 	# Sunglasses over the glowing eyes, and a bucket hat.
 	b.box(Vector3(0.0, 1.652, -0.152), Vector3(0.2, 0.045, 0.012), &"plain", Color(0.03, 0.03, 0.04), &"head")
+	b.part(&"hat")
 	b.tube([Vector3(0.0, 1.72, -0.02), Vector3(0.0, 1.74, -0.02)], [Vector2(0.18, 0.18), Vector2(0.15, 0.15)], &"linen", Color(0.95, 0.9, 0.75), &"head", 10)
 	b.tube([Vector3(0.0, 1.73, -0.02), Vector3(0.0, 1.81, -0.02)], [Vector2(0.13, 0.135), Vector2(0.11, 0.115)], &"linen", Color(0.95, 0.9, 0.75), &"head", 10)
 	b.head(false)
@@ -239,6 +241,7 @@ func _knappe() -> void:
 	# Grey beard, the helmet and its lamp.
 	b.ball(Vector3(0.0, 1.55, -0.1), Vector3(0.11, 0.1, 0.07), &"fur", Color(0.42, 0.4, 0.38), &"head", 8, 5)
 	b.spike([Vector3(0.0, 1.55, -0.13), Vector3(0.0, 1.45, -0.14), Vector3(0.0, 1.39, -0.12)], 0.06, &"fur", Color(0.42, 0.4, 0.38), &"head", 6)
+	b.part(&"hat")
 	b.ball(Vector3(0.0, 1.71, -0.02), Vector3(0.145, 0.11, 0.155), &"metal", Color(0.16, 0.16, 0.17), &"head", 10, 5)
 	b.tube([Vector3(0.0, 1.69, -0.02), Vector3(0.0, 1.705, -0.02)], [Vector2(0.17, 0.18), Vector2(0.165, 0.175)], &"metal", Color(0.16, 0.16, 0.17), &"head", 10)
 	b.tube([Vector3(0.0, 1.74, -0.15), Vector3(0.0, 1.74, -0.2)], [Vector2(0.035, 0.035), Vector2(0.04, 0.04)], &"metal", brass, &"head", 8)
@@ -469,6 +472,7 @@ func _wilderer() -> void:
 	# Grey stubble, a drooping moustache, the wide hat with its Gamsbart.
 	b.box(Vector3(0.0, 1.535, -0.09), Vector3(0.17, 0.06, 0.08), &"fur", Color(0.4, 0.4, 0.38), &"head", Basis.IDENTITY, Vector2(0.6, 0.6))
 	b.box(Vector3(0.0, 1.578, -0.142), Vector3(0.1, 0.022, 0.025), &"fur", Color(0.32, 0.3, 0.28), &"head")
+	b.part(&"hat")
 	b.tube([Vector3(0.0, 1.72, -0.02), Vector3(0.0, 1.735, -0.02)], [Vector2(0.24, 0.24), Vector2(0.23, 0.23)], &"wool", hat, &"head", 12)
 	b.tube([Vector3(0.0, 1.73, -0.02), Vector3(0.0, 1.8, -0.02), Vector3(0.0, 1.85, -0.02)], [Vector2(0.125, 0.13), Vector2(0.12, 0.125), Vector2(0.1, 0.105)], &"wool", hat, &"head", 10)
 	b.tube([Vector3(0.0, 1.74, -0.02), Vector3(0.0, 1.765, -0.02)], [Vector2(0.127, 0.132), Vector2(0.125, 0.13)], &"leather", leather, &"head", 10, false)
@@ -524,6 +528,7 @@ func _mandl() -> void:
 	b.box(Vector3(0.0, 1.675, -0.135), Vector3(0.17, 0.025, 0.035), &"fur", Color(0.88, 0.86, 0.82), &"head")
 	b.ball(Vector3(0.0, 1.53, -0.1), Vector3(0.1, 0.09, 0.07), &"fur", Color(0.9, 0.88, 0.84), &"head", 8, 5)
 	b.spike([Vector3(0.0, 1.53, -0.13), Vector3(0.0, 1.4, -0.15), Vector3(0.0, 1.28, -0.13)], 0.075, &"fur", Color(0.9, 0.88, 0.84), &"head", 6)
+	b.part(&"hat")
 	b.tube([Vector3(0.0, 1.71, -0.02), Vector3(0.0, 1.73, -0.02)], [Vector2(0.17, 0.17), Vector2(0.16, 0.16)], &"wool", hat, &"head", 10)
 	b.spike([Vector3(0.0, 1.72, -0.02), Vector3(0.0, 1.9, 0.0), Vector3(0.0, 2.06, 0.06), Vector3(0.0, 2.16, 0.16)], 0.125, &"wool", hat, &"head", 9)
 	b.tube([Vector3(0.0, 1.73, -0.02), Vector3(0.0, 1.76, -0.02)], [Vector2(0.126, 0.126), Vector2(0.122, 0.122)], &"glow", gold, &"head", 9, false)

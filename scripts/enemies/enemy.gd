@@ -14,6 +14,8 @@ signal said(enemy: Enemy, line: int)
 signal vanished(enemy: Enemy)
 ## It fired its gun (the Wilderer, M9 part 5b; solo and host), the shot ending at `at`, for co-op.
 signal fired(enemy: Enemy, at: Vector3)
+## Its hat was shot off by `source`, along `direction` (Huat obschiaßn; solo and host), for co-op.
+signal hat_lost(enemy: Enemy, direction: Vector3, source: Node3D)
 
 ## QUEUED: waiting at a window another enemy is working. BREAKING: tearing boards off a barricade.
 ## LUNGING: crouching for and then flying through a leap at the player (Perchte). AIMING: standing
@@ -64,6 +66,11 @@ var _flinch_tween: Tween
 var _flash_material: StandardMaterial3D
 var _meshes: Array[MeshInstance3D] = []
 var _head_parts: Array[Node3D] = []
+# Huat obschiaßn: the model's hat (its "Hat" mesh; null if it wears none), the box round it, and
+# whether it is still on.
+var _hat: MeshInstance3D
+var _hat_box := HatBox.new()
+var _hat_on: bool = false
 # The window being entered, from the navigation link: wall centre, inward direction, landing point inside.
 var _window: Barricade
 var _window_wall: Vector3
@@ -171,6 +178,8 @@ func _ready() -> void:
 	_flash_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_flash_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_flash_material.albedo_color = Color(1, 1, 1, 0)
+	_hat_box.receiver = self
+	_visual.add_child(_hat_box)
 
 
 func activate(enemy_data: EnemyData, for_wave: int, at: Transform3D) -> void:
@@ -185,6 +194,9 @@ func activate(enemy_data: EnemyData, for_wave: int, at: Transform3D) -> void:
 			hurtbox.scale = Vector3.ONE * enemy_data.model_scale
 		_meshes.assign(_model.find_children("*", "MeshInstance3D", true, false))
 		_head_parts.assign(_model.find_children("*", "Node3D", true, false).filter(func(n: Node) -> bool: return n.is_in_group("head_part")))
+		_hat = _model.find_child("Hat", true, false) as MeshInstance3D
+		if _hat:
+			_hat_box.fit(_hat.mesh.get_aabb(), Constants.HAT_BOX_FLOOR * enemy_data.model_scale)
 	data = enemy_data
 	_fit_body()
 	focus = null
@@ -228,7 +240,12 @@ func activate(enemy_data: EnemyData, for_wave: int, at: Transform3D) -> void:
 		_rig.reset()
 	for part: Node3D in _head_parts:
 		part.visible = true
+	_hat_on = _hat != null
+	if _hat:
+		_hat.visible = true
 	_set_active(true)
+	if _hat_on and _rig:
+		_hat_box.global_transform = _rig.head_moved()
 	_state = State.CHASING
 	talk_left = 0.0
 	_spotted = false
@@ -501,6 +518,60 @@ func _pop_head() -> void:
 	for part: Node3D in _head_parts:
 		part.visible = false
 	_head_pop.play(_head_shape.global_position, Vector3.UP)
+	# Up goes the hat with it (no points: the head was the target).
+	if _hat_on:
+		_hat_flies(Vector3(randf_range(-1.0, 1.0), Constants.HAT_POP_LIFT, randf_range(-1.0, 1.0)))
+
+
+func has_hat() -> bool:
+	return _hat_on and is_alive()
+
+
+## Whether a shot from `from` to `to` goes through the hat; for a hat sitting low in the head's box
+## (the Knappe's helmet), which a ray meets only after the head.
+func hat_in_line(from: Vector3, to: Vector3) -> bool:
+	return has_hat() and _hat_box.crosses(from, to)
+
+
+## Huat obschiaßn: a bullet from `source`'s gun went through the hat along `direction`. Off it flies
+## and the shooter gets the points (solo, or the host; a puppet shows it at once and asks the host,
+## whose word pays). False if there was no hat to knock off.
+func knock_hat(direction: Vector3, source: Node3D) -> bool:
+	if not has_hat():
+		return false
+	_hat_flies(_hat_push(direction))
+	if puppet:
+		if hit_relay.is_valid():
+			hit_relay.call(self, &"knock_hat", [direction])
+		return true
+	hat_lost.emit(self, direction, source)
+	Events.hat_shot.emit(self, source)
+	Gredn.hat(self)
+	return true
+
+
+## The host's enemy lost its hat to `source` (co-op): here too (unless our own shot did it already),
+## and the points go to whoever shot it.
+func puppet_hat(direction: Vector3, source: Node3D) -> void:
+	if not is_alive():
+		return
+	if _hat_on:
+		_hat_flies(_hat_push(direction))
+	Events.hat_shot.emit(self, source)
+
+
+func _hat_push(direction: Vector3) -> Vector3:
+	var along := Vector3(direction.x, 0.0, direction.z)
+	return along.normalized() * Constants.HAT_PUSH + Vector3.UP * Constants.HAT_LIFT if along.length() > 0.01 else Vector3.UP * Constants.HAT_LIFT
+
+
+func _hat_flies(push: Vector3) -> void:
+	_hat_on = false
+	_hat.visible = false
+	_hat_box.set_on(false)
+	var placed: Transform3D = _rig.head_moved() if _rig else _hat.global_transform
+	FlyingHat.launch(_hat.mesh, placed, get_parent(), push)
+	Sound.play_at(&"hat_off", placed * _hat.mesh.get_aabb().get_center())
 
 
 func _physics_process(delta: float) -> void:
@@ -516,6 +587,8 @@ func _physics_process(delta: float) -> void:
 		_rig.update(delta, Vector2(velocity.x, velocity.z).length())
 		# You hit what you see: the head hurtbox stays on the head as it hunches, swings and dives.
 		_head_shape.global_position = _rig.head_position()
+		if _hat_on:
+			_hat_box.global_transform = _rig.head_moved()
 	elif _rig.is_ragdoll():
 		_ragdoll_time += delta
 
@@ -1063,6 +1136,7 @@ func _die(is_headshot: bool, is_melee: bool, source: Node3D, amount: int = 100) 
 	collision_mask = Constants.LAYER_WORLD
 	for hurtbox: Hurtbox in _hurtboxes:
 		hurtbox.collision_layer = 0
+	_hat_box.set_on(false)
 	# Co-op: the host's drop is the one everyone sees (CoopWorld); a puppet leaves none of its own.
 	if data.drop and not puppet:
 		WeaponPickup.spawn(data.drop, global_position, get_parent())
@@ -1139,6 +1213,7 @@ func _set_active(active: bool) -> void:
 	collision_mask = _movement_mask() if active else 0
 	for hurtbox: Hurtbox in _hurtboxes:
 		hurtbox.collision_layer = Constants.LAYER_HITBOX if active else 0
+	_hat_box.set_on(active and _hat_on)
 	process_mode = Node.PROCESS_MODE_INHERIT if active else Node.PROCESS_MODE_DISABLED
 
 

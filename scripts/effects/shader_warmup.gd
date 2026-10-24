@@ -145,7 +145,14 @@ func _collect() -> void:
 	for file: String in DirAccess.get_files_at(ENEMIES_DIR):
 		var enemy := load(ENEMIES_DIR.path_join(file.trim_suffix(".remap"))) as EnemyData
 		if enemy and enemy.model:
-			_items.append(enemy.model.instantiate() as Node3D)
+			var model := enemy.model.instantiate() as Node3D
+			_items.append(model)
+			# A hat shot off flies as a plain, unskinned copy (Huat obschiaßn).
+			var hat := model.find_child("Hat", true, false) as MeshInstance3D
+			if hat:
+				var copy := MeshInstance3D.new()
+				copy.mesh = hat.mesh
+				_items.append(copy)
 	# Co-op: the other players' hikers.
 	_items.append(HIKER.instantiate() as Node3D)
 	for script: Script in EFFECTS:
