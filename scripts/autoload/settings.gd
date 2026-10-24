@@ -38,6 +38,10 @@ var perchten: int = 0
 ## in this browser only.
 var best_wave: int = 0
 var best_points: int = 0
+## Das Gipfelbuch: runs are sent to the global leaderboard (on until switched off), and the ids of
+## our entries there (Board.remember).
+var board: bool = true
+var board_ids: Array[int] = []
 
 
 func _ready() -> void:
@@ -84,6 +88,12 @@ func _load() -> void:
 	invert_y = file.get_value(SECTION, "invert_y", invert_y)
 	damage_numbers = file.get_value(SECTION, "damage_numbers", damage_numbers)
 	chatter = file.get_value(SECTION, "chatter", chatter)
+	board = file.get_value(SECTION, "board", board)
+	var ids: Variant = file.get_value(SECTION, "board_ids", [])
+	if ids is Array:
+		for id: Variant in ids:
+			if id is int:
+				board_ids.append(id)
 	seen_version = str(file.get_value(SECTION, "seen_version", seen_version))
 	var saved_locale: String = file.get_value(SECTION, "locale", locale)
 	if saved_locale in LOCALES:
@@ -137,6 +147,8 @@ func save() -> void:
 	file.set_value(SECTION, "invert_y", invert_y)
 	file.set_value(SECTION, "damage_numbers", damage_numbers)
 	file.set_value(SECTION, "chatter", chatter)
+	file.set_value(SECTION, "board", board)
+	file.set_value(SECTION, "board_ids", board_ids)
 	file.set_value(SECTION, "seen_version", seen_version)
 	file.set_value(SECTION, "locale", locale)
 	file.set_value(SECTION, "render_scale", render_scale)

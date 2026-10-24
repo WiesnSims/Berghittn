@@ -1,5 +1,7 @@
 # Cloudflare Pages project berghittn (https://berghittn.pages.dev). The Functions in functions/ hand
-# co-op WebSockets to the Room Durable Object, which lives in the helper Worker in relay/.
+# co-op WebSockets to the Room Durable Object, which lives in the helper Worker in relay/, and keep
+# das Gipfelbuch (the leaderboard, board/) in a D1 database. Preview deployments get their own
+# database, so play-tests never land on the real board.
 name = "berghittn"
 pages_build_output_dir = "export"
 compatibility_date = "2025-09-01"
@@ -8,3 +10,22 @@ compatibility_date = "2025-09-01"
 name = "ROOMS"
 class_name = "Room"
 script_name = "berghittn-relay"
+
+[[d1_databases]]
+binding = "BOARD"
+database_name = "berghittn-board"
+database_id = "23c9cb43-880f-4883-997b-6d544ebecb23"
+migrations_dir = "board/migrations"
+
+[env.preview]
+
+[[env.preview.durable_objects.bindings]]
+name = "ROOMS"
+class_name = "Room"
+script_name = "berghittn-relay"
+
+[[env.preview.d1_databases]]
+binding = "BOARD"
+database_name = "berghittn-board-preview"
+database_id = "1bc91eae-0bd5-4f8a-b839-4f1613dea466"
+migrations_dir = "board/migrations"

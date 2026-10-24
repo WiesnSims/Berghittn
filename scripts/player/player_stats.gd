@@ -39,11 +39,13 @@ func kills_with(data: WeaponData) -> int:
 
 
 ## This run as one row of the co-op Hüttenwertung (Net.share_run); `fav` is a translation key.
+## For the group's Gipfelbuch entry: `public` (our name may be in it) and `clean` (no debug points).
 func row(player_name: String, points: int) -> Dictionary:
 	var best: WeaponData = favourite()
 	return {
 		"name": player_name, "points": points, "kills": kills, "headshots": headshots,
 		"fav": String(best.display_name) if best else "", "fav_kills": kills_with(best), "schnaps": schnaps,
+		"public": Settings.board, "clean": Board.clean,
 	}
 
 
@@ -55,6 +57,8 @@ static func sanitize_row(data: Dictionary) -> Dictionary:
 		"kills": number.call("kills"), "headshots": number.call("headshots"),
 		"fav": str(data.get("fav", "")).left(ROW_TEXT_MAX), "fav_kills": number.call("fav_kills"),
 		"schnaps": number.call("schnaps"),
+		"public": data.get("public", true) is bool and data.get("public", true),
+		"clean": data.get("clean", true) is bool and data.get("clean", true),
 	}
 
 

@@ -132,6 +132,12 @@ func share_run(row: Dictionary) -> void:
 	runs_changed.emit()
 
 
+## Host: the group's Gipfelbuch entry got its place (Board.ranked); everyone else hears it too.
+func share_rank(rank: int, week_rank: int, id: int) -> void:
+	if is_host() and state != State.OFFLINE:
+		_rank.rpc(rank, week_rank, id)
+
+
 ## Nomoi! pressed: we want another round with the same people.
 func want_nomoi() -> void:
 	if is_host():
@@ -298,6 +304,12 @@ func _nomoi_count(wanting: int, total: int) -> void:
 func _run(row: Dictionary) -> void:
 	runs[multiplayer.get_remote_sender_id()] = PlayerStats.sanitize_row(row)
 	runs_changed.emit()
+
+
+@rpc("authority", "call_remote", "reliable")
+func _rank(rank: int, week_rank: int, id: int) -> void:
+	Board.remember(id)
+	Board.ranked.emit(rank, week_rank, id)
 
 
 ## A guest's name and hiker, to the host.

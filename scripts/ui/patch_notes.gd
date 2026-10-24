@@ -7,6 +7,17 @@ extends RefCounted
 
 const ENTRIES: Array[Dictionary] = [
 	{
+		"version": "1.1.1", "date": "2026-10-24",
+		"en": [
+			"Das Gipfelbuch: the global leaderboard on the title screen, Solo and Co-op, all time and this week.",
+			"Your runs are signed in automatically, and the end screen shows your place (switch it off in Settings).",
+		],
+		"de": [
+			"Das Gipfelbuch: die weltweite Bestenliste im Titelbildschirm, Solo und Gemeinsam, Allzeit und diese Woche.",
+			"Deine Runden werden automatisch eingetragen, und der Endbildschirm zeigt deinen Platz (abschaltbar in den Einstellungen).",
+		],
+	},
+	{
 		"version": "1.1", "date": "2026-10-24",
 		"en": [
 			"Nomoi!: play again with the same group in one click, and the Hüttenwertung after a co-op match.",

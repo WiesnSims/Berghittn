@@ -589,8 +589,18 @@ const BAND_PITCH_PER_WAVE: float = 0.02
 const BAND_PITCH_MAX: float = 1.2
 
 # Co-op (M7, NETWORKING.md).
-## The live site; the relay sits behind it at /api/room/<code>.
+## The live site; the relay sits behind it at /api/room/<code>, das Gipfelbuch at /api/board/...
 const NET_SITE: String = "https://berghittn.pages.dev"
+
+# Das Gipfelbuch, the global leaderboard (GAME_DESIGN section 12, board/board.js).
+## A request to it gives up after this long (s); the game goes on without it.
+const BOARD_TIMEOUT: float = 8.0
+## Our own entries the panel can highlight (their ids, the newest kept).
+const BOARD_REMEMBERED: int = 200
+## Co-op: the host waits this long (s) at most for everyone's run before sending the group's.
+const BOARD_COOP_WAIT: float = 4.0
+const BOARD_PANEL_SIZE: Vector2 = Vector2(980, 440)
+const BOARD_FONT_SIZE: int = 18
 const NET_CODE_LENGTH: int = 4
 ## The host can start once this many are in the lobby.
 const NET_MIN_PLAYERS: int = 2

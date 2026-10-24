@@ -319,6 +319,31 @@ It pecks (`_peck`, 8) and flutters off, and hangs in the air while stunned. The 
 skeleton laid out as a bird; `EnemyRig.flap` beats the wings. Constants: `DOHLE_*`. Tests:
 `tests/m9_dohlen`, `tests/net_specials`.
 
+## Das Gipfelbuch (global leaderboard, 1.1.1)
+
+The server is `board/board.js`, run by the Pages Function `functions/api/board/[action].js` on a D1
+database bound as `BOARD` (`wrangler.toml`): `berghittn-board` for the live site,
+`berghittn-board-preview` for preview deployments. The schema is in `board/migrations`. In the game,
+the `Board` autoload asks for a ticket when wave 1 starts (`start_run`), sends the run at the end
+(`submit`, from `DeathScreen.offer_board`; in co-op the host's `main._board_coop` sends the group's
+entry and `Net.share_rank` tells everyone its place) and lists the boards (`fetch`, used by
+`BoardPanel` on the title screen). The switch is `Settings.board`. Desktop runs without `--board=<url>`
+never talk to a board, so test runs cannot write to the real one.
+
+Schema changes (new files in `board/migrations`) go to both databases:
+
+```
+npx wrangler@latest d1 migrations apply berghittn-board --remote
+npx wrangler@latest d1 migrations apply berghittn-board-preview --remote --env preview
+```
+
+Moderation, for a faked score or a bad name:
+
+```
+npx wrangler@latest d1 execute berghittn-board --remote --command "SELECT id, names, wave, points FROM entries ORDER BY wave DESC, points DESC LIMIT 20"
+npx wrangler@latest d1 execute berghittn-board --remote --command "DELETE FROM entries WHERE id = 123"
+```
+
 ## Prop models (M6)
 
 ```
@@ -432,6 +457,30 @@ With browsers on a deployed build, the bots take its id and the browsers join by
 (and `--role=guest1 --room=<code>`), or `tests/net_waves.tscn` with `--players=4 --browsers=1`.
 
 ## Tests
+
+```
+node --test board/test/board.test.mjs
+node tools/board_test.mjs
+```
+
+Das Gipfelbuch, both against a local server (`wrangler pages dev` with a fresh local D1, from
+`board/test/local.mjs`).
+- `board.test.mjs` tests the server:
+  - tickets count once
+  - ranking by wave, then points, with ties
+  - refusals: a wrong ticket, wrong numbers, a wave reached too fast, too many points
+  - co-op on its own board
+  - this week's range, the top 50, the ticket limit per address
+  - name cleaning
+- `board_test.mjs` runs the game against it:
+  - `tests/board_solo` covers:
+    - the ticket at wave 1, sending at death, the end screen's place
+    - the title screen's panel with its tabs and our entry highlighted
+    - the name question, Don't sign, the switch
+    - F4 forfeit, an unreachable board
+  - `tests/net_board` covers a co-op match over the local relay: one entry for the group, the
+    opted-out guest without a name, the place on both end screens.
+
 
 ```
 godot --headless --fixed-fps 60 res://tests/m4_zones.tscn
@@ -729,8 +778,8 @@ Cloudflare Pages project `berghittn` -> https://berghittn.pages.dev
 npx wrangler@latest pages deploy export --project-name berghittn --branch main --commit-dirty=true
 ```
 
-The deploy also uploads `functions/` (the co-op Function) with the Durable Object binding from the
-root `wrangler.toml`. The relay Worker is deployed on its own, only when `relay/` changed:
+The deploy also uploads `functions/` (the co-op and Gipfelbuch Functions) with the Durable Object
+and D1 bindings from the root `wrangler.toml` (previews: `[env.preview]`). The relay Worker is deployed on its own, only when `relay/` changed:
 
 ```
 cd relay && npx wrangler@latest deploy      # "No targets deployed" is right: it has no public URL

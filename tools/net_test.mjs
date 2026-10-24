@@ -12,7 +12,9 @@ let relay = process.env.RELAY_URL;
 let dev;
 
 function godot(role, extra = []) {
-	const args = ['--headless', scene, '--', `--relay=${relay}`, `--role=${role}`, ...extra];
+	// BOARD_URL: a local Gipfelbuch for the game to use (tools/board_test.mjs).
+	const board = process.env.BOARD_URL ? [`--board=${process.env.BOARD_URL}`] : [];
+	const args = ['--headless', scene, '--', `--relay=${relay}`, `--role=${role}`, ...board, ...extra];
 	const child = spawn('godot', args, { stdio: ['ignore', 'pipe', 'pipe'] });
 	const lines = createInterface({ input: child.stdout });
 	const listeners = [];
