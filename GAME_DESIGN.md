@@ -1014,6 +1014,71 @@ new ones are added here)*
 - Q6 (answered): a second upgrade that doubles the effect of the first.
 - Q7 (answered): both new fighters, the Wilderer (5b) and the Bergdohlen (5c).
 
+### Das Gipfelbuch: a global leaderboard (user request 2026-10-24, version 1.1.1)
+
+The best runs of every player, worldwide, in the game: the hut's summit book.
+
+*What is stored*
+- One entry per finished run: the name(s), the wave reached, the points, kills, headshots, the
+  favourite weapon, the number of players, the date and the game version.
+- Ranked like the personal best: the furthest wave first, then the points.
+- Solo: the player's own run. Co-op: one entry for the whole group, sent by the host: every
+  player's name, the team's points (all players' points together), the team's kills.
+
+*Boards*
+- Two tabs: Solo and Co-op.
+- Two ranges in each: all time, and this week (since Monday 00:00 UTC), so new players have a
+  board they can get onto.
+- The top 50 are shown; this browser's own entries are highlighted.
+
+*In the game*
+- The title screen gets a "Gipfelbuch" button that opens the panel (like the patch notes).
+- The death screen sends the run and shows where it landed: "Platz 12 im Gipfelbuch (diese Woche:
+  Platz 3)". In co-op every player sees the group's place.
+- Sending is automatic, with an opt-out switch in Settings ("Ins Gipfelbuch eintragen", on).
+- The name is the one typed in the lobby. Solo without a name, the death screen asks once:
+  "Eintragen" with a name, or "Nicht eintragen", which turns the switch off. In co-op a player
+  who switched it off appears without a name ("–"); the host's switch decides whether the group
+  is sent at all.
+- No connection: nothing is shown, the game goes on as before.
+
+*Server*
+- A Cloudflare D1 database (SQLite, free plan), bound to the Pages project; the Pages Functions
+  at berghittn.pages.dev/api/board/... read and write it. No new domain, no workers.dev.
+  Preview deployments use their own database, so play-tests never land on the real board.
+- Moderation: entries are deleted with `wrangler d1 execute` (no admin page).
+- Names: at most 16 characters, control characters removed; a short list of swear words turns a
+  name into "Wanderer".
+
+*Cheating (a browser game cannot stop it, only make it harder)*
+- When wave 1 starts the game asks the server for a run ticket; the server notes the time.
+- A result is taken once per ticket, only from the mode it was opened for, and only if the wave
+  could have been reached in the time since (at least 25 s a wave: the 30 s breaks) and the
+  points fit the wave.
+- A limit of tickets per hour and address.
+- What still gets through is deleted by hand.
+
+*Tests*
+- `relay/test/board.test.mjs`: the Functions against a local D1 (`wrangler pages dev`): tickets,
+  the checks, the ranking, the week, the names.
+- `tests/board_*`: the game against that local server: a solo run is sent and its place shown,
+  the opt-out sends nothing, the panel lists both tabs and ranges, and a co-op match sends one
+  entry for the group that every player sees.
+
+Built (2026-10-24, branch leaderboard, version 1.1.1):
+- Server and storage:
+  - board/board.js behind functions/api/board/[action].js.
+  - D1 berghittn-board (live) and berghittn-board-preview (previews); schema in board/migrations.
+- The game:
+  - the Board autoload (tickets, submit, fetch)
+  - the title screen's Gipfelbuch button and BoardPanel
+  - the death screen's place line and name question
+  - the Settings switch "Enter my runs in the Gipfelbuch"
+  - the co-op entry sent by the host, with the place shared through Net.share_rank
+- F4 debug points forfeit the run.
+- Desktop runs only use a board given with --board.
+- Tests: board/test/board.test.mjs, tools/board_test.mjs (tests/board_solo, tests/net_board).
+
 
 ## 13. Project structure
 
@@ -1068,7 +1133,7 @@ and wait for feedback.
 
 ## 15. Out of scope (do not build unless asked)
 
-Voice chat, accounts/login, leaderboards, in-app purchases, mobile controls,
+Voice chat, accounts/login, in-app purchases, mobile controls,
 more than one map, more than four players, procedural levels.
 
 ## 16. Open questions for the user

@@ -1,6 +1,7 @@
 class_name StartScreen
 extends Control
-## Title screen (#77): the game's teaser behind, Solo, Co-op, Settings and the patch notes, with the
+## Title screen (#77): the game's teaser behind, Solo, Co-op, Settings, the patch notes and das
+## Gipfelbuch (the global leaderboard), with the
 ## version in a corner. Solo's click doubles as the
 ## user gesture browsers require for pointer lock (and audio). Until the hut's shaders are built
 ## (#78, ShaderWarmup) it shows only the still picture and how far that is: each new shader blocks the
@@ -22,6 +23,7 @@ var _revealed: bool = false
 var _join_mode: bool = false
 var _version: Label
 var _notes: PatchNotesPanel
+var _board: BoardPanel
 
 
 func _ready() -> void:
@@ -41,6 +43,9 @@ func _ready() -> void:
 	_notes = PatchNotesPanel.new()
 	add_child(_notes)
 	(%PatchNotesButton as Button).pressed.connect(_open_notes)
+	_board = BoardPanel.new()
+	add_child(_board)
+	(%BoardButton as Button).pressed.connect(_board.open)
 	set_ready(0.0)
 	if GameState.notice != "":
 		show_notice(GameState.notice)
@@ -83,7 +88,7 @@ func _reveal() -> void:
 
 
 func _menu_items() -> Array[Control]:
-	return [_solo, _coop, %SettingsButton, %PatchNotesButton, %Controls]
+	return [_solo, _coop, %SettingsButton, %PatchNotesButton, %BoardButton, %Controls]
 
 
 ## The patch notes; from now on this version counts as read.

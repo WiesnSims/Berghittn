@@ -285,5 +285,21 @@ messages = {
 [&"", &"WEAPON_KRAMPUSRUTE_2"]: [&"Höllen-Rute, doppelt dengelt"],
 [&"", &"UI_PATCH_NOTES"]: [&"Patch Notes"],
 [&"", &"UI_PATCH_NOTES_NEW"]: [&"Patch Notes · neu!"],
-[&"", &"UI_VERSION"]: [&"Version %s"]
+[&"", &"UI_VERSION"]: [&"Version %s"],
+[&"", &"UI_SET_BOARD"]: [&"Ins Gipfelbuch eintragen"],
+[&"", &"UI_BOARD"]: [&"Gipfelbuch"],
+[&"", &"UI_BOARD_ALL"]: [&"Allzeit"],
+[&"", &"UI_BOARD_WEEK"]: [&"Diese Woche"],
+[&"", &"UI_BOARD_PLACE"]: [&"#"],
+[&"", &"UI_BOARD_WAVE"]: [&"Welle"],
+[&"", &"UI_BOARD_LOADING"]: [&"Das Gipfelbuch wird aufgeschlagen…"],
+[&"", &"UI_BOARD_OFFLINE"]: [&"Das Gipfelbuch ist gerade nicht erreichbar."],
+[&"", &"UI_BOARD_EMPTY"]: [&"Noch keine Einträge. Trag dich als Erstes ein!"],
+[&"", &"UI_BOARD_SENDING"]: [&"Wird ins Gipfelbuch eingetragen…"],
+[&"", &"UI_BOARD_RANK"]: [&"Platz %d im Gipfelbuch!"],
+[&"", &"UI_BOARD_RANK_WEEK"]: [&"Platz %d im Gipfelbuch  ·  diese Woche: Platz %d"],
+[&"", &"UI_BOARD_ASK"]: [&"Dein Name fürs Gipfelbuch:"],
+[&"", &"UI_BOARD_ENTER"]: [&"Eintragen"],
+[&"", &"UI_BOARD_SKIP"]: [&"Nicht eintragen"],
+[&"", &"UI_BOARD_OFF_HINT"]: [&"Nicht eingetragen. In den Einstellungen kannst du das Gipfelbuch wieder einschalten."]
 }

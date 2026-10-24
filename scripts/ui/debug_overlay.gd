@@ -1,6 +1,7 @@
 extends Label
 ## FPS and position readout for checking performance and movement in browser builds. Toggle with F3.
-## While it is on, F4 adds points, for testing doors and wall-buys without playing for them.
+## While it is on, F4 adds points, for testing doors and wall-buys without playing for them; such a
+## run no longer goes into the Gipfelbuch.
 ## In co-op a second line shows the relay traffic down and up, averaged over the last second.
 
 var _since_refresh: float = 0.0
@@ -16,6 +17,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		var player := get_tree().get_first_node_in_group("player") as Player
 		if player:
 			player.points.add(Constants.DEBUG_POINTS)
+			Board.forfeit()
 
 
 func _process(delta: float) -> void:

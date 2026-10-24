@@ -4,6 +4,8 @@ extends Control
 ## Schnaps) and the personal best. The Restart click doubles as the gesture for pointer lock.
 ## Co-op (M9 "Nomoi!"): everyone's runs in the Hüttenwertung, Nomoi! to play again with the same
 ## people, and the room's invite link. Solo: Play with friends opens a room.
+## Das Gipfelbuch: the run's place on the global leaderboard (solo sent from here; in co-op the host
+## sends the group's and everyone hears its place). Solo without a name it asks for one once.
 
 signal restart_requested
 signal friends_requested
@@ -17,6 +19,8 @@ const HEADER_COLOR := Color(0.75, 0.7, 0.62)
 const CELL_COLOR := Color(0.95, 0.92, 0.85)
 const MINE_COLOR := Color(1.0, 0.86, 0.45)
 const CELL_SIZE: int = 17
+const BOARD_COLOR := Color(1.0, 0.86, 0.45)
+const BOARD_SIZE: int = 22
 
 @onready var _quip: Label = %Quip
 @onready var _stats: Label = %Stats
@@ -38,6 +42,11 @@ const CELL_SIZE: int = 17
 
 var _coop: bool = false
 var _wants_nomoi: bool = false
+# Das Gipfelbuch: the line with the run's place, the name question, and the solo run to send.
+var _board_line: Label
+var _ask: HBoxContainer
+var _name_edit: LineEdit
+var _board_entry: Dictionary = {}
 
 
 func _ready() -> void:
@@ -49,6 +58,9 @@ func _ready() -> void:
 	Net.runs_changed.connect(_refresh_wertung)
 	Net.nomoi_changed.connect(_refresh_nomoi)
 	Net.roster_changed.connect(_refresh_nomoi)
+	_build_board()
+	Board.ranked.connect(_on_ranked)
+	Board.not_ranked.connect(func() -> void: _board_line.hide())
 
 
 ## `run`: our player's stats; `new_best`: this run just became the personal best (Settings.record_run).
@@ -83,6 +95,88 @@ func present(wave: int, points: int, run: PlayerStats, new_best: bool, coop: boo
 	_enable_timer.start()
 	show()
 	_refresh_nomoi()
+
+
+## Solo: sends the run to the Gipfelbuch (keys as Board.submit takes them, without the names), or
+## first asks for a name if the player never typed one.
+func offer_board(entry: Dictionary) -> void:
+	if not Board.has_run("solo"):
+		return
+	_board_entry = entry
+	var player_name: String = str(Settings.profile.get("name", "")).strip_edges()
+	if player_name == "":
+		_ask.show()
+		return
+	_send_board(player_name)
+
+
+func _send_board(player_name: String) -> void:
+	_ask.hide()
+	_board_line.text = tr("UI_BOARD_SENDING")
+	_board_line.show()
+	var entry: Dictionary = _board_entry.duplicate()
+	entry["names"] = [player_name]
+	Board.submit(entry)
+
+
+## The name typed for the Gipfelbuch is our name from now on (also in the lobby).
+func _on_board_enter(_text: String = "") -> void:
+	var player_name: String = _name_edit.text.strip_edges().left(HikerStyle.NAME_MAX_LENGTH)
+	if player_name == "":
+		return
+	var profile: Dictionary = Settings.edit_profile(1)
+	profile["name"] = player_name
+	Settings.profile = profile
+	Settings.save()
+	_send_board(player_name)
+
+
+## Not into the Gipfelbuch: the Settings switch goes off (and can be turned on again there).
+func _on_board_skip() -> void:
+	Settings.board = false
+	Settings.save()
+	_ask.hide()
+	_board_line.text = tr("UI_BOARD_OFF_HINT")
+	_board_line.show()
+
+
+func _on_ranked(rank: int, week_rank: int, _id: int) -> void:
+	_board_line.text = tr("UI_BOARD_RANK") % rank if week_rank == rank else tr("UI_BOARD_RANK_WEEK") % [rank, week_rank]
+	_board_line.show()
+
+
+# Under the personal best: the place line, and the name question (both hidden until needed).
+func _build_board() -> void:
+	var box: Control = _best.get_parent()
+	_board_line = Label.new()
+	_board_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_board_line.add_theme_font_size_override("font_size", BOARD_SIZE)
+	_board_line.add_theme_color_override("font_color", BOARD_COLOR)
+	_board_line.hide()
+	box.add_child(_board_line)
+	box.move_child(_board_line, _best.get_index() + 1)
+	_ask = HBoxContainer.new()
+	_ask.alignment = BoxContainer.ALIGNMENT_CENTER
+	_ask.add_theme_constant_override("separation", 10)
+	var question := Label.new()
+	question.text = "UI_BOARD_ASK"
+	_ask.add_child(question)
+	_name_edit = LineEdit.new()
+	_name_edit.max_length = HikerStyle.NAME_MAX_LENGTH
+	_name_edit.custom_minimum_size = Vector2(220, 0)
+	_name_edit.text_submitted.connect(_on_board_enter)
+	_ask.add_child(_name_edit)
+	var enter := Button.new()
+	enter.text = "UI_BOARD_ENTER"
+	enter.pressed.connect(_on_board_enter)
+	_ask.add_child(enter)
+	var skip := Button.new()
+	skip.text = "UI_BOARD_SKIP"
+	skip.pressed.connect(_on_board_skip)
+	_ask.add_child(skip)
+	_ask.hide()
+	box.add_child(_ask)
+	box.move_child(_ask, _board_line.get_index() + 1)
 
 
 func _on_enable_timeout() -> void:

@@ -285,5 +285,21 @@ messages = {
 [&"", &"WEAPON_KRAMPUSRUTE_2"]: [&"Höllen-Rute, doppelt dengelt"],
 [&"", &"UI_PATCH_NOTES"]: [&"Patch notes"],
 [&"", &"UI_PATCH_NOTES_NEW"]: [&"Patch notes · new!"],
-[&"", &"UI_VERSION"]: [&"Version %s"]
+[&"", &"UI_VERSION"]: [&"Version %s"],
+[&"", &"UI_SET_BOARD"]: [&"Enter my runs in the Gipfelbuch"],
+[&"", &"UI_BOARD"]: [&"Gipfelbuch"],
+[&"", &"UI_BOARD_ALL"]: [&"All time"],
+[&"", &"UI_BOARD_WEEK"]: [&"This week"],
+[&"", &"UI_BOARD_PLACE"]: [&"#"],
+[&"", &"UI_BOARD_WAVE"]: [&"Wave"],
+[&"", &"UI_BOARD_LOADING"]: [&"Opening the Gipfelbuch…"],
+[&"", &"UI_BOARD_OFFLINE"]: [&"The Gipfelbuch can't be reached right now."],
+[&"", &"UI_BOARD_EMPTY"]: [&"No entries yet. Be the first!"],
+[&"", &"UI_BOARD_SENDING"]: [&"Signing the Gipfelbuch…"],
+[&"", &"UI_BOARD_RANK"]: [&"Place %d in the Gipfelbuch!"],
+[&"", &"UI_BOARD_RANK_WEEK"]: [&"Place %d in the Gipfelbuch  ·  this week: place %d"],
+[&"", &"UI_BOARD_ASK"]: [&"Your name for the Gipfelbuch:"],
+[&"", &"UI_BOARD_ENTER"]: [&"Sign it"],
+[&"", &"UI_BOARD_SKIP"]: [&"Don't sign"],
+[&"", &"UI_BOARD_OFF_HINT"]: [&"Not signed. You can switch the Gipfelbuch back on in Settings."]
 }

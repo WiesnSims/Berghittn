@@ -39,6 +39,8 @@ func _ready() -> void:
 	_lobby.closed.connect(_enter_menu)
 	Net.match_started.connect(_on_match_started)
 	Net.ended.connect(_on_net_ended)
+	Events.wave_started.connect(_on_wave_started)
+	Board.new_round()
 	_enter_menu()
 	if GameState.pending_match and Net.in_match():
 		# The host started again while this browser still showed the last match's end.
@@ -124,6 +126,7 @@ func _on_match_started() -> void:
 		get_tree().reload_current_scene.call_deferred()
 		return
 	_coop = true
+	Board.new_round()
 	_lobby.hide()
 	_death_screen.hide()
 	_setup_coop()
@@ -181,6 +184,36 @@ func _on_coop_over(wave: int) -> void:
 	_pause_menu.hide()
 	_hud.end_coop()
 	_death_screen.present(wave, _player.points.total, _player.stats, Settings.record_run(wave, _player.points.total), true)
+	_board_coop(wave)
+
+
+## Wave 1 began: the run gets its Gipfelbuch ticket (in co-op the host's, for the whole group).
+func _on_wave_started(wave: int, _boss: bool) -> void:
+	if wave == 1 and (not _coop or Net.is_host()):
+		Board.start_run("coop" if _coop else "solo")
+
+
+## Host: once everyone's run is in, one Gipfelbuch entry for the group (best points first; a player
+## who switched the Gipfelbuch off is in it without a name), and its place goes to everyone.
+func _board_coop(wave: int) -> void:
+	if not Net.is_host() or not Board.has_run("coop"):
+		return
+	var waited: float = 0.0
+	while Net.runs.size() < Net.roster.size() and waited < Constants.BOARD_COOP_WAIT:
+		await get_tree().process_frame
+		waited += get_process_delta_time()
+	var rows: Array = Net.runs.values()
+	if rows.is_empty() or rows.any(func(row: Dictionary) -> bool: return not row.get("clean", true)):
+		return
+	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a["points"]) > int(b["points"]))
+	var entry: Dictionary = {"names": [], "wave": wave, "points": 0, "kills": 0, "headshots": 0, "fav": rows[0]["fav"]}
+	for row: Dictionary in rows:
+		(entry["names"] as Array).append(row["name"] if row.get("public", true) else tr("UI_DEATH_NONE"))
+		for key: String in ["points", "kills", "headshots"]:
+			entry[key] += int(row[key])
+	if not Board.ranked.is_connected(Net.share_rank):
+		Board.ranked.connect(Net.share_rank, CONNECT_ONE_SHOT)
+	Board.submit(entry)
 
 
 func _on_net_ended(reason: String) -> void:
@@ -201,6 +234,11 @@ func _on_player_died() -> void:
 	get_tree().paused = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_death_screen.present(_waves.wave, _player.points.total, _player.stats, Settings.record_run(_waves.wave, _player.points.total))
+	var best: WeaponData = _player.stats.favourite()
+	_death_screen.offer_board({
+		"wave": _waves.wave, "points": _player.points.total, "kills": _player.stats.kills,
+		"headshots": _player.stats.headshots, "fav": String(best.display_name) if best else "",
+	})
 
 
 func _restart() -> void:
