@@ -2,10 +2,29 @@ class_name PatchNotes
 extends RefCounted
 ## What changed in each version (user request 2026-10-24), newest first, short and for players: a
 ## line per change, not the details. The version itself is application/config/version in
-## project.godot; a new one gets its entry here at the top. 1.1 is for M9 once it is finished.
+## project.godot; a new one gets its entry here at the top. 1.1 is M9.
 ## The text is not in the translation tables: each entry carries both languages.
 
 const ENTRIES: Array[Dictionary] = [
+	{
+		"version": "1.1", "date": "2026-10-24",
+		"en": [
+			"Nomoi!: play again with the same group in one click, and the Hüttenwertung after a co-op match.",
+			"Hits and kills you can feel, damage numbers (Settings) and dialect kill streaks with bonus points.",
+			"The enemies talk (Settings: Enemy chatter).",
+			"Da Dengelstock in the Holzschuppen's hay loft: forge your guns and special weapons, twice over.",
+			"New: das Venedigermandl, a little gold digger who runs off with his sack. Catch him!",
+			"New enemies: da Wilderer with his old rifle (take cover when his scope glints), and flocks of Bergdohlen.",
+		],
+		"de": [
+			"Nomoi!: mit der gleichen Runde mit einem Klick nochmal spielen, und die Hüttenwertung nach einem Koop-Spiel.",
+			"Treffer und Kills, die man spürt, Schadenszahlen (Einstellungen) und Kill-Serien im Dialekt mit Bonuspunkten.",
+			"Die Gegner reden (Einstellungen: Gegner reden).",
+			"Da Dengelstock auf dem Heuboden im Holzschuppen: schmiede deine Waffen und Spezialwaffen, zweimal.",
+			"Neu: das Venedigermandl, ein kleiner Goldgräber, der mit seinem Sack davonläuft. Fang ihn!",
+			"Neue Gegner: da Wilderer mit seinem alten Gewehr (in Deckung, wenn sein Zielfernrohr blitzt) und Schwärme von Bergdohlen.",
+		],
+	},
 	{
 		"version": "1.0.1", "date": "2026-10-24",
 		"en": [

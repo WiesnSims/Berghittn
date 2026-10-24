@@ -130,7 +130,8 @@ func _bot(stand: Vector3, host: bool) -> void:
 		var id: int = enemy.get_instance_id()
 		if not _born.has(id):
 			_born[id] = _t
-		if enemy.global_position.distance_to(stand) <= REACH:
+		# A Wilderer keeps his distance: he is there once he aims (on a guest, his puppet's pose).
+		if enemy.global_position.distance_to(stand) <= REACH or (enemy._rig and enemy._rig.action() == EnemyRig.Action.AIM):
 			_types[enemy.data.id] = _types.get(enemy.data.id, 0) + 1
 			enemy.receive_hit(100000, true, false, _player)
 			_kills += 1

@@ -253,6 +253,7 @@ messages = {
 [&"", &"MARKER_MANDL"]: [&"Venedigermandl"],
 [&"", &"ENEMY_VENEDIGERMANDL"]: [&"Venedigermandl"],
 [&"", &"ENEMY_WILDERER"]: [&"Wilderer"],
+[&"", &"ENEMY_BERGDOHLE"]: [&"Bergdohle"],
 [&"", &"UI_DENGEL"]: [&"E drücken: %s dengeln lassen (%d)"],
 [&"", &"UI_DENGEL_TWICE"]: [&"E drücken: %s doppelt dengeln lassen (%d)"],
 [&"", &"UI_DENGEL_NEED"]: [&"%s dengeln: %d Punkte nötig"],

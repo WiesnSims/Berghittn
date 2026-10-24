@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/bergdohle.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"bergdohle"
+display_name = "ENEMY_BERGDOHLE"
+base_health = 60
+health_per_wave = 8
+speed = 6.0
+damage = 8
+attack_range = 0.9
+attack_windup = 0.0
+attack_cooldown = 1.0
+head_pop_damage = 1000000
+model = ExtResource("2")
+model_scale = 0.35
+flies = true
+flock_min = 3
+flock_max = 5
+flinch_multiplier = 1.5
+groan_sounds = Array[StringName]([&"dohle_caw"])
+death_sound = &"dohle_caw"
+attack_sound = &"dohle_caw"
+voice_pitch = 1.2

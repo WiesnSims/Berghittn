@@ -20,6 +20,10 @@ enum Action { NONE, STRIKE, PULL, CLIMB, CROUCH, LEAP, DANCE, DAZED, CARRIED, DI
 @export var one_handed: bool = false
 ## How big it was built against the standard figure (EnemyData.model_scale).
 @export var build_scale: float = 1.0
+## A bird (the Bergdohle, M9 part 5c): the arms are wings, beating this many degrees up and down
+## this many times a second, flying or hovering alike. 0: no wings.
+@export var flap: float = 0.0
+@export var flap_rate: float = 4.0
 
 @onready var skeleton: Skeleton3D = $Skeleton
 @onready var _ragdoll: PhysicalBoneSimulator3D = $Skeleton/Ragdoll
@@ -67,7 +71,7 @@ func update(delta: float, speed: float) -> void:
 	_action_time += delta
 	if _action_time > _action_length and _action not in [Action.DANCE, Action.CARRIED, Action.CLIMB, Action.DAZED, Action.DIG, Action.AIM]:
 		_action = Action.NONE
-	_phase += speed * delta * cadence * PI
+	_phase += (flap_rate * TAU if flap > 0.0 else speed * cadence * PI) * delta
 	_walk = move_toward(_walk, clampf(speed / 2.0, 0.0, 1.0), delta * 4.0)
 	var blend: float = 1.0 - exp(-delta * (22.0 if _action == Action.STRIKE else 12.0))
 	for bone: StringName in _bones:
@@ -225,6 +229,13 @@ func _target(bone: StringName) -> Vector3:
 			angle.x -= deg_to_rad(arm_swing) * s * side * walk
 		"chest":
 			angle.y += deg_to_rad(4.0) * s * walk
+	if flap > 0.0:
+		# Wing beats: the arm up and down about its length, the forearm a little behind.
+		match limb:
+			"arm":
+				angle.z += deg_to_rad(flap) * s * side
+			"forearm":
+				angle.z += deg_to_rad(flap * 0.5) * sin(_phase - 0.6) * side
 	var t: float = clampf(_action_time / _action_length, 0.0, 1.0)
 	match _action:
 		Action.STRIKE:

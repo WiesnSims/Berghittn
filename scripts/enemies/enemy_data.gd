@@ -46,6 +46,12 @@ extends Resource
 @export var shot_range_max: float = 25.0
 @export var aim_time: float = 1.2
 @export var shot_cooldown: float = 3.0
+## Flies (the Bergdohlen, M9 part 5c): no walking on the navmesh and no climbing; it steers through
+## the air (Constants.DOHLE_*), only through open doors and broken windows, pecks for `damage` and
+## flutters off. The wave manager sends flock_min..flock_max at once.
+@export var flies: bool = false
+@export var flock_min: int = 1
+@export var flock_max: int = 1
 ## Boss (Krampus): announced, gets a health bar, and is immune to crowd control (section 6a).
 @export var is_boss: bool = false
 ## Treasure (the Venedigermandl, M9 part 5a): never attacks, runs from the players, vanishes after
@@ -57,6 +63,8 @@ extends Resource
 ## cry as it dies, and the pitch its attack grunt and death cry are played at.
 @export var groan_sounds: Array[StringName] = []
 @export var death_sound: StringName = &"enemy_death"
+## Its grunt as it swings (a Bergdohle caws as it pecks).
+@export var attack_sound: StringName = &"enemy_attack"
 @export var voice_pitch: float = 1.0
 
 

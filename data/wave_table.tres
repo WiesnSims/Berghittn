@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="WaveTable" load_steps=15 format=3]
+[gd_resource type="Resource" script_class="WaveTable" load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://scripts/waves/wave_table.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/waves/wave_entry.gd" id="2"]
@@ -9,6 +9,7 @@
 [ext_resource type="Resource" path="res://data/enemies/krampus.tres" id="7"]
 [ext_resource type="Resource" path="res://data/enemies/venedigermandl.tres" id="8"]
 [ext_resource type="Resource" path="res://data/enemies/wilderer.tres" id="9"]
+[ext_resource type="Resource" path="res://data/enemies/bergdohle.tres" id="10"]
 
 [sub_resource type="Resource" id="Wanderer"]
 script = ExtResource("2")
@@ -45,6 +46,13 @@ first_wave = 7
 weight = 1.0
 last_wave = 0
 
+[sub_resource type="Resource" id="Bergdohle"]
+script = ExtResource("2")
+enemy = ExtResource("10")
+first_wave = 6
+weight = 0.5
+last_wave = 0
+
 [resource]
 script = ExtResource("1")
 base_enemies = 6
@@ -54,7 +62,7 @@ start_spawn_interval = 2.5
 spawn_interval_step = 0.1
 min_spawn_interval = 0.6
 break_time = 30.0
-entries = Array[ExtResource("2")]([SubResource("Wanderer"), SubResource("Tourist"), SubResource("Knappe"), SubResource("Perchte"), SubResource("Wilderer")])
+entries = Array[ExtResource("2")]([SubResource("Wanderer"), SubResource("Tourist"), SubResource("Knappe"), SubResource("Perchte"), SubResource("Wilderer"), SubResource("Bergdohle")])
 boss = ExtResource("7")
 boss_escort = ExtResource("3")
 boss_escort_count = 6

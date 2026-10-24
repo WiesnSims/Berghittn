@@ -86,13 +86,20 @@ func _spawn() -> void:
 		push_warning("Wave %d: no spawn point or no enemy type; skipping a spawn." % wave)
 		_count_spawned()
 		return
-	var pool: Array = _pools.get(data.id, [])
-	var enemy: Enemy = pool.pop_back() if not pool.is_empty() else _create_enemy()
-	var angle: float = _rng.randf() * TAU
-	var scatter := Vector3(cos(angle), 0.0, sin(angle)) * _rng.randf() * Constants.SPAWN_SCATTER_RADIUS
-	enemy.activate(data, wave, point.global_transform.translated(scatter))
-	_alive += 1
-	_count_spawned()
+	# A flock of birds (the Bergdohlen) comes at once, high up, each one of the wave and of the alive.
+	var count: int = 1
+	if data.flies:
+		count = clampi(_rng.randi_range(data.flock_min, data.flock_max), 1, mini(_to_spawn, Constants.MAX_ALIVE_ENEMIES - _alive))
+	for i: int in count:
+		var pool: Array = _pools.get(data.id, [])
+		var enemy: Enemy = pool.pop_back() if not pool.is_empty() else _create_enemy()
+		var angle: float = _rng.randf() * TAU
+		var scatter := Vector3(cos(angle), 0.0, sin(angle)) * _rng.randf() * Constants.SPAWN_SCATTER_RADIUS
+		if data.flies:
+			scatter = Vector3(cos(angle), 0.0, sin(angle)) * _rng.randf() * Constants.DOHLE_SPAWN_SCATTER + Vector3.UP * Constants.DOHLE_SPAWN_HEIGHT
+		enemy.activate(data, wave, point.global_transform.translated(scatter))
+		_alive += 1
+		_count_spawned()
 
 
 ## The Venedigermandl turns up now (also used by tests), at a spawn point of an open zone at least

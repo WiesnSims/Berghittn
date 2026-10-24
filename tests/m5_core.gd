@@ -118,6 +118,7 @@ func _wave_mix() -> void:
 			expected.append(&"tourist")
 		if wave >= 6:
 			expected.append(&"knappe")
+			expected.append(&"bergdohle")
 		if wave >= 7:
 			expected.append(&"wilderer")
 		if wave >= 8:

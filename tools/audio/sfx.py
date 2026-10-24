@@ -556,6 +556,19 @@ def dengel_quench(v):
 
 
 
+def dohle_caw(v):
+    """A Bergdohle (M9 part 5c): the chough's ringing, rising-then-falling "tschri-ah", a little hoarse."""
+    s = [0.34, 0.28, 0.4, 0.3][v]
+    top = [1500, 1700, 1350, 1600][v]
+    f0 = np.concatenate([d.glide(s * 0.35, top * 0.75, top), d.glide(s * 0.65, top, top * 0.7)])
+    t = np.arange(len(f0)) / d.SR
+    f0 = f0 * (1.0 + 0.02 * np.sin(2 * np.pi * 28 * t))
+    x = d.harmonics(f0, len(f0) / d.SR, [1.0, 0.6, 0.35, 0.2, 0.1])
+    x = d.bandpass(d.drive(x, 1.6), 800, 6000) + 0.08 * d.bandpass(d.noise(len(x) / d.SR), 2000, 6000)
+    x = x * d.env_points(len(x) / d.SR, [(0, 0), (0.02, 1), (s * 0.6, 0.8), (len(x) / d.SR, 0)])
+    return d.normalize(d.fade(d.reverb(x, 0.6, 0.15)), 0.8)
+
+
 def mandl_jingle(v):
     """The Venedigermandl appears (M9 part 5a): a spill of little gold coins chinking, rising."""
     x = np.zeros(d.n_of(1.3))
@@ -786,7 +799,7 @@ SOUNDS = {
     "buy": (buy, 1), "deny": (deny, 1), "door_open": (door_open, 1), "creak": (creak, 5),
     "chest_open": (chest_open, 1), "chest_tick": (chest_tick, 6), "chest_reveal": (chest_reveal, 1),
     "anvil_clang": (anvil_clang, 3), "dengel_quench": (dengel_quench, 1),
-    "mandl_jingle": (mandl_jingle, 1), "mandl_coins": (mandl_coins, 3), "mandl_fountain": (mandl_fountain, 1),
+    "dohle_caw": (dohle_caw, 4), "mandl_jingle": (mandl_jingle, 1), "mandl_coins": (mandl_coins, 3), "mandl_fountain": (mandl_fountain, 1),
     "mandl_poof": (mandl_poof, 1),
     "perk_drink": (perk_drink, 1), "jause_eat": (jause_eat, 1), "ammo_crate": (ammo_crate, 1),
     "ui_click": (ui_click, 1), "wave_start": (wave_start, 1), "boss_wave": (boss_wave, 1),

@@ -694,6 +694,33 @@ const MANDL_GLOW_RANGE: float = 4.0
 const MANDL_HIT_COINS: int = 10
 const MANDL_KILL_COINS: int = 90
 
+# --- Die Bergdohlen (M9 part 5c, GAME_DESIGN section 12; the rest is in data/enemies/bergdohle.tres) -
+## How high (m) over the ground or the floor of its way it flies, and how far it keeps under a
+## ceiling; where it pecks at a player (m above their feet), and from how near.
+const DOHLE_HEIGHT: float = 1.6
+const DOHLE_CEILING_GAP: float = 0.45
+const DOHLE_ATTACK_HEIGHT: float = 1.3
+const DOHLE_PECK_RANGE: float = 0.8
+## After a peck it flutters off, up and away, for this long (s), at this share of its speed.
+const DOHLE_FLUTTER_TIME: float = 1.0
+const DOHLE_FLUTTER_SPEED: float = 0.7
+## Seconds between new looks at its way; how fast it turns its flight (share a second).
+const DOHLE_REPATH: float = 0.3
+const DOHLE_STEER: float = 5.0
+## Its body: a ball this big (m), this high over its origin.
+const DOHLE_RADIUS: float = 0.18
+const DOHLE_BODY_HEIGHT: float = 0.27
+## Through a window: first to this far (m) in front of it, then through. At a shut one it circles
+## this wide in front of it until the boards are gone.
+const DOHLE_WINDOW_LEAD: float = 1.0
+const DOHLE_WAIT_CIRCLE: float = 1.0
+## A flock comes in this high (m) over its spawn point, spread this wide.
+const DOHLE_SPAWN_HEIGHT: float = 3.0
+const DOHLE_SPAWN_SCATTER: float = 2.0
+## Caught on an edge (moved less than DOHLE_STUCK_MOVE m in DOHLE_STUCK_TIME s): back over the floor.
+const DOHLE_STUCK_MOVE: float = 0.4
+const DOHLE_STUCK_TIME: float = 1.5
+
 # --- Da Wilderer (M9 part 5b, GAME_DESIGN section 12; the rest is in data/enemies/wilderer.tres) ---
 ## Nearer than this (m) he comes for the player with the stock instead of shooting.
 const WILDERER_CLOSE: float = 6.0
