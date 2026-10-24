@@ -952,6 +952,19 @@ gold, glowing faintly gold so he is easy to spot in the storm.
   cover) and fires once (25 damage, a visible tracer, walls block it), then moves on. Close up he
   clubs with the stock. He makes the long sight lines of the Terrasse and the Schuppen dangerous
   and gives cover a purpose. Lines: "Des is mei Revier!", "Hob di!".
+  Built (2026-10-24, branch m9-wilderer): EnemyData.shot_damage/shot_range_min/max/aim_time/
+  shot_cooldown on the shared Enemy, state AIMING. He aims only with no wall between his eyes and the
+  player's chest; the aim follows them until 0.25 s before the shot (moving then dodges it); the shot
+  hits the first player or escort within 0.45 m of its line short of a wall (boards are no cover:
+  they have no collision). After a shot he moves on 6 m sideways or back (in range, no window on the
+  way) and waits 3 s before he aims again; nearer than 6 m he goes for the stock (30). A stun,
+  dance or knock breaks his aim. The glint is a star the same size on screen at any distance,
+  pulsing faster towards the shot; the click is the bolt; the shot the Stutzen's, lower, with a
+  streak. Model: loden jacket, bandolier, wide hat with a Gamsbart, a scoped rifle along the right
+  forearm, shouldered in the new AIM pose. Lines: SPOT and IDLE "Des is mei Revier!", AIM "Hob di!",
+  and our own (play-test them) a hit "Waidmannsheil!" (the hunter's greeting after a good shot),
+  dying "Waidmannsdank…" (its reply). Co-op: the pose carries the glint, CoopEnemies._fired the
+  bang and the streak. Tests: tests/m9_wilderer, tests/net_specials.
 - (5c) **Die Bergdohlen**, flying enemies: Alpine choughs with dead white eyes, in flocks of 3 to 5
   from wave 6. Small, 60 + 8·wave health (one good hit), 6 m/s, they fly over fences and through
   broken windows without stopping at barricades, peck (8 damage) and flutter off for a moment.

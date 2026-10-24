@@ -227,7 +227,7 @@ godot --headless --script res://tools/models/build_enemies.gd
   `assets/materials/characters/` (wool, leather, fur, skin, linen, wood, metal, plain, glow).
 - `EnemyRig` (`scripts/enemies/enemy_rig.gd`, on the model's root) poses the bones in code: the
   stance and walk the builder sets per type, plus one action at a time (`STRIKE`, `PULL`, `CLIMB`,
-  `CROUCH`, `LEAP`, `DANCE`, `DAZED`, `CARRIED`, the Venedigermandl's `DIG`) that `Enemy` starts from its states. The head
+  `CROUCH`, `LEAP`, `DANCE`, `DAZED`, `CARRIED`, the Venedigermandl's `DIG`, the Wilderer's `AIM` and `SHOOT`) that `Enemy` starts from its states. The head
   hurtbox follows the head bone.
 - Ragdolls (#39): a kill hands the bones to physics, pushed away from the shooter. They collide
   with the world only. At most `RAGDOLL_MAX` (6) are simulated at once; each freezes in the pose
@@ -291,6 +291,21 @@ Stube open there is no such place, so he waits until the players get outside.
   `APPEAR`, `RUN`, `HIT`, `VANISH`, `DEATH`, always said and heard from 40 m.
 - Co-op: the host's Mandl is a puppet on the guests like any enemy; `CoopEnemies._vanished` takes
   his vanishing over. Tests: `tests/m9_mandl`, `tests/net_specials`.
+
+## Da Wilderer (M9 part 5b)
+
+A ranged enemy: `data/enemies/wilderer.tres` (`EnemyData.shot_*`, `aim_time`), in the waves from
+wave 7. With a player 6 to 25 m off and no wall between his eyes and their chest he stops and aims
+(`Enemy._ranged`, state `AIMING`): a bolt click, the rig's `AIM`, and a `ScopeGlint` on his scope that
+pulses faster towards the shot. The aim follows the player until `WILDERER_AIM_LOCK` (0.25 s) before
+the shot, so stepping aside then, or getting behind a wall at any time, dodges it. The shot
+(`_fire`) is a ray against the world; the first player or escort within `WILDERER_HIT_RADIUS` of the
+line takes `shot_damage`, and a streak (`ricochet_trail.gd`) shows it. Then he moves on 6 m sideways
+or back, staying in range, before he may aim again. Nearer than 6 m he walks in and clubs with the
+stock (`damage`). A stun, dance or knock breaks the aim. The rifle lies along his right hand bone,
+so the `AIM` pose (arm straight ahead) shoulders it; `EnemyRig.point_on` finds the muzzle and the
+scope. Co-op: the pose carries the glint; `CoopEnemies._fired` plays the bang and the streak on the
+guests. Tests: `tests/m9_wilderer`, `tests/net_specials`.
 
 ## Prop models (M6)
 

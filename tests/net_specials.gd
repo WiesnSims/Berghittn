@@ -10,7 +10,8 @@ extends Node
 ## the Dengelstock with the host's word, the anvil is busy for the host meanwhile, and the guest's
 ## hiker shows empty hands, then the Gendarmen-Pistole; the guest's Kraxn shows on its back; the
 ## host's Venedigermandl turns up on the guest with his banner, the guest's kill pays the guest the
-## whole sack, and the next one vanishes on both.
+## whole sack, and the next one vanishes on both; the host's Wilderer aims at the guest (the glint on the
+## guest's screen) and his shot hurts the guest, with the streak there too.
 
 const TIMEOUT: float = 25.0
 const ALPHORN: WeaponData = preload("res://data/weapons/alphorn.tres")
@@ -237,6 +238,48 @@ func _run() -> bool:
 		if not await _sync(round):
 			return false
 	print("venedigermandl: on the guest with his banner, the guest's kill paid the guest, the next vanished on both")
+	# --- the Wilderer (M9 part 5b): the host's, shooting at the guest out in the field ---
+	if host:
+		# Out of his way, in the Stube.
+		_player.global_position = (get_tree().get_first_node_in_group("player_spawn") as Node3D).global_position
+		await get_tree().create_timer(0.5).timeout
+		var wilderer: Enemy = waves._create_enemy()
+		wilderer.activate(load("res://data/enemies/wilderer.tres"), 7, Transform3D(Basis.IDENTITY, Vector3(-6.0, -0.3, 28.0)))
+		wilderer.process_mode = Node.PROCESS_MODE_PAUSABLE
+		if not await _until(func() -> bool: return wilderer.net_id != 0):
+			return _fail("the Wilderer never went to the guest")
+		_note.rpc("wilderer", wilderer.net_id)
+		if not await _until(func() -> bool: return _marks.has("shot")):
+			return _fail("the guest was never shot")
+		wilderer.receive_hit(99999, false, false, null)
+	else:
+		_player.health.invincible_left = 0.0
+		if not await _until(func() -> bool: return _marks.has("wilderer")):
+			return _fail("the host sent no Wilderer")
+		var puppet: Enemy = Coop.enemies.by_id(int(_marks["wilderer"]))
+		if puppet == null or puppet.data.shot_damage <= 0:
+			return _fail("no Wilderer puppet")
+		var health: int = _player.health.current()
+		# Arrays: a lambda keeps its own copy of a plain local.
+		var glinted: Array[bool] = [false]
+		var streaked: Array[bool] = [false]
+		var shot: bool = await _until(func() -> bool:
+				glinted[0] = glinted[0] or (puppet._glint != null and puppet._glint.visible)
+				streaked[0] = streaked[0] or _child_with_script(Coop.enemies, "ricochet_trail.gd")
+				return _player.health.current() <= health - 25)
+		_player.health.invincible_left = 9999.0
+		if not shot:
+			return _fail("the Wilderer's shot never hurt the guest (%d of %d)" % [_player.health.current(), health])
+		if not glinted[0]:
+			return _fail("no glint on the guest's screen while he aimed")
+		if not await _until(func() -> bool:
+				streaked[0] = streaked[0] or _child_with_script(Coop.enemies, "ricochet_trail.gd")
+				return streaked[0]):
+			return _fail("no streak of his shot on the guest")
+		_mark.rpc("shot")
+	if not await _sync("wilderer_done"):
+		return false
+	print("wilderer: the host's Wilderer aimed (glint on the guest), his shot hurt the guest, the streak shown there")
 	# --- the Krampus-Rute drop: one, for whoever is first ---
 	if host:
 		WeaponPickup.spawn(RUTE, _player.global_position + Vector3.FORWARD * 3.0, _main)

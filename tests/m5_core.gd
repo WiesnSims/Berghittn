@@ -108,7 +108,7 @@ func _wave_mix() -> void:
 	var table: WaveTable = waves.wave_table
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 7
-	for wave: int in [1, 3, 6, 8]:
+	for wave: int in [1, 3, 6, 7, 8]:
 		var seen: Dictionary = {}
 		for i: int in 3000:
 			var data: EnemyData = table.pick_enemy(wave, rng)
@@ -118,6 +118,8 @@ func _wave_mix() -> void:
 			expected.append(&"tourist")
 		if wave >= 6:
 			expected.append(&"knappe")
+		if wave >= 7:
+			expected.append(&"wilderer")
 		if wave >= 8:
 			expected.append(&"perchte")
 		expected.sort()

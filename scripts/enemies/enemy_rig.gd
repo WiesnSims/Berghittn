@@ -3,11 +3,11 @@ extends Node3D
 ## The skeleton of an enemy model (M6 part 4, built by tools/models): poses its bones in code (the
 ## stance it stands in, the walk, and one action at a time: a swing, ripping a board out, a dive
 ## through a window, the Perchte's crouch and leap, a dance, being dazed or carried, the
-## Venedigermandl digging), and turns it
+## Venedigermandl digging, the Wilderer's aim and shot), and turns it
 ## into a ragdoll when it dies. Bones rotate around the model's own axes (their rest has no turn):
 ## +X swings a limb forward, -X leans the chest forward, Z spreads an arm.
 
-enum Action { NONE, STRIKE, PULL, CLIMB, CROUCH, LEAP, DANCE, DAZED, CARRIED, DIG }
+enum Action { NONE, STRIKE, PULL, CLIMB, CROUCH, LEAP, DANCE, DAZED, CARRIED, DIG, AIM, SHOOT }
 
 ## Degrees per bone that it stands in (a zombie's arms forward, a hunch).
 @export var stance: Dictionary = {}
@@ -65,7 +65,7 @@ func update(delta: float, speed: float) -> void:
 	if _simulating or _frozen:
 		return
 	_action_time += delta
-	if _action_time > _action_length and _action not in [Action.DANCE, Action.CARRIED, Action.CLIMB, Action.DAZED, Action.DIG]:
+	if _action_time > _action_length and _action not in [Action.DANCE, Action.CARRIED, Action.CLIMB, Action.DAZED, Action.DIG, Action.AIM]:
 		_action = Action.NONE
 	_phase += speed * delta * cadence * PI
 	_walk = move_toward(_walk, clampf(speed / 2.0, 0.0, 1.0), delta * 4.0)
@@ -94,6 +94,21 @@ func pose_now() -> void:
 func head_position() -> Vector3:
 	var pose: Transform3D = skeleton.global_transform * skeleton.get_bone_global_pose(_head_index)
 	return pose * (Vector3.UP * 0.12 * build_scale)
+
+
+## Where `point` (in the built model's rest space, like the builder's shapes) on `bone` is now.
+func point_on(bone: StringName, point: Vector3) -> Vector3:
+	var index: int = _bones[bone]
+	return skeleton.global_transform * skeleton.get_bone_global_pose(index) * (point - skeleton.get_bone_global_rest(index).origin)
+
+
+func action() -> Action:
+	return _action
+
+
+## How far through the current action it is (0..1).
+func action_share() -> float:
+	return clampf(_action_time / _action_length, 0.0, 1.0)
 
 
 ## Goes limp: the bones are handed to physics, pushed by `push` (m/s) at the chest. False if
@@ -196,7 +211,7 @@ func _target(bone: StringName) -> Vector3:
 	var angle: Vector3 = _stance(bone)
 	var s: float = sin(_phase)
 	var walk: float = _walk
-	if _action in [Action.CLIMB, Action.CARRIED, Action.DANCE, Action.LEAP, Action.CROUCH, Action.DIG]:
+	if _action in [Action.CLIMB, Action.CARRIED, Action.DANCE, Action.LEAP, Action.CROUCH, Action.DIG, Action.AIM, Action.SHOOT]:
 		walk = 0.0
 	var side: float = -1.0 if String(bone).ends_with("_r") else 1.0
 	var limb: String = String(bone).trim_suffix("_l").trim_suffix("_r")
@@ -299,6 +314,21 @@ func _target(bone: StringName) -> Vector3:
 					angle = Vector3(deg_to_rad(25.0), 0.0, deg_to_rad(-8.0) * side)
 				"shin":
 					angle = Vector3(deg_to_rad(-35.0), 0.0, 0.0)
+		Action.AIM, Action.SHOOT:
+			# The rifle at the shoulder, right arm straight ahead along it, the left hand under the
+			# barrel; the shot kicks the barrel and the chest up, then settles.
+			var kick: float = 0.0 if _action == Action.AIM else maxf(0.0, 1.0 - t * 2.5)
+			match limb:
+				"arm":
+					angle = Vector3(deg_to_rad((88.0 if side < 0.0 else 92.0) + 18.0 * kick), 0.0, deg_to_rad(6.0 if side < 0.0 else 28.0) * side)
+				"forearm":
+					angle = Vector3(deg_to_rad(0.0 if side < 0.0 else 12.0), 0.0, 0.0)
+				"chest":
+					angle = Vector3(deg_to_rad(-4.0 + 8.0 * kick), deg_to_rad(-10.0), 0.0)
+				"head":
+					angle = Vector3(deg_to_rad(4.0), deg_to_rad(10.0), deg_to_rad(-8.0))
+				"thigh":
+					angle = Vector3(deg_to_rad(8.0 * side), 0.0, deg_to_rad(-5.0) * side)
 		Action.CARRIED:
 			# Flailing on the fork.
 			var flail: float = sin(_action_time * 14.0 + side)
