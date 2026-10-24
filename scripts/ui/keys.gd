@@ -48,7 +48,7 @@ static func event_name(event: InputEvent) -> String:
 		# display server knows it; the browser's and the headless one do not (they log an error on
 		# every call).
 		var label: Key = KEY_NONE
-		if not DisplayServer.get_name() in ["Web", "headless"]:
+		if not OS.has_feature("web") and DisplayServer.get_name() != "headless":
 			label = DisplayServer.keyboard_get_keycode_from_physical(code)
 		return OS.get_keycode_string(label if label != KEY_NONE else code)
 	var button := event as InputEventMouseButton
