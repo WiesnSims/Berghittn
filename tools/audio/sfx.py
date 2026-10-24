@@ -555,6 +555,46 @@ def dengel_quench(v):
     return d.normalize(d.fade(d.mix(hiss, bubbles), 0.01, 0.3), 0.8)
 
 
+
+def mandl_jingle(v):
+    """The Venedigermandl appears (M9 part 5a): a spill of little gold coins chinking, rising."""
+    x = np.zeros(d.n_of(1.3))
+    for i, f in enumerate([1568, 1760, 2093, 2349, 2637, 3136]):
+        b = bell(0.6, f, [1, 2.4, 4.1], [0.12, 0.05, 0.02], [1, 0.35, 0.15])
+        at = d.n_of(i * 0.07 + d.rng.uniform(0, 0.02))
+        x[at:at + len(b)] += b[: len(x) - at] * (0.6 + 0.08 * i)
+    return d.normalize(d.fade(d.reverb(x, 0.9, 0.25)), 0.8)
+
+
+def mandl_coins(v):
+    """Coins knocked out of the sack: a few quick chinks, falling."""
+    x = np.zeros(d.n_of(0.6))
+    for _ in range(4 + v):
+        f = d.rng.uniform(2400, 4200)
+        b = bell(0.25, f, [1, 2.7, 5.1], [0.06, 0.03, 0.015], [1, 0.4, 0.2])
+        at = d.n_of(d.rng.uniform(0.0, 0.3))
+        x[at:at + len(b)] += b[: len(x) - at]
+    return d.normalize(d.fade(x), 0.7)
+
+
+def mandl_fountain(v):
+    """The whole sack spilt: a shower of coins, long and bright."""
+    x = np.zeros(d.n_of(2.0))
+    for i in range(60):
+        f = d.rng.uniform(1800, 4600)
+        b = bell(0.3, f, [1, 2.7, 5.1], [0.07, 0.03, 0.015], [1, 0.4, 0.2])
+        at = d.n_of(min(1.6, d.rng.exponential(0.35)))
+        x[at:at + len(b)] += b[: len(x) - at] * d.rng.uniform(0.4, 1.0)
+    return d.normalize(d.fade(d.reverb(x, 0.8, 0.2), 0.002, 0.3), 0.85)
+
+
+def mandl_poof(v):
+    """He vanishes in a puff of gold dust: a soft whoosh with a sparkle on top."""
+    s = 0.8
+    whoosh = d.bandpass(d.noise(s), 600, 3000) * d.env_points(s, [(0, 0), (0.08, 1), (s, 0)])
+    sparkle = d.mix(*[(0.05 + i * 0.05, bell(0.4, 3000 + i * 400, [1, 2.2], [0.08, 0.03], [1, 0.3])) for i in range(5)])
+    return d.normalize(d.fade(d.mix(whoosh * 0.7, sparkle * 0.5)), 0.8)
+
 def perk_drink(v):
     cork = d.mix(d.sine(d.glide(0.08, 700, 1400), 0.08) * d.env_exp(0.08, 0.02), click(2500, 0.003, 0.5))
     glug = np.zeros(d.n_of(1.2))
@@ -746,6 +786,8 @@ SOUNDS = {
     "buy": (buy, 1), "deny": (deny, 1), "door_open": (door_open, 1), "creak": (creak, 5),
     "chest_open": (chest_open, 1), "chest_tick": (chest_tick, 6), "chest_reveal": (chest_reveal, 1),
     "anvil_clang": (anvil_clang, 3), "dengel_quench": (dengel_quench, 1),
+    "mandl_jingle": (mandl_jingle, 1), "mandl_coins": (mandl_coins, 3), "mandl_fountain": (mandl_fountain, 1),
+    "mandl_poof": (mandl_poof, 1),
     "perk_drink": (perk_drink, 1), "jause_eat": (jause_eat, 1), "ammo_crate": (ammo_crate, 1),
     "ui_click": (ui_click, 1), "wave_start": (wave_start, 1), "boss_wave": (boss_wave, 1),
     "resi_moo": (resi_moo, 3), "milk": (milk, 1), "fassl_roll": (fassl_roll, 1), "fassl_tap": (fassl_tap, 1),

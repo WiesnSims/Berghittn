@@ -39,6 +39,9 @@ extends Resource
 @export var lunge_cooldown: float = 3.0
 ## Boss (Krampus): announced, gets a health bar, and is immune to crowd control (section 6a).
 @export var is_boss: bool = false
+## Treasure (the Venedigermandl, M9 part 5a): never attacks, runs from the players, vanishes after
+## a while, pays a fortune; outside the wave count, and lures do not pull it.
+@export var treasure: bool = false
 ## Left behind where it dies, for a player to pick up (the Krampus drops his Rute); null = nothing.
 @export var drop: WeaponData
 ## Sounds (Sound ids, M6 part 2): groans now and then while it is about (one picked at random), its

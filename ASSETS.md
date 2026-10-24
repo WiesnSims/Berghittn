@@ -4,7 +4,7 @@
 |---|---|---|
 | Gunshots `assets/audio/sfx/shot_*.ogg`, and the recorded shotgun under `boeller_*.ogg` (pitched down, layered with synthesised boom and debris): Walther PPQ (Dienstpistole), Tikka T3 (Stutzen), Winchester 1894 and Marlin 336 (Repetierer), Winchester Model 12 and Charles Daly 12 ga (Jagdflinte), near-distance takes, cut, mixed to mono and limited by `tools/audio/recordings.py` | "The Free Firearm Sound Library" by Ben Jaszczak, Brian Nelson, Kevin Heras, Matthew Nanney, https://opengameart.org/content/the-free-firearm-sound-library | CC0 |
 | All other sounds and music in `assets/audio/` (M6 part 2): reloads, melee, special weapons, equipment, enemy voices, footsteps, purchases, doors, the Hüttentruhe, events, wind, creaks, fire, and the brass band tune "Da Berghittn-Polka" | Self-made: synthesised from oscillators, noise and filters by `tools/audio/` (`python tools/audio/build.py`); an original tune | Our own, part of this project |
-| Engraved gun steel `assets/textures/gun_forged.png` (M9 part 4): the forged look of a dengelt weapon | Made by `tools/textures/engrave.py` from our `gun_steel` (CC0 photo, see below) with our own procedural scrollwork | CC0 base, our own engraving |
+| Engraved gun steel `gun_forged` (`assets/textures/gun_forged.png`, M9 part 4, 512 like `gun_steel`): the forged look of a dengelt weapon | Made by `tools/textures/engrave.py` from our `gun_steel` (CC0 photo, see below) with our own procedural scrollwork | CC0 base, our own engraving |
 | Enemy voice lines `assets/audio/sfx/gredn_*.ogg` (M9 part 3): our own dialect lines | Spoken by [eSpeak NG](https://github.com/espeak-ng/espeak-ng) on the dev machine and run through our own filters by `tools/audio/voices.py`. eSpeak NG (GPL-3) is only used as a tool and is not part of the game; the audio it makes is ours | Our own, part of this project |
 
 ## Textures (M6 part 3)
@@ -48,4 +48,4 @@ stuffed animals and trophies (M8, `tools/models/stuffed.gd`, `build_trophies.gd`
 anywhere.
 
 The title screen's teaser picture (`assets/ui/teaser.jpg`, #77) is rendered from the game itself by
-`tools/teaser/teaser.tscn`; `assets/textures/white.png` (4x4 white, #78) is self-made. Both are our own.
+`tools/teaser/teaser.tscn`; `white` (`assets/textures/white.png`, 4x4 white, #78) is self-made. Both are our own.

@@ -10,6 +10,8 @@ signal despawned(enemy: Enemy)
 signal posed(enemy: Enemy, action: EnemyRig.Action, length: float)
 ## It said Gredn line `line` (M9 part 3; solo and host), for co-op to pass on.
 signal said(enemy: Enemy, line: int)
+## It vanished alive (the Venedigermandl, M9 part 5a; solo and host), for co-op to pass on.
+signal vanished(enemy: Enemy)
 
 ## QUEUED: waiting at a window another enemy is working. BREAKING: tearing boards off a barricade.
 ## LUNGING: crouching for and then flying through a leap at the player (Perchte).
@@ -33,6 +35,8 @@ var puppet: bool = false
 var net_id: int = 0
 ## The last hit's damage, so the host can tell guests how hard the killing blow was (ragdoll, head).
 var last_damage: int = 0
+## The wave it came in (the Venedigermandl's pay goes by it).
+var wave: int = 0
 ## Co-op guests: (enemy, method, args) -> void, sends a hit on a puppet to the host.
 static var hit_relay: Callable
 var _state: State = State.INACTIVE
@@ -111,6 +115,18 @@ var _spotted: bool = false
 var _speaking_left: float = 0.0
 # Seconds its corpse has been a ragdoll.
 var _ragdoll_time: float = 0.0
+# The Venedigermandl (EnemyData.treasure): seconds before he vanishes, whether a player set him
+# running and where he runs to, the dart's phase, seconds to his next giggle, whether he has said
+# he is here, his glow, his marker and his gold.
+var _life_left: float = 0.0
+var _running: bool = false
+var _escape: Vector3
+var _dart_phase: float = 0.0
+var _giggle_left: float = 0.0
+var _announced: bool = false
+var _glow: OmniLight3D
+var _marker: MapMarker
+var _gold: MandlGold
 ## The corpses being simulated now, oldest first (at most Constants.RAGDOLL_MAX).
 static var _ragdolls: Array[Enemy] = []
 
@@ -126,7 +142,7 @@ func _ready() -> void:
 	_flash_material.albedo_color = Color(1, 1, 1, 0)
 
 
-func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
+func activate(enemy_data: EnemyData, for_wave: int, at: Transform3D) -> void:
 	if data != enemy_data:
 		if _model:
 			_model.queue_free()
@@ -139,6 +155,7 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 		_meshes.assign(_model.find_children("*", "MeshInstance3D", true, false))
 		_head_parts.assign(_model.find_children("*", "Node3D", true, false).filter(func(n: Node) -> bool: return n.is_in_group("head_part")))
 	data = enemy_data
+	wave = for_wave
 	health = data.health_for_wave(wave)
 	max_health = health
 	_lunge_cooldown_left = 0.0
@@ -182,6 +199,8 @@ func activate(enemy_data: EnemyData, wave: int, at: Transform3D) -> void:
 	_groan_left = 0.3 if data.is_boss else randf_range(0.5, Constants.GROAN_MAX)
 	if data.is_boss:
 		Events.boss_spawned.emit(self)
+	if data.treasure:
+		_appear()
 
 
 func is_alive() -> bool:
@@ -236,6 +255,8 @@ func _take_hit(amount: int, is_headshot: bool, is_melee: bool, source: Node3D, p
 	_hit_flash()
 	if health > 0:
 		_flinch(is_headshot)
+		if data.treasure and pays:
+			_gold_fx().coins(_chest())
 		if pays:
 			Events.enemy_damaged.emit(self, amount, is_headshot, source)
 		if amount >= max_health * Constants.GREDN_HARD_HIT:
@@ -463,6 +484,15 @@ func _step(delta: float) -> void:
 	_lunge_cooldown_left -= delta
 	talk_left -= delta
 	_speaking_left -= delta
+	if data and data.treasure and is_alive():
+		_life_left -= delta
+		if _life_left <= 0.0:
+			_vanish()
+			return
+		if not _announced and _life_left <= Constants.MANDL_LIFETIME - Constants.NET_POSE_INTERVAL * 2.0:
+			# A moment after he appears, so co-op guests already have him and hear it too.
+			_announced = true
+			Gredn.moment(self, Gredn.Moment.APPEAR)
 	if is_alive():
 		_groan_left -= delta
 		if _groan_left <= 0.0:
@@ -603,6 +633,9 @@ func _knocked(delta: float) -> void:
 
 
 func _chase(delta: float) -> void:
+	if data.treasure:
+		_treasure(delta)
+		return
 	var lure: Node3D = _find_lure()
 	if lure != _lure:
 		_lure = lure
@@ -797,6 +830,9 @@ func _end_lunge() -> void:
 
 
 func _near_window_link() -> bool:
+	# The Venedigermandl never climbs through a window.
+	if data.treasure:
+		return false
 	# A crowd at a window shoves its front man around, so he may never get within the agent's
 	# path_desired_distance of the link and link_reached never fires: the whole crowd stalls.
 	# Close enough to the window the path goes through counts as there.
@@ -817,7 +853,7 @@ func _near_window_link() -> bool:
 
 
 func _on_link_reached(details: Dictionary) -> void:
-	if _state != State.CHASING:
+	if _state != State.CHASING or data.treasure:
 		return
 	# Window links are the only links.
 	var entry: Vector3 = details.get("link_entry_position", global_position)
@@ -964,6 +1000,9 @@ func _die(is_headshot: bool, is_melee: bool, source: Node3D, amount: int = 100) 
 		_visual.rotation.x = 0.0
 	if _burn_fx:
 		_burn_fx.emitting = false
+	if data.treasure:
+		_gold_fx().fountain(_chest())
+		_treasure_gone()
 	_leave_window()
 	collision_layer = 0
 	collision_mask = Constants.LAYER_WORLD
@@ -1236,6 +1275,8 @@ func puppet_damaged(amount: int, is_headshot: bool, source: Node3D, health_left:
 	if not ours:
 		_hit_flash()
 		_flinch(is_headshot)
+	if data.treasure:
+		_gold_fx().coins(_chest())
 	Events.enemy_damaged.emit(self, amount, is_headshot, source)
 
 
@@ -1249,6 +1290,12 @@ func puppet_killed(is_headshot: bool, is_melee: bool, source: Node3D, amount: in
 	_die(is_headshot, is_melee, source, amount)
 
 
+## The host's Venedigermandl vanished: here too.
+func puppet_vanish() -> void:
+	if is_alive():
+		_vanish()
+
+
 func _puppet_step(delta: float) -> void:
 	if _hurled:
 		_hurling(delta)
@@ -1256,6 +1303,133 @@ func _puppet_step(delta: float) -> void:
 	_groan_left -= delta
 	if _groan_left <= 0.0:
 		_groan()
+
+
+# --- Das Venedigermandl (M9 part 5a, EnemyData.treasure) ------------------------------------------
+
+## He turns up: a gold spark in the air and a jingle, the banner, his glow and a marker, and he digs.
+func _appear() -> void:
+	_life_left = Constants.MANDL_LIFETIME
+	_running = false
+	_announced = false
+	_giggle_left = 0.0
+	if _glow == null:
+		_glow = OmniLight3D.new()
+		_glow.light_color = Constants.MANDL_GLOW_COLOR
+		_glow.light_energy = Constants.MANDL_GLOW_ENERGY
+		_glow.omni_range = Constants.MANDL_GLOW_RANGE
+		_glow.position = Vector3.UP * 1.1 * data.model_scale
+		_visual.add_child(_glow)
+	_glow.visible = true
+	if _marker:
+		_marker.queue_free()
+	_marker = MapMarker.new()
+	_marker.text = "MARKER_MANDL"
+	_marker.color = Constants.MANDL_GLOW_COLOR
+	add_child(_marker)
+	_gold_fx().spark(global_position + Vector3.UP * 2.0)
+	Sound.play(&"mandl_jingle")
+	Events.event_announced.emit(tr("EVENT_MANDL"))
+	_pose(EnemyRig.Action.DIG)
+
+
+## Digging until a player comes near, then off and away from the nearest, darting from side to side
+## and giggling; never an attack. Only through open zones: a way with a window or a player blocker on
+## it is never taken.
+func _treasure(delta: float) -> void:
+	_target = _nearest_target()
+	var near: float = INF if _target == null else _flat(_target.global_position - global_position).length()
+	if not _running and near <= Constants.MANDL_NOTICE:
+		_running = true
+		_repath_left = 0.0
+		_giggle_left = 0.3
+		_pose(EnemyRig.Action.NONE)
+	elif _running and near > Constants.MANDL_CALM:
+		_running = false
+		_pose(EnemyRig.Action.DIG)
+	if not _running:
+		_halt(delta)
+		return
+	_giggle_left -= delta
+	if _giggle_left <= 0.0:
+		_giggle_left = randf_range(Constants.MANDL_GIGGLE_MIN, Constants.MANDL_GIGGLE_MAX)
+		if Gredn.moment(self, Gredn.Moment.RUN) < 0 and _speaking_left <= 0.0:
+			_voice(data.groan_sounds[0])
+	_repath_left -= delta
+	if _repath_left <= 0.0:
+		_repath_left = Constants.MANDL_REPATH
+		_escape = _escape_spot()
+		_agent.target_position = _escape
+	var direction: Vector3 = _flat(_agent.get_next_path_position() - global_position)
+	if direction.length_squared() < 0.0001:
+		direction = _flat(global_position - _target.global_position)
+	direction = direction.normalized()
+	# Darting: mostly hard to one side, then quickly to the other.
+	_dart_phase += delta * Constants.MANDL_DART_RATE * TAU
+	var side := Vector3(-direction.z, 0.0, direction.x) * clampf(sin(_dart_phase) * 2.5, -1.0, 1.0)
+	direction = _unstick((direction + side * Constants.MANDL_DART).normalized(), delta)
+	velocity.x = direction.x * data.speed * _slow_factor
+	velocity.z = direction.z * data.speed * _slow_factor
+	_apply_gravity(delta)
+	_face(direction, delta)
+	move_and_slide()
+
+
+## Where to run: of the spots a little way off in the directions away from the nearest player, the
+## one farthest from every player that can be walked to without a window or a player blocker.
+func _escape_spot() -> Vector3:
+	var world: World3D = get_world_3d()
+	var away: Vector3 = _flat(global_position - _target.global_position)
+	away = away.normalized() if away.length_squared() > 0.0001 else global_basis.z
+	var best: Vector3 = global_position + away * Constants.MANDL_FLEE_LOOKAHEAD
+	var best_score: float = -INF
+	for angle: float in Constants.MANDL_FLEE_ANGLES:
+		var spot: Vector3 = NavigationServer3D.map_get_closest_point(world.navigation_map,
+				global_position + away.rotated(Vector3.UP, deg_to_rad(angle)) * Constants.MANDL_FLEE_LOOKAHEAD)
+		if _flat(spot - global_position).length() < Constants.MANDL_FLEE_LOOKAHEAD * 0.3:
+			continue
+		if not EventDirector.walkable(world, global_position, spot):
+			continue
+		var score: float = INF
+		for node: Node in get_tree().get_nodes_in_group("player"):
+			var player := node as Node3D
+			if player and player.is_targetable():
+				score = minf(score, player.global_position.distance_to(spot))
+		score -= absf(angle) * 0.01
+		if score > best_score:
+			best_score = score
+			best = spot
+	return best
+
+
+## Ten seconds are up: gone in a puff of gold dust, "Arrivederci!".
+func _vanish() -> void:
+	Gredn.moment(self, Gredn.Moment.VANISH)
+	_gold_fx().puff(_chest())
+	_treasure_gone()
+	_kill_tween()
+	_leave_window()
+	vanished.emit(self)
+	_despawn()
+
+
+func _treasure_gone() -> void:
+	if _glow:
+		_glow.visible = false
+	if _marker:
+		_marker.queue_free()
+		_marker = null
+
+
+func _gold_fx() -> MandlGold:
+	if _gold == null or not is_instance_valid(_gold):
+		_gold = MandlGold.new()
+		get_parent().add_child(_gold)
+	return _gold
+
+
+func _chest() -> Vector3:
+	return global_position + Vector3.UP * 1.1 * data.model_scale
 
 
 func _kill_tween() -> void:

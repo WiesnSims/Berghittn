@@ -86,6 +86,7 @@ func _announce(enemy: Enemy) -> void:
 	if not enemy.posed.is_connected(_on_posed):
 		enemy.posed.connect(_on_posed)
 		enemy.said.connect(_on_said)
+		enemy.vanished.connect(_on_vanished)
 	_spawned.rpc(enemy.net_id, String(enemy.data.id), _waves.wave, enemy.global_transform, enemy.health)
 
 
@@ -143,6 +144,15 @@ func _on_killed(node: Node3D, is_headshot: bool, is_melee: bool, source: Node3D)
 	if enemy == null or enemy.net_id == 0:
 		return
 	_killed.rpc(enemy.net_id, is_headshot, is_melee, Coop.peer_of(source), enemy.last_damage)
+	_by_id.erase(enemy.net_id)
+	enemy.net_id = 0
+
+
+## The Venedigermandl vanished (after his last line went out).
+func _on_vanished(enemy: Enemy) -> void:
+	if enemy.net_id == 0:
+		return
+	_vanished.rpc(enemy.net_id)
 	_by_id.erase(enemy.net_id)
 	enemy.net_id = 0
 
@@ -251,6 +261,15 @@ func _damaged(id: int, amount: int, is_headshot: bool, peer: int, health_left: i
 	var puppet: Enemy = _by_id.get(id)
 	if puppet:
 		puppet.puppet_damaged(amount, is_headshot, Coop.node_of(peer), health_left, peer == Net.my_id())
+
+
+@rpc("authority", "call_remote", "reliable")
+func _vanished(id: int) -> void:
+	var puppet: Enemy = _by_id.get(id)
+	_by_id.erase(id)
+	_buffers.erase(id)
+	if puppet:
+		puppet.puppet_vanish()
 
 
 @rpc("authority", "call_remote", "reliable")

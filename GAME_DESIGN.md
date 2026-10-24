@@ -931,6 +931,19 @@ gold, glowing faintly gold so he is easy to spot in the storm.
 - He comes now and then on his own, outside the wave count (the wave still ends without him):
   from wave 4, a 25 % chance a wave, never on a boss wave, at a spawn point in an open zone at
   least 20 m from every player. At most one at a time. All numbers in constants.gd.
+- Built (2026-10-24, branch m9-venedigermandl): EnemyData.treasure on the shared Enemy;
+  WaveManager.send_mandl spawns him outside the wave count (6 to 20 s into the wave; at a spawn point
+  of an open zone 20 m from every player and walkable from one, or else such a navmesh spot; none
+  while only the Stube is open, as nothing there is 20 m off). Running away he picks, every 0.6 s,
+  the spot 7 m off (straight away or up to 110° to the side) that is farthest from the players and
+  walkable without a window or player blocker, and darts hard left and right about once a second.
+  Model 0.72 of a man (hat, white beard, pick, a sack glowing at the seams), a gold OmniLight and a
+  map marker; the dig is a new rig action. Hits knock coins from the sack, the kill spills it in a
+  fountain, he vanishes in a puff of gold dust (MandlGold). His Italian ("Mamma mia!",
+  "Arrivederci!", "Porca miseria…") is spoken by eSpeak's Italian voice; "Ciao" is said "Tschau".
+  His lines always come (no dice), at most every 2.5 s, heard from 40 m; between them he giggles.
+  Co-op: puppet as usual, CoopEnemies._vanished for his vanishing. Tests: tests/m9_mandl,
+  tests/net_specials.
 
 **5b and 5c — two new fighters with abilities no enemy has yet** (Q7: the user wants both):
 - (5b) **Da Wilderer**, a ranged enemy: a zombie poacher with an old rifle, from wave 7

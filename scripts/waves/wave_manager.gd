@@ -2,6 +2,8 @@ class_name WaveManager
 extends Node3D
 ## Runs the waves: countdown, spawning at the active spawn points, and the break once every enemy is dead.
 ## Enemies are pooled because instancing during combat causes hitches in web builds.
+## Now and then the Venedigermandl (M9 part 5a) turns up as well, outside the wave count: the wave
+## ends without him.
 
 enum Phase { BREAK, SPAWNING, CLEARING }
 
@@ -21,6 +23,9 @@ var _pools: Dictionary = {}
 # Boss wave: the exact enemies still to come, boss first; empty in normal waves.
 var _queue: Array[EnemyData] = []
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
+# Seconds until the Venedigermandl comes this wave (below 0: not this wave), and the one about.
+var _mandl_left: float = -1.0
+var _mandl: Enemy
 
 
 func _ready() -> void:
@@ -38,6 +43,10 @@ func begin_break(delay: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if _mandl_left > 0.0:
+		_mandl_left -= delta
+		if _mandl_left <= 0.0:
+			send_mandl()
 	match _phase:
 		Phase.BREAK:
 			_break_left -= delta
@@ -60,6 +69,10 @@ func _start_wave(number: int) -> void:
 		_to_spawn = _queue.size()
 	else:
 		_to_spawn = wave_table.enemy_count(wave, get_tree().get_nodes_in_group("player").size())
+	_mandl_left = -1.0
+	if wave >= Constants.MANDL_FIRST_WAVE and not wave_table.is_boss_wave(wave) and wave_table.treasure \
+			and _rng.randf() < Constants.MANDL_CHANCE:
+		_mandl_left = _rng.randf_range(Constants.MANDL_DELAY_MIN, Constants.MANDL_DELAY_MAX)
 	# First enemy right away: the countdown already was the wait.
 	_spawn_left = 0.0
 	_phase = Phase.SPAWNING
@@ -80,6 +93,50 @@ func _spawn() -> void:
 	enemy.activate(data, wave, point.global_transform.translated(scatter))
 	_alive += 1
 	_count_spawned()
+
+
+## The Venedigermandl turns up now (also used by tests), at a spawn point of an open zone at least
+## MANDL_SPAWN_DISTANCE from every player and walkable from one (no window or player blocker on the
+## way), or else at such a spot anywhere players can walk. At most one at a time; null if there is
+## one already or no place for him.
+func send_mandl() -> Enemy:
+	if wave_table.treasure == null or (is_instance_valid(_mandl) and _mandl.is_alive() and _mandl.data.treasure):
+		return null
+	var at: Vector3 = _mandl_spot()
+	if at == Vector3.INF:
+		return null
+	var data: EnemyData = wave_table.treasure
+	var pool: Array = _pools.get(data.id, [])
+	_mandl = pool.pop_back() if not pool.is_empty() else _create_enemy()
+	_mandl.activate(data, maxi(wave, 1), Transform3D(Basis(Vector3.UP, _rng.randf() * TAU), at))
+	return _mandl
+
+
+func _mandl_spot() -> Vector3:
+	var players: Array[Node3D] = []
+	for node: Node in get_tree().get_nodes_in_group("player"):
+		if node.has_method("is_targetable") and node.call("is_targetable"):
+			players.append(node as Node3D)
+	if players.is_empty():
+		return Vector3.INF
+	var world: World3D = get_world_3d()
+	var far := func(spot: Vector3) -> bool:
+		return players.all(func(p: Node3D) -> bool: return p.global_position.distance_to(spot) >= Constants.MANDL_SPAWN_DISTANCE)
+	var points: Array[Vector3] = []
+	for node: Node in get_tree().get_nodes_in_group("spawn_points"):
+		var point := node as SpawnPoint
+		if point and zones.is_unlocked(point.zone):
+			points.append(point.global_position)
+	points.shuffle()
+	for spot: Vector3 in points:
+		if far.call(spot) and players.any(func(p: Node3D) -> bool: return EventDirector.walkable(world, p.global_position, spot)):
+			return spot
+	for i: int in 8:
+		var spot: Vector3 = EventDirector.reachable_spot(world, players.pick_random().global_position,
+				Constants.MANDL_SPAWN_DISTANCE, Constants.MANDL_SPAWN_DISTANCE * 2.0)
+		if spot != Vector3.INF and far.call(spot):
+			return spot
+	return Vector3.INF
 
 
 func _count_spawned() -> void:
@@ -118,7 +175,10 @@ func _create_enemy() -> Enemy:
 	return enemy
 
 
-func _on_enemy_died(_enemy: Enemy) -> void:
+func _on_enemy_died(enemy: Enemy) -> void:
+	# The Venedigermandl was never counted.
+	if enemy.data.treasure:
+		return
 	_alive -= 1
 	_check_cleared()
 

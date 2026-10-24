@@ -212,7 +212,7 @@ godot --headless --import                   # then reimport
 
 ## Enemy models and ragdolls (M6)
 
-The five enemies are self-made low-poly models, built by a script into `assets/models/enemies/`:
+The enemies (and the Venedigermandl, M9 part 5a) are self-made low-poly models, built by a script into `assets/models/enemies/`:
 
 ```
 godot --headless --script res://tools/models/build_enemies.gd
@@ -227,7 +227,7 @@ godot --headless --script res://tools/models/build_enemies.gd
   `assets/materials/characters/` (wool, leather, fur, skin, linen, wood, metal, plain, glow).
 - `EnemyRig` (`scripts/enemies/enemy_rig.gd`, on the model's root) poses the bones in code: the
   stance and walk the builder sets per type, plus one action at a time (`STRIKE`, `PULL`, `CLIMB`,
-  `CROUCH`, `LEAP`, `DANCE`, `DAZED`, `CARRIED`) that `Enemy` starts from its states. The head
+  `CROUCH`, `LEAP`, `DANCE`, `DAZED`, `CARRIED`, the Venedigermandl's `DIG`) that `Enemy` starts from its states. The head
   hurtbox follows the head bone.
 - Ragdolls (#39): a kill hands the bones to physics, pushed away from the shooter. They collide
   with the world only. At most `RAGDOLL_MAX` (6) are simulated at once; each freezes in the pose
@@ -271,6 +271,26 @@ python tools/textures/engrave.py    # the engraved steel of the forged look (gun
 - A dengelt weapon keeps its base's `family`, so wall-buys, the chest and the slots count it as
   that gun. `ForgedLook` (`scripts/weapons/forged_look.gd`) dresses its model: copies of the same
   materials with gold steel on the engraved texture and darker wood, so no new shader is built.
+
+## Das Venedigermandl (M9 part 5a)
+
+A treasure enemy: `data/enemies/venedigermandl.tres` with `EnemyData.treasure` set, on the shared
+Enemy scene. `WaveManager` sends him (`send_mandl`), outside the wave count: from wave 4, a quarter
+of the waves (never a boss wave), 6 to 20 s in, at a spawn point of an open zone at least 20 m from
+every player and walkable from one (or else such a spot anywhere players can walk). With only the
+Stube open there is no such place, so he waits until the players get outside.
+
+- `Enemy._treasure`: he digs until a player is within 15 m, then runs (5.5 m/s) to the spot a few
+  metres off, away from the players, that can be walked to without a window or player blocker,
+  darting from side to side and giggling. He never attacks or climbs; lures do not pull him, stuns
+  and slows do. After 10 s he vanishes (`vanished`, a puff of gold dust).
+- Hits pay 10 as usual and knock coins out of his sack; the kill pays `1000 + 100 x wave` to the
+  killer (`PlayerPoints`) and spills the sack. The gold is `MandlGold` (`scripts/effects/`), his
+  glow an OmniLight, his marker a `MapMarker`. All numbers are `MANDL_*` in `constants.gd`.
+- Voice: `voices.py` (`mandl`, his Italian in eSpeak's Italian voice); his lines are Gredn moments
+  `APPEAR`, `RUN`, `HIT`, `VANISH`, `DEATH`, always said and heard from 40 m.
+- Co-op: the host's Mandl is a puppet on the guests like any enemy; `CoopEnemies._vanished` takes
+  his vanishing over. Tests: `tests/m9_mandl`, `tests/net_specials`.
 
 ## Prop models (M6)
 

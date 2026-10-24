@@ -41,8 +41,13 @@ func _on_enemy_damaged(_enemy: Node3D, _amount: int, _is_headshot: bool, source:
 		add(Constants.POINTS_HIT)
 
 
-func _on_enemy_killed(_enemy: Node3D, is_headshot: bool, is_melee: bool, source: Node3D) -> void:
+func _on_enemy_killed(enemy: Node3D, is_headshot: bool, is_melee: bool, source: Node3D) -> void:
 	if source != _player:
+		return
+	# The Venedigermandl's whole sack (M9 part 5a).
+	var body := enemy as Enemy
+	if body and body.data.treasure:
+		add(Constants.MANDL_KILL_POINTS + Constants.MANDL_KILL_PER_WAVE * body.wave)
 		return
 	if is_melee:
 		add(Constants.POINTS_KILL_MELEE)

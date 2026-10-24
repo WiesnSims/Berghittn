@@ -1,9 +1,9 @@
 extends Node3D
 ## Frames of the enemy models (M6 part 4) in a plain studio: the line-up from the front and the
-## back, the faces, every action pose, and a ragdoll fall. Windowed:
+## back, the faces, every action pose (the Venedigermandl's dig too), and a ragdoll fall. Windowed:
 ##     godot res://tests/model_view.tscn -- <out dir>
 
-const IDS: Array[String] = ["wanderer", "tourist", "knappe", "perchte", "krampus"]
+const IDS: Array[String] = ["wanderer", "tourist", "knappe", "perchte", "krampus", "venedigermandl"]
 
 var _out: String
 var _camera: Camera3D
@@ -15,7 +15,7 @@ func _ready() -> void:
 	_out = args[0] if args.size() > 0 else "user://model_view"
 	DirAccess.make_dir_recursive_absolute(_out)
 	_studio()
-	var x: float = -6.0
+	var x: float = -7.5
 	for id: String in IDS:
 		var data: EnemyData = load("res://data/enemies/%s.tres" % id)
 		var rig := data.model.instantiate() as EnemyRig
@@ -78,7 +78,8 @@ func _run() -> void:
 	for pose: Array in [["walk", EnemyRig.Action.NONE, 2.0, 0.3], ["strike_windup", EnemyRig.Action.STRIKE, 0.0, 0.4],
 			["strike_hit", EnemyRig.Action.STRIKE, 0.0, 0.62], ["pull", EnemyRig.Action.PULL, 0.0, 0.3], ["climb", EnemyRig.Action.CLIMB, 0.0, 0.5],
 			["crouch", EnemyRig.Action.CROUCH, 0.0, 0.3], ["leap", EnemyRig.Action.LEAP, 0.0, 0.3],
-			["dance", EnemyRig.Action.DANCE, 0.0, 0.7], ["dazed", EnemyRig.Action.DAZED, 0.0, 0.6], ["carried", EnemyRig.Action.CARRIED, 0.0, 0.5]]:
+			["dance", EnemyRig.Action.DANCE, 0.0, 0.7], ["dazed", EnemyRig.Action.DAZED, 0.0, 0.6], ["carried", EnemyRig.Action.CARRIED, 0.0, 0.5],
+			["dig_up", EnemyRig.Action.DIG, 0.0, 0.5], ["dig_down", EnemyRig.Action.DIG, 0.0, 0.75], ["run", EnemyRig.Action.NONE, 5.5, 0.3]]:
 		await _pose(pose[0], pose[1], pose[2], pose[3])
 	for rig: EnemyRig in _rigs:
 		rig.reset()
