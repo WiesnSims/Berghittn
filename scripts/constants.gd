@@ -337,6 +337,32 @@ const GREDN_TIME_MIN: float = 1.6
 const GREDN_FADE_TIME: float = 0.5
 ## How loud the voices are (dB).
 const GREDN_VOLUME: float = -3.0
+
+# --- Da Dengelstock (M9 part 4): the weapon upgrade in the Holzschuppen's hay loft ---------------
+## Cold until this wave starts, then open for the rest of the match.
+const DENGEL_WAVE: int = 5
+## Seconds into that wave it is lit, after the wave's banner.
+const DENGEL_OPEN_DELAY: float = 3.5
+## Points for dengeln (level 1) and doppelt dengeln (level 2).
+const DENGEL_COST: Array[int] = [5000, 10000]
+## Seconds of hammering, and seconds the forged weapon waits to be taken before it is gone.
+const DENGEL_TIME: float = 10.0
+const DENGEL_WAIT: float = 30.0
+## Seconds between hammer blows (each a clang and a spray of sparks).
+const DENGEL_BLOW_TIME: float = 0.5
+## Where things are at the Dengelstock (m, local to it; -Z towards the player): the grindstone for the
+## melee weapon beside the anvil, and how high over the anvil's foot the forged weapon floats.
+const DENGEL_GRINDSTONE_AT: Vector3 = Vector3(1.05, 0.0, 0.3)
+const DENGEL_FLOAT_HEIGHT: float = 1.0
+## Weapons on the anvil are drawn this much larger than in hand, but at most this long (m).
+const DENGEL_SHOW_SCALE: float = 1.6
+const DENGEL_SHOW_MAX_LENGTH: float = 1.1
+## The forged look (ForgedLook) per level: the steel's colour (on the engraved texture), how metallic
+## and how rough it is at most, and what the wood's colour is multiplied by.
+const FORGED_GOLD: Array[Color] = [Color(0.82, 0.52, 0.2), Color(1.0, 0.7, 0.28)]
+const FORGED_METALLIC: Array[float] = [0.45, 0.55]
+const FORGED_ROUGHNESS: Array[float] = [0.4, 0.28]
+const FORGED_WOOD: Array[Color] = [Color(0.8, 0.6, 0.52), Color(0.85, 0.55, 0.45)]
 # Ready ring at the crosshair (play-test, Alphorn): seconds the pulse takes when the gun is ready again.
 const READY_PULSE_TIME: float = 0.3
 const DAMAGE_FLASH_TIME: float = 0.4

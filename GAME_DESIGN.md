@@ -870,6 +870,24 @@ a sheet-metal hood, so it reads as safe in a hay loft.
 - Data: WeaponData.upgrade points to the upgraded WeaponData resource, so the numbers stay in
   data. Ghost weapons in co-op show the forged look; the death screen shows the upgraded name.
 - Split into 4a (the Dengelstock, the guns and the Schaufel) and 4b (the special weapons).
+- Built 4a (2026-10-24, branch m9-dengelstock): the Schmied's corner in the loft's south-east
+  corner (stone slab, hearth with a rim of coals, sheet-metal hood and pipe, anvil on its stump), lit
+  3.5 s into wave 5 so its banner follows the wave's; the light column stays for that wave. The
+  hammer works by itself (sparks and a clang every 0.5 s). The melee weapon goes on at a grindstone
+  beside the anvil (it is never in hand); meanwhile V does nothing and the guns are in hand. During
+  the 10 s with a gun on the anvil, the other gun is put away too and comes up after. A weapon
+  not taken in 30 s is gone: with no gun left the plain Dienstpistole comes back, and the melee
+  slot gets the Schneeschaufel. Names: Gendarmen-Pistole, Wilderer-Flinte (three shells, four
+  doppelt), Kaiserjäger-Stutzen, Oberförster-Repetierer (its Querschläger hops hit twice as hard),
+  Schneefräsn-Schaufl; doppelt dengelt adds ", doppelt dengelt". Easter egg (user, 2026-10-24): the
+  Dienstpistole doppelt dengelt is the **Golden Gun**, gold all over, and every hit kills (bosses
+  too), since nobody would otherwise put 15000 into the pistol. The Schaufl's twist: a survivor of
+  its blow stands dazed 1.2 s (2.4 s doppelt). The numbers are written by tools/weapons/dengel.py
+  from the base .tres. Wall-buys and the Munitionskiste fill a dengelt gun's own reserve at the
+  usual price; the chest and wall-buys count it as its base gun. Forged look: the steel gold on an
+  engraved texture (tools/textures/engrave.py), the wood darker and redder, brighter doppelt; shots
+  pitched down (x0.85, x0.75). Co-op: the host's word on the anvil (CoopWorld), the others see the
+  owner's empty hands and then the forged gun. Tests: tests/m9_dengel, tests/net_specials.
 
 *Part 5 — Neue Gäste: two new enemies (user request 2026-10-23)*
 Both are EnemyData resources on the shared Enemy scene, with their own model (tools/models), rig

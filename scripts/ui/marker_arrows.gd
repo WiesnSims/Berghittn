@@ -23,7 +23,8 @@ func _draw() -> void:
 	if camera == null:
 		return
 	var center: Vector2 = size * 0.5
-	var inner := Rect2(Vector2.ONE * MARGIN, size - Vector2.ONE * MARGIN * 2.0)
+	# (A window smaller than the margins, as in headless tests, has no inside.)
+	var inner := Rect2(Vector2.ONE * MARGIN, (size - Vector2.ONE * MARGIN * 2.0).max(Vector2.ZERO))
 	for node: Node in get_tree().get_nodes_in_group("map_markers"):
 		var marker := node as MapMarker
 		if marker == null or not marker.is_visible_in_tree():

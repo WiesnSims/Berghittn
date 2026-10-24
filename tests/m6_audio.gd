@@ -215,6 +215,9 @@ func _footsteps() -> void:
 
 
 func _enemies() -> void:
+	# Their groans and cries, not their lines (Gredn, M9 part 3).
+	var chatter: bool = Settings.chatter
+	Settings.chatter = false
 	var enemy: Enemy = waves._create_enemy()
 	enemy.activate(load("res://data/enemies/wanderer.tres"), 1, Transform3D(Basis.IDENTITY, FIELD + Vector3(6.0, 0.0, 0.0)))
 	enemy.process_mode = Node.PROCESS_MODE_PAUSABLE
@@ -225,6 +228,7 @@ func _enemies() -> void:
 	_quiet()
 	enemy.receive_hit(100000, false, false, player)
 	_check(_sounding(&"enemy_death"), "and cries out as it falls")
+	Settings.chatter = chatter
 
 
 func _stacking() -> void:

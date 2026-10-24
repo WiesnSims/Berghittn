@@ -245,6 +245,24 @@ godot --headless res://tools/models/build_weapons.tscn
   rerun after changing a rule. It runs as a scene, not with `--script`: the viewmodel scripts need the
   autoloads to compile. The rules live in `tools/models/reshape.gd`, shared with the props.
 
+## Weapon upgrades: da Dengelstock (M9 part 4)
+
+The Dengelstock (`scripts/zones/dengelstock.gd`, in the Holzschuppen's hay loft) forges a weapon
+into the WeaponData its `upgrade` points to. The dengelt (`<id>_dengelt.tres`) and doppelt dengelt
+(`<id>_doppelt.tres`) weapons are written from their base by a script, so retune the base and run it
+again:
+
+```
+python tools/weapons/dengel.py      # every upgradable weapon, both levels
+python tools/textures/engrave.py    # the engraved steel of the forged look (gun_forged.png)
+```
+
+- The rules (damage, magazine, reserve, boss share, shot pitch, a melee weapon's twist) are in
+  `dengel.py`; `tests/m9_dengel` checks the files against them.
+- A dengelt weapon keeps its base's `family`, so wall-buys, the chest and the slots count it as
+  that gun. `ForgedLook` (`scripts/weapons/forged_look.gd`) dresses its model: copies of the same
+  materials with gold steel on the engraved texture and darker wood, so no new shader is built.
+
 ## Prop models (M6)
 
 ```

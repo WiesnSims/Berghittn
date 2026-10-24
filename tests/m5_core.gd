@@ -579,6 +579,9 @@ func _ammo_crate() -> void:
 
 func _boss_wave() -> void:
 	# Straight into wave 5 with the real wave manager (the event director is off since the start).
+	# The Dengelstock (M9 part 4) lights in wave 5 with a banner of its own: not in this check.
+	for stock: Node in get_tree().get_nodes_in_group("dengelstocks"):
+		Events.wave_started.disconnect((stock as Dengelstock)._on_wave_started)
 	_place(Vector3(-2.0, 0.0, 3.5))
 	waves._alive = 0
 	waves.process_mode = Node.PROCESS_MODE_INHERIT

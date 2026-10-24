@@ -17,6 +17,7 @@
 [ext_resource type="Script" path="res://scripts/zones/wall_buy.gd" id="16_gyn0w"]
 [ext_resource type="Resource" path="res://data/equipment/kuhfladen.tres" id="17_fdluv"]
 [ext_resource type="Material" path="res://assets/materials/hay.tres" id="tex_hay"]
+[ext_resource type="Script" path="res://scripts/zones/dengelstock.gd" id="dengelstock"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_3ymej"]
 _surfaces = [{
@@ -338,6 +339,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.3, 5.4, 14.3)
 light_color = Color(1, 0.75, 0.45, 1)
 light_energy = 0.7
 omni_range = 7.0
+
+[node name="Dengelstock" type="Node3D" parent="."]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 19.9, 3.5, 18.4)
+script = ExtResource("dengelstock")
 
 [node name="Roof" type="Node3D" parent="." unique_id=1379709747]
 

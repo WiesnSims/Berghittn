@@ -125,6 +125,28 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, RICOCHET, BEHAVIOR, BLOCK, PLAY 
 ## through. The attacker is shoved back by secondary_knockback; walking slows to aim_move_multiplier.
 @export var block_angle: float = 60.0
 @export var block_share: float = 0.0
+## The Dengelstock (M9 part 4): the weapon it forges this one into (null = it cannot be dengelt, or
+## no higher than this), how often this one was dengelt (0 base, 1 dengelt, 2 doppelt dengelt), and
+## the id of the base weapon it was made from (empty on the base itself), so a wall-buy, the chest and
+## the slots know it for the same gun.
+@export var upgrade: WeaponData
+@export var level: int = 0
+@export var family: StringName
+## Share of the damage that bosses take (an upgrade doubles the damage, but bosses only x1.5).
+@export var boss_multiplier: float = 1.0
+## Pitch of its shot sounds (a forged gun sounds deeper).
+@export var sound_pitch: float = 1.0
+## Melee: seconds a survivor of the blow stands dazed (the Schneefräsn-Schaufl's twist; 0 = none).
+@export var stun_time: float = 0.0
+## The Golden Gun (the Dienstpistole doppelt dengelt, an easter egg): every hit kills, bosses too,
+## and the whole gun is gold, not only its steel.
+@export var one_hit: bool = false
+@export var golden: bool = false
+
+
+## The base weapon's id: the same for a gun and its dengelt versions.
+func family_id() -> StringName:
+	return family if family != &"" else id
 
 
 func can_aim() -> bool:

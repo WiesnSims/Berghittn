@@ -81,6 +81,14 @@ func _coverage() -> void:
 	var tourist: GDScript = load("res://scripts/events/tourist_guest.gd")
 	if tourist.source_code.contains("eisstock.tres"):
 		ways[&"eisstock"] = "the Deitscha Tourist"
+	# The Dengelstock (M9 part 4) forges what can be had into what its upgrade points to.
+	if not main.find_children("*", "Dengelstock", true, false).is_empty():
+		for file: String in DirAccess.get_files_at("res://data/weapons"):
+			var weapon: WeaponData = load("res://data/weapons/" + file.trim_suffix(".remap")) as WeaponData
+			var level: WeaponData = weapon
+			while ways.has(level.id) and level.upgrade:
+				ways[level.upgrade.id] = "the Dengelstock"
+				level = level.upgrade
 	for folder: String in ["weapons", "equipment"]:
 		for file: String in DirAccess.get_files_at("res://data/" + folder):
 			var item: Resource = load("res://data/%s/%s" % [folder, file.trim_suffix(".remap")])

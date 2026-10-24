@@ -76,12 +76,15 @@ func arm() -> void:
 	rig.stance = stance
 
 
-## The gun now in their hands.
+## The gun now in their hands; null for none (it is at the Dengelstock).
 func hold(data: WeaponData) -> void:
 	if _hands == null:
 		return
 	if _gun:
 		_gun.visible = false
+	if data == null:
+		_gun = null
+		return
 	_gun = _guns.get(data.id)
 	if _gun == null and data.viewmodel:
 		_gun = WeaponPickup.model_of(data)
