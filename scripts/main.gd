@@ -24,6 +24,12 @@ func _ready() -> void:
 	var gredn := Gredn.new()
 	gredn.name = "Gredn"
 	add_child(gredn)
+	var nadln := Wandernadln.new()
+	nadln.name = "Wandernadln"
+	add_child(nadln)
+	var zeitlupe := Zeitlupe.new()
+	zeitlupe.name = "Zeitlupe"
+	add_child(zeitlupe)
 	var spawn := get_tree().get_first_node_in_group("player_spawn") as Node3D
 	_player.spawn_at(spawn.global_transform)
 	_hud.bind_player(_player)
@@ -211,10 +217,10 @@ func _board_coop(wave: int) -> void:
 	if rows.is_empty() or rows.any(func(row: Dictionary) -> bool: return not row.get("clean", true)):
 		return
 	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a["points"]) > int(b["points"]))
-	var entry: Dictionary = {"names": [], "wave": wave, "points": 0, "kills": 0, "headshots": 0, "fav": rows[0]["fav"]}
+	var entry: Dictionary = {"names": [], "wave": wave, "points": 0, "kills": 0, "headshots": 0, "bsundan": 0, "fav": rows[0]["fav"]}
 	for row: Dictionary in rows:
 		(entry["names"] as Array).append(row["name"] if row.get("public", true) else tr("UI_DEATH_NONE"))
-		for key: String in ["points", "kills", "headshots"]:
+		for key: String in ["points", "kills", "headshots", "bsundan"]:
 			entry[key] += int(row[key])
 	if not Board.ranked.is_connected(Net.share_rank):
 		Board.ranked.connect(Net.share_rank, CONNECT_ONE_SHOT)
@@ -243,6 +249,7 @@ func _on_player_died() -> void:
 	_death_screen.offer_board({
 		"wave": _waves.wave, "points": _player.points.total, "kills": _player.stats.kills,
 		"headshots": _player.stats.headshots, "fav": String(best.display_name) if best else "",
+		"bsundan": _player.stats.bsundan,
 	})
 
 

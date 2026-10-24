@@ -4,6 +4,9 @@ extends Node
 
 @warning_ignore("unused_signal")
 signal enemy_damaged(enemy: Node3D, amount: int, is_headshot: bool, source: Node3D)
+## An enemy came into the fight (out of the pool, on every screen: co-op puppets too).
+@warning_ignore("unused_signal")
+signal enemy_appeared(enemy: Node3D)
 @warning_ignore("unused_signal")
 signal enemy_killed(enemy: Node3D, is_headshot: bool, is_melee: bool, source: Node3D)
 ## Huat obschiaßn: `source` shot `enemy`'s hat off.

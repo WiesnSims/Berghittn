@@ -52,6 +52,17 @@ var fov: float = Constants.DEFAULT_FOV
 var toggle_aim: bool = false
 var crosshair_color: int = 0
 var crosshair_size: float = 1.0
+## The last kill of a wave in slow motion (Zeitlupe, 1.2): on by default.
+var zeitlupe: bool = true
+## The Steckbriefe and the Wandernadln (1.2), this browser's player only: the enemy ids met in our
+## matches, our kills per enemy id, hats shot off and headshot kills in all, the furthest co-op wave,
+## and each badge's tier (Wandernadln.BADGES id -> 1 Bronze, 2 Silber, 3 Gold).
+var met: Array[String] = []
+var kills: Dictionary = {}
+var hats: int = 0
+var headshots: int = 0
+var coop_best: int = 0
+var badges: Dictionary = {}
 
 
 func _ready() -> void:
@@ -133,6 +144,27 @@ func _load() -> void:
 	perchten = maxi(int(file.get_value(SECTION, "perchten", 0)), 0)
 	best_wave = maxi(int(file.get_value(SECTION, "best_wave", 0)), 0)
 	best_points = maxi(int(file.get_value(SECTION, "best_points", 0)), 0)
+	zeitlupe = file.get_value(SECTION, "zeitlupe", zeitlupe)
+	var seen: Variant = file.get_value(SECTION, "met", [])
+	if seen is Array:
+		for id: Variant in seen:
+			if id is String and not (id as String) in met:
+				met.append(id)
+	kills = _counts(file.get_value(SECTION, "kills", {}))
+	badges = _counts(file.get_value(SECTION, "badges", {}))
+	hats = maxi(int(file.get_value(SECTION, "hats", 0)), 0)
+	headshots = maxi(int(file.get_value(SECTION, "headshots", 0)), 0)
+	coop_best = maxi(int(file.get_value(SECTION, "coop_best", 0)), 0)
+
+
+# A saved Dictionary of String -> whole number, without anything else that may have got in.
+static func _counts(saved: Variant) -> Dictionary:
+	var counts: Dictionary = {}
+	if saved is Dictionary:
+		for key: Variant in saved:
+			if (key is String or key is StringName) and saved[key] is int:
+				counts[String(key)] = maxi(saved[key], 0)
+	return counts
 
 
 ## Keeps the run if it beats the personal best: a further wave, or the same wave with more points.
@@ -186,4 +218,11 @@ func save() -> void:
 	file.set_value(SECTION, "perchten", perchten)
 	file.set_value(SECTION, "best_wave", best_wave)
 	file.set_value(SECTION, "best_points", best_points)
+	file.set_value(SECTION, "zeitlupe", zeitlupe)
+	file.set_value(SECTION, "met", met)
+	file.set_value(SECTION, "kills", kills)
+	file.set_value(SECTION, "badges", badges)
+	file.set_value(SECTION, "hats", hats)
+	file.set_value(SECTION, "headshots", headshots)
+	file.set_value(SECTION, "coop_best", coop_best)
 	file.save(SAVE_PATH)

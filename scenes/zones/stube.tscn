@@ -22,6 +22,7 @@
 [ext_resource type="Resource" path="res://data/weapons/jagdflinte.tres" id="18_rb0r0"]
 [ext_resource type="Resource" path="res://data/equipment/kuhglocke.tres" id="21_17jin"]
 [ext_resource type="PackedScene" path="res://scenes/props/trophy_wall.tscn" id="m8_wall"]
+[ext_resource type="PackedScene" path="res://scenes/props/hat_rack.tscn" id="v12_rack"]
 [ext_resource type="PackedScene" path="res://scenes/props/raurakl.tscn" id="m8_raurakl"]
 [ext_resource type="ArrayMesh" path="res://assets/models/trophies/trophy_gams.res" id="m8_gams"]
 [ext_resource type="ArrayMesh" path="res://assets/models/trophies/trophy_hirsch.res" id="m8_hirsch"]
@@ -1132,6 +1133,9 @@ equipment = ExtResource("21_17jin")
 
 [node name="TrophyWall" parent="Stuffed" instance=ExtResource("m8_wall")]
 transform = Transform3D(0, 0, 1.3, 0, 1.3, 0, -1.3, 0, 0, 6.948, 3.7, -3.4)
+
+[node name="HatRack" parent="Stuffed" instance=ExtResource("v12_rack")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 6.95, 1.3, -3.5)
 
 [node name="Gams" type="MeshInstance3D" parent="Stuffed"]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 6.26, 2.55, 0)

@@ -22,8 +22,10 @@ extends Node3D
 ## Kassier's blow, the Sprengmeister's fuse, the Schönperchte's blessing, the Influencer going live,
 ## the Trailrunner running into a wall. A variant has the lines of its base enemy for the moments it
 ## has none of its own.
+## GREET (1.2 extras): a plain enemy near a Bsundan that just turned up calls out to it; these lines
+## have a fifth field, the variant they greet (greet).
 enum Moment { SPOT, IDLE, BARRICADE, HIT, LUNGE, DEATH, APPEAR, RUN, VANISH, AIM, SHOT, SITZ, HAT,
-		FEE, FUSE, BLESS, LIVE, CRASH }
+		FEE, FUSE, BLESS, LIVE, CRASH, GREET }
 
 const LINE: Script = preload("res://scripts/effects/gredn_line.gd")
 
@@ -111,6 +113,22 @@ const LINES: Array = [
 	[&"trailrunner", Moment.CRASH, "Au! Mei Bestzeit!", &"gredn_trailrunner_au"],
 	[&"trailrunner", Moment.HAT, "Mei Laufkappl!", &"gredn_trailrunner_kappl"],
 	[&"trailrunner", Moment.DEATH, "Ziel… erreicht…", &"gredn_trailrunner_ziel"],
+	[&"wanderer", Moment.GREET, "Da Kassier is do, jetzt zahlst!", &"gredn_wanderer_greet_kassier", &"kassier"],
+	[&"tourist", Moment.GREET, "Ui, der Herr Kassier!", &"gredn_tourist_greet_kassier", &"kassier"],
+	[&"knappe", Moment.GREET, "Hob i mein Beitrag scho zoit?", &"gredn_knappe_greet_kassier", &"kassier"],
+	[&"wanderer", Moment.GREET, "Da Bergführer! Olle ans Seil!", &"gredn_wanderer_greet_bergfuehrer", &"bergfuehrer"],
+	[&"tourist", Moment.GREET, "Endlich a Führung!", &"gredn_tourist_greet_bergfuehrer", &"bergfuehrer"],
+	[&"wanderer", Moment.GREET, "Do rennt scho wieder oana!", &"gredn_wanderer_greet_trailrunner", &"trailrunner"],
+	[&"tourist", Moment.GREET, "Der is schnö unterwegs!", &"gredn_tourist_greet_trailrunner", &"trailrunner"],
+	[&"knappe", Moment.GREET, "Obacht, da Renner!", &"gredn_knappe_greet_trailrunner", &"trailrunner"],
+	[&"tourist", Moment.GREET, "Mach a Foto von mia!", &"gredn_tourist_greet_influencer", &"influencer"],
+	[&"wanderer", Moment.GREET, "Na servas, a Influencer.", &"gredn_wanderer_greet_influencer", &"influencer"],
+	[&"perchte", Moment.GREET, "Hö-hö! Filmst mi?", &"gredn_perchte_greet_influencer", &"influencer"],
+	[&"knappe", Moment.GREET, "Achtung, da Sprengmeister!", &"gredn_knappe_greet_sprengmeister", &"sprengmeister"],
+	[&"wanderer", Moment.GREET, "Weg do, der hot Dynamit!", &"gredn_wanderer_greet_sprengmeister", &"sprengmeister"],
+	[&"perchte", Moment.GREET, "Die Schöne is do! Hö-hö!", &"gredn_perchte_greet_schoenperchte", &"schoenperchte"],
+	[&"wanderer", Moment.GREET, "Jetzt wird's gsegnet!", &"gredn_wanderer_greet_schoenperchte", &"schoenperchte"],
+	[&"knappe", Moment.GREET, "Glück und Segen, Schöne!", &"gredn_knappe_greet_schoenperchte", &"schoenperchte"],
 ]
 const CHANCE: Dictionary = {
 	Moment.SPOT: Constants.GREDN_CHANCE_SPOT, Moment.IDLE: Constants.GREDN_CHANCE_IDLE,
@@ -119,7 +137,7 @@ const CHANCE: Dictionary = {
 	Moment.APPEAR: 1.0, Moment.RUN: 1.0, Moment.VANISH: 1.0,
 	Moment.AIM: Constants.GREDN_CHANCE_AIM, Moment.SHOT: Constants.GREDN_CHANCE_SHOT, Moment.SITZ: 1.0,
 	Moment.HAT: 1.0, Moment.FEE: 1.0, Moment.FUSE: 1.0, Moment.BLESS: 1.0, Moment.LIVE: 1.0,
-	Moment.CRASH: 1.0,
+	Moment.CRASH: 1.0, Moment.GREET: 1.0,
 }
 
 static var current: Gredn
@@ -187,6 +205,49 @@ static func now(enemy: Enemy, which: Moment) -> int:
 	if current == null or enemy.puppet:
 		return -1
 	return current.blurt(enemy, which)
+
+
+## A Bsundan turned up (solo, or the host): the nearest plain enemy within GREET_RADIUS of it that has
+## a line for it calls out to it. Returns the line's index, or -1. Untyped: by the time a timer calls
+## it the enemy may have been freed.
+static func greet(who: Variant) -> int:
+	if current == null or not is_instance_valid(who):
+		return -1
+	var variant := who as Enemy
+	if variant == null or variant.puppet or not variant.is_alive() or variant.data.variant_of == null:
+		return -1
+	var best: Enemy
+	var best_line: Array[int] = []
+	var nearest: float = Constants.GREET_RADIUS
+	for node: Node in variant.get_parent().get_children():
+		var other := node as Enemy
+		if other == null or other == variant or not other.is_alive() or other.data.variant_of or other.puppet:
+			continue
+		var distance: float = other.global_position.distance_to(variant.global_position)
+		if distance > nearest:
+			continue
+		var choices: Array[int] = greetings(other.data.id, variant.data.id)
+		if choices.is_empty():
+			continue
+		best = other
+		best_line = choices
+		nearest = distance
+	if best == null:
+		return -1
+	var line: int = best_line.pick_random()
+	best.talk_left = Constants.GREDN_ENEMY_GAP
+	best.said.emit(best, line)
+	current.say(best, line)
+	return line
+
+
+## The lines `speaker` has to greet the variant `variant`.
+static func greetings(speaker: StringName, variant: StringName) -> Array[int]:
+	var choices: Array[int] = []
+	for i: int in LINES.size():
+		if LINES[i][1] == Moment.GREET and LINES[i][0] == speaker and LINES[i][4] == variant:
+			choices.append(i)
+	return choices
 
 
 ## The lines `data` has for `which`: its own, or (a variant) its base enemy's.

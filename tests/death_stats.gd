@@ -95,8 +95,10 @@ func _coop_screen(screen: DeathScreen, player: Player) -> void:
 	for cell: Node in grid.get_children():
 		cells.append((cell as Label).text)
 	_check(grid.visible and not (screen.get_node("%Run") as Control).visible, "co-op: the Hüttenwertung instead of our own run")
-	_check(cells.size() == 18 and cells[6] == "Gast" and cells[12] == "Wirt", "a header and one row per player, most points first: %s" % [cells])
-	_check(cells[9] == tr("UI_DEATH_SHARE") % [6, 50] and cells[10] == tr("UI_DEATH_NONE") and cells[16] == tr("UI_DEATH_WEAPON") % [tr(FLINTE.display_name), 3], "their headshot share and favourite weapon")
+	# Seven columns since the Bsundan killed (1.2 extras).
+	_check(cells.size() == 21 and cells[7] == "Gast" and cells[14] == "Wirt", "a header and one row per player, most points first: %s" % [cells])
+	_check(cells[10] == tr("UI_DEATH_SHARE") % [6, 50] and cells[11] == tr("UI_DEATH_NONE") and cells[18] == tr("UI_DEATH_WEAPON") % [tr(FLINTE.display_name), 3], "their headshot share and favourite weapon")
+	_check(cells[13] == "0" and cells[20] == "0", "and the Bsundan each killed")
 	var nomoi := screen.get_node("%NomoiButton") as Button
 	_check(nomoi.visible and not (screen.get_node("%FriendsButton") as Control).visible, "co-op: Nomoi!, no Play with friends")
 	(screen.get_node("EnableTimer") as Timer).timeout.emit()

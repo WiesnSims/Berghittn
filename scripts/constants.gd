@@ -877,3 +877,19 @@ const TRAIL_THROW: float = 9.0
 const TRAIL_THROW_UP: float = 3.0
 const TRAIL_SHOVE: float = 5.0
 const TRAIL_CRASH_STUN: float = 2.5
+
+# 1.2 extras (GAME_DESIGN section 12).
+## "Bsundane Woch!": the random event's variant chance for the rest of the wave, from which wave,
+## and how many of the wave must still be to come.
+const BSUNDAN_WEEK_CHANCE: float = 0.25
+const BSUNDAN_WEEK_FIRST_WAVE: int = 8
+const BSUNDAN_WEEK_MIN_LEFT: int = 8
+## The others greet the Bsundan: how long after it turns up, and how near a plain enemy must be.
+const GREET_DELAY: float = 1.5
+const GREET_RADIUS: float = 15.0
+## Zeitlupe: the game's speed in the slow motion, how long it holds (real seconds), how long it eases
+## back, and the low pass on the sound meanwhile (Hz).
+const ZEITLUPE_SCALE: float = 0.25
+const ZEITLUPE_TIME: float = 0.6
+const ZEITLUPE_EASE: float = 0.4
+const ZEITLUPE_CUTOFF: float = 900.0

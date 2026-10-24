@@ -117,8 +117,11 @@ async function entry(env, body) {
 	const points = int(body.points, Number.MAX_SAFE_INTEGER);
 	const kills = int(body.kills, Number.MAX_SAFE_INTEGER);
 	const headshots = int(body.headshots, Number.MAX_SAFE_INTEGER);
+	// The Bsundan killed (1.2): games before 1.2 do not send it.
+	const bsundan = body.bsundan === undefined ? 0 : int(body.bsundan, Number.MAX_SAFE_INTEGER);
 	// Co-op: everyone still in the room at the end (the others may have left, so one is fine too).
-	if (players < 1 || names.length !== players || !wave || points === null || kills === null || headshots === null || headshots > kills) {
+	if (players < 1 || names.length !== players || !wave || points === null || kills === null || headshots === null || headshots > kills
+		|| bsundan === null || bsundan > kills) {
 		return json({ error: 'entry' }, 400);
 	}
 	// Could this wave have been reached since the ticket, and do the points fit it?
@@ -133,9 +136,9 @@ async function entry(env, body) {
 	const fav = String(body.fav ?? '').replace(/[^\w]/g, '').slice(0, MAX_TEXT);
 	const version = String(body.version ?? '').replace(/[^\w.-]/g, '').slice(0, MAX_TEXT);
 	const saved = await env.BOARD.prepare(
-		'INSERT INTO entries (mode, names, wave, points, kills, headshots, fav, players, version, created) '
-		+ 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id',
-	).bind(mode, JSON.stringify(names), wave, points, kills, headshots, fav, players, version, now).first('id');
+		'INSERT INTO entries (mode, names, wave, points, kills, headshots, bsundan, fav, players, version, created) '
+		+ 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id',
+	).bind(mode, JSON.stringify(names), wave, points, kills, headshots, bsundan, fav, players, version, now).first('id');
 	return json({
 		id: saved,
 		rank: await rank(env, mode, wave, points, 0),
@@ -158,7 +161,7 @@ async function list(env, url) {
 	}
 	const since = url.searchParams.get('range') === 'week' ? weekStart() : 0;
 	const { results } = await env.BOARD.prepare(
-		'SELECT id, names, wave, points, kills, headshots, fav, players, created FROM entries '
+		'SELECT id, names, wave, points, kills, headshots, bsundan, fav, players, created FROM entries '
 		+ 'WHERE mode = ? AND created >= ? ORDER BY wave DESC, points DESC, id ASC LIMIT ?',
 	).bind(mode, since, LIST_SIZE).all();
 	return { entries: results.map((row) => ({ ...row, names: JSON.parse(row.names) })) };

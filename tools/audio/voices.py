@@ -246,6 +246,22 @@ LINES = {
     "gredn_trailrunner_au": (tourist, "Au! Mei Bestzeit!"),
     "gredn_trailrunner_kappl": (tourist, "Mei Laufkappl!"),
     "gredn_trailrunner_ziel": (tourist, "Ziel. Erreicht."),
+    "gredn_wanderer_greet_kassier": (wanderer, "Da Kassier is do, jetzt zahlst!"),
+    "gredn_tourist_greet_kassier": (tourist, "Ui, der Herr Kassier!"),
+    "gredn_knappe_greet_kassier": (knappe, "Hob i mein Beitrag scho zoit?"),
+    "gredn_wanderer_greet_bergfuehrer": (wanderer, "Da Bergführer! Olle ans Seil!"),
+    "gredn_tourist_greet_bergfuehrer": (tourist, "Endlich a Führung!"),
+    "gredn_wanderer_greet_trailrunner": (wanderer, "Do rennt scho wieder oana!"),
+    "gredn_tourist_greet_trailrunner": (tourist, "Der is schnö unterwegs!"),
+    "gredn_knappe_greet_trailrunner": (knappe, "Obacht, da Renner!"),
+    "gredn_tourist_greet_influencer": (tourist, "Mach a Foto von mia!"),
+    "gredn_wanderer_greet_influencer": (wanderer, "Na servas, a Influenzer."),
+    "gredn_perchte_greet_influencer": (perchte, "Hö hö! Filmst mi?"),
+    "gredn_knappe_greet_sprengmeister": (knappe, "Achtung, da Sprengmeister!"),
+    "gredn_wanderer_greet_sprengmeister": (wanderer, "Weg do, der hot Dynamit!"),
+    "gredn_perchte_greet_schoenperchte": (perchte, "Die Schöne is do! Hö hö!"),
+    "gredn_wanderer_greet_schoenperchte": (wanderer, "Jetzt wirds gsegnet!"),
+    "gredn_knappe_greet_schoenperchte": (knappe, "Glück und Segen, Schöne!"),
 }
 
 

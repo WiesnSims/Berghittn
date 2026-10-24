@@ -8,9 +8,12 @@ extends Node3D
 var enemy: Enemy
 
 
-## It came (again, out of the pool): reset, and the banner on this screen.
+## It came (again, out of the pool): reset, and the banner on this screen; a moment later (solo and
+## host) a plain enemy near it greets it (Gredn.greet).
 func activated() -> void:
 	Events.event_announced.emit(tr("EVENT_VARIANT_" + String(enemy.data.id).to_upper()))
+	if deciding():
+		get_tree().create_timer(Constants.GREET_DELAY).timeout.connect(Gredn.greet.bind(enemy))
 
 
 ## Every step while it lives (solo and host), in any state.

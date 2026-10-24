@@ -166,7 +166,8 @@ func _band() -> void:
 	var intro := Sound.stream(&"band_1") as AudioStreamOggVorbis
 	_check(not intro.loop and intro.get_length() < Constants.BAND_INTRO_MAX, "the band only plays the wave in (%.1f s, no loop)" % intro.get_length())
 	Events.wave_cleared.emit(15)
-	await _seconds(Constants.BAND_FADE_TIME + 0.3)
+	# The fade runs in game time: the Zeitlupe (1.2) slows the wave's end first.
+	await _seconds(Constants.BAND_FADE_TIME + Constants.ZEITLUPE_TIME + Constants.ZEITLUPE_EASE + 0.3)
 	_check(band.playing_tune() == &"", "and the break is quiet but for the storm")
 	_quiet()
 

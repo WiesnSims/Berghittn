@@ -54,7 +54,8 @@ func _check(ok: bool, what: String) -> void:
 
 func _step() -> void:
 	await get_tree().physics_frame
-	t += 1.0 / 60.0
+	# Game time: the Zeitlupe (1.2) slows the game at a wave's end, the break counts in game time.
+	t += Engine.time_scale / 60.0
 	# God mode: this test is about waves and points, M2 already covers dying.
 	player.health._health = float(player.health.max_health)
 	player.weapons.reserve = 64

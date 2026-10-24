@@ -1306,6 +1306,94 @@ Built (2026-10-25, branch worktree-enemy-variants, version 1.2):
 - ShaderWarmup draws the variants' models and hats (from data/enemies) and variant_looks.gd (fuse
   sparks, LIVE, rope).
 
+### 1.2 extras (user request 2026-10-25, version 1.2)
+
+Smaller things around the Bsundan, so they are seen and remembered, plus a few good moments. The
+user picked seven of eight; the Wurlitzer (a song buff from a jukebox) was dropped: the Skiraum's
+small side room should get something else later (open; to be decided before 1.2 ships).
+
+**Da Huatständer.** A hat rack on the Stube's east wall, under the Trophäenwand: a dark board with
+eleven pegs and a brass plate with a name under each. Top row the five hats of the plain enemies
+(Wanderer, Tourist, Knappe, Wilderer, Venedigermandl), bottom row the six Bsundan. The first hat of
+each kind shot off in a match (Huat obschiaßn, by anyone) goes up on its peg with a pop and a nail
+sound; a Bsundan hat also gets a banner ("Da Huat vom Kassier hängt jetzt in da Stubn!"). Empty
+pegs keep their plate, dimmed. Each screen keeps its own rack, like the Trophäenwand (every screen
+sees every shot hat). A full rack in one match earns a Wandernadl.
+
+**Bsundane on the end screen and in the Gipfelbuch.** PlayerStats counts the Bsundan this player
+killed: a "Bsundane" row on the death screen and a column in the co-op Hüttenwertung. The Gipfelbuch
+stores it per entry (solo: the player's, co-op: the team's) and shows it as a column. Server:
+board/migrations/0002 adds `bsundan INTEGER NOT NULL DEFAULT 0` (older entries 0); the server takes
+it like the kills (a whole number, never more than the kills).
+
+**"Bsundane Woch!" (random event).** A fourth random event (section 8a), from wave 8: for the rest
+of that wave the variant chance is BSUNDAN_WEEK_CHANCE 25 % instead of 3 % (still one alive at a
+time, never on a boss wave). Banner on every screen: "Bsundane Woch! Heid kemman de Bsundan!". No
+actor and no marker: the Bsundan are the event.
+
+**The others greet the Bsundan.** When a variant turns up, a plain enemy near it (within 15 m, the
+nearest one) calls out to it once, a new Gredn moment GREET with lines about that variant ("Da
+Kassier is do, jetzt zahlst!", "Achtung, da Sprengmeister!"), two or three per variant, in the
+speaker's own voice. Always said (no dice), heard like any line.
+
+**Zeitlupe.** The last kill of a wave plays in slow motion: ZEITLUPE_SCALE 0.25 game speed for
+ZEITLUPE_TIME 0.6 s (real time), easing back over 0.4 s, with the sound muffled (a low pass on the
+Master bus). On every screen at the wave's end. A Settings switch "Slow motion on the last kill"
+(on), for players who do not like it.
+
+**Steckbriefe (wanted posters).** A new title-screen button "Steckbriefe & Wandernadln" opens a
+panel with two tabs. Steckbriefe: a wanted poster ("GSUACHT") for each of the 14 enemies (8 plain
+and 6 Bsundan): a picture of it, its name (dialect), what it does (one or two plain sentences,
+translated), one of its lines, and how many this browser's player has killed. An enemy never met
+is a dark silhouette with "???" until it first turns up in one of our matches (Settings.met). The
+pictures are rendered from the models once (tests/portraits) into assets/ui/steckbriefe/<id>.png.
+
+**Wandernadln (badges).** Like the real hiking badges: six badges in Bronze, Silber and Gold, 18
+in all, kept in Settings (this browser):
+- Gipfelstürmer: reach wave 10 / 20 / 30.
+- Bsundan-Jaga: kill a Bsundan / all six kinds / 50 Bsundan in all.
+- Huatsammler: shoot 25 / 250 hats off in all / fill the Huatständer in one match.
+- Scharfschütz: 100 / 1000 / 5000 headshot kills in all.
+- Krampusbezwinger: kill 1 / 10 / 50 Krampusse.
+- Seilschaft: reach wave 5 / 10 / 20 in co-op.
+A new one comes with a banner and a sound in the match. The panel's second tab shows all 18 (got or
+still to do, with progress); the title screen shows the count ("Wandernadln 5/18") under the menu.
+
+How (planned):
+- HatRack (scripts/trophies/hat_rack.gd, scenes/props/hat_rack.tscn) in the Stube under the
+  TrophyWall; the hats from assets/models/enemies/<id>_hat.res.
+- PlayerStats.bsundan; Board entry key `bsundan`; board.js and migration 0002; BoardPanel column.
+- EventDirector: event `bsundan` (WaveManager.variant_chance for the wave).
+- Gredn.Moment.GREET, lines with the variant they greet; voices in voices.py.
+- Zeitlupe (scripts/effects/zeitlupe.gd) under Main, on Events.wave_cleared; Settings.zeitlupe.
+- Settings: met, kills (per enemy id), hats, headshots, coop_best, badges. Wandernadln
+  (scripts/trophies/wandernadln.gd) counts and awards; SteckbriefPanel (scripts/ui/) with both tabs.
+- Test: tests/v12_extras (rack, stats, event, greet, Zeitlupe, met/kills, badges, panel).
+
+Built (2026-10-25, branch v12-extras, on top of the Bsundan, version 1.2):
+- HatRack (scripts/trophies/hat_rack.gd, scenes/props/hat_rack.tscn) on the Stube's east wall under
+  the TrophyWall: wood_dark board and pegs, Label3D plates (dim until the hat hangs), each hat
+  shrunk to fit 0.42 m (the Tafel). `filled` gives the Gold Huatsammler.
+- PlayerStats.bsundan; DeathScreen row and Hüttenwertung column; the Gipfelbuch entry's `bsundan`
+  (main.gd, solo and the group's sum), board/board.js (optional, a whole number up to the kills),
+  board/migrations/0002_bsundan.sql, BoardPanel column. To go live the migration is applied to
+  berghittn-board before the deploy (`npx wrangler d1 migrations apply berghittn-board --remote`).
+- EventDirector `bsundan` / bsundane_woch() (from wave 8, with at least 8 of the wave still to come):
+  WaveManager.variant_chance, reset each wave; the banner by Coop.announce.
+- Gredn.Moment.GREET and Gredn.greet (the nearest plain enemy within 15 m with a line for that
+  variant, 1.5 s after it turns up; EnemyVariant.activated starts it); 16 lines with voices.
+- Zeitlupe (scripts/effects/zeitlupe.gd): Engine.time_scale with a tween that ignores it, a low pass
+  on Master, always processing, reset when the scene goes; Settings.zeitlupe and its switch.
+- Events.enemy_appeared (Enemy.activate). Wandernadln (scripts/trophies/wandernadln.gd) keeps
+  Settings.met / kills / hats / headshots / coop_best / badges and gives the badges (banner, the
+  `nadl` chime from sfx.py); earlier progress (the personal best) counts quietly at start.
+- SteckbriefPanel (scripts/ui/steckbrief_panel.gd): posters with a silhouette shader for enemies not
+  met, and the badge page; the title screen's button and the count in its corner. Pictures:
+  tests/portraits (assets/ui/steckbriefe/<id>.png).
+- Views for checking: tests/room_view (the map from given spots), tests/ui_view (the menus).
+- Tests: tests/v12_extras (47 checks); tests/net_specials (the guest's Huatständer, Bsundane Woch on
+  the guest); board/test/board.test.mjs (bsundan kept, 0 from older games, refused above the kills).
+
 
 ## 13. Project structure
 

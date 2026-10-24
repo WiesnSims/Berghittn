@@ -122,6 +122,18 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.92, 0.85, 1)
 theme_override_font_sizes/font_size = 20
 
+[node name="BsundanLabel" type="Label" parent="Center/Box/Run"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.7, 0.62, 1)
+theme_override_font_sizes/font_size = 20
+text = "UI_DEATH_BSUNDAN"
+
+[node name="Bsundan" type="Label" parent="Center/Box/Run"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.92, 0.85, 1)
+theme_override_font_sizes/font_size = 20
+
 [node name="Wertung" type="GridContainer" parent="Center/Box"]
 unique_name_in_owner = true
 visible = false
@@ -129,7 +141,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/h_separation = 22
 theme_override_constants/v_separation = 4
-columns = 6
+columns = 7
 
 [node name="Best" type="Label" parent="Center/Box"]
 unique_name_in_owner = true

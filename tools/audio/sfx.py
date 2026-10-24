@@ -807,6 +807,20 @@ def fuse_hiss(v):
     return d.normalize(d.mix(strike, (0.08, body)), 0.75)
 
 
+def nadl(v):
+    """A Wandernadl (1.2): three bright bells going up, a little sparkle over the last."""
+    x = np.zeros(d.n_of(1.4))
+    for i, f in enumerate([1318.5, 1661.2, 1975.5]):
+        b = bell(0.9, f, [1, 2.76, 5.4], [0.4, 0.18, 0.07], [1, 0.35, 0.12])
+        at = d.n_of(0.11 * i)
+        x[at:at + len(b)] += b[: len(x) - at] * (0.7 + 0.15 * i)
+    for _ in range(5):
+        c = bell(0.2, d.rng.uniform(3500, 5200), [1, 2.7], [0.04, 0.02], [1, 0.3])
+        at = d.n_of(d.rng.uniform(0.3, 0.6))
+        x[at:at + len(c)] += c[: len(x) - at] * 0.25
+    return d.normalize(d.fade(x), 0.75)
+
+
 def perchten_schellen(v):
     """The Schönperchte jumps: a shake of bright little bells, twice."""
     x = np.zeros(d.n_of(1.6))
@@ -855,7 +869,7 @@ SOUNDS = {
     "murmeltier_scream": (murmeltier_scream, 2), "murmeltier_pop": (murmeltier_pop, 1),
     "murmeltier_hit": (murmeltier_hit, 1), "camera": (camera, 1),
     "wind_loop": (wind_loop, 1), "fire_crackle": (fire_crackle, 1),
-    "kassa_ching": (kassa_ching, 1), "fuse_hiss": (fuse_hiss, 1), "perchten_schellen": (perchten_schellen, 2),
+    "kassa_ching": (kassa_ching, 1), "fuse_hiss": (fuse_hiss, 1), "perchten_schellen": (perchten_schellen, 2), "nadl": (nadl, 1),
 }
 
 LOOPS = {"flame_loop", "kuhglocke_ring", "resi_bell", "eisstock_slide", "fassl_roll", "wind_loop", "fire_crackle"}

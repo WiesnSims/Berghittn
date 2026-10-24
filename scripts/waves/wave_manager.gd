@@ -7,7 +7,8 @@ extends Node3D
 ## Sitzfleisch (1.1.2): a player who stays put too long in a wave gets a Wilderer and a few
 ## Bergdohlen sent after them (on top of the wave), a banner and a taunt.
 ## Die Bsundan (1.2): from VARIANT_FIRST_WAVE a normal spawn is now and then a rare variant instead,
-## at most one alive; the Bergführer brings his Seilschaft from the wave along.
+## at most one alive; the Bergführer brings his Seilschaft from the wave along. "Bsundane Woch!"
+## (1.2 extras, an EventDirector event) raises the chance for the rest of a wave.
 
 enum Phase { BREAK, SPAWNING, CLEARING }
 
@@ -37,9 +38,12 @@ const DOHLE: EnemyData = preload("res://data/enemies/bergdohle.tres")
 # The variant about now (if it still lives), and the last one sent (not twice in a row).
 var _variant: Enemy
 var _last_variant: EnemyData
+## This wave's chance of a variant per spawn (Bsundane Woch raises it until the wave ends).
+var variant_chance: float = Constants.VARIANT_CHANCE
 
 
 func _ready() -> void:
+	add_to_group("wave_manager")
 	_rng.randomize()
 	# Deferred so the HUD, which is set up after the world, hears the first countdown.
 	Events.wave_break_started.emit.call_deferred(1, _break_left)
@@ -73,6 +77,7 @@ func _physics_process(delta: float) -> void:
 
 func _start_wave(number: int) -> void:
 	wave = number
+	variant_chance = Constants.VARIANT_CHANCE
 	_queue.clear()
 	if wave_table.is_boss_wave(wave):
 		_queue.append(wave_table.boss)
@@ -128,12 +133,17 @@ func _spawn() -> void:
 func _roll_variant() -> EnemyData:
 	if wave < Constants.VARIANT_FIRST_WAVE or wave_table.is_boss_wave(wave) or variant_about():
 		return null
-	if _rng.randf() >= Constants.VARIANT_CHANCE:
+	if _rng.randf() >= variant_chance:
 		return null
 	var data: EnemyData = wave_table.pick_variant(wave, _last_variant, _rng)
 	if data:
 		_last_variant = data
 	return data
+
+
+## How many enemies of this wave are still to come.
+func still_to_spawn() -> int:
+	return _to_spawn if _phase == Phase.SPAWNING else 0
 
 
 ## A rare variant is alive now.

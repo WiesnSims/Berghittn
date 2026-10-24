@@ -15,6 +15,11 @@ const ENTRIES: Array[Dictionary] = [
 			"Die Schönperchte blesses the enemies around her. Shoot her Tafel off!",
 			"Da Influencer goes live: the enemies near him get faster, and his ring light dazzles.",
 			"Da Bergführer brings his Seilschaft on a rope, and da Trailrunner charges straight at you.",
+			"Da Huatständer: every kind of hat you shoot off hangs in the Stube, under the Trophäenwand.",
+			"Steckbriefe & Wandernadln on the title screen: a wanted poster for every enemy you have met, and 18 badges to earn.",
+			"\"Bsundane Woch!\": a new event that brings the Bsundan far more often for a wave. The other enemies greet them, too.",
+			"The last kill of a wave plays in slow motion (it can be switched off in Settings).",
+			"The end screen and the Gipfelbuch count the Bsundan you killed.",
 		],
 		"de": [
 			"Die Bsundan: sechs seltene Spezialgegner mit eigenem Aussehen, Hut und Trick, für die dreifachen Punkte.",
@@ -23,6 +28,11 @@ const ENTRIES: Array[Dictionary] = [
 			"Die Schönperchte segnet die Gegner um sie herum. Schieß ihr die Tafel runter!",
 			"Da Influencer geht live: die Gegner bei ihm werden schneller, und sein Ringlicht blendet.",
 			"Da Bergführer bringt seine Seilschaft am Seil mit, und da Trailrunner rennt geradewegs auf dich zu.",
+			"Da Huatständer: Jede Art Hut, die du abschießt, hängt in der Stube, unter der Trophäenwand.",
+			"Steckbriefe & Wandernadln im Hauptmenü: ein Steckbrief für jeden Gegner, dem du begegnet bist, und 18 Abzeichen zum Sammeln.",
+			"\"Bsundane Woch!\": ein neues Ereignis, bei dem eine Welle lang viel öfter Bsundane kommen. Die anderen Gegner begrüßen sie auch.",
+			"Der letzte Kill einer Welle läuft in Zeitlupe (in den Einstellungen abschaltbar).",
+			"Der Endbildschirm und das Gipfelbuch zählen die Bsundan, die du erlegt hast.",
 		],
 	},
 	{
