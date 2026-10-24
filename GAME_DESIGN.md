@@ -1002,6 +1002,16 @@ new ones are added here)*
 - A hidden quest: three Enzian bottles hidden on the map unlock a secret song and a free Schnaps.
 - Night and weather: the storm gets heavier through the waves, a Föhn wave with clear sight.
 - Bergtour, a procedural mode reshuffling the rooms (needs section 15 changed first).
+- D'Bergrettung, an endgame quest (written up 2026-10-24 as an M10 plan, then parked by the user:
+  it does not fit the game well enough for now). The Funkgerät in the Stube calls for help from
+  wave 8; carry diesel from the Skiraum to a new Notstrom-Aggregat in the Schuppen; kill da
+  Liftwart (a mini-boss with an ice pick that pulls you in) for the key to the Seilbahn's
+  Steuerpult; hold out 150 s while the gondola climbs, with da Tatzelwurm coiled on the cable
+  outside the portal (a fixed boss with three frost-blister weak spots); ride down out of the
+  portal fighting Bergdohlen: "Obabgfoahn!", a win screen, a Tatzlwurm-Haubn and an `escaped`
+  mark in the Gipfelbuch. Quest enemies: Eismandl (ice crust, weak to fire), Liftwart,
+  Bernhardiner (dog packs, the barrel heals), Tatzelwurm. The full write-up is in commit fd6a50c
+  (PR #105).
 
 *Questions for the user*
 - Q1 (answered): Nomoi! shows at once on every end screen; the match restarts when everyone in
@@ -1167,138 +1177,6 @@ Built (2026-10-24, branch dengel-balance, version 1.1.2):
 - Tests: m9_dengel (the new rules, the Golden Gun), m9_stumpf, m9_sitz, keys, view_settings,
   title_slides, main_menu.
 
-**M10 — D'Bergrettung: the endgame quest (plan, proposed 2026-10-24; nothing is built before the
-user approves it and answers the questions)**
-User request 2026-10-24: an endgame quest that gives a run a real ending, with some enemies made
-for the quest. Today a run only ends when everyone is down. M10 adds a way out: get the Seilbahn
-running and ride the gondola down into the valley. The endless waves stay as they are; the quest
-is optional and runs alongside them, and a player who ignores it plays the game as before.
-The map stays the one map (section 15): every step uses rooms that exist, and the ride leaves
-through the gondola portal that has been barred since M5.
-
-*The story in one line*
-The Bergrettung calls up on the hut's old radio: they cannot come up in the storm, but if the
-hut gets the Seilbahn running they will catch the gondola in the valley. "Schaut's, dass
-d'Bahn geht. Mia wartn untn."
-
-*The steps (every one announced like the events: banner, light column, edge arrow, label through
-walls; the HUD gets a small Quest-Zettel under the points with the current step)*
-1. **Da Funk (Stube).** From wave 8 (Q1) the Funkgerät on the bar crackles ("Hüttn, bitte
-   melden!"). Hold E for 3 s to answer. The Bergrettung tells the plan; the Zettel shows the steps.
-   If the Seilbahn (1500) is still shut, the first line says "Mach d'Seilbahn auf".
-2. **Da Diesel (Skiraum to Schuppen).** The Seilbahn has no power. The Notstrom-Aggregat, a new
-   prop in the Holzschuppen under the hay loft, needs diesel. A red Kanister stands behind the ski
-   racks at the end of the boot corridor. Carrying it (Q6): both hands, so only the melee weapon
-   can be used, no sprint, 80 % walking speed; G drops it where you stand, and any player can pick
-   it up again. The Skiraum corridor is the chokepoint, so the way back is the fight.
-3. **Da Aggregat (Schuppen).** Fill it (hold E 3 s with the Kanister), then pull the starter cord:
-   hold E 6 s while it coughs. Each try draws every enemy within 25 m, and while it runs the
-   **Eismandl** (below) thaw out of the snow heaps in the Schuppen and on the Terrasse. Once it runs,
-   the Seilbahn's lights come on.
-4. **Da Liftwart (anywhere).** The Steuerpult (a new desk on the Seilbahn platform) is locked. The
-   key is on the belt of **da Liftwart**, the undead lift operator (a mini-boss, below), who comes
-   in the wave after the lights come on, with a banner ("Da Liftwart is a no do!"). He drops the
-   Schaltschlüssel where he falls (E to take, like the Krampus-Rute).
-5. **D'Bergfahrt (Seilbahn): the last stand.** Turn the key at the Steuerpult (hold E 2 s): the
-   gondola in the valley starts up. From now on a clock shows the gondola climbing: 150 s
-   (constants.gd). The waves go on, harder: the wave's spawn interval halves and the **Bernhardiner**
-   (below) come in packs. Halfway up the cable, **da Tatzelwurm** (the final boss) coils round the
-   cable outside the portal and the gondola stops until he is driven off.
-6. **D'Obfoahrt.** The gondola docks at the platform. The barrier in the portal opens and the
-   cabin doors stand open for 20 s; every player inside when they shut rides down. The ride takes
-   about 30 s: out of the portal, along the cable over the alm and into the storm, with the hut
-   falling behind and a flock of Bergdohlen chasing the cabin (shoot them off; a peck still hurts,
-   and a player going down in the cabin is still a down). Then a fade: "Obabgfoahn!" and the end
-   screen (Q2).
-
-*Quest enemies (Q5 picks which; each is an EnemyData on the shared Enemy scene with its own model,
-rig poses, ragdoll, eSpeak NG voice lines and a co-op puppet, like the M9 enemies). They come only
-in the quest (Q7 asks whether any may join the normal waves later)*
-- **Die Eismandl** (step 3): hikers frozen in the snow since some other winter, thawing out of the
-  snow heaps as the Aggregat runs. Slow (1.5 m/s) with a thick crust of ice: 200 + 25·wave health,
-  bullets do half until the ice is broken. Fire breaks it at once (Brennkessel, burning bodies, the
-  Höllen-Rute's twist), a headshot or a melee hit cracks it in one. Without ice they are fast
-  (4.5 m/s) and brittle (60 + 8·wave). Their blow chills: 1.5 s at 70 % speed. Lines: "Is des
-  kalt…", "Wo is mei Hüttn?", "Endlich warm…" (dying).
-- **Da Liftwart** (step 4, once per run): a big man in a lift operator's orange overall with a fur
-  hat and a long ice pick, the key on his belt. 1500 + 150·wave health, 2.8 m/s, 50 damage. His
-  move: he hooks a player with the ice pick from 6 m and pulls them 3 m towards him (a red line
-  first, 0.6 s to sidestep). A boss bar like the Krampus; he ignores lures and slows like the
-  bosses. Lines: "Fahrkartn, bitte!", "Ohne Karte foahrt koana!", "Betriebsschluss!", dying
-  "Letzte Bergfahrt…".
-- **Die Bernhardiner** (step 5): undead rescue dogs, with the little barrel on the collar. In packs
-  of 3 or 4, fast (6 m/s), 80 + 10·wave health, 15 damage, a short leap. Killed, one in four drops
-  its barrel: a sip of Schnaps heals 50 for whoever takes it. They do not talk; they bark and howl
-  (sfx synthesised in tools/audio).
-- **Da Tatzelwurm** (step 5, the final boss): from Alpine legend, a giant lizard-worm with a cat's
-  head and two short front legs. He never walks the navmesh: he coils on the cable outside the
-  gondola portal, so he is a fixed boss in one place, read from the whole platform and cheap to run.
-  - 8000 + 600·wave health over all (co-op x the player count's wave factor), a boss bar.
-  - Three glowing frost blisters on his body are the weak spots (x3 damage); his head counts as
-    the head (x2). Once all three blisters have burst he lets go of the cable and falls.
-  - He spits frost balls through the portal (25 damage and the Eismandl chill where they land,
-    a growing glow first, 1 s), and every 20 s he screams and shakes the cable: the whole
-    station shakes, and two Eismandl drop in through the east windows.
-  - Lines on a deep growl: "Wer weckt mi auf?", "Mei Berg!", "Des Seil g'hert mir!", falling
-    "Do… schaut's… her…".
-  - Killed, his skull goes up on the Trophäenwand (the seventh plaque, a new one for him).
-
-*Rewards*
-- The escape ends the run as a win (Q2): the end screen says "Obabgfoahn in Welle N" in gold, with
-  the stats of #86 plus the time the quest took.
-- A new earned hat: the **Tatzlwurm-Haubn** (his cat's head as a hood), kept in the browser like the
-  other earned hats. In co-op everyone who rode down earns it.
-- Gipfelbuch (Q3): escaped runs get their own mark and ranking (proposal below).
-
-*Co-op*
-- The host runs the quest like the events (CoopEvents): every step is shared, any player can do any
-  step, and the Kanister is a shared item (who carries it is shown by name tag).
-- Step 6: everyone in the cabin when the doors shut rides down. Downed players inside ride along;
-  a player who is out (bled out) or not in the cabin stays behind (Q4). The match ends for the whole
-  room; whoever stayed is shown "Zruckglassn" on the Hüttenwertung, and the run still counts as an
-  escape for the group if at least one rode down.
-- Nomoi! (M9 part 1) works as after a game over.
-
-*Gipfelbuch (proposal for Q3)*
-- An escape always ranks above every run that did not escape. Among escapes, the earlier wave is
-  better (a faster escape), then the points. Runs without an escape rank as today.
-- Each entry gets a flag `escaped` (a new D1 column, migration in board/migrations) and the board
-  shows a small gondola next to it.
-- Cheating: the server only takes an escape that comes at least 25 s a wave after the ticket (as
-  today) and not before wave 8 + the time the steps need at least (constants: 4 minutes).
-
-*Numbers* All in constants.gd (QUEST_*), first values tuned by play-test.
-
-*Parts (one PR each, play-tested after each one, version 1.2 when the last one is merged)*
-- **10.1 — The frame and the first steps:** QuestDirector (host-run in co-op), Quest-Zettel in the
-  HUD, the Funkgerät, Kanister carrying, the Aggregat, the lights coming on. Test: tests/m10_quest
-  (a bot runs steps 1 to 3), tests/net_quest.
-- **10.2 — Die Eismandl and da Liftwart:** the two enemies, the key and the Steuerpult. Tests:
-  tests/m10_eismandl, tests/m10_liftwart, tests/net_specials.
-- **10.3 — D'Bergfahrt:** the clock, the Bernhardiner, the Tatzelwurm on the cable. Tests:
-  tests/m10_tatzelwurm, tests/m10_bernhardiner.
-- **10.4 — D'Obfoahrt:** the gondola docking, boarding, the ride with the Bergdohlen, the win
-  screen, the hat, the Gipfelbuch column, patch notes and version 1.2. Tests: tests/m10_ride,
-  tests/net_ride (host and guest ride down, one is left behind), board tests for `escaped`.
-
-*Budget* Four new models (about 0.3 MiB), the Aggregat, Kanister, Funkgerät and Steuerpult props,
-voice lines and a few sfx (about 0.5 MiB). The .pck is checked after every part, as always.
-
-*Questions for the user*
-- Q1: When does the radio first crackle? Proposal: wave 8. With all steps that puts the escape
-  around wave 12 to 15 for a good team. Later (wave 10 or 12) makes it rarer and more of a goal.
-- Q2: Is the escape the end of the run, or a choice? Proposal: the end (a win). Option B: at the
-  gondola the players choose "Obabfoahn" (end and win) or "Dableibn" (the gondola leaves without
-  them, the run goes on endless, the Tatzelwurm trophy stays on the wall).
-- Q3: Gipfelbuch: escapes ranked above every other run, the earlier wave first (proposal above)? Or
-  a third tab "Obabgfoahn" next to Solo and Co-op, so the endless boards stay as they are?
-- Q4: Co-op: should a teammate who is out (bled out) ride down too if the others escape, or stay
-  behind as proposed?
-- Q5: Which quest enemies: all four (Eismandl, Liftwart, Bernhardiner, Tatzelwurm)? Any to drop or
-  swap?
-- Q6: Carrying the Kanister: melee only, no sprint (proposed), or the pistol too?
-- Q7: Should the Eismandl or the Bernhardiner also join the normal waves once the quest is done (or
-  in late waves), or stay quest-only?
 
 ## 13. Project structure
 
