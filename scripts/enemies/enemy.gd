@@ -1457,18 +1457,25 @@ func _route(goal: Vector3, windows: bool) -> Vector3:
 	var query := NavigationPathQueryParameters3D.new()
 	query.map = map
 	query.navigation_layers = _agent.navigation_layers
-	query.start_position = NavigationServer3D.map_get_closest_point(map, global_position)
-	query.target_position = NavigationServer3D.map_get_closest_point(map, goal)
+	query.start_position = NavigationServer3D.map_get_closest_point(map, _floor_below(global_position))
+	query.target_position = NavigationServer3D.map_get_closest_point(map, _floor_below(goal))
 	var result := NavigationPathQueryResult3D.new()
 	NavigationServer3D.query_path(query, result)
 	var path: PackedVector3Array = result.path
 	if path.size() < 2:
 		return goal
+	# The first window on the whole way decides it, seen yet or not: else a bird would fly at a shut
+	# window until it came in sight, turn off for a broken one, and come back once it was out of sight.
+	var first: int = result.path_types.find(NavigationPathQueryResult3D.PATH_SEGMENT_TYPE_LINK, 1)
+	var link: NavigationLink3D = instance_from_id(result.path_owner_ids[first]) as NavigationLink3D if first > 0 else null
+	if windows and link:
+		var window: Barricade = _find_barricade(_flat(link.to_global((link.start_position + link.end_position) * 0.5)))
+		if window and not window.is_open():
+			return _window_step(link, path[first - 1])
 	var best: Vector3 = _raised(path[1])
 	for i: int in range(1, path.size()):
-		if result.path_types[i] == NavigationPathQueryResult3D.PATH_SEGMENT_TYPE_LINK:
-			var link := instance_from_id(result.path_owner_ids[i]) as NavigationLink3D
-			if link and windows:
+		if i == first:
+			if windows and link:
 				return _window_step(link, path[i - 1])
 			break
 		var point: Vector3 = _raised(path[i])
@@ -1511,9 +1518,19 @@ func _pass_window(opening: Vector3, through: Vector3) -> Vector3:
 	var front: Vector3 = centre - through * Constants.DOHLE_WINDOW_LEAD
 	var past: float = (global_position - centre).dot(through)
 	var off_line: float = _flat(global_position - centre - through * past).length()
-	if past < -0.2 and (off_line > 0.35 or absf(global_position.y - centre.y) > 0.35):
+	# Only near the window does being past its plane mean being through (a bird beside the house can
+	# be "past" a window on another wall).
+	var near: bool = global_position.distance_to(centre) <= Constants.DOHLE_WINDOW_LEAD * 2.0
+	if not near or (past < -0.2 and (off_line > 0.35 or absf(global_position.y - centre.y) > 0.35)):
 		return _route(front, false)
 	return centre + through * (Constants.DOHLE_WINDOW_LEAD + 0.5)
+
+
+## The ground or floor under `point` (a bird's way starts there, not on a roof beside it).
+func _floor_below(point: Vector3) -> Vector3:
+	var down := PhysicsRayQueryParameters3D.create(point + Vector3.UP * 0.3, point + Vector3.DOWN * 8.0, Constants.LAYER_WORLD)
+	var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(down)
+	return hit.position if not hit.is_empty() else point - Vector3.UP * Constants.DOHLE_HEIGHT
 
 
 ## `point` on the ground, raised to flying height, but kept under any ceiling over it.
