@@ -36,6 +36,8 @@ func _ready() -> void:
 	_pause_menu.settings_requested.connect(_settings_menu.open)
 	_start_screen.coop_requested.connect(_open_lobby)
 	_pause_menu.leave_requested.connect(Net.leave)
+	_pause_menu.menu_requested.connect(_to_title)
+	_death_screen.menu_requested.connect(func() -> void: Net.leave() if _coop else _to_title())
 	_lobby.closed.connect(_enter_menu)
 	Net.match_started.connect(_on_match_started)
 	Net.ended.connect(_on_net_ended)
@@ -252,6 +254,15 @@ func _restart() -> void:
 		return
 	# Request the lock inside the click so the reloaded scene can skip the menus.
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	get_tree().reload_current_scene()
+
+
+## Back to the title screen, in a fresh scene: the run (if any) ends there, not into the Gipfelbuch.
+func _to_title() -> void:
+	Board.forfeit()
+	GameState.has_started = false
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	get_tree().paused = false
 	get_tree().reload_current_scene()
 
 

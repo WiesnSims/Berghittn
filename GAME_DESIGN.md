@@ -1127,6 +1127,21 @@ Munitionskiste refilled all of it for a flat 1000.
 - View settings: a field-of-view slider (70 to 100°, default 75), aiming by toggle instead of
   holding right click, and the crosshair's colour (six) and size (50 to 200 %).
 
+*Added later the same day (user request): title pictures, Main menu*
+- The title screen gets six more pictures from the game, seven in all: the Stube (as before), the
+  Venedigermandl running off over the beer garden, Bergdohlen circling the hut at dawn, the
+  Wilderer's scope glinting across the Holzschuppen, the Dengelstock at work in the hay loft, three
+  hikers back to back in the Stube, and the Krampus in the Stube door by a lantern.
+- A random one comes first; every 20 s the next crossfades in. Each keeps the slow camera drift and
+  gets its own 2D effect (muzzle flashes, gold glitter, circling birds, the glint and the shot,
+  hammer sparks, a swinging lantern). Snow blows over all of them.
+- Main menu: a solo run could only be left by reloading the page, so the Gipfelbuch was out of reach
+  after a run (user report). Now:
+  - the end screen has a Gipfelbuch button (opens on this run's board, Solo or Co-op, with our
+    entries highlighted) and a Main menu button (co-op: leaves the room)
+  - the solo pause menu has Main menu; it asks once more ("End this run?"), and a run ended that
+    way does not go into the Gipfelbuch
+
 Built (2026-10-24, branch dengel-balance, version 1.1.2):
 - Balance: tools/weapons/dengel.py (reserve and right-click rounds), Constants.DENGEL_AMMO_EXTRA,
   WeaponHolder.ammo_extra and crate_extra, AmmoCrate.price_for, WallBuy._ammo_price.
@@ -1140,7 +1155,12 @@ Built (2026-10-24, branch dengel-balance, version 1.1.2):
 - Golden Gun: WeaponData.refillable; dengel.py's LEVEL_2_ONLY (mag 1, reserve 9, no chamber).
 - View: Settings.fov, toggle_aim, crosshair_color and crosshair_size; Player reads the field of
   view, WeaponHolder._aim_held and Crosshair._draw use the others. The Settings menu scrolls now.
-- Tests: m9_dengel (the new rules, the Golden Gun), m9_stumpf, m9_sitz, keys, view_settings.
+- Title pictures: tools/teaser renders each scene (`-- <scene>`) and prints its spots;
+  TeaserBackdrop.SCENES holds the pictures and effects, its Slide, Effect and Flock classes run them.
+- Main menu: DeathScreen._build_more (Gipfelbuch and Main menu, menu_requested), BoardPanel.open(mode),
+  PauseMenu.menu_requested (solo, after a second click), main._to_title.
+- Tests: m9_dengel (the new rules, the Golden Gun), m9_stumpf, m9_sitz, keys, view_settings,
+  title_slides, main_menu.
 
 
 ## 13. Project structure

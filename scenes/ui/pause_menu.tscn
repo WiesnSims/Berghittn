@@ -101,11 +101,13 @@ text = "UI_LOBBY_COPIED"
 horizontal_alignment = 1
 
 [node name="Controls" type="Label" parent="Center/Box"]
+custom_minimum_size = Vector2(760, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 theme_override_font_sizes/font_size = 16
 text = "UI_CONTROLS"
 horizontal_alignment = 1
+autowrap_mode = 3
 
 [node name="RelockTimer" type="Timer" parent="."]
 one_shot = true

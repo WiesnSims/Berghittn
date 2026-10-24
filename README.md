@@ -201,10 +201,13 @@ godot --headless --import                   # then reimport
   the shaders are built it shows only the still picture, "Preparing the hut ..." and a progress bar:
   each new shader blocks the browser's main thread (up to ~0.7 s), so a live menu stuttered
   (play-test). Then the menu fades in and the picture comes alive. An invite link waits too.
-- Behind it, `TeaserBackdrop` animates a still from the game in 2D (drift, snow, lamp flicker, the
-  Jagdflinte firing now and then), so it needs no 3D shaders. The still is rendered by
-  `godot res://tools/teaser/teaser.tscn` into `assets/ui/teaser.jpg` (lossy import); the tool prints
-  where the muzzle and the lamp are, for `MUZZLE_AT` / `LAMP_AT`.
+- Behind it, `TeaserBackdrop` animates stills from the game in 2D, so it needs no 3D shaders: seven
+  scenes (1.1.2), a random one first, the next crossfading in every 20 s (loaded in the background
+  meanwhile). Each drifts and has its own effects (lamp flicker, muzzle flashes, gold glitter,
+  circling Bergdohlen, the Wilderer's glint, Dengelstock sparks, a swinging lantern), with snow over
+  all. A still is rendered by `godot res://tools/teaser/teaser.tscn -- <scene>` into
+  `assets/ui/teaser_<scene>.jpg` (lossy import); the tool prints where the scene's spots are, for
+  `TeaserBackdrop.SCENES`. Test: `tests/title_slides.tscn`.
 - Loading (measured 2026-10-18, Edge on Windows, first visit): downloads 1.9 s, Godot running by 2 s,
   scene built by ~4.5 s; then the browser compiles ~150 WebGL programs, ~16 s on a first visit (one
   per material setup and light pass; the lit ones take ~0.7 s each, built twice, with and without

@@ -347,5 +347,7 @@ messages = {
 [&"", &"UI_COLOR_YELLOW"]: [&"Gelb"],
 [&"", &"UI_COLOR_CYAN"]: [&"Türkis"],
 [&"", &"UI_COLOR_PINK"]: [&"Pink"],
-[&"", &"UI_COLOR_RED"]: [&"Rot"]
+[&"", &"UI_COLOR_RED"]: [&"Rot"],
+[&"", &"UI_MAIN_MENU"]: [&"Hauptmenü"],
+[&"", &"UI_MAIN_MENU_SURE"]: [&"Runde beenden? Nochmal klicken"]
 }
