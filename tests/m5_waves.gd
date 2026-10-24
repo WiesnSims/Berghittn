@@ -2,7 +2,8 @@ extends Node
 ## Run: godot --headless --fixed-fps 60 res://tests/m5_waves.tscn
 ## M5 acceptance "wave 10 reachable": the real wave manager runs waves 1 to 10 (boss waves 5 and 10
 ## included) against an immortal bot in the Stube that kills whatever reaches it. Every enemy type must
-## show up and find its way in; an enemy that never arrives counts as stuck.
+## show up and find its way in (a Wilderer is there once he aims at the bot); an enemy that never
+## arrives counts as stuck.
 
 const STAND: Vector3 = Vector3(-2.0, 0.0, 3.5)
 const REACH: float = 7.0
@@ -67,7 +68,7 @@ func _bot() -> void:
 		var id: int = e.get_instance_id()
 		if not _born.has(id):
 			_born[id] = t
-		if e.global_position.distance_to(STAND) <= REACH:
+		if e.global_position.distance_to(STAND) <= REACH or e._state == Enemy.State.AIMING:
 			_types[e.data.id] = _types.get(e.data.id, 0) + 1
 			e.receive_hit(100000, true, false, player)
 		elif t - _born[id] > STUCK_AFTER:
