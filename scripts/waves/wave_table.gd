@@ -21,6 +21,8 @@ extends Resource
 @export var boss_escort_count: int = 6
 @export var boss_first_wave: int = 5
 @export var boss_every: int = 5
+## The Venedigermandl (M9 part 5a): now and then, outside the wave count (Constants.MANDL_*).
+@export var treasure: EnemyData
 
 
 func is_boss_wave(wave: int) -> bool:

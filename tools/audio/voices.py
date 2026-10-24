@@ -1,7 +1,7 @@
 """Enemy voice lines, "Gredn" (M9 part 3): every line spoken by eSpeak NG and run through an undead
 filter per enemy type. The filters are the ones the user approved from the samples (2026-10-23):
 the Wanderer and the Tourist clean (no breath hiss), the Knappe, the Perchte and the Krampus as first
-sampled.
+sampled. The Venedigermandl (M9 part 5a): quick, high and giggly, clean; his Italian in eSpeak's Italian.
 
 eSpeak NG (GPL-3) is only a tool on the dev machine, never shipped; the audio it makes is ours.
     winget install --id eSpeak-NG.eSpeak-NG -e      (or set ESPEAK to the espeak-ng executable)
@@ -127,6 +127,34 @@ def krampus(text):
     return finish(x, 0.3, 1.8)
 
 
+
+def mandl(text, voice="de+m4"):
+    """Quick and high, a giggly wobble on it, clean (no hiss), a small dry room."""
+    x, sr = speak(text, voice, 185, 80)
+    x = at_pitch(x, sr, 1.2)
+    t = np.arange(len(x)) / SR
+    x = d.normalize(x) * (1.0 + 0.22 * np.sin(2 * np.pi * 6.5 * t))
+    x = d.bandpass(d.drive(x, 1.2), 200, 7500)
+    return finish(x, 0.1, 0.6)
+
+
+def mandl_it(text):
+    return mandl(text, "it+m4")
+
+
+def giggle(_text):
+    """A run of quick, rising and falling "hi"s."""
+    parts = []
+    for i, p in enumerate([95, 99, 92, 97, 88, 84]):
+        x, sr = speak("hi", "de+m4", 260, p)
+        x = d.trim(at_pitch(x, sr, 1.3 + 0.05 * (i % 2)))
+        parts.append(x[: d.n_of(0.11)])
+        parts.append(np.zeros(d.n_of(0.025)))
+    x = np.concatenate(parts)
+    t = np.arange(len(x)) / SR
+    x = d.normalize(x) * (1.0 + 0.3 * np.sin(2 * np.pi * 9 * t))
+    return finish(d.bandpass(x, 250, 7500), 0.1, 0.5)
+
 # Sound id -> (filter, how eSpeak is to say it). Every id is used by a line in gredn.gd.
 LINES = {
     "gredn_wanderer_griass_di": (wanderer, "Griaß di. Griaß di."),
@@ -152,6 +180,14 @@ LINES = {
     "gredn_krampus_sackl": (krampus, "In mei Sackl mit dir!"),
     "gredn_krampus_buessn": (krampus, "Des wirst ma büßn!"),
     "gredn_krampus_joahr": (krampus, "I kimm wieder. Nächsts Joahr!"),
+    "gredn_venedigermandl_glanzt": (mandl, "Do glanzt wos!"),
+    "gredn_venedigermandl_gold": (mandl, "Des Gold ghert mir!"),
+    "gredn_venedigermandl_mamma": (mandl_it, "Mamma mia!"),
+    "gredn_venedigermandl_ciao": (mandl, "Tschau, Bergsteiger!"),
+    "gredn_venedigermandl_au": (mandl, "Au, mei Gold!"),
+    "gredn_venedigermandl_arrivederci": (mandl_it, "Arrivederci!"),
+    "gredn_venedigermandl_porca": (mandl_it, "Porca miseria."),
+    "gredn_venedigermandl_giggle": (giggle, ""),
 }
 
 

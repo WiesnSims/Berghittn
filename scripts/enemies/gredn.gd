@@ -9,8 +9,13 @@ extends Node3D
 ## setting is on and the enemy is within GREDN_REACH of its camera, the nearest GREDN_SHOWN at most.
 ## In co-op the host sends the line's index (one byte) to the guests with the enemy (CoopEnemies).
 ## Lines stay in dialect in both languages.
+##
+## The Venedigermandl (M9 part 5a, EnemyData.treasure) has only seconds: he always talks when his
+## moment comes (no dice, no gap between enemies), every MANDL_TALK_GAP at most (his last words and
+## his goodbye even sooner), and is heard from MANDL_VOICE_REACH.
 
-enum Moment { SPOT, IDLE, BARRICADE, HIT, LUNGE, DEATH }
+## APPEAR, RUN and VANISH are the Venedigermandl's: as he turns up, as he runs, as he vanishes.
+enum Moment { SPOT, IDLE, BARRICADE, HIT, LUNGE, DEATH, APPEAR, RUN, VANISH }
 
 const LINE: Script = preload("res://scripts/effects/gredn_line.gd")
 
@@ -41,11 +46,19 @@ const LINES: Array = [
 	[&"krampus", Moment.IDLE, "In mei Sackl mit dir!", &"gredn_krampus_sackl"],
 	[&"krampus", Moment.HIT, "Des wirst ma büßn!", &"gredn_krampus_buessn"],
 	[&"krampus", Moment.DEATH, "I kimm wieder… nächsts Joahr!", &"gredn_krampus_joahr"],
+	[&"venedigermandl", Moment.APPEAR, "Do glanzt wos!", &"gredn_venedigermandl_glanzt"],
+	[&"venedigermandl", Moment.RUN, "Des Gold g'hert mir!", &"gredn_venedigermandl_gold"],
+	[&"venedigermandl", Moment.RUN, "Mamma mia!", &"gredn_venedigermandl_mamma"],
+	[&"venedigermandl", Moment.RUN, "Ciao, Bergsteiger!", &"gredn_venedigermandl_ciao"],
+	[&"venedigermandl", Moment.HIT, "Au, mei Gold!", &"gredn_venedigermandl_au"],
+	[&"venedigermandl", Moment.VANISH, "Arrivederci!", &"gredn_venedigermandl_arrivederci"],
+	[&"venedigermandl", Moment.DEATH, "Porca miseria…", &"gredn_venedigermandl_porca"],
 ]
 const CHANCE: Dictionary = {
 	Moment.SPOT: Constants.GREDN_CHANCE_SPOT, Moment.IDLE: Constants.GREDN_CHANCE_IDLE,
 	Moment.BARRICADE: Constants.GREDN_CHANCE_BARRICADE, Moment.HIT: Constants.GREDN_CHANCE_HIT,
 	Moment.LUNGE: Constants.GREDN_CHANCE_LUNGE, Moment.DEATH: Constants.GREDN_CHANCE_DEATH,
+	Moment.APPEAR: 1.0, Moment.RUN: 1.0, Moment.VANISH: 1.0,
 }
 
 static var current: Gredn
@@ -79,7 +92,11 @@ static func moment(enemy: Enemy, which: Moment) -> int:
 ## Picks a line for `enemy` at this moment, if it may talk and the dice say so: said here, and the
 ## enemy's `said` signal takes it to co-op guests. Returns its index, or -1.
 func talk(enemy: Enemy, which: Moment) -> int:
-	if _gap_left > 0.0 or enemy.talk_left > 0.0 or (not always and randf() >= CHANCE[which]):
+	var treasure: bool = enemy.data.treasure
+	if treasure:
+		if enemy.talk_left > 0.0 and which != Moment.DEATH and which != Moment.VANISH:
+			return -1
+	elif _gap_left > 0.0 or enemy.talk_left > 0.0 or (not always and randf() >= CHANCE[which]):
 		return -1
 	var choices: Array[int] = []
 	for i: int in LINES.size():
@@ -88,8 +105,11 @@ func talk(enemy: Enemy, which: Moment) -> int:
 	if choices.is_empty() or not _player_near(enemy):
 		return -1
 	var line: int = choices.pick_random()
-	_gap_left = randf_range(Constants.GREDN_GAP_MIN, Constants.GREDN_GAP_MAX)
-	enemy.talk_left = Constants.GREDN_ENEMY_GAP
+	if treasure:
+		enemy.talk_left = Constants.MANDL_TALK_GAP
+	else:
+		_gap_left = randf_range(Constants.GREDN_GAP_MIN, Constants.GREDN_GAP_MAX)
+		enemy.talk_left = Constants.GREDN_ENEMY_GAP
 	enemy.said.emit(enemy, line)
 	say(enemy, line)
 	return line
@@ -104,7 +124,7 @@ func say(enemy: Enemy, line: int) -> void:
 	if camera == null:
 		return
 	var distance: float = camera.global_position.distance_to(enemy.global_position)
-	if distance > Constants.GREDN_REACH:
+	if distance > _reach(enemy):
 		return
 	_shown = _shown.filter(func(s: Array) -> bool: return is_instance_valid(s[1]))
 	if _shown.size() >= Constants.GREDN_SHOWN:
@@ -142,13 +162,18 @@ func _physics_process(delta: float) -> void:
 	_gap_left -= delta
 
 
-static func _distance(camera: Camera3D, node: Node3D) -> float:
-	return camera.global_position.distance_to(node.global_position) if is_instance_valid(node) else INF
+# Untyped: the enemy may have been freed meanwhile (a typed argument would fail on it).
+static func _distance(camera: Camera3D, node: Variant) -> float:
+	return camera.global_position.distance_to((node as Node3D).global_position) if is_instance_valid(node) else INF
+
+
+static func _reach(enemy: Enemy) -> float:
+	return Constants.MANDL_VOICE_REACH if enemy.data.treasure else Constants.GREDN_REACH
 
 
 func _player_near(enemy: Enemy) -> bool:
 	for node: Node in get_tree().get_nodes_in_group("player"):
 		var player := node as Node3D
-		if player and player.global_position.distance_to(enemy.global_position) <= Constants.GREDN_REACH:
+		if player and player.global_position.distance_to(enemy.global_position) <= _reach(enemy):
 			return true
 	return false

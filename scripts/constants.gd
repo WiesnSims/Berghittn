@@ -654,3 +654,39 @@ const UNLOCK_WAVE: int = 10
 ## The Raurakl, when hit: two turns in this long (s), and its grumble shows this long after.
 const RAURAKL_SPIN_TIME: float = 0.8
 const RAURAKL_BUBBLE_TIME: float = 2.5
+
+# --- Das Venedigermandl (M9 part 5a, GAME_DESIGN section 12) --------------------------------------
+## From this wave, a MANDL_CHANCE a wave (never a boss wave), MANDL_DELAY_MIN..MAX s into the wave.
+const MANDL_FIRST_WAVE: int = 4
+const MANDL_CHANCE: float = 0.25
+const MANDL_DELAY_MIN: float = 6.0
+const MANDL_DELAY_MAX: float = 20.0
+## He appears at least this far (m) from every player, and vanishes this long (s) after.
+const MANDL_SPAWN_DISTANCE: float = 20.0
+const MANDL_LIFETIME: float = 10.0
+## A player this near (m) sets him running; he digs again once every player is beyond MANDL_CALM.
+const MANDL_NOTICE: float = 15.0
+const MANDL_CALM: float = 18.0
+## Running away: how far ahead (m) he looks for a way, how often (s), the directions he tries
+## (degrees off straight away), and the dart from side to side (share of his speed, darts a second).
+const MANDL_FLEE_LOOKAHEAD: float = 7.0
+const MANDL_REPATH: float = 0.6
+const MANDL_FLEE_ANGLES: Array[float] = [0.0, 35.0, -35.0, 70.0, -70.0, 110.0, -110.0]
+const MANDL_DART: float = 0.75
+const MANDL_DART_RATE: float = 1.3
+## The kill pays MANDL_KILL_POINTS + MANDL_KILL_PER_WAVE * wave to the killer (hits pay as usual).
+const MANDL_KILL_POINTS: int = 1000
+const MANDL_KILL_PER_WAVE: int = 100
+## His voice carries this far (m); a line at most every MANDL_TALK_GAP (s), and a giggle or a running
+## line every MANDL_GIGGLE_MIN..MAX (s) while he runs.
+const MANDL_VOICE_REACH: float = 40.0
+const MANDL_TALK_GAP: float = 2.5
+const MANDL_GIGGLE_MIN: float = 1.4
+const MANDL_GIGGLE_MAX: float = 2.4
+## The faint gold glow round him.
+const MANDL_GLOW_COLOR: Color = Color(1.0, 0.75, 0.3)
+const MANDL_GLOW_ENERGY: float = 2.2
+const MANDL_GLOW_RANGE: float = 4.0
+## Coins knocked out per hit, and spilt from the whole sack when he dies.
+const MANDL_HIT_COINS: int = 10
+const MANDL_KILL_COINS: int = 90

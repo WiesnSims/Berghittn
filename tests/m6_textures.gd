@@ -10,7 +10,7 @@ const TEXTURES_DIR: String = "res://assets/textures"
 const MATERIALS_DIR: String = "res://assets/materials"
 const TEXTURE_SIZE_MAX: int = 256
 ## Hero assets (section 3: the weapons) may be 512.
-const HERO: Array[String] = ["gun_wood.png", "gun_steel.png"]
+const HERO: Array[String] = ["gun_wood.png", "gun_steel.png", "gun_forged.png"]
 const HERO_SIZE_MAX: int = 512
 const TEXTURE_BUDGET: int = 10 * 1024 * 1024
 ## Plain paint: the trail sign and the Speck keep a flat colour (props get models in M6 part 4).

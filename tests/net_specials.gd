@@ -8,7 +8,9 @@ extends Node
 ## tapped, the Tourist's Eisstöcke, each paid in the guest's own game, with the host's banners; an
 ## enemy's line (Gredn) picked by the host is heard and shown on the guest; the guest's gun goes on
 ## the Dengelstock with the host's word, the anvil is busy for the host meanwhile, and the guest's
-## hiker shows empty hands, then the Gendarmen-Pistole; the guest's Kraxn shows on its back.
+## hiker shows empty hands, then the Gendarmen-Pistole; the guest's Kraxn shows on its back; the
+## host's Venedigermandl turns up on the guest with his banner, the guest's kill pays the guest the
+## whole sack, and the next one vanishes on both.
 
 const TIMEOUT: float = 25.0
 const ALPHORN: WeaponData = preload("res://data/weapons/alphorn.tres")
@@ -196,6 +198,45 @@ func _run() -> bool:
 	print("kraxn: on the guest's hiker, two guns strapped to it")
 	if not await _sync("kraxn"):
 		return false
+	# --- the Venedigermandl (M9 part 5a): killed by the guest, then one that vanishes ---
+	# Out in the field, where there is room for him 20 m off (the Stube alone is too small).
+	_player.global_position = Vector3(10.0 if host else 12.0, 0.0, 31.0)
+	if not await _sync("field"):
+		return false
+	await get_tree().create_timer(0.5).timeout
+	for round: String in ["mandl", "mandl_gone"]:
+		if host:
+			waves.wave = 4
+			var mandl: Enemy = waves.send_mandl()
+			if mandl == null:
+				return _fail("no Venedigermandl")
+			# The wave manager is off in this test; he runs on his own.
+			mandl.process_mode = Node.PROCESS_MODE_PAUSABLE
+			if not await _until(func() -> bool: return mandl.net_id != 0):
+				return _fail("the Venedigermandl never went to the guest")
+			_note.rpc(round, mandl.net_id)
+			if not await _until(func() -> bool: return not mandl.is_alive()):
+				return _fail("the host's Venedigermandl stayed (%s)" % round)
+		else:
+			if not await _until(func() -> bool: return _marks.has(round)):
+				return _fail("the host sent no Venedigermandl")
+			var puppet: Enemy = Coop.enemies.by_id(int(_marks[round]))
+			if puppet == null or not puppet.data.treasure or puppet.wave != 4:
+				return _fail("no Venedigermandl puppet")
+			if not _banners.has(tr("EVENT_MANDL")):
+				return _fail("no \"Do glanzt wos!\" banner on the guest")
+			var points: int = _player.points.total
+			if round == "mandl":
+				puppet.receive_hit(99999, true, false, _player)
+				if not await _until(func() -> bool: return _player.points.total == points + 1400):
+					return _fail("the guest's kill paid %d, not 1400" % (_player.points.total - points))
+			elif not await _until(func() -> bool: return not puppet.is_alive()):
+				return _fail("the vanished Venedigermandl stayed on the guest")
+			elif _player.points.total != points:
+				return _fail("his vanishing paid the guest")
+		if not await _sync(round):
+			return false
+	print("venedigermandl: on the guest with his banner, the guest's kill paid the guest, the next vanished on both")
 	# --- the Krampus-Rute drop: one, for whoever is first ---
 	if host:
 		WeaponPickup.spawn(RUTE, _player.global_position + Vector3.FORWARD * 3.0, _main)

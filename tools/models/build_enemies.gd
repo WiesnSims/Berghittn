@@ -1,5 +1,5 @@
 extends SceneTree
-## Builds the five enemy models (M6 part 4) into assets/models/enemies, each at its EnemyData
+## Builds the enemy models (M6 part 4; the Venedigermandl, M9 part 5a) into assets/models/enemies, each at its EnemyData
 ## model_scale, with the stance and swing its EnemyRig plays, and the living Deitscha Tourist
 ## (assets/models/guest.tscn, part 4c):
 ##
@@ -34,6 +34,7 @@ func _init() -> void:
 	_knappe()
 	_perchte()
 	_krampus()
+	_mandl()
 	_guest()
 	print("enemy models built")
 	quit()
@@ -377,6 +378,61 @@ func _krampus() -> void:
 				&"forearm_r": Vector3(25, 0, 0), &"chest": Vector3(-14, 0, 0), &"head": Vector3(10, 0, 0),
 				&"thigh_l": Vector3(8, 0, -6), &"thigh_r": Vector3(8, 0, 6), &"shin_l": Vector3(-14, 0, 0), &"shin_r": Vector3(-14, 0, 0)},
 		"stride": 22.0, "arm_swing": 12.0, "cadence": 1.1})
+
+
+## Das Venedigermandl (M9 part 5a): a small hunched man from Venice in a long dark coat and a pointed
+## hat, with a white beard, a pick in his right hand and a fat sack of gold on his back that glows
+## through its seams. Alive (white eyes); built small (model_scale), so he is hard to hit.
+func _mandl() -> void:
+	var b := Builder.new(_scale("venedigermandl"))
+	_standard(b)
+	var coat := Color(0.16, 0.12, 0.1)
+	var skin := Color(0.78, 0.58, 0.46)
+	var hat := Color(0.52, 0.1, 0.08)
+	var gold := Color(1.0, 0.78, 0.25)
+	var sack := Color(0.5, 0.38, 0.22)
+	# The long coat, down past the knees, and a rope belt.
+	_torso(b, [[0.42, 0.22, 0.17], [0.6, 0.2, 0.15], [0.86, 0.18, 0.13], [1.0, 0.17, 0.125], [WAIST.y, 0.17, 0.12], [1.26, 0.2, 0.13], [1.4, 0.22, 0.13], [1.47, 0.16, 0.1], [1.5, 0.07, 0.06]], &"wool", coat, 9)
+	b.tube([Vector3(0.0, 0.98, 0.0), Vector3(0.0, 1.01, 0.0)], [Vector2(0.178, 0.133), Vector2(0.178, 0.133)], &"linen", Color(0.62, 0.5, 0.32), &"hips", 9, false)
+	_legs(b, Vector2(0.075, 0.08), Vector2(0.05, 0.055), &"wool", coat.darkened(0.2), &"wool", Color(0.3, 0.22, 0.14))
+	_boots(b, Color(0.2, 0.12, 0.07), Vector3(0.11, 0.1, 0.25))
+	_arms(b, Vector2(0.07, 0.07), Vector2(0.055, 0.055), &"wool", coat)
+	_hands(b, skin)
+	# The pick in the right hand: shaft forward, head up.
+	var hand_r := Vector3(-WRIST.x, WRIST.y - 0.07, 0.0)
+	b.tube([hand_r + Vector3(0, 0, 0.14), hand_r + Vector3(0, 0, -0.45)], [Vector2(0.02, 0.02), Vector2(0.022, 0.022)], &"wood", Color(0.5, 0.34, 0.2), &"hand_r", 6)
+	b.tube([hand_r + Vector3(0, 0.22, -0.43), hand_r + Vector3(0, 0.02, -0.46), hand_r + Vector3(0, -0.15, -0.4)], [Vector2(0.007, 0.007), Vector2(0.026, 0.034), Vector2(0.007, 0.007)], &"metal", Color(0.5, 0.52, 0.55), &"hand_r", 5)
+	# The sack of gold on his back: tied at the top, coins showing, the gold shining through the seams.
+	b.ball(Vector3(0.0, 1.2, 0.27), Vector3(0.24, 0.28, 0.2), &"linen", sack, &"chest", 10, 7)
+	b.tube([Vector3(0.0, 1.44, 0.27), Vector3(0.0, 1.52, 0.29)], [Vector2(0.07, 0.06), Vector2(0.1, 0.08)], &"linen", sack.darkened(0.1), &"chest", 8)
+	b.tube([Vector3(0.0, 1.43, 0.27), Vector3(0.0, 1.46, 0.27)], [Vector2(0.075, 0.065), Vector2(0.075, 0.065)], &"leather", Color(0.25, 0.15, 0.08), &"chest", 8, false)
+	b.ball(Vector3(0.0, 1.53, 0.29), Vector3(0.08, 0.035, 0.065), &"glow", gold, &"chest", 7, 3)
+	for k: int in 3:
+		var a: float = -0.6 + k * 0.6
+		b.box(Vector3(sin(a) * 0.245, 1.2 + k * 0.05 - 0.05, 0.27 + cos(a) * 0.205), Vector3(0.012, 0.3, 0.012), &"glow", gold, &"chest", Basis(Vector3.FORWARD, a * 0.3))
+	b.box(Vector3(-0.06, 1.0, 0.43), Vector3(0.05, 0.05, 0.012), &"glow", gold, &"chest", Basis(Vector3.RIGHT, 0.4))
+	# The strap over the left shoulder.
+	b.box(Vector3(0.11, 1.3, -0.12), Vector3(0.04, 0.38, 0.02), &"leather", Color(0.25, 0.15, 0.08), &"chest", Basis(Vector3.FORWARD, -0.35))
+	_face(b, skin, EYE, Vector3(0.0, 1.63, -0.02), Vector3(0.11, 0.135, 0.12), true)
+	b.head(true)
+	# A big nose, bushy brows, the long white beard and the pointed hat with a gold band.
+	b.ball(Vector3(0.0, 1.6, -0.16), Vector3(0.035, 0.04, 0.045), &"skin", skin.darkened(0.12), &"head", 6, 4)
+	b.box(Vector3(0.0, 1.675, -0.135), Vector3(0.17, 0.025, 0.035), &"fur", Color(0.88, 0.86, 0.82), &"head")
+	b.ball(Vector3(0.0, 1.53, -0.1), Vector3(0.1, 0.09, 0.07), &"fur", Color(0.9, 0.88, 0.84), &"head", 8, 5)
+	b.spike([Vector3(0.0, 1.53, -0.13), Vector3(0.0, 1.4, -0.15), Vector3(0.0, 1.28, -0.13)], 0.075, &"fur", Color(0.9, 0.88, 0.84), &"head", 6)
+	b.tube([Vector3(0.0, 1.71, -0.02), Vector3(0.0, 1.73, -0.02)], [Vector2(0.17, 0.17), Vector2(0.16, 0.16)], &"wool", hat, &"head", 10)
+	b.spike([Vector3(0.0, 1.72, -0.02), Vector3(0.0, 1.9, 0.0), Vector3(0.0, 2.06, 0.06), Vector3(0.0, 2.16, 0.16)], 0.125, &"wool", hat, &"head", 9)
+	b.tube([Vector3(0.0, 1.73, -0.02), Vector3(0.0, 1.76, -0.02)], [Vector2(0.126, 0.126), Vector2(0.122, 0.122)], &"glow", gold, &"head", 9, false)
+	b.head(false)
+	b.ragdoll({&"arm_l": 0.07, &"forearm_l": 0.055, &"arm_r": 0.07, &"forearm_r": 0.055,
+			&"thigh_l": 0.08, &"shin_l": 0.055, &"thigh_r": 0.08, &"shin_r": 0.055},
+			Vector3(0.36, 0.24, 0.28), Vector3(0.4, 0.38, 0.3), 0.13)
+	b.save(OUT + "/venedigermandl.tscn", "VenedigermandlModel", RIG, {
+		"build_scale": b.scale, "one_handed": true,
+		"stance": {&"arm_r": Vector3(35, 0, 6), &"forearm_r": Vector3(40, 0, 0), &"arm_l": Vector3(-15, 0, -10),
+				&"forearm_l": Vector3(60, 0, 0), &"chest": Vector3(-26, 0, 0), &"head": Vector3(24, 0, 0),
+				&"thigh_l": Vector3(10, 0, -4), &"thigh_r": Vector3(10, 0, 4), &"shin_l": Vector3(-16, 0, 0), &"shin_r": Vector3(-16, 0, 0)},
+		"stride": 32.0, "arm_swing": 8.0, "cadence": 1.6})
 
 
 ## The Deitscha Tourist (section 8a), alive (M6 part 4c): sunburnt, a striped shirt over his belly, a
