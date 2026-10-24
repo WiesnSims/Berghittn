@@ -29,6 +29,25 @@ const AIM_SENSITIVITY_MIN: float = 0.2
 const AIM_SENSITIVITY_MAX: float = 1.0
 const DEFAULT_VOLUME: float = 0.8
 const RENDER_SCALE_MIN: float = 0.5
+## Antialiasing (Settings, 1.1.2): off, FXAA (our own pass in post_fx, nearly free), MSAA 2x or 4x
+## (the renderer's, smoother edges but more for the GPU to do). FXAA by default.
+enum Antialiasing { OFF, FXAA, MSAA_2X, MSAA_4X }
+const ANTIALIASING_KEYS: Array[String] = ["UI_AA_OFF", "UI_AA_FXAA", "UI_AA_MSAA_2X", "UI_AA_MSAA_4X"]
+const DEFAULT_ANTIALIASING: int = Antialiasing.FXAA
+## Field of view (degrees, vertical) the player can pick in Settings (1.1.2); 75 was the fixed one.
+const DEFAULT_FOV: float = 75.0
+const FOV_MIN: float = 70.0
+const FOV_MAX: float = 100.0
+## Crosshair colours to pick from (Settings, 1.1.2), the first is the default, and its size.
+const CROSSHAIR_COLORS: Array[Color] = [
+	Color(0.95, 0.95, 0.9), Color(0.35, 1.0, 0.35), Color(1.0, 0.9, 0.2), Color(0.3, 0.95, 1.0),
+	Color(1.0, 0.4, 0.85), Color(1.0, 0.3, 0.25),
+]
+const CROSSHAIR_COLOR_KEYS: Array[String] = [
+	"UI_COLOR_WHITE", "UI_COLOR_GREEN", "UI_COLOR_YELLOW", "UI_COLOR_CYAN", "UI_COLOR_PINK", "UI_COLOR_RED",
+]
+const CROSSHAIR_SIZE_MIN: float = 0.5
+const CROSSHAIR_SIZE_MAX: float = 2.0
 
 # Chrome refuses a new pointer lock for about a second after the user pressed Esc to exit one.
 const POINTER_RELOCK_DELAY: float = 1.2
@@ -367,6 +386,24 @@ const DENGEL_WAVE: int = 5
 const DENGEL_OPEN_DELAY: float = 3.5
 ## Points for dengeln (level 1) and doppelt dengeln (level 2).
 const DENGEL_COST: Array[int] = [5000, 10000]
+## Ammo for a forged gun costs this much more, by its level (plain, dengelt, doppelt dengelt), at the
+## Munitionskiste and at its wall-buy (balance 1.1.2: forged guns were refilled too cheaply).
+const DENGEL_AMMO_EXTRA: Array[int] = [0, 500, 1000]
+## Stumpf (1.1.2): a doppelt dengelt weapon loses its edge after this many kills and is dengelt again;
+## sharpening it back at the Dengelstock costs DENGEL_RESHARPEN_COST instead of DENGEL_COST[1].
+const STUMPF_KILLS: int = 150
+const DENGEL_RESHARPEN_COST: int = 5000
+## The HUD warns once this many kills of the edge are left.
+const STUMPF_WARN: int = 25
+## Sitzfleisch (1.1.2): a player who stays within SITZ_RADIUS (m) of one spot for SITZ_TIME (s) of a
+## wave, from SITZ_FIRST_WAVE on, gets a Wilderer and SITZ_FLOCK Bergdohlen sent after them, a banner
+## and a taunt from the nearest enemy; the clock starts over when they move (or after the visit).
+const SITZ_RADIUS: float = 5.0
+const SITZ_TIME: float = 45.0
+const SITZ_FIRST_WAVE: int = 3
+const SITZ_FLOCK: int = 3
+## They come from the nearest open spawn point at least this far (m) from the camper, if there is one.
+const SITZ_SPAWN_MIN: float = 15.0
 ## Seconds of hammering, and seconds the forged weapon waits to be taken before it is gone.
 const DENGEL_TIME: float = 10.0
 const DENGEL_WAIT: float = 30.0
@@ -599,7 +636,7 @@ const BOARD_TIMEOUT: float = 8.0
 const BOARD_REMEMBERED: int = 200
 ## Co-op: the host waits this long (s) at most for everyone's run before sending the group's.
 const BOARD_COOP_WAIT: float = 4.0
-const BOARD_PANEL_SIZE: Vector2 = Vector2(980, 440)
+const BOARD_PANEL_SIZE: Vector2 = Vector2(980, 360)
 const BOARD_FONT_SIZE: int = 18
 const NET_CODE_LENGTH: int = 4
 ## The host can start once this many are in the lobby.

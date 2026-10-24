@@ -140,6 +140,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
+	# The field of view from Settings (1.1.2); aiming narrows it to the gun's own.
+	_base_fov = Settings.fov
 	var aim: float = weapons.aim_eased() if weapons.weapon else 0.0
 	var aim_fov: float = weapons.weapon.aim_fov if weapons.weapon else _base_fov
 	_camera.fov = lerpf(_base_fov, aim_fov, aim)

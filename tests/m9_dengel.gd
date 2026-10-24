@@ -8,6 +8,8 @@ extends Node
 ## gun left, the pistol comes back); the shovel at the grindstone comes back as the
 ## Schneefräsn-Schaufl, whose blow leaves the survivor dazed; the Dienstpistole doppelt dengelt is
 ## the Golden Gun, all gold, killing whatever it hits (bosses too).
+## Balance 1.1.2: the reserve only x1.25 / x1.5, the right-click mode takes x1.5 / x2 the rounds, and
+## ammo for a forged gun costs more at its wall-buy and at the Munitionskiste.
 
 const BASES: Array[String] = ["pistole", "jagdflinte", "stutzen", "repetierer", "schaufel", "alphorn", "knoedelwerfer",
 		"handboeller", "rodelkanone", "harmonika", "brennkessel", "goassl", "mistgabel", "schmarrnpfanne", "krampusrute"]
@@ -95,8 +97,12 @@ func _check_data() -> void:
 				and two.family_id() == base.id and base.family_id() == base.id
 		ok = ok and one.damage == base.damage * 2 and two.damage == base.damage * 4
 		ok = ok and is_equal_approx(one.damage * one.boss_multiplier, base.damage * 1.5) and is_equal_approx(two.damage * two.boss_multiplier, base.damage * 2.25)
-		ok = ok and one.mag_size == ceili(base.mag_size * 1.5) and two.mag_size == base.mag_size * 2
-		ok = ok and one.reserve_ammo == base.reserve_ammo * 2 and two.reserve_ammo == base.reserve_ammo * 4
+		ok = ok and one.mag_size == ceili(base.mag_size * 1.5) and one.reserve_ammo == ceili(base.reserve_ammo * 1.25)
+		# The Golden Gun has its own (checked in _golden_gun).
+		if not two.golden:
+			ok = ok and two.mag_size == base.mag_size * 2 and two.reserve_ammo == ceili(base.reserve_ammo * 1.5)
+		if base.secondary_rounds > 1:
+			ok = ok and one.secondary_rounds == ceili(base.secondary_rounds * 1.5) and two.secondary_rounds == base.secondary_rounds * 2
 		ok = ok and one.sound_pitch < 1.0 and two.sound_pitch < one.sound_pitch
 		for i: int in base.ricochet_damage.size():
 			ok = ok and one.ricochet_damage[i] == base.ricochet_damage[i] * 2 and two.ricochet_damage[i] == base.ricochet_damage[i] * 4
@@ -192,6 +198,17 @@ func _dengel_the_stutzen() -> void:
 	_check(weapons.needs_ammo(stutzen), "its wall-buy sells it ammo")
 	weapons.refill_ammo(stutzen)
 	_check(weapons.reserve == gun.reserve_ammo, "the wall-buy fills its own reserve (%d)" % weapons.reserve)
+	_check(weapons.ammo_extra(stutzen) == Constants.DENGEL_AMMO_EXTRA[1], "its ammo costs %d more" % weapons.ammo_extra(stutzen))
+	var wall: WallBuy = null
+	for buy: WallBuy in main.find_children("*", "WallBuy", true, false):
+		if buy.weapon == stutzen:
+			wall = buy
+	weapons.reserve = 3
+	_check(wall != null and wall._ammo_price(player) == stutzen.ammo_cost + Constants.DENGEL_AMMO_EXTRA[1],
+			"at the wall-buy: %d" % (wall._ammo_price(player) if wall else 0))
+	var crate := main.find_children("*", "AmmoCrate", true, false)[0] as AmmoCrate
+	_check(crate.price_for(player) == crate.cost + Constants.DENGEL_AMMO_EXTRA[1], "at the Munitionskiste: %d" % crate.price_for(player))
+	weapons.refill_ammo(stutzen)
 	Events.enemy_killed.emit(null, false, false, player)
 	_check(player.stats.favourite() == gun and player.stats.kills_with(gun) == 3, "the death screen counts its kills with the Stutzen's, under its new name")
 
@@ -330,3 +347,12 @@ func _golden_gun() -> void:
 	await _frames(1)
 	_check(not boss.is_alive(), "one shot fells a Krampus with %d health" % boss.max_health)
 	weapons.force_aim = false
+	# Balance 1.1.2: one round in it, nine to spare, and nothing tops it up.
+	_check(gun.loaded_capacity(true) == 1 and gun.reserve_ammo == 9 and not gun.refillable, "1 round and 9 to spare (%d / %d)" % [gun.mag_size, gun.reserve_ammo])
+	weapons.reserve = 2
+	var crate := main.find_children("*", "AmmoCrate", true, false)[0] as AmmoCrate
+	_check(not weapons.needs_ammo(gun) and crate.get_interact_prompt(player) == "" or weapons.needs_any_ammo() and crate.price_for(player) == crate.cost,
+		"no wall-buy ammo and no Munitionskiste for it")
+	weapons.refill_all()
+	weapons.refill_current()
+	_check(weapons.reserve == 2, "and no Murmeltier: still %d to spare" % weapons.reserve)

@@ -16,7 +16,8 @@ extends Node3D
 
 ## APPEAR, RUN and VANISH are the Venedigermandl's: as he turns up, as he runs, as he vanishes.
 ## AIM and SHOT are the Wilderer's: as he starts to aim, and when his shot hits.
-enum Moment { SPOT, IDLE, BARRICADE, HIT, LUNGE, DEATH, APPEAR, RUN, VANISH, AIM, SHOT }
+## SITZ is Sitzfleisch (1.1.2): the nearest enemy mocks a player who stays put too long (taunt).
+enum Moment { SPOT, IDLE, BARRICADE, HIT, LUNGE, DEATH, APPEAR, RUN, VANISH, AIM, SHOT, SITZ }
 
 const LINE: Script = preload("res://scripts/effects/gredn_line.gd")
 
@@ -59,13 +60,19 @@ const LINES: Array = [
 	[&"wilderer", Moment.AIM, "Hob di!", &"gredn_wilderer_hob_di"],
 	[&"wilderer", Moment.SHOT, "Waidmannsheil!", &"gredn_wilderer_waidmannsheil"],
 	[&"wilderer", Moment.DEATH, "Waidmannsdank…", &"gredn_wilderer_waidmannsdank"],
+	[&"wanderer", Moment.SITZ, "Wurzln schlagst do, oder wos?", &"gredn_wanderer_sitz"],
+	[&"tourist", Moment.SITZ, "Bist do festgwachsn?", &"gredn_tourist_sitz"],
+	[&"knappe", Moment.SITZ, "Do hockt oana wia a Schwammerl.", &"gredn_knappe_sitz"],
+	[&"perchte", Moment.SITZ, "Hockn bleibn? Hö-hö-hö!", &"gredn_perchte_sitz"],
+	[&"krampus", Moment.SITZ, "Wer hockt, den hol i!", &"gredn_krampus_sitz"],
+	[&"wilderer", Moment.SITZ, "Do hockt mei Wild.", &"gredn_wilderer_sitz"],
 ]
 const CHANCE: Dictionary = {
 	Moment.SPOT: Constants.GREDN_CHANCE_SPOT, Moment.IDLE: Constants.GREDN_CHANCE_IDLE,
 	Moment.BARRICADE: Constants.GREDN_CHANCE_BARRICADE, Moment.HIT: Constants.GREDN_CHANCE_HIT,
 	Moment.LUNGE: Constants.GREDN_CHANCE_LUNGE, Moment.DEATH: Constants.GREDN_CHANCE_DEATH,
 	Moment.APPEAR: 1.0, Moment.RUN: 1.0, Moment.VANISH: 1.0,
-	Moment.AIM: Constants.GREDN_CHANCE_AIM, Moment.SHOT: Constants.GREDN_CHANCE_SHOT,
+	Moment.AIM: Constants.GREDN_CHANCE_AIM, Moment.SHOT: Constants.GREDN_CHANCE_SHOT, Moment.SITZ: 1.0,
 }
 
 static var current: Gredn
@@ -117,6 +124,25 @@ func talk(enemy: Enemy, which: Moment) -> int:
 	else:
 		_gap_left = randf_range(Constants.GREDN_GAP_MIN, Constants.GREDN_GAP_MAX)
 		enemy.talk_left = Constants.GREDN_ENEMY_GAP
+	enemy.said.emit(enemy, line)
+	say(enemy, line)
+	return line
+
+
+## Sitzfleisch: `enemy` mocks a player who stays put, whatever the dice and the gaps say (solo, or
+## the host). Returns the line's index, or -1 if it has no such line.
+func taunt(enemy: Enemy) -> int:
+	if enemy.puppet:
+		return -1
+	var choices: Array[int] = []
+	for i: int in LINES.size():
+		if LINES[i][0] == enemy.data.id and LINES[i][1] == Moment.SITZ:
+			choices.append(i)
+	if choices.is_empty():
+		return -1
+	var line: int = choices.pick_random()
+	_gap_left = randf_range(Constants.GREDN_GAP_MIN, Constants.GREDN_GAP_MAX)
+	enemy.talk_left = Constants.GREDN_ENEMY_GAP
 	enemy.said.emit(enemy, line)
 	say(enemy, line)
 	return line

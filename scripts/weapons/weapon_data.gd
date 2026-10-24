@@ -149,6 +149,9 @@ enum Secondary { NONE, AIM, SCOPE, ALL_BARRELS, RICOCHET, BEHAVIOR, BLOCK, PLAY 
 ## and the whole gun is gold, not only its steel.
 @export var one_hit: bool = false
 @export var golden: bool = false
+## False for a gun whose ammo is never topped up (the Golden Gun, 1.1.2): no wall-buy ammo, no
+## Munitionskiste, no Murmeltier refill.
+@export var refillable: bool = true
 
 
 ## The base weapon's id: the same for a gun and its dengelt versions.

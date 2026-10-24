@@ -7,6 +7,25 @@ extends RefCounted
 
 const ENTRIES: Array[Dictionary] = [
 	{
+		"version": "1.1.2", "date": "2026-10-24",
+		"en": [
+			"Balance: forged guns carry less spare ammo, their right-click modes use more rounds, and their ammo costs more.",
+			"Stumpf: a doppelt dengelt weapon goes dull after 150 kills. Sharpen it again at the Dengelstock for half the price.",
+			"Sitzfleisch: whoever stays in one spot too long during a wave gets visitors.",
+			"Settings: key bindings for every action, field of view, aiming by toggle, the crosshair's colour and size, and antialiasing (FXAA, MSAA 2×/4×).",
+			"Six new title screen pictures, taking turns.",
+			"Main menu: from the pause menu and the end screen, which also opens the Gipfelbuch.",
+		],
+		"de": [
+			"Balance: geschmiedete Waffen tragen weniger Reservemunition, ihr Rechtsklick braucht mehr Schuss, und ihre Munition kostet mehr.",
+			"Stumpf: eine doppelt dengelte Waffe wird nach 150 Abschüssen stumpf. Am Dengelstock um den halben Preis wieder schärfen lassen.",
+			"Sitzfleisch: Wer während einer Welle zu lang an einem Fleck hockt, kriegt Besuch.",
+			"Einstellungen: Tastenbelegung für jede Aktion, Sichtfeld, Zielen per Umschalten, Farbe und Größe des Fadenkreuzes, und Kantenglättung (FXAA, MSAA 2×/4×).",
+			"Sechs neue Bilder im Titelbildschirm, die sich abwechseln.",
+			"Hauptmenü: aus dem Pausenmenü und vom Endbildschirm, der auch das Gipfelbuch öffnet.",
+		],
+	},
+	{
 		"version": "1.1.1", "date": "2026-10-24",
 		"en": [
 			"Das Gipfelbuch: the global leaderboard on the title screen, Solo and Co-op, all time and this week.",

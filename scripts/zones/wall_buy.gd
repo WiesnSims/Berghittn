@@ -49,8 +49,14 @@ func get_interact_prompt(player: Node3D) -> String:
 		return tr(key) % [gun_name, weapon.cost]
 	if not buyer.weapons.needs_ammo(weapon):
 		return ""
-	var ammo_key: String = "UI_BUY_AMMO" if buyer.points.can_afford(weapon.ammo_cost) else "UI_BUY_AMMO_NEED"
-	return tr(ammo_key) % [gun_name, weapon.ammo_cost]
+	var price: int = _ammo_price(buyer)
+	var ammo_key: String = "UI_BUY_AMMO" if buyer.points.can_afford(price) else "UI_BUY_AMMO_NEED"
+	return tr(ammo_key) % [gun_name, price]
+
+
+## Half the gun's price, and more for a forged one (WeaponHolder.ammo_extra, balance 1.1.2).
+func _ammo_price(buyer: Player) -> int:
+	return weapon.ammo_cost + buyer.weapons.ammo_extra(weapon)
 
 
 func interact(player: Node3D) -> void:
@@ -62,7 +68,7 @@ func interact(player: Node3D) -> void:
 	if not buyer.weapons.has_weapon(weapon):
 		if buyer.points.spend(weapon.cost):
 			buyer.weapons.give_weapon(weapon)
-	elif buyer.weapons.needs_ammo(weapon) and buyer.points.spend(weapon.ammo_cost):
+	elif buyer.weapons.needs_ammo(weapon) and buyer.points.spend(_ammo_price(buyer)):
 		buyer.weapons.refill_ammo(weapon)
 
 

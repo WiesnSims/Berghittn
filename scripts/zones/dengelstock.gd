@@ -92,6 +92,13 @@ static func cost_of(data: WeaponData) -> int:
 	return Constants.DENGEL_COST[clampi(data.level, 0, Constants.DENGEL_COST.size() - 1)]
 
 
+## What `player` pays to dengel `data` once more: less to sharpen a weapon that went dull (Stumpf).
+static func cost_for(player: Player, data: WeaponData) -> int:
+	if data.level == 1 and player.weapons.is_dulled(data):
+		return Constants.DENGEL_RESHARPEN_COST
+	return cost_of(data)
+
+
 # Interactable interface (see Interactor); the grindstone asks with `for_melee`.
 
 func get_interact_position() -> Vector3:
@@ -115,9 +122,11 @@ func prompt_for(player: Player, for_melee: bool) -> String:
 			var data: WeaponData = _held(player, for_melee)
 			if data == null or data.upgrade == null:
 				return ""
-			var cost: int = cost_of(data)
+			var cost: int = cost_for(player, data)
 			if not player.points.can_afford(cost):
 				return tr("UI_DENGEL_NEED") % [tr(data.display_name), cost]
+			if player.weapons.is_dulled(data):
+				return tr("UI_DENGEL_RESHARPEN") % [tr(data.display_name), cost]
 			return tr("UI_DENGEL_TWICE" if data.level > 0 else "UI_DENGEL") % [tr(data.display_name), cost]
 		State.FORGING:
 			if for_melee:
@@ -139,12 +148,13 @@ func use(player: Player, for_melee: bool) -> void:
 	if state != State.OPEN:
 		return
 	var data: WeaponData = _held(player, for_melee)
-	if data == null or data.upgrade == null or not player.points.spend(cost_of(data)):
+	var cost: int = cost_for(player, data) if data else 0
+	if data == null or data.upgrade == null or not player.points.spend(cost):
 		return
 	Sound.play(&"buy")
 	# Co-op: the host says whether the anvil is still free (and pays back if it was not).
 	if Coop.is_guest():
-		Coop.world.request_dengel(self, data.upgrade, for_melee, cost_of(data))
+		Coop.world.request_dengel(self, data.upgrade, for_melee, cost)
 		return
 	start(player, data.upgrade, for_melee)
 

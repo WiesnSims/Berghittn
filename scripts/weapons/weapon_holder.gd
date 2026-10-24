@@ -17,6 +17,11 @@ signal melee_changed(data: WeaponData)
 signal slots_changed(count: int)
 ## Emitted when a shot hit an enemy, for the hit marker.
 signal hit_confirmed(is_headshot: bool, killed: bool)
+## A doppelt dengelt weapon in hand made a kill: `left` kills of its edge remain, of STUMPF_KILLS
+## (`melee` for the melee weapon). Stumpf, 1.1.2.
+signal edge_changed(left: int, melee: bool)
+## A doppelt dengelt weapon went dull: `was` is dengelt again now, `now`.
+signal went_dull(was: WeaponData, now: WeaponData)
 ## Co-op (M7): something the others should see (a shot, a swing, a held mode), for CoopPlayers to
 ## pass on; their copy of these guns replays it (ghost).
 signal acted(action: Act, rounds: int)
@@ -36,6 +41,8 @@ class GunSlot:
 	var viewmodel: Viewmodel
 	## What a shot does for a special weapon (section 6a); null for plain hitscan.
 	var behavior: WeaponBehavior
+	## Kills left before a doppelt dengelt gun goes dull (Stumpf); 0 for the others.
+	var edge: int = 0
 
 @export var starting_weapon: WeaponData
 ## Always carried (section 6: the shovel until the melee slot gets replaced).
@@ -129,12 +136,19 @@ var _ghost_flame: CPUParticles3D
 var _ghost_flash: OmniLight3D
 # Seconds the hands hold only the melee weapon after a gun went to the Dengelstock (M9 part 4).
 var _hands_free_left: float = 0.0
+# Aiming by toggle (Settings.toggle_aim): a right click puts the sights up, the next one down.
+var _aim_toggled: bool = false
+# Stumpf: kills left of the doppelt dengelt melee weapon's edge, and the families that went dull and
+# have not been sharpened again since (cheaper at the Dengelstock).
+var _melee_edge: int = 0
+var _dulled: Dictionary = {}
 
 
 func _ready() -> void:
 	_rng.randomize()
 	if ghost:
 		return
+	Events.enemy_killed.connect(_on_enemy_killed)
 	_starting_melee = melee_weapon
 	if starting_weapon:
 		give_weapon(starting_weapon)
@@ -205,6 +219,9 @@ func _new_slot(data: WeaponData) -> GunSlot:
 	slot.data = data
 	slot.mag = data.loaded_capacity(true)
 	slot.reserve = data.reserve_ammo
+	slot.edge = Constants.STUMPF_KILLS if data.level >= 2 else 0
+	if data.level >= 2:
+		_dulled.erase(data.family_id())
 	if data.viewmodel:
 		# Built once per gun and kept: instancing on every switch would hitch in the middle of a fight.
 		slot.viewmodel = data.viewmodel.instantiate() as Viewmodel
@@ -229,7 +246,8 @@ func set_downed(on: bool, pistol: WeaponData) -> void:
 		_before_down = _current
 		_hands_free_left = 0.0
 		var index: int = _slot_of(pistol)
-		if index < 0:
+		# The Golden Gun is not the pistol to crawl with: its few rounds are kept for later.
+		if index < 0 or not _slots[index].data.refillable:
 			_slots.append(_new_slot(pistol))
 			_borrowed = true
 			index = _slots.size() - 1
@@ -338,6 +356,23 @@ func _stop_playing_if_needed() -> void:
 		_stop_playing()
 
 
+## What refilling the carried `data` (or its forged version) costs on top: DENGEL_AMMO_EXTRA by level.
+func ammo_extra(data: WeaponData) -> int:
+	var index: int = _slot_of(data)
+	if index < 0:
+		return 0
+	return Constants.DENGEL_AMMO_EXTRA[clampi(_slots[index].data.level, 0, Constants.DENGEL_AMMO_EXTRA.size() - 1)]
+
+
+## The Munitionskiste's extra: ammo_extra of every carried gun it would refill.
+func crate_extra() -> int:
+	var extra: int = 0
+	for slot: GunSlot in _slots:
+		if needs_ammo(slot.data):
+			extra += ammo_extra(slot.data)
+	return extra
+
+
 ## Carried, as it is or dengelt.
 func has_weapon(data: WeaponData) -> bool:
 	if data.is_melee:
@@ -360,7 +395,64 @@ func set_melee(data: WeaponData) -> void:
 		_melee_viewmodel = data.viewmodel.instantiate() as MeleeViewmodel
 		ForgedLook.dress(_melee_viewmodel, data)
 		_motion.add_child(_melee_viewmodel)
+	_melee_edge = Constants.STUMPF_KILLS if data and data.level >= 2 else 0
+	if data and data.level >= 2:
+		_dulled.erase(data.family_id())
 	melee_changed.emit(data)
+
+
+## Stumpf: kills left of the edge of the gun in hand (or the melee weapon); -1 if it is not doppelt
+## dengelt.
+func edge_left(melee: bool = false) -> int:
+	if melee:
+		return _melee_edge if melee_weapon and melee_weapon.level >= 2 else -1
+	if _current < 0 or weapon == null or weapon.level < 2:
+		return -1
+	return _slots[_current].edge
+
+
+## This weapon's kind went dull and was not sharpened again since (the Dengelstock asks).
+func is_dulled(data: WeaponData) -> bool:
+	return data != null and _dulled.has(data.family_id())
+
+
+# A kill of ours wears down the edge of what it was made with: the melee weapon, or the gun in hand
+# (like the death screen's count, a burn or a thrown thing goes to what is in hand).
+func _on_enemy_killed(_enemy: Node3D, _is_headshot: bool, is_melee: bool, source: Node3D) -> void:
+	if source == null or source != _shooter:
+		return
+	if is_melee:
+		if melee_weapon == null or melee_weapon.level < 2 or _melee_edge <= 0:
+			return
+		_melee_edge -= 1
+		edge_changed.emit(_melee_edge, true)
+		if _melee_edge == 0:
+			_go_dull(true)
+		return
+	if _current < 0 or weapon == null or weapon.level < 2 or _slots[_current].edge <= 0:
+		return
+	_slots[_current].edge -= 1
+	edge_changed.emit(_slots[_current].edge, false)
+	if _slots[_current].edge == 0:
+		_go_dull(false)
+
+
+# Doppelt dengelt -> dengelt: the same kind one level down, keeping what ammo still fits.
+func _go_dull(melee: bool) -> void:
+	var was: WeaponData = melee_weapon if melee else weapon
+	var dull := load("res://data/weapons/%s_dengelt.tres" % was.family_id()) as WeaponData
+	if dull == null:
+		return
+	_dulled[was.family_id()] = true
+	if melee:
+		set_melee(dull)
+	else:
+		var slot: GunSlot = _new_slot(dull)
+		slot.mag = mini(mag, dull.mag_size)
+		slot.reserve = mini(reserve, dull.reserve_ammo)
+		_replace_current(slot)
+	Sound.play(&"anvil_clang", -4.0, 0.6)
+	went_dull.emit(was, dull)
 
 
 ## Holding the melee weapon up as a guard right now. Walking slows down; guns cannot fire.
@@ -398,7 +490,7 @@ func block(attacker: Node3D) -> bool:
 ## (A dengelt gun counts for its base: its own, larger reserve is what gets filled.)
 func needs_ammo(data: WeaponData) -> bool:
 	var index: int = _slot_of(data)
-	if index < 0:
+	if index < 0 or not _slots[index].data.refillable:
 		return false
 	var spare: int = reserve if index == _current else _slots[index].reserve
 	return spare < _slots[index].data.reserve_ammo
@@ -406,7 +498,7 @@ func needs_ammo(data: WeaponData) -> bool:
 
 func refill_ammo(data: WeaponData) -> void:
 	var index: int = _slot_of(data)
-	if index < 0:
+	if index < 0 or not _slots[index].data.refillable:
 		return
 	var full: int = _slots[index].data.reserve_ammo
 	_slots[index].reserve = full
@@ -417,7 +509,7 @@ func refill_ammo(data: WeaponData) -> void:
 
 ## The gun in hand topped up completely, magazine and reserve (the Murmeltier's reward).
 func refill_current() -> void:
-	if weapon == null:
+	if weapon == null or not weapon.refillable:
 		return
 	_cancel_reload()
 	mag = maxi(mag, weapon.mag_size)
@@ -562,7 +654,7 @@ func _physics_process(delta: float) -> void:
 		lock_trigger()
 	_was_captured = captured
 	_capture_grace = maxf(_capture_grace - delta, 0.0)
-	_update_aim(delta, force_aim or (captured and Input.is_action_pressed("secondary")))
+	_update_aim(delta, force_aim or (captured and _aim_held(Input.is_action_pressed("secondary"), Input.is_action_just_pressed("secondary"))))
 	if _melee_step(delta):
 		return
 	if _switch_left > 0.0:
@@ -803,6 +895,7 @@ func _select(index: int) -> void:
 		if old.viewmodel:
 			old.viewmodel.visible = false
 	_current = index
+	_aim_toggled = false
 	var slot: GunSlot = _slots[index]
 	weapon = slot.data
 	bloom = 0.0
@@ -1136,6 +1229,18 @@ func shooter_exclude() -> Array[RID]:
 func add_effect(effect: Node3D) -> void:
 	effect.transform = global_transform
 	_shooter.get_parent().add_child(effect)
+
+
+# Right click held (`held`), or (Settings.toggle_aim) clicked on (`clicked` this frame) and not yet
+# off again. Only for a gun that aims: its right click is not a special mode of its own.
+func _aim_held(held: bool, clicked: bool) -> bool:
+	if not Settings.toggle_aim:
+		return held
+	if weapon == null or not weapon.can_aim():
+		_aim_toggled = false
+	elif clicked:
+		_aim_toggled = not _aim_toggled
+	return _aim_toggled
 
 
 func _update_aim(delta: float, held: bool) -> void:

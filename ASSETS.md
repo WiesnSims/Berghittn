@@ -47,5 +47,5 @@ jacket and trousers reuse the `wool` and `leather` textures, tinted per player),
 stuffed animals and trophies (M8, `tools/models/stuffed.gd`, `build_trophies.gd`). No external models
 anywhere.
 
-The title screen's teaser picture (`assets/ui/teaser.jpg`, #77) is rendered from the game itself by
-`tools/teaser/teaser.tscn`; `white` (`assets/textures/white.png`, 4x4 white, #78) is self-made. Both are our own.
+The title screen's teaser pictures (`assets/ui/teaser_*.jpg`: the Stube from #77, six more in 1.1.2)
+are rendered from the game itself by `tools/teaser/teaser.tscn`; `white` (`assets/textures/white.png`, 4x4 white, #78) is self-made. Both are our own.

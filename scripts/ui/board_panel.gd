@@ -87,9 +87,10 @@ func _ready() -> void:
 	hide()
 
 
-func open() -> void:
+## Opens on `mode`'s board ("solo" or "coop"), or the one last shown.
+func open(mode: String = "") -> void:
 	show()
-	_show(_mode, _period)
+	_show(mode if mode in Board.MODES else _mode, _period)
 
 
 func close() -> void:

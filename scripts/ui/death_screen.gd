@@ -6,9 +6,12 @@ extends Control
 ## people, and the room's invite link. Solo: Play with friends opens a room.
 ## Das Gipfelbuch: the run's place on the global leaderboard (solo sent from here; in co-op the host
 ## sends the group's and everyone hears its place). Solo without a name it asks for one once.
+## Under the buttons (1.1.2): the Gipfelbuch itself, and the way back to the title screen.
 
 signal restart_requested
 signal friends_requested
+## Back to the title screen (co-op: out of the room).
+signal menu_requested
 
 const QUIP_KEYS: Array[String] = ["UI_DEATH_QUIP_1", "UI_DEATH_QUIP_2", "UI_DEATH_QUIP_3", "UI_DEATH_QUIP_4"]
 const HEADER_KEYS: Array[String] = [
@@ -47,6 +50,9 @@ var _board_line: Label
 var _ask: HBoxContainer
 var _name_edit: LineEdit
 var _board_entry: Dictionary = {}
+var _board_panel: BoardPanel
+var _board_button: Button
+var _menu_button: Button
 
 
 func _ready() -> void:
@@ -59,6 +65,7 @@ func _ready() -> void:
 	Net.nomoi_changed.connect(_refresh_nomoi)
 	Net.roster_changed.connect(_refresh_nomoi)
 	_build_board()
+	_build_more()
 	Board.ranked.connect(_on_ranked)
 	Board.not_ranked.connect(func() -> void: _board_line.hide())
 
@@ -90,8 +97,9 @@ func present(wave: int, points: int, run: PlayerStats, new_best: bool, coop: boo
 		(%Room as Label).text = tr("UI_LOBBY_ROOM") % Net.code
 		_refresh_wertung()
 	# Players are usually still clicking when they die; do not let that click restart instantly.
-	for button: Button in [_restart_button, _nomoi_button, _friends_button]:
+	for button: Button in [_restart_button, _nomoi_button, _friends_button, _board_button, _menu_button]:
 		button.disabled = true
+	_board_panel.hide()
 	_enable_timer.start()
 	show()
 	_refresh_nomoi()
@@ -179,9 +187,37 @@ func _build_board() -> void:
 	box.move_child(_ask, _board_line.get_index() + 1)
 
 
+# A second, smaller row under the buttons: the Gipfelbuch (on this run's board, our entries
+# highlighted) and Main menu.
+func _build_more() -> void:
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 14)
+	var buttons: Control = _restart_button.get_parent()
+	buttons.get_parent().add_child(row)
+	buttons.get_parent().move_child(row, buttons.get_index() + 1)
+	_board_button = _small_button(row, "UI_BOARD")
+	_board_button.pressed.connect(func() -> void: _board_panel.open("coop" if _coop else "solo"))
+	_menu_button = _small_button(row, "UI_MAIN_MENU")
+	_menu_button.pressed.connect(menu_requested.emit)
+	_board_panel = BoardPanel.new()
+	add_child(_board_panel)
+
+
+func _small_button(row: Control, key: String) -> Button:
+	var button := Button.new()
+	button.text = key
+	button.custom_minimum_size = Vector2(240, 44)
+	button.add_theme_font_size_override("font_size", 22)
+	row.add_child(button)
+	return button
+
+
 func _on_enable_timeout() -> void:
 	_restart_button.disabled = false
 	_friends_button.disabled = false
+	_board_button.disabled = false
+	_menu_button.disabled = false
 	_refresh_nomoi()
 	(_nomoi_button if _coop and not _nomoi_button.disabled else _restart_button).grab_focus()
 

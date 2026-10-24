@@ -1079,6 +1079,94 @@ Built (2026-10-24, branch leaderboard, version 1.1.1):
 - Desktop runs only use a board given with --board.
 - Tests: board/test/board.test.mjs, tools/board_test.mjs (tests/board_solo, tests/net_board).
 
+### Balance, Stumpf and key bindings (user request 2026-10-24, version 1.1.2)
+
+*Why:* players reported that doppelt dengelt weapons were too strong. A player could stay in one
+place and spam the right-click modes for a very long time without being hurt. Level 2 gave damage
+x4, magazine x2 and reserve x4: about 16 times the base gun's damage before it ran dry. The
+Munitionskiste refilled all of it for a flat 1000.
+
+*Balance (part 1 to 3)*
+1. The reserve grows less: x1.25 when dengelt, x1.5 when doppelt dengelt (was x2 and x4). Damage
+   and magazine stay as they were.
+2. The right-click mode costs more rounds: x1.5 when dengelt, x2 when doppelt dengelt (rounded up).
+3. Ammo for a forged gun costs more: +500 when dengelt, +1000 when doppelt dengelt. This applies at
+   the Munitionskiste (for each forged gun it refills) and at the gun's wall-buy.
+
+*Stumpf*
+- A doppelt dengelt weapon (a gun, or the melee weapon) loses its edge after 150 kills made with
+  it. It then goes back to dengelt in the same slot, keeping the ammo that still fits.
+- The HUD shows the kills left next to its name ("Schneid 87"). A warning comes at 25 kills left,
+  and a banner when it goes dull.
+- The Dengelstock sharpens a weapon that went dull back to doppelt dengelt for 5000 instead of
+  10000, with a fresh edge.
+- The Golden Gun goes dull too.
+
+*Key bindings*
+- Settings get a "Key bindings" section: every action (moving, jump, sprint, crouch, shoot, weapon
+  mode, reload, melee, throw, use, the three gun slots, next and previous gun) on any key or mouse
+  button.
+- A key that another action has is swapped with it. Esc cancels. Pause (P, Esc) and the debug keys
+  are kept.
+- "Reset keys" brings the defaults back.
+- Every text that names a key (prompts, the HUD, the controls line on the title and in the pause
+  menu) names the key it is bound to now.
+
+*Added the same day (user request): Sitzfleisch, the Golden Gun, view settings*
+- Sitzfleisch, against camping:
+  - A player who stays within 5 m of one spot for 45 s of a wave (from wave 3, not in the break)
+    gets a Wilderer and three Bergdohlen sent after them. They come from the nearest open spawn
+    point at least 15 m away, count in the wave and go for that player over anyone nearer.
+  - A banner says so (in co-op naming the player), and the enemy nearest them mocks them with a
+    new dialect line (one per voice, Gredn moment SITZ).
+  - The clock starts over when they move, and after the visit.
+- The Golden Gun (the Dienstpistole doppelt dengelt, a secret easter egg: never in the patch notes):
+  - one round in it (no extra round in the chamber) and nine to spare
+  - never refilled: no wall-buy ammo, no Munitionskiste, no Murmeltier
+  - downed in co-op, a plain pistol is lent instead, so its rounds are kept
+- View settings: a field-of-view slider (70 to 100°, default 75), aiming by toggle instead of
+  holding right click, and the crosshair's colour (six) and size (50 to 200 %).
+
+*Added later the same day (user request): title pictures, Main menu*
+- The title screen gets six more pictures from the game, seven in all: the Stube (as before), the
+  Venedigermandl running off over the beer garden, Bergdohlen circling the hut at dawn, the
+  Wilderer's scope glinting across the Holzschuppen, the Dengelstock at work in the hay loft, three
+  hikers back to back in the Stube, and the Krampus in the Stube door by a lantern.
+- A random one comes first; every 20 s the next crossfades in. Each keeps the slow camera drift and
+  gets its own 2D effect (muzzle flashes, gold glitter, circling birds, the glint and the shot,
+  hammer sparks, a swinging lantern). Snow blows over all of them.
+- Main menu: a solo run could only be left by reloading the page, so the Gipfelbuch was out of reach
+  after a run (user report). Now:
+  - the end screen has a Gipfelbuch button (opens on this run's board, Solo or Co-op, with our
+    entries highlighted) and a Main menu button (co-op: leaves the room)
+  - the solo pause menu has Main menu; it asks once more ("End this run?"), and a run ended that
+    way does not go into the Gipfelbuch
+- Antialiasing (Settings → graphics, user request): Off, FXAA (default), MSAA 2x, MSAA 4x. The
+  Compatibility renderer has MSAA but no screen-space AA, so FXAA is a switch in our own post pass
+  (post_fx.gdshader), which the picture takes anyway: nearly free, and no extra shader to build.
+
+Built (2026-10-24, branch dengel-balance, version 1.1.2):
+- Balance: tools/weapons/dengel.py (reserve and right-click rounds), Constants.DENGEL_AMMO_EXTRA,
+  WeaponHolder.ammo_extra and crate_extra, AmmoCrate.price_for, WallBuy._ammo_price.
+- Stumpf: Constants.STUMPF_KILLS, STUMPF_WARN and DENGEL_RESHARPEN_COST; on WeaponHolder,
+  GunSlot.edge, _melee_edge, edge_left, is_dulled, the edge_changed and went_dull signals;
+  Dengelstock.cost_for.
+- Key bindings: scripts/ui/keys.gd (Keys: names, {action} tokens in the string tables, rebinding
+  with swaps, saved in Settings.bindings) and the Settings menu's section.
+- Sitzfleisch: WaveManager._watch_sitzfleisch, sitzfleisch() and _spawn_point_near; Enemy.focus;
+  Gredn.taunt with the SITZ lines (voices in tools/audio/voices.py); Constants.SITZ_*.
+- Golden Gun: WeaponData.refillable; dengel.py's LEVEL_2_ONLY (mag 1, reserve 9, no chamber).
+- View: Settings.fov, toggle_aim, crosshair_color and crosshair_size; Player reads the field of
+  view, WeaponHolder._aim_held and Crosshair._draw use the others. The Settings menu scrolls now.
+- Title pictures: tools/teaser renders each scene (`-- <scene>`) and prints its spots;
+  TeaserBackdrop.SCENES holds the pictures and effects, its Slide, Effect and Flock classes run them.
+- Antialiasing: Settings.antialiasing (Constants.Antialiasing), the window's msaa_3d, the post
+  shader's `fxaa` uniform (main._apply_fxaa).
+- Main menu: DeathScreen._build_more (Gipfelbuch and Main menu, menu_requested), BoardPanel.open(mode),
+  PauseMenu.menu_requested (solo, after a second click), main._to_title.
+- Tests: m9_dengel (the new rules, the Golden Gun), m9_stumpf, m9_sitz, keys, view_settings,
+  title_slides, main_menu.
+
 
 ## 13. Project structure
 

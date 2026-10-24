@@ -1,7 +1,9 @@
 class_name SettingsMenu
 extends Control
-## Sensitivity, volume, language and picture options, reachable from the start screen and the pause
-## menu. Every change applies at once (so a slider can be judged while it moves) and is saved on close.
+## Sensitivity, volume, language and picture options, and the key bindings (Keys), reachable from the
+## start screen and the pause menu. Every change applies at once (so a slider can be judged while it
+## moves) and is saved on close. A key binding's button waits for the next key or mouse button; Esc
+## leaves it as it was.
 
 signal closed
 
@@ -18,6 +20,12 @@ const FONT_SIZE: int = 20
 
 @onready var _rows: VBoxContainer = %Rows
 @onready var _back_button: Button = %BackButton
+
+# The action whose button waits for a key ("" when none), its button per action, and the line saying
+# a key cannot be had.
+var _listening: String = ""
+var _key_buttons: Dictionary = {}
+var _key_note: Label
 
 
 func _ready() -> void:
@@ -37,6 +45,29 @@ func close() -> void:
 	closed.emit()
 
 
+func _input(event: InputEvent) -> void:
+	if _listening == "" or not visible:
+		return
+	var pressed: bool = (event is InputEventKey and (event as InputEventKey).pressed and not (event as InputEventKey).echo) \
+			or (event is InputEventMouseButton and (event as InputEventMouseButton).pressed)
+	if not pressed:
+		return
+	get_viewport().set_input_as_handled()
+	var action: String = _listening
+	_listening = ""
+	if event is InputEventKey and (event as InputEventKey).physical_keycode == KEY_ESCAPE:
+		_refresh_keys()
+		return
+	if not Keys.can_bind(event):
+		_key_note.text = "UI_KEYS_TAKEN"
+		_refresh_keys()
+		return
+	_key_note.text = ""
+	Settings.bindings = Keys.rebind(action, event)
+	_refresh_keys()
+	Settings.apply(false)
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if visible and event.is_action_pressed("pause"):
 		get_viewport().set_input_as_handled()
@@ -51,6 +82,13 @@ func _build() -> void:
 	_add_slider("UI_SET_AIM_SENSITIVITY", Constants.AIM_SENSITIVITY_MIN, Constants.AIM_SENSITIVITY_MAX,
 			Settings.aim_sensitivity, func(v: float) -> void: Settings.aim_sensitivity = v, _percent)
 	_add_toggle("UI_SET_INVERT_Y", Settings.invert_y, func(on: bool) -> void: Settings.invert_y = on)
+	_add_toggle("UI_SET_TOGGLE_AIM", Settings.toggle_aim, func(on: bool) -> void: Settings.toggle_aim = on)
+	_add_slider("UI_SET_FOV", Constants.FOV_MIN, Constants.FOV_MAX, Settings.fov,
+			func(v: float) -> void: Settings.fov = roundf(v), func(v: float) -> String: return "%d°" % roundi(v))
+	_add_choice("UI_SET_CROSSHAIR_COLOR", Constants.CROSSHAIR_COLOR_KEYS, Settings.crosshair_color,
+			func(index: int) -> void: Settings.crosshair_color = index)
+	_add_slider("UI_SET_CROSSHAIR_SIZE", Constants.CROSSHAIR_SIZE_MIN, Constants.CROSSHAIR_SIZE_MAX, Settings.crosshair_size,
+			func(v: float) -> void: Settings.crosshair_size = v, _percent)
 	_add_toggle("UI_SET_DAMAGE_NUMBERS", Settings.damage_numbers, func(on: bool) -> void: Settings.damage_numbers = on)
 	_add_toggle("UI_SET_CHATTER", Settings.chatter, func(on: bool) -> void: Settings.chatter = on)
 	_add_toggle("UI_SET_BOARD", Settings.board, func(on: bool) -> void: Settings.board = on)
@@ -60,6 +98,55 @@ func _build() -> void:
 	_add_language()
 	_add_slider("UI_SET_RENDER_SCALE", Constants.RENDER_SCALE_MIN, 1.0, Settings.render_scale,
 			func(v: float) -> void: Settings.render_scale = v, _percent)
+	_add_choice("UI_SET_ANTIALIASING", Constants.ANTIALIASING_KEYS, Settings.antialiasing,
+			func(index: int) -> void: Settings.antialiasing = index)
+	_add_keys()
+
+
+func _add_keys() -> void:
+	var heading := Label.new()
+	heading.text = "UI_SET_KEYS"
+	heading.add_theme_font_size_override("font_size", FONT_SIZE + 4)
+	heading.custom_minimum_size = Vector2(0.0, ROW_HEIGHT * 1.5)
+	heading.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	_rows.add_child(heading)
+	for entry: Array in Keys.ACTIONS:
+		var action: String = entry[0]
+		var row: HBoxContainer = _add_row(entry[1])
+		var button := Button.new()
+		button.custom_minimum_size = Vector2(200.0, 0.0)
+		button.add_theme_font_size_override("font_size", FONT_SIZE)
+		# Key names are shown as they are.
+		button.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		button.pressed.connect(func() -> void: _listen(action))
+		row.add_child(button)
+		_key_buttons[action] = button
+	_key_note = Label.new()
+	_key_note.add_theme_font_size_override("font_size", FONT_SIZE)
+	_rows.add_child(_key_note)
+	var reset := Button.new()
+	reset.text = "UI_KEYS_RESET"
+	reset.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	reset.add_theme_font_size_override("font_size", FONT_SIZE)
+	reset.pressed.connect(func() -> void:
+		_listening = ""
+		Settings.bindings = {}
+		Keys.apply({})
+		_key_note.text = ""
+		_refresh_keys()
+		Settings.apply(false))
+	_rows.add_child(reset)
+	_refresh_keys()
+
+
+func _listen(action: String) -> void:
+	_listening = action
+	_refresh_keys()
+
+
+func _refresh_keys() -> void:
+	for action: String in _key_buttons:
+		(_key_buttons[action] as Button).text = tr("UI_KEYS_PRESS") if action == _listening else Keys.name_of(action)
 
 
 func _percent(value: float) -> String:
@@ -112,6 +199,19 @@ func _add_toggle(key: String, value: bool, assign: Callable) -> void:
 		assign.call(on)
 		Settings.apply(false))
 	row.add_child(toggle)
+
+
+func _add_choice(key: String, items: Array[String], selected: int, assign: Callable) -> void:
+	var row: HBoxContainer = _add_row(key)
+	var picker := OptionButton.new()
+	picker.add_theme_font_size_override("font_size", FONT_SIZE)
+	for item: String in items:
+		picker.add_item(item)
+	picker.selected = selected
+	picker.item_selected.connect(func(index: int) -> void:
+		assign.call(index)
+		Settings.apply(false))
+	row.add_child(picker)
 
 
 func _add_language() -> void:

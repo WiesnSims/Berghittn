@@ -28,6 +28,8 @@ var locale: String = Constants.DEFAULT_LOCALE
 var volumes: Dictionary = {}
 ## Share of the window resolution the 3D view renders at; lower helps weak laptops.
 var render_scale: float = 1.0
+## Constants.Antialiasing. MSAA is the window's; FXAA is the post pass's switch (main.gd sets it).
+var antialiasing: int = Constants.DEFAULT_ANTIALIASING
 ## Co-op name and hiker (HikerStyle profile), chosen in the lobby; empty until the player changes
 ## something there, and until then each player wears their peer's default (profile_for).
 var profile: Dictionary = {}
@@ -42,6 +44,14 @@ var best_points: int = 0
 ## our entries there (Board.remember).
 var board: bool = true
 var board_ids: Array[int] = []
+## Key bindings (Keys): each rebindable action's first key or button; empty means the defaults.
+var bindings: Dictionary = {}
+## The view (1.1.2): field of view in degrees, aiming by toggle (a click on, a click off) instead of
+## holding right click, and the crosshair's colour (Constants.CROSSHAIR_COLORS) and size.
+var fov: float = Constants.DEFAULT_FOV
+var toggle_aim: bool = false
+var crosshair_color: int = 0
+var crosshair_size: float = 1.0
 
 
 func _ready() -> void:
@@ -50,6 +60,7 @@ func _ready() -> void:
 	for bus: StringName in BUSES:
 		volumes[bus] = Constants.DEFAULT_VOLUME
 	_load()
+	Keys.apply(bindings)
 	apply(false)
 
 
@@ -74,6 +85,8 @@ func apply(and_save: bool = true) -> void:
 		AudioServer.set_bus_mute(index, linear <= 0.0)
 		AudioServer.set_bus_volume_db(index, linear_to_db(maxf(linear, 0.0001)))
 	get_tree().root.scaling_3d_scale = render_scale
+	var msaa: Dictionary = {Constants.Antialiasing.MSAA_2X: Viewport.MSAA_2X, Constants.Antialiasing.MSAA_4X: Viewport.MSAA_4X}
+	get_tree().root.msaa_3d = msaa.get(antialiasing, Viewport.MSAA_DISABLED)
 	if and_save:
 		save()
 	changed.emit()
@@ -89,6 +102,13 @@ func _load() -> void:
 	damage_numbers = file.get_value(SECTION, "damage_numbers", damage_numbers)
 	chatter = file.get_value(SECTION, "chatter", chatter)
 	board = file.get_value(SECTION, "board", board)
+	fov = clampf(file.get_value(SECTION, "fov", fov), Constants.FOV_MIN, Constants.FOV_MAX)
+	toggle_aim = file.get_value(SECTION, "toggle_aim", toggle_aim)
+	crosshair_color = clampi(file.get_value(SECTION, "crosshair_color", crosshair_color), 0, Constants.CROSSHAIR_COLORS.size() - 1)
+	crosshair_size = clampf(file.get_value(SECTION, "crosshair_size", crosshair_size), Constants.CROSSHAIR_SIZE_MIN, Constants.CROSSHAIR_SIZE_MAX)
+	var keys: Variant = file.get_value(SECTION, "bindings", {})
+	if keys is Dictionary:
+		bindings = keys
 	var ids: Variant = file.get_value(SECTION, "board_ids", [])
 	if ids is Array:
 		for id: Variant in ids:
@@ -99,6 +119,7 @@ func _load() -> void:
 	if saved_locale in LOCALES:
 		locale = saved_locale
 	render_scale = clampf(file.get_value(SECTION, "render_scale", render_scale), Constants.RENDER_SCALE_MIN, 1.0)
+	antialiasing = clampi(file.get_value(SECTION, "antialiasing", antialiasing), 0, Constants.ANTIALIASING_KEYS.size() - 1)
 	for bus: StringName in BUSES:
 		set_volume(bus, file.get_value(SECTION, "volume_" + bus, volume(bus)))
 	var saved: Variant = file.get_value(SECTION, "profile", {})
@@ -149,9 +170,15 @@ func save() -> void:
 	file.set_value(SECTION, "chatter", chatter)
 	file.set_value(SECTION, "board", board)
 	file.set_value(SECTION, "board_ids", board_ids)
+	file.set_value(SECTION, "bindings", bindings)
+	file.set_value(SECTION, "fov", fov)
+	file.set_value(SECTION, "toggle_aim", toggle_aim)
+	file.set_value(SECTION, "crosshair_color", crosshair_color)
+	file.set_value(SECTION, "crosshair_size", crosshair_size)
 	file.set_value(SECTION, "seen_version", seen_version)
 	file.set_value(SECTION, "locale", locale)
 	file.set_value(SECTION, "render_scale", render_scale)
+	file.set_value(SECTION, "antialiasing", antialiasing)
 	for bus: StringName in BUSES:
 		file.set_value(SECTION, "volume_" + bus, volume(bus))
 	file.set_value(SECTION, "profile", profile)

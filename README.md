@@ -124,6 +124,14 @@ listens to `Events` and credits only its own player (`source` on every hit, kill
   saved to `user://settings.cfg` (IndexedDB in the browser). The menu
   (`scenes/ui/settings_menu.tscn`) opens from the start screen and the pause menu, applies changes
   live and saves on Back.
+- View (1.1.2): `Settings.fov` (the camera's field of view, `Player._process`), `toggle_aim`
+  (`WeaponHolder._aim_held`), `crosshair_color` and `crosshair_size` (`Crosshair._draw`). Test:
+  `tests/view_settings`.
+- Key bindings (1.1.2): `Keys` (`scripts/ui/keys.gd`) lists the rebindable actions, rebinds an
+  action's first event (a key another action had is swapped), and saves them in
+  `Settings.bindings`; `Keys.apply` puts them over the project's defaults at start. Texts that name
+  a key hold `{action}` tokens in the string tables (`Press {interact} to ...`), filled in by
+  `Keys.fill` where they are shown (HUD, controls lines). Test: `tests/keys`.
 
 ## Sound (M6)
 
@@ -193,10 +201,13 @@ godot --headless --import                   # then reimport
   the shaders are built it shows only the still picture, "Preparing the hut ..." and a progress bar:
   each new shader blocks the browser's main thread (up to ~0.7 s), so a live menu stuttered
   (play-test). Then the menu fades in and the picture comes alive. An invite link waits too.
-- Behind it, `TeaserBackdrop` animates a still from the game in 2D (drift, snow, lamp flicker, the
-  Jagdflinte firing now and then), so it needs no 3D shaders. The still is rendered by
-  `godot res://tools/teaser/teaser.tscn` into `assets/ui/teaser.jpg` (lossy import); the tool prints
-  where the muzzle and the lamp are, for `MUZZLE_AT` / `LAMP_AT`.
+- Behind it, `TeaserBackdrop` animates stills from the game in 2D, so it needs no 3D shaders: seven
+  scenes (1.1.2), a random one first, the next crossfading in every 20 s (loaded in the background
+  meanwhile). Each drifts and has its own effects (lamp flicker, muzzle flashes, gold glitter,
+  circling Bergdohlen, the Wilderer's glint, Dengelstock sparks, a swinging lantern), with snow over
+  all. A still is rendered by `godot res://tools/teaser/teaser.tscn -- <scene>` into
+  `assets/ui/teaser_<scene>.jpg` (lossy import); the tool prints where the scene's spots are, for
+  `TeaserBackdrop.SCENES`. Test: `tests/title_slides.tscn`.
 - Loading (measured 2026-10-18, Edge on Windows, first visit): downloads 1.9 s, Godot running by 2 s,
   scene built by ~4.5 s; then the browser compiles ~150 WebGL programs, ~16 s on a first visit (one
   per material setup and light pass; the lit ones take ~0.7 s each, built twice, with and without
@@ -268,9 +279,25 @@ python tools/textures/engrave.py    # the engraved steel of the forged look (gun
 - The rules (damage, magazine, reserve, boss share, shot pitch, a melee or special weapon's twist,
   `WeaponData.twist`, its meaning per behavior) are in
   `dengel.py`; `tests/m9_dengel` checks the files against them.
+- Balance (1.1.2): the reserve grows only x1.25 / x1.5, and the right-click rounds x1.5 / x2.
+  Ammo for a forged gun costs `Constants.DENGEL_AMMO_EXTRA` more by level, at its wall-buy
+  (`WallBuy._ammo_price`) and at the Munitionskiste (`AmmoCrate.price_for`).
+- Stumpf (1.1.2): a doppelt dengelt weapon's edge (`GunSlot.edge`, or `_melee_edge` for the melee
+  weapon) lasts `STUMPF_KILLS` of our kills with it. Then `WeaponHolder._go_dull` puts the dengelt
+  one in its place and the HUD shows the `went_dull` banner. `Dengelstock.cost_for` charges
+  `DENGEL_RESHARPEN_COST` to sharpen it again. Test: `tests/m9_stumpf`.
 - A dengelt weapon keeps its base's `family`, so wall-buys, the chest and the slots count it as
   that gun. `ForgedLook` (`scripts/weapons/forged_look.gd`) dresses its model: copies of the same
   materials with gold steel on the engraved texture and darker wood, so no new shader is built.
+
+## Sitzfleisch (1.1.2)
+
+`WaveManager._watch_sitzfleisch` keeps, per player, where they settled and how long they stayed
+within `SITZ_RADIUS` of it during a wave (from `SITZ_FIRST_WAVE`). After `SITZ_TIME`,
+`sitzfleisch()` sends a Wilderer and `SITZ_FLOCK` Bergdohlen from `_spawn_point_near` (the nearest
+open point at least `SITZ_SPAWN_MIN` away). They are counted in the wave, with `Enemy.focus` on the
+camper, and the camper gets a banner (`Coop.announce` in co-op). The nearest enemy says its SITZ line
+(`Gredn.taunt`). Test: `tests/m9_sitz`.
 
 ## Das Venedigermandl (M9 part 5a)
 

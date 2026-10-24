@@ -48,6 +48,9 @@ static var hit_relay: Callable
 var _state: State = State.INACTIVE
 ## A player or an escort (group "escorts"): anything with is_targetable() and take_damage(amount, attacker).
 var _target: Node3D
+## Sitzfleisch (1.1.2): the player this one was sent after; it goes for them over anyone nearer while
+## they can be hunted. Cleared by activate.
+var focus: Node3D
 var _model: Node3D
 # The model's skeleton (M6 part 4): limb poses and the ragdoll.
 var _rig: EnemyRig
@@ -184,6 +187,7 @@ func activate(enemy_data: EnemyData, for_wave: int, at: Transform3D) -> void:
 		_head_parts.assign(_model.find_children("*", "Node3D", true, false).filter(func(n: Node) -> bool: return n.is_in_group("head_part")))
 	data = enemy_data
 	_fit_body()
+	focus = null
 	wave = for_wave
 	health = data.health_for_wave(wave)
 	max_health = health
@@ -1170,6 +1174,8 @@ func _find_lure() -> Node3D:
 
 
 func _nearest_target() -> Node3D:
+	if is_instance_valid(focus) and focus.is_targetable():
+		return focus
 	var best: Node3D = null
 	var best_distance: float = INF
 	for node: Node in get_tree().get_nodes_in_group("player") + get_tree().get_nodes_in_group("escorts"):

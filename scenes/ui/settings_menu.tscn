@@ -42,9 +42,15 @@ theme_override_font_sizes/font_size = 48
 text = "UI_SETTINGS"
 horizontal_alignment = 1
 
-[node name="Rows" type="VBoxContainer" parent="Center/Box"]
+[node name="Scroll" type="ScrollContainer" parent="Center/Box"]
+custom_minimum_size = Vector2(680, 440)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Rows" type="VBoxContainer" parent="Center/Box/Scroll"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
 [node name="BackButton" type="Button" parent="Center/Box"]
