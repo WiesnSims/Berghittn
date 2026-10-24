@@ -46,6 +46,8 @@ func _ready() -> void:
 	_board = BoardPanel.new()
 	add_child(_board)
 	(%BoardButton as Button).pressed.connect(_board.open)
+	Settings.changed.connect(_refresh_controls)
+	_refresh_controls()
 	set_ready(0.0)
 	if GameState.notice != "":
 		show_notice(GameState.notice)
@@ -89,6 +91,11 @@ func _reveal() -> void:
 
 func _menu_items() -> Array[Control]:
 	return [_solo, _coop, %SettingsButton, %PatchNotesButton, %BoardButton, %Controls]
+
+
+## The controls line names the keys as they are bound (Keys).
+func _refresh_controls() -> void:
+	(%Controls as Label).text = Keys.fill(tr("UI_CONTROLS"))
 
 
 ## The patch notes; from now on this version counts as read.

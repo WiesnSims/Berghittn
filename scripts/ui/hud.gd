@@ -105,6 +105,10 @@ func bind_player(player: Player) -> void:
 	_weapons = player.weapons
 	_weapons.ammo_changed.connect(_on_ammo_changed)
 	_weapons.weapon_changed.connect(_on_weapon_changed)
+	_weapons.edge_changed.connect(_on_edge_changed)
+	_weapons.went_dull.connect(func(was: WeaponData, _now: WeaponData) -> void:
+		_show_banner(tr("UI_STUMPF") % tr(was.display_name))
+		_on_weapon_changed(_weapons.weapon))
 	_weapons.reload_started.connect(_on_reload_changed.unbind(1))
 	_weapons.reload_finished.connect(_on_reload_changed)
 	_weapons.hit_confirmed.connect(_crosshair.show_hit)
@@ -123,7 +127,7 @@ func bind_player(player: Player) -> void:
 	_points_label.text = str(player.points.total)
 	_on_weapon_changed(_weapons.weapon)
 	if _weapons.melee_weapon:
-		_melee_label.text = tr("UI_MELEE") % tr(_weapons.melee_weapon.display_name)
+		_melee_label.text = Keys.fill(tr("UI_MELEE")) % tr(_weapons.melee_weapon.display_name)
 	# Connected after the start weapon is shown, so only a new one gets the banner.
 	_weapons.melee_changed.connect(_on_melee_changed)
 	_on_ammo_changed(_weapons.mag, _weapons.reserve)
@@ -138,14 +142,30 @@ func _on_ammo_changed(mag: int, reserve: int) -> void:
 func _on_weapon_changed(data: WeaponData) -> void:
 	# Nothing in hand while the gun is at the Dengelstock.
 	_weapon_label.text = tr(data.display_name) if data else ""
+	var edge: int = _weapons.edge_left()
+	if data and edge >= 0:
+		_weapon_label.text += "  " + tr("UI_EDGE") % edge
 	_update_status()
+
+
+# Stumpf: the edge's kills left next to the name, and a warning once it is nearly dull.
+func _on_edge_changed(left: int, melee: bool) -> void:
+	if melee:
+		_melee_label.text = Keys.fill(tr("UI_MELEE")) % tr(_weapons.melee_weapon.display_name) + "  " + tr("UI_EDGE") % left
+	else:
+		_on_weapon_changed(_weapons.weapon)
+	if left == Constants.STUMPF_WARN:
+		var data: WeaponData = _weapons.melee_weapon if melee else _weapons.weapon
+		_show_banner(tr("UI_STUMPF_SOON") % tr(data.display_name))
 
 
 func _on_melee_changed(data: WeaponData) -> void:
 	if data == null:
 		_melee_label.text = ""
 		return
-	_melee_label.text = tr("UI_MELEE") % tr(data.display_name)
+	_melee_label.text = Keys.fill(tr("UI_MELEE")) % tr(data.display_name)
+	if _weapons.edge_left(true) >= 0:
+		_melee_label.text += "  " + tr("UI_EDGE") % _weapons.edge_left(true)
 	_show_banner(tr("UI_MELEE_TAKEN") % tr(data.display_name))
 
 
@@ -159,9 +179,9 @@ func _update_status() -> void:
 	elif _weapons.is_reloading():
 		_status_label.text = tr("UI_RELOADING")
 	elif _weapons.mag == 0:
-		_status_label.text = tr("UI_RELOAD_HINT") if _weapons.reserve > 0 else tr("UI_NO_AMMO")
+		_status_label.text = Keys.fill(tr("UI_RELOAD_HINT")) if _weapons.reserve > 0 else tr("UI_NO_AMMO")
 	elif _weapons.mag * 4 <= _weapons.weapon.mag_size:
-		_status_label.text = tr("UI_RELOAD_HINT")
+		_status_label.text = Keys.fill(tr("UI_RELOAD_HINT"))
 	else:
 		_status_label.text = ""
 
@@ -201,7 +221,8 @@ func _on_points_changed(total: int, gained: int) -> void:
 
 
 func _on_prompt_changed(text: String) -> void:
-	_prompt_label.text = text
+	# Prompts name the key ("Press {interact} ..."): whatever it is bound to now (Keys).
+	_prompt_label.text = Keys.fill(text)
 
 
 func _on_wave_break_started(_next_wave: int, duration: float) -> void:
@@ -279,7 +300,7 @@ func _on_perks_changed(perks: Array[PerkData]) -> void:
 
 
 func _on_equipment_changed(item: EquipmentData, count: int) -> void:
-	_equipment_label.text = tr("UI_EQUIPMENT") % [tr(item.display_name), count] if item and count > 0 else ""
+	_equipment_label.text = Keys.fill(tr("UI_EQUIPMENT")) % [tr(item.display_name), count] if item and count > 0 else ""
 
 
 func _on_wave_cleared(wave: int) -> void:
@@ -347,7 +368,7 @@ func _update_coop() -> void:
 		return
 	match _player.life:
 		Player.Life.DOWNED:
-			var text: String = tr("UI_COOP_DOWNED") % ceili(_player.bleed_left)
+			var text: String = Keys.fill(tr("UI_COOP_DOWNED")) % ceili(_player.bleed_left)
 			if _player.revive_progress > 0.0:
 				text += "\n" + tr("UI_COOP_BEING_REVIVED") % roundi(_player.revive_progress * 100.0)
 			_coop_label.text = text

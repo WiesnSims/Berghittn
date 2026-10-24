@@ -18,6 +18,13 @@ func _ready() -> void:
 	_relock_timer.wait_time = Constants.POINTER_RELOCK_DELAY
 	_relock_timer.timeout.connect(_on_relock_timeout)
 	visibility_changed.connect(_on_visibility_changed)
+	Settings.changed.connect(_refresh_controls)
+	_refresh_controls()
+
+
+## The controls line names the keys as they are bound (Keys).
+func _refresh_controls() -> void:
+	($Center/Box/Controls as Label).text = Keys.fill(tr("UI_CONTROLS"))
 
 
 func _on_visibility_changed() -> void:

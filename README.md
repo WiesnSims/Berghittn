@@ -124,6 +124,11 @@ listens to `Events` and credits only its own player (`source` on every hit, kill
   saved to `user://settings.cfg` (IndexedDB in the browser). The menu
   (`scenes/ui/settings_menu.tscn`) opens from the start screen and the pause menu, applies changes
   live and saves on Back.
+- Key bindings (1.1.2): `Keys` (`scripts/ui/keys.gd`) lists the rebindable actions, rebinds an
+  action's first event (a key another action had is swapped), and saves them in
+  `Settings.bindings`; `Keys.apply` puts them over the project's defaults at start. Texts that name
+  a key hold `{action}` tokens in the string tables (`Press {interact} to ...`), filled in by
+  `Keys.fill` where they are shown (HUD, controls lines). Test: `tests/keys`.
 
 ## Sound (M6)
 
@@ -268,6 +273,13 @@ python tools/textures/engrave.py    # the engraved steel of the forged look (gun
 - The rules (damage, magazine, reserve, boss share, shot pitch, a melee or special weapon's twist,
   `WeaponData.twist`, its meaning per behavior) are in
   `dengel.py`; `tests/m9_dengel` checks the files against them.
+- Balance (1.1.2): the reserve grows only x1.25 / x1.5, and the right-click rounds x1.5 / x2.
+  Ammo for a forged gun costs `Constants.DENGEL_AMMO_EXTRA` more by level, at its wall-buy
+  (`WallBuy._ammo_price`) and at the Munitionskiste (`AmmoCrate.price_for`).
+- Stumpf (1.1.2): a doppelt dengelt weapon's edge (`GunSlot.edge`, or `_melee_edge` for the melee
+  weapon) lasts `STUMPF_KILLS` of our kills with it. Then `WeaponHolder._go_dull` puts the dengelt
+  one in its place and the HUD shows the `went_dull` banner. `Dengelstock.cost_for` charges
+  `DENGEL_RESHARPEN_COST` to sharpen it again. Test: `tests/m9_stumpf`.
 - A dengelt weapon keeps its base's `family`, so wall-buys, the chest and the slots count it as
   that gun. `ForgedLook` (`scripts/weapons/forged_look.gd`) dresses its model: copies of the same
   materials with gold steel on the engraved texture and darker wood, so no new shader is built.

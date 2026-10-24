@@ -2,6 +2,7 @@ class_name AmmoCrate
 extends Node3D
 ## Munitionskiste in the Matratzenlager (user request, 2026-10-17: every room has a purpose):
 ## refills the reserve of every carried gun at once, the only refill for guns from the chest.
+## Forged guns cost extra (WeaponHolder.crate_extra, balance 1.1.2).
 
 @export var cost: int = 1000
 
@@ -25,13 +26,18 @@ func get_interact_prompt(player: Node3D) -> String:
 	var buyer := player as Player
 	if not buyer.weapons.needs_any_ammo():
 		return ""
-	var key: String = "UI_AMMO_CRATE" if buyer.points.can_afford(cost) else "UI_AMMO_CRATE_NEED"
-	return tr(key) % cost
+	var price: int = price_for(buyer)
+	var key: String = "UI_AMMO_CRATE" if buyer.points.can_afford(price) else "UI_AMMO_CRATE_NEED"
+	return tr(key) % price
+
+
+func price_for(buyer: Player) -> int:
+	return cost + buyer.weapons.crate_extra()
 
 
 func interact(player: Node3D) -> void:
 	var buyer := player as Player
-	if not buyer.weapons.needs_any_ammo() or not buyer.points.spend(cost):
+	if not buyer.weapons.needs_any_ammo() or not buyer.points.spend(price_for(buyer)):
 		return
 	buyer.weapons.refill_all()
 	Sound.play_at(&"ammo_crate", global_position)

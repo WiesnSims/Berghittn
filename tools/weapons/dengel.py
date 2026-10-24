@@ -4,8 +4,10 @@ and follow the base when it is tuned. Run it again after changing a base weapon:
 
     python tools/weapons/dengel.py
 
-Level 1: damage x2 (bosses x1.5), magazine +50 % (rounded up), reserve x2, a deeper shot.
-Level 2 doubles every effect of level 1: damage x4 (bosses x2.25), magazine +100 %, reserve x4.
+Level 1: damage x2 (bosses x1.5), magazine +50 % (rounded up), a deeper shot.
+Level 2 doubles every effect of level 1: damage x4 (bosses x2.25), magazine +100 %.
+Balance (1.1.2, players camped spamming the right-click modes): the reserve grows only to x1.25 and
+x1.5 (rounded up), and the right-click mode takes x1.5 and x2 the rounds (rounded up).
 Melee and special weapons: the damage, and the twist (stun_time, twist) doubled from level 1 to level 2.
 tests/m9_dengel checks the files against these rules."""
 import math
@@ -34,10 +36,10 @@ FORGE = {
     "schmarrnpfanne": {"twist": 1.5},
     "krampusrute": {"twist": 3.0},
 }
-# Per level: damage, boss share (of that damage), magazine, reserve, shot pitch.
+# Per level: damage, boss share (of that damage), magazine, reserve, right-click rounds, shot pitch.
 LEVELS = {
-    1: {"damage": 2.0, "boss": 0.75, "mag": 1.5, "reserve": 2.0, "pitch": 0.85},
-    2: {"damage": 4.0, "boss": 0.5625, "mag": 2.0, "reserve": 4.0, "pitch": 0.75},
+    1: {"damage": 2.0, "boss": 0.75, "mag": 1.5, "reserve": 1.25, "rounds": 1.5, "pitch": 0.85},
+    2: {"damage": 4.0, "boss": 0.5625, "mag": 2.0, "reserve": 1.5, "rounds": 2.0, "pitch": 0.75},
 }
 SUFFIX = {1: "dengelt", 2: "doppelt"}
 # Base id -> fields of level 2 only. The Dienstpistole doppelt dengelt is the Golden Gun (an easter
@@ -78,7 +80,10 @@ def forged(base_text, base_id, level, extras):
         text = set_field(text, "mag_size", str(math.ceil(mag * k["mag"])))
     reserve = int(field(text, "reserve_ammo") or 0)
     if reserve > 0:
-        text = set_field(text, "reserve_ammo", str(int(reserve * k["reserve"])))
+        text = set_field(text, "reserve_ammo", str(math.ceil(reserve * k["reserve"])))
+    rounds = int(field(text, "secondary_rounds") or 0)
+    if rounds > 0:
+        text = set_field(text, "secondary_rounds", str(math.ceil(rounds * k["rounds"])))
     for name, value in extras.items():
         text = set_field(text, name, repr(value * level) if isinstance(value, float) else str(value * level))
     if level == 2:

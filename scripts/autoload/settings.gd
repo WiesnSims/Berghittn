@@ -42,6 +42,8 @@ var best_points: int = 0
 ## our entries there (Board.remember).
 var board: bool = true
 var board_ids: Array[int] = []
+## Key bindings (Keys): each rebindable action's first key or button; empty means the defaults.
+var bindings: Dictionary = {}
 
 
 func _ready() -> void:
@@ -50,6 +52,7 @@ func _ready() -> void:
 	for bus: StringName in BUSES:
 		volumes[bus] = Constants.DEFAULT_VOLUME
 	_load()
+	Keys.apply(bindings)
 	apply(false)
 
 
@@ -89,6 +92,9 @@ func _load() -> void:
 	damage_numbers = file.get_value(SECTION, "damage_numbers", damage_numbers)
 	chatter = file.get_value(SECTION, "chatter", chatter)
 	board = file.get_value(SECTION, "board", board)
+	var keys: Variant = file.get_value(SECTION, "bindings", {})
+	if keys is Dictionary:
+		bindings = keys
 	var ids: Variant = file.get_value(SECTION, "board_ids", [])
 	if ids is Array:
 		for id: Variant in ids:
@@ -149,6 +155,7 @@ func save() -> void:
 	file.set_value(SECTION, "chatter", chatter)
 	file.set_value(SECTION, "board", board)
 	file.set_value(SECTION, "board_ids", board_ids)
+	file.set_value(SECTION, "bindings", bindings)
 	file.set_value(SECTION, "seen_version", seen_version)
 	file.set_value(SECTION, "locale", locale)
 	file.set_value(SECTION, "render_scale", render_scale)

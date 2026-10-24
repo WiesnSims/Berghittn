@@ -7,6 +7,19 @@ extends RefCounted
 
 const ENTRIES: Array[Dictionary] = [
 	{
+		"version": "1.1.2", "date": "2026-10-24",
+		"en": [
+			"Balance: forged guns carry less spare ammo, their right-click modes use more rounds, and their ammo costs more.",
+			"Stumpf: a doppelt dengelt weapon goes dull after 150 kills. Sharpen it again at the Dengelstock for half the price.",
+			"Key bindings in Settings: put every action on the key or mouse button you like.",
+		],
+		"de": [
+			"Balance: geschmiedete Waffen tragen weniger Reservemunition, ihr Rechtsklick braucht mehr Schuss, und ihre Munition kostet mehr.",
+			"Stumpf: eine doppelt dengelte Waffe wird nach 150 Abschüssen stumpf. Am Dengelstock um den halben Preis wieder schärfen lassen.",
+			"Tastenbelegung in den Einstellungen: jede Aktion auf die Taste oder Maustaste, die du willst.",
+		],
+	},
+	{
 		"version": "1.1.1", "date": "2026-10-24",
 		"en": [
 			"Das Gipfelbuch: the global leaderboard on the title screen, Solo and Co-op, all time and this week.",

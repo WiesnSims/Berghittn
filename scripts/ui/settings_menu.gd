@@ -1,7 +1,9 @@
 class_name SettingsMenu
 extends Control
-## Sensitivity, volume, language and picture options, reachable from the start screen and the pause
-## menu. Every change applies at once (so a slider can be judged while it moves) and is saved on close.
+## Sensitivity, volume, language and picture options, and the key bindings (Keys), reachable from the
+## start screen and the pause menu. Every change applies at once (so a slider can be judged while it
+## moves) and is saved on close. A key binding's button waits for the next key or mouse button; Esc
+## leaves it as it was.
 
 signal closed
 
@@ -19,6 +21,12 @@ const FONT_SIZE: int = 20
 @onready var _rows: VBoxContainer = %Rows
 @onready var _back_button: Button = %BackButton
 
+# The action whose button waits for a key ("" when none), its button per action, and the line saying
+# a key cannot be had.
+var _listening: String = ""
+var _key_buttons: Dictionary = {}
+var _key_note: Label
+
 
 func _ready() -> void:
 	_back_button.pressed.connect(close)
@@ -35,6 +43,29 @@ func close() -> void:
 	Settings.save()
 	hide()
 	closed.emit()
+
+
+func _input(event: InputEvent) -> void:
+	if _listening == "" or not visible:
+		return
+	var pressed: bool = (event is InputEventKey and (event as InputEventKey).pressed and not (event as InputEventKey).echo) \
+			or (event is InputEventMouseButton and (event as InputEventMouseButton).pressed)
+	if not pressed:
+		return
+	get_viewport().set_input_as_handled()
+	var action: String = _listening
+	_listening = ""
+	if event is InputEventKey and (event as InputEventKey).physical_keycode == KEY_ESCAPE:
+		_refresh_keys()
+		return
+	if not Keys.can_bind(event):
+		_key_note.text = "UI_KEYS_TAKEN"
+		_refresh_keys()
+		return
+	_key_note.text = ""
+	Settings.bindings = Keys.rebind(action, event)
+	_refresh_keys()
+	Settings.apply(false)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -60,6 +91,53 @@ func _build() -> void:
 	_add_language()
 	_add_slider("UI_SET_RENDER_SCALE", Constants.RENDER_SCALE_MIN, 1.0, Settings.render_scale,
 			func(v: float) -> void: Settings.render_scale = v, _percent)
+	_add_keys()
+
+
+func _add_keys() -> void:
+	var heading := Label.new()
+	heading.text = "UI_SET_KEYS"
+	heading.add_theme_font_size_override("font_size", FONT_SIZE + 4)
+	heading.custom_minimum_size = Vector2(0.0, ROW_HEIGHT * 1.5)
+	heading.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	_rows.add_child(heading)
+	for entry: Array in Keys.ACTIONS:
+		var action: String = entry[0]
+		var row: HBoxContainer = _add_row(entry[1])
+		var button := Button.new()
+		button.custom_minimum_size = Vector2(200.0, 0.0)
+		button.add_theme_font_size_override("font_size", FONT_SIZE)
+		# Key names are shown as they are.
+		button.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		button.pressed.connect(func() -> void: _listen(action))
+		row.add_child(button)
+		_key_buttons[action] = button
+	_key_note = Label.new()
+	_key_note.add_theme_font_size_override("font_size", FONT_SIZE)
+	_rows.add_child(_key_note)
+	var reset := Button.new()
+	reset.text = "UI_KEYS_RESET"
+	reset.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	reset.add_theme_font_size_override("font_size", FONT_SIZE)
+	reset.pressed.connect(func() -> void:
+		_listening = ""
+		Settings.bindings = {}
+		Keys.apply({})
+		_key_note.text = ""
+		_refresh_keys()
+		Settings.apply(false))
+	_rows.add_child(reset)
+	_refresh_keys()
+
+
+func _listen(action: String) -> void:
+	_listening = action
+	_refresh_keys()
+
+
+func _refresh_keys() -> void:
+	for action: String in _key_buttons:
+		(_key_buttons[action] as Button).text = tr("UI_KEYS_PRESS") if action == _listening else Keys.name_of(action)
 
 
 func _percent(value: float) -> String:

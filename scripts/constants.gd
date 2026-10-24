@@ -367,6 +367,15 @@ const DENGEL_WAVE: int = 5
 const DENGEL_OPEN_DELAY: float = 3.5
 ## Points for dengeln (level 1) and doppelt dengeln (level 2).
 const DENGEL_COST: Array[int] = [5000, 10000]
+## Ammo for a forged gun costs this much more, by its level (plain, dengelt, doppelt dengelt), at the
+## Munitionskiste and at its wall-buy (balance 1.1.2: forged guns were refilled too cheaply).
+const DENGEL_AMMO_EXTRA: Array[int] = [0, 500, 1000]
+## Stumpf (1.1.2): a doppelt dengelt weapon loses its edge after this many kills and is dengelt again;
+## sharpening it back at the Dengelstock costs DENGEL_RESHARPEN_COST instead of DENGEL_COST[1].
+const STUMPF_KILLS: int = 150
+const DENGEL_RESHARPEN_COST: int = 5000
+## The HUD warns once this many kills of the edge are left.
+const STUMPF_WARN: int = 25
 ## Seconds of hammering, and seconds the forged weapon waits to be taken before it is gone.
 const DENGEL_TIME: float = 10.0
 const DENGEL_WAIT: float = 30.0

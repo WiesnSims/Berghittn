@@ -1079,6 +1079,49 @@ Built (2026-10-24, branch leaderboard, version 1.1.1):
 - Desktop runs only use a board given with --board.
 - Tests: board/test/board.test.mjs, tools/board_test.mjs (tests/board_solo, tests/net_board).
 
+### Balance, Stumpf and key bindings (user request 2026-10-24, version 1.1.2)
+
+*Why:* players reported that doppelt dengelt weapons were too strong. A player could stay in one
+place and spam the right-click modes for a very long time without being hurt. Level 2 gave damage
+x4, magazine x2 and reserve x4: about 16 times the base gun's damage before it ran dry. The
+Munitionskiste refilled all of it for a flat 1000.
+
+*Balance (part 1 to 3)*
+1. The reserve grows less: x1.25 when dengelt, x1.5 when doppelt dengelt (was x2 and x4). Damage
+   and magazine stay as they were.
+2. The right-click mode costs more rounds: x1.5 when dengelt, x2 when doppelt dengelt (rounded up).
+3. Ammo for a forged gun costs more: +500 when dengelt, +1000 when doppelt dengelt. This applies at
+   the Munitionskiste (for each forged gun it refills) and at the gun's wall-buy.
+
+*Stumpf*
+- A doppelt dengelt weapon (a gun, or the melee weapon) loses its edge after 150 kills made with
+  it. It then goes back to dengelt in the same slot, keeping the ammo that still fits.
+- The HUD shows the kills left next to its name ("Schneid 87"). A warning comes at 25 kills left,
+  and a banner when it goes dull.
+- The Dengelstock sharpens a weapon that went dull back to doppelt dengelt for 5000 instead of
+  10000, with a fresh edge.
+- The Golden Gun goes dull too.
+
+*Key bindings*
+- Settings get a "Key bindings" section: every action (moving, jump, sprint, crouch, shoot, weapon
+  mode, reload, melee, throw, use, the three gun slots, next and previous gun) on any key or mouse
+  button.
+- A key that another action has is swapped with it. Esc cancels. Pause (P, Esc) and the debug keys
+  are kept.
+- "Reset keys" brings the defaults back.
+- Every text that names a key (prompts, the HUD, the controls line on the title and in the pause
+  menu) names the key it is bound to now.
+
+Built (2026-10-24, branch dengel-balance, version 1.1.2):
+- Balance: tools/weapons/dengel.py (reserve and right-click rounds), Constants.DENGEL_AMMO_EXTRA,
+  WeaponHolder.ammo_extra and crate_extra, AmmoCrate.price_for, WallBuy._ammo_price.
+- Stumpf: Constants.STUMPF_KILLS, STUMPF_WARN and DENGEL_RESHARPEN_COST; on WeaponHolder,
+  GunSlot.edge, _melee_edge, edge_left, is_dulled, the edge_changed and went_dull signals;
+  Dengelstock.cost_for.
+- Key bindings: scripts/ui/keys.gd (Keys: names, {action} tokens in the string tables, rebinding
+  with swaps, saved in Settings.bindings) and the Settings menu's section.
+- Tests: m9_dengel (the new rules), m9_stumpf, keys.
+
 
 ## 13. Project structure
 
