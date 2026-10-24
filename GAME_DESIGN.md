@@ -1002,6 +1002,16 @@ new ones are added here)*
 - A hidden quest: three Enzian bottles hidden on the map unlock a secret song and a free Schnaps.
 - Night and weather: the storm gets heavier through the waves, a Föhn wave with clear sight.
 - Bergtour, a procedural mode reshuffling the rooms (needs section 15 changed first).
+- D'Bergrettung, an endgame quest (written up 2026-10-24 as an M10 plan, then parked by the user:
+  it does not fit the game well enough for now). The Funkgerät in the Stube calls for help from
+  wave 8; carry diesel from the Skiraum to a new Notstrom-Aggregat in the Schuppen; kill da
+  Liftwart (a mini-boss with an ice pick that pulls you in) for the key to the Seilbahn's
+  Steuerpult; hold out 150 s while the gondola climbs, with da Tatzelwurm coiled on the cable
+  outside the portal (a fixed boss with three frost-blister weak spots); ride down out of the
+  portal fighting Bergdohlen: "Obabgfoahn!", a win screen, a Tatzlwurm-Haubn and an `escaped`
+  mark in the Gipfelbuch. Quest enemies: Eismandl (ice crust, weak to fire), Liftwart,
+  Bernhardiner (dog packs, the barrel heals), Tatzelwurm. The full write-up is in commit fd6a50c
+  (PR #105).
 
 *Questions for the user*
 - Q1 (answered): Nomoi! shows at once on every end screen; the match restarts when everyone in
