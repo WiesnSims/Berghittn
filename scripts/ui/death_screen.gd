@@ -1,7 +1,7 @@
 class_name DeathScreen
 extends Control
 ## Game-over overlay (solo: down = game over). Shows the run (kills, headshots, favourite weapon,
-## Schnaps) and the personal best. The Restart click doubles as the gesture for pointer lock.
+## Schnaps, Bsundan killed) and the personal best. The Restart click doubles as the gesture for pointer lock.
 ## Co-op (M9 "Nomoi!"): everyone's runs in the Hüttenwertung, Nomoi! to play again with the same
 ## people, and the room's invite link. Solo: Play with friends opens a room.
 ## Das Gipfelbuch: the run's place on the global leaderboard (solo sent from here; in co-op the host
@@ -16,7 +16,7 @@ signal menu_requested
 const QUIP_KEYS: Array[String] = ["UI_DEATH_QUIP_1", "UI_DEATH_QUIP_2", "UI_DEATH_QUIP_3", "UI_DEATH_QUIP_4"]
 const HEADER_KEYS: Array[String] = [
 	"UI_WERTUNG_NAME", "UI_WERTUNG_POINTS", "UI_DEATH_KILLS", "UI_DEATH_HEADSHOTS", "UI_DEATH_FAVOURITE",
-	"UI_DEATH_SCHNAPS",
+	"UI_DEATH_SCHNAPS", "UI_DEATH_BSUNDAN",
 ]
 const HEADER_COLOR := Color(0.75, 0.7, 0.62)
 const CELL_COLOR := Color(0.95, 0.92, 0.85)
@@ -33,6 +33,7 @@ const BOARD_SIZE: int = 22
 @onready var _headshots: Label = %Headshots
 @onready var _favourite: Label = %Favourite
 @onready var _schnaps: Label = %Schnaps
+@onready var _bsundan: Label = %Bsundan
 @onready var _wertung: GridContainer = %Wertung
 @onready var _best: Label = %Best
 @onready var _restart_button: Button = %RestartButton
@@ -83,6 +84,7 @@ func present(wave: int, points: int, run: PlayerStats, new_best: bool, coop: boo
 	var favourite: WeaponData = run.favourite()
 	_favourite.text = tr("UI_DEATH_WEAPON") % [tr(favourite.display_name), run.kills_with(favourite)] if favourite else tr("UI_DEATH_NONE")
 	_schnaps.text = str(run.schnaps)
+	_bsundan.text = str(run.bsundan)
 	_new_best.visible = new_best
 	_best.visible = not new_best
 	_best.text = tr("UI_DEATH_BEST") % [Settings.best_wave, Settings.best_points]
@@ -264,7 +266,7 @@ func _refresh_wertung() -> void:
 		for text: String in [
 			row["name"], str(row["points"]), str(kills),
 			tr("UI_DEATH_SHARE") % [row["headshots"], roundi(100.0 * int(row["headshots"]) / maxi(kills, 1))],
-			fav, str(row["schnaps"]),
+			fav, str(row["schnaps"]), str(row["bsundan"]),
 		]:
 			_wertung.add_child(_cell(text, color))
 

@@ -3,7 +3,8 @@ extends Node
 ## Decides when the events of section 8a happen. Die Resi comes every 3 to 5 waves from wave 3, but only
 ## while the Terrasse is open (she waits for it) and never on a boss wave. On top of that, now and then a
 ## random event: at most one a wave, never on a boss wave or a wave Resi comes, not the same one twice
-## in a row when another could come.
+## in a row when another could come. "Bsundane Woch!" (1.2) has no actor: the rest of the wave
+## brings the rare variants far more often (WaveManager.variant_chance).
 ## Co-op (M7): only the host's director sends events; CoopEvents gives every guest a copy of each.
 
 @export var zones: ZoneMap
@@ -23,6 +24,7 @@ var _fassl: Bierfassl
 var _murmel: Murmeltier
 var _guest: TouristGuest
 var _last_random: StringName = &""
+var _wave: int = 0
 
 
 func _ready() -> void:
@@ -31,6 +33,7 @@ func _ready() -> void:
 
 
 func _on_wave_started(wave: int, is_boss_wave: bool) -> void:
+	_wave = wave
 	if is_boss_wave or Coop.is_guest():
 		# The Krampus has the stage to himself; Resi comes the wave after.
 		return
@@ -58,6 +61,10 @@ func available_random_events() -> Array[StringName]:
 	# He gets off at the Seilbahn and must be able to walk to the Stube through open zones.
 	if not is_instance_valid(_guest) and zones.is_unlocked(&"seilbahn") and _guest_route_open():
 		events.append(&"guest")
+	# Only with enough of the wave still to come for the Bsundan to turn up in.
+	var waves: WaveManager = _waves()
+	if _wave >= Constants.BSUNDAN_WEEK_FIRST_WAVE and waves and waves.still_to_spawn() >= Constants.BSUNDAN_WEEK_MIN_LEFT 			and waves.variant_chance < Constants.BSUNDAN_WEEK_CHANCE:
+		events.append(&"bsundan")
 	if events.size() > 1:
 		events.erase(_last_random)
 	return events
@@ -77,7 +84,23 @@ func start_event(event: StringName) -> Node:
 			return send_murmeltier()
 		&"guest":
 			return send_guest()
+		&"bsundan":
+			bsundane_woch()
 	return null
+
+
+## "Bsundane Woch!" (also used by tests): the rest of this wave brings the Bsundan far more often.
+func bsundane_woch() -> void:
+	var waves: WaveManager = _waves()
+	if waves == null:
+		return
+	waves.variant_chance = Constants.BSUNDAN_WEEK_CHANCE
+	Coop.announce("EVENT_BSUNDAN_WEEK")
+	Sound.play(&"event_call")
+
+
+func _waves() -> WaveManager:
+	return get_tree().get_first_node_in_group("wave_manager") as WaveManager
 
 
 ## Sends die Resi in now (also used by tests). Her way in is the ResiSpots markers in the Terrasse.

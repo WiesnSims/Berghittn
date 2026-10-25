@@ -1,8 +1,8 @@
 class_name StartScreen
 extends Control
-## Title screen (#77): the game's teaser behind, Solo, Co-op, Settings, the patch notes and das
-## Gipfelbuch (the global leaderboard), with the
-## version in a corner. Solo's click doubles as the
+## Title screen (#77): the game's teaser behind, Solo, Co-op, Settings, the patch notes, das
+## Gipfelbuch (the global leaderboard) and the Steckbriefe & Wandernadln (1.2), with the version in a
+## corner and the Wandernadln earned over it. Solo's click doubles as the
 ## user gesture browsers require for pointer lock (and audio). Until the hut's shaders are built
 ## (#78, ShaderWarmup) it shows only the still picture and how far that is: each new shader blocks the
 ## browser for a moment, so a live menu would stutter. Then the menu comes in and the picture moves.
@@ -24,6 +24,8 @@ var _join_mode: bool = false
 var _version: Label
 var _notes: PatchNotesPanel
 var _board: BoardPanel
+var _steckbriefe: SteckbriefPanel
+var _nadln: Label
 
 
 func _ready() -> void:
@@ -46,6 +48,25 @@ func _ready() -> void:
 	_board = BoardPanel.new()
 	add_child(_board)
 	(%BoardButton as Button).pressed.connect(_board.open)
+	_steckbriefe = SteckbriefPanel.new()
+	add_child(_steckbriefe)
+	(%SteckbriefButton as Button).pressed.connect(_steckbriefe.open.bind(0))
+	_nadln = Label.new()
+	_nadln.add_theme_font_size_override("font_size", 16)
+	_nadln.add_theme_color_override("font_color", Color(1.0, 0.86, 0.45))
+	_nadln.add_theme_color_override("font_outline_color", Color.BLACK)
+	_nadln.add_theme_constant_override("outline_size", 4)
+	# Over the version, clear of the controls line.
+	_nadln.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE, 16)
+	_nadln.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_nadln.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_nadln.offset_top -= 26
+	_nadln.offset_bottom -= 26
+	_nadln.mouse_filter = Control.MOUSE_FILTER_STOP
+	_nadln.gui_input.connect(func(event: InputEvent) -> void:
+		if event is InputEventMouseButton and event.pressed and _revealed:
+			_steckbriefe.open(1))
+	add_child(_nadln)
 	Settings.changed.connect(_refresh_controls)
 	_refresh_controls()
 	set_ready(0.0)
@@ -90,7 +111,7 @@ func _reveal() -> void:
 
 
 func _menu_items() -> Array[Control]:
-	return [_solo, _coop, %SettingsButton, %PatchNotesButton, %BoardButton, %Controls]
+	return [_solo, _coop, %SettingsButton, %PatchNotesButton, %BoardButton, %SteckbriefButton, %Controls, _nadln]
 
 
 ## The controls line names the keys as they are bound (Keys).
@@ -119,3 +140,4 @@ func _refresh() -> void:
 	# Marked until this version's notes were opened once.
 	var unread: bool = Settings.seen_version != PatchNotes.current()
 	(%PatchNotesButton as Button).text = tr("UI_PATCH_NOTES_NEW") if unread else tr("UI_PATCH_NOTES")
+	_nadln.text = tr("UI_NADL_COUNT") % Wandernadln.earned()

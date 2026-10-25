@@ -131,6 +131,14 @@ size_flags_horizontal = 0
 theme_override_font_sizes/font_size = 24
 text = "UI_BOARD"
 
+[node name="SteckbriefButton" type="Button" parent="Margin/Column"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 50)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 21
+text = "UI_STECKBRIEFE_BUTTON"
+
 [node name="Fill" type="Control" parent="Margin/Column"]
 layout_mode = 2
 size_flags_vertical = 3

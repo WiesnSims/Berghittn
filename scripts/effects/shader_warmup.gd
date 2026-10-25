@@ -24,6 +24,7 @@ const EFFECTS: Array[Script] = [
 	preload("res://scripts/weapons/behaviors/knoedel.gd"),
 	preload("res://scripts/weapons/behaviors/knoedel_pile.gd"),
 	preload("res://scripts/weapons/behaviors/rodel_sled.gd"),
+	preload("res://scripts/weapons/behaviors/kegel_ball.gd"),
 	preload("res://scripts/weapons/behaviors/handboeller_shell.gd"),
 	preload("res://scripts/weapons/behaviors/alphorn_wave.gd"),
 	preload("res://scripts/weapons/behaviors/harmonika_notes.gd"),
@@ -35,6 +36,17 @@ const EFFECTS: Array[Script] = [
 	preload("res://scripts/effects/mandl_gold.gd"),
 	preload("res://scripts/effects/scope_glint.gd"),
 	preload("res://scripts/enemies/variants/variant_looks.gd"),
+	preload("res://scripts/events/map_marker.gd"),
+]
+## The events' actors (section 8a): their models drawn as they are (the Tourist is skinned), and every
+## material in their scenes on a swatch. Play-test 1.2: Resi stalled the game for a second or two
+## as she came, compiling her look and her marker's glow on the spot.
+const EVENT_MODELS: Array[String] = [
+	"res://scenes/events/resi_model.tscn", "res://scenes/events/murmeltier_model.tscn", "res://assets/models/guest.tscn",
+]
+const EVENT_SCENES: Array[String] = [
+	"res://scenes/events/resi.tscn", "res://scenes/events/murmeltier.tscn", "res://scenes/events/bierfassl.tscn",
+	"res://scenes/events/tourist_guest.tscn",
 ]
 
 ## The world this warms up for (main's World); its materials are collected from it.
@@ -156,11 +168,25 @@ func _collect() -> void:
 				_items.append(copy)
 	# Co-op: the other players' hikers.
 	_items.append(HIKER.instantiate() as Node3D)
+	for path: String in EVENT_MODELS:
+		_items.append((load(path) as PackedScene).instantiate() as Node3D)
+	for path: String in EVENT_SCENES:
+		# Never in the tree: their scripts do not run.
+		var scene: Node = (load(path) as PackedScene).instantiate()
+		for node: Node in [scene] + scene.find_children("*", "", true, false):
+			for material: Material in _materials_of(node):
+				if material and not seen.has(material):
+					seen[material] = true
+					_items.append(_swatch(material))
+		scene.free()
 	for script: Script in EFFECTS:
 		var effect := Node3D.new()
 		effect.set_script(script)
 		if "silent" in effect:
 			effect.set("silent", true)
+		# A marker's label draws (and so compiles) only with some text.
+		if effect is MapMarker:
+			effect.set("text", "UI_TITLE")
 		_items.append(effect)
 		# Built in its _ready, so shown in full only once it is in the tree.
 		effect.ready.connect(_show_all.bind(effect), CONNECT_ONE_SHOT)

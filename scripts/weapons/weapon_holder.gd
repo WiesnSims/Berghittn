@@ -661,6 +661,9 @@ func _physics_process(delta: float) -> void:
 		_switch_left -= delta
 		return
 	if is_reloading():
+		# An instant secondary (Hoch damit!) still goes off: the last ball may be rolling yet.
+		if (captured or force_aim) and weapon.secondary == WeaponData.Secondary.BEHAVIOR and _behavior 				and _behavior.secondary_instant() and Input.is_action_just_pressed("secondary") and _behavior.secondary_ready():
+			fire_secondary()
 		_reload_left -= delta
 		_load_rounds()
 		if _reload_left <= 0.0:
@@ -698,7 +701,9 @@ func _physics_process(delta: float) -> void:
 		else:
 			start_reload()
 		return
-	if weapon.secondary == WeaponData.Secondary.BEHAVIOR and Input.is_action_just_pressed("secondary") and _cooldown <= 0.0:
+	if weapon.secondary == WeaponData.Secondary.BEHAVIOR and Input.is_action_just_pressed("secondary") 			and (_cooldown <= 0.0 or (_behavior and _behavior.secondary_instant())):
+		if _behavior and not _behavior.secondary_ready():
+			return
 		if _can_fire_secondary():
 			fire_secondary()
 		else:
@@ -1002,13 +1007,15 @@ func fire_secondary() -> void:
 	var from_reserve: int = maxi(rounds - mag, 0)
 	mag -= rounds - from_reserve
 	reserve -= from_reserve
-	_set_cooldown(1.0 / weapon.fire_rate)
+	if not _behavior.secondary_instant():
+		_set_cooldown(1.0 / weapon.fire_rate)
 	_behavior.fire_secondary()
 	Sound.play(weapon.secondary_sound if weapon.secondary_sound != &"" else weapon.fire_sound, 0.0, weapon.sound_pitch)
 	fired.emit(rounds)
 	acted.emit(Act.SECONDARY, rounds)
 	ammo_changed.emit(mag, reserve)
-	if _viewmodel:
+	# Not over a reload's own animation.
+	if _viewmodel and not is_reloading():
 		_viewmodel.play_secondary(rounds)
 
 

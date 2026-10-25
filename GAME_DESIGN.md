@@ -1306,6 +1306,162 @@ Built (2026-10-25, branch worktree-enemy-variants, version 1.2):
 - ShaderWarmup draws the variants' models and hats (from data/enemies) and variant_looks.gd (fuse
   sparks, LIVE, rope).
 
+### 1.2 extras (user request 2026-10-25, version 1.2)
+
+Smaller things around the Bsundan, so they are seen and remembered, plus a few good moments. The
+user picked seven of eight; the Wurlitzer (a song buff from a jukebox) was dropped: the Skiraum's
+small side room got the Kegelbahn instead (below, user pick 2026-10-25).
+
+**Da Huatständer.** A hat rack on the Stube's east wall, under the Trophäenwand: a dark board with
+eleven pegs and a brass plate with a name under each. Top row the five hats of the plain enemies
+(Wanderer, Tourist, Knappe, Wilderer, Venedigermandl), bottom row the six Bsundan. The first hat of
+each kind shot off in a match (Huat obschiaßn, by anyone) goes up on its peg with a pop and a nail
+sound; a Bsundan hat also gets a banner ("Da Huat vom Kassier hängt jetzt in da Stubn!"). Empty
+pegs keep their plate, dimmed. Each screen keeps its own rack, like the Trophäenwand (every screen
+sees every shot hat). A full rack in one match earns a Wandernadl.
+
+**Bsundane on the end screen and in the Gipfelbuch.** PlayerStats counts the Bsundan this player
+killed: a "Bsundane" row on the death screen and a column in the co-op Hüttenwertung. The Gipfelbuch
+stores it per entry (solo: the player's, co-op: the team's) and shows it as a column. Server:
+board/migrations/0002 adds `bsundan INTEGER NOT NULL DEFAULT 0` (older entries 0); the server takes
+it like the kills (a whole number, never more than the kills).
+
+**"Bsundane Woch!" (random event).** A fourth random event (section 8a), from wave 8: for the rest
+of that wave the variant chance is BSUNDAN_WEEK_CHANCE 25 % instead of 3 % (still one alive at a
+time, never on a boss wave). Banner on every screen: "Bsundane Woch! Heid kemman de Bsundan!". No
+actor and no marker: the Bsundan are the event.
+
+**The others greet the Bsundan.** When a variant turns up, a plain enemy near it (within 15 m, the
+nearest one) calls out to it once, a new Gredn moment GREET with lines about that variant ("Da
+Kassier is do, jetzt zahlst!", "Achtung, da Sprengmeister!"), two or three per variant, in the
+speaker's own voice. Always said (no dice), heard like any line.
+
+**Zeitlupe.** The last kill of a wave plays in slow motion: ZEITLUPE_SCALE 0.25 game speed for
+ZEITLUPE_TIME 0.6 s (real time), easing back over 0.4 s, with the sound muffled (a low pass on the
+Master bus). On every screen at the wave's end. A Settings switch "Slow motion on the last kill"
+(on), for players who do not like it.
+
+**Steckbriefe (wanted posters).** A new title-screen button "Steckbriefe & Wandernadln" opens a
+panel with two tabs. Steckbriefe: a wanted poster ("GSUACHT") for each of the 14 enemies (8 plain
+and 6 Bsundan): a picture of it, its name (dialect), what it does (one or two plain sentences,
+translated), one of its lines, and how many this browser's player has killed. An enemy never met
+is a dark silhouette with "???" until it first turns up in one of our matches (Settings.met). The
+pictures are rendered from the models once (tests/portraits) into assets/ui/steckbriefe/<id>.png.
+
+**Wandernadln (badges).** Like the real hiking badges: six badges in Bronze, Silber and Gold, 18
+in all, kept in Settings (this browser):
+- Gipfelstürmer: reach wave 10 / 20 / 30.
+- Bsundan-Jaga: kill a Bsundan / all six kinds / 50 Bsundan in all.
+- Huatsammler: shoot 25 / 250 hats off in all / fill the Huatständer in one match.
+- Scharfschütz: 100 / 1000 / 5000 headshot kills in all.
+- Krampusbezwinger: kill 1 / 10 / 50 Krampusse.
+- Seilschaft: reach wave 5 / 10 / 20 in co-op.
+A new one comes with a banner and a sound in the match. The panel's second tab shows all 18 (got or
+still to do, with progress); the title screen shows the count ("Wandernadln 5/18") under the menu.
+
+How (planned):
+- HatRack (scripts/trophies/hat_rack.gd, scenes/props/hat_rack.tscn) in the Stube under the
+  TrophyWall; the hats from assets/models/enemies/<id>_hat.res.
+- PlayerStats.bsundan; Board entry key `bsundan`; board.js and migration 0002; BoardPanel column.
+- EventDirector: event `bsundan` (WaveManager.variant_chance for the wave).
+- Gredn.Moment.GREET, lines with the variant they greet; voices in voices.py.
+- Zeitlupe (scripts/effects/zeitlupe.gd) under Main, on Events.wave_cleared; Settings.zeitlupe.
+- Settings: met, kills (per enemy id), hats, headshots, coop_best, badges. Wandernadln
+  (scripts/trophies/wandernadln.gd) counts and awards; SteckbriefPanel (scripts/ui/) with both tabs.
+- Test: tests/v12_extras (rack, stats, event, greet, Zeitlupe, met/kills, badges, panel).
+
+Built (2026-10-25, branch v12-extras, on top of the Bsundan, version 1.2):
+- HatRack (scripts/trophies/hat_rack.gd, scenes/props/hat_rack.tscn) on the Stube's east wall under
+  the TrophyWall: wood_dark board and pegs, Label3D plates (dim until the hat hangs), each hat
+  shrunk to fit 0.42 m (the Tafel). `filled` gives the Gold Huatsammler.
+- PlayerStats.bsundan; DeathScreen row and Hüttenwertung column; the Gipfelbuch entry's `bsundan`
+  (main.gd, solo and the group's sum), board/board.js (optional, a whole number up to the kills),
+  board/migrations/0002_bsundan.sql, BoardPanel column. To go live the migration is applied to
+  berghittn-board before the deploy (`npx wrangler d1 migrations apply berghittn-board --remote`).
+- EventDirector `bsundan` / bsundane_woch() (from wave 8, with at least 8 of the wave still to come):
+  WaveManager.variant_chance, reset each wave; the banner by Coop.announce.
+- Gredn.Moment.GREET and Gredn.greet (the nearest plain enemy within 15 m with a line for that
+  variant, 1.5 s after it turns up; EnemyVariant.activated starts it); 16 lines with voices.
+- Zeitlupe (scripts/effects/zeitlupe.gd): Engine.time_scale with a tween that ignores it, a low pass
+  on Master, always processing, reset when the scene goes; Settings.zeitlupe and its switch.
+- Events.enemy_appeared (Enemy.activate). Wandernadln (scripts/trophies/wandernadln.gd) keeps
+  Settings.met / kills / hats / headshots / coop_best / badges and gives the badges (banner, the
+  `nadl` chime from sfx.py); earlier progress (the personal best) counts quietly at start.
+- SteckbriefPanel (scripts/ui/steckbrief_panel.gd): posters with a silhouette shader for enemies not
+  met, and the badge page; the title screen's button and the count in its corner. Pictures:
+  tests/portraits (assets/ui/steckbriefe/<id>.png).
+- Views for checking: tests/room_view (the map from given spots), tests/ui_view (the menus).
+- Tests: tests/v12_extras (47 checks); tests/net_specials (the guest's Huatständer, Bsundane Woch on
+  the guest); board/test/board.test.mjs (bsundan kept, 0 from older games, refused above the kills).
+
+### Da Kegelbahn and da Bolingboi (user request 2026-10-25, version 1.2)
+
+The Skiraum's boot corridor behind the partition (4 x 15 m) becomes a Kegelbahn, a skittle alley
+like those in the cellars of Austrian inns: a wooden lane down the middle with a gutter on each side,
+nine pins in a diamond at the north end (the middle one, the König, with a red crown), a ball return
+with three balls at the south end, a sign and a board over the pins.
+
+*Kegeln*
+- At the ball return, E bowls a ball from where the player stands at the line, straight along where
+  they look (flat). It rolls down the lane (KEGEL_SPEED); a ball that leaves the lane is a "Pudel"
+  (the gutter) and hits nothing.
+- Every player has three balls. Pins knocked down are cleared after each ball (Abräumen), so the
+  three balls are three tries to clear all nine. All nine with the first ball: "Alle Neune!".
+- Cleared: the reward, da Bolingboi. Three balls gone without clearing: no reward. Either way the
+  player's balls come back five waves later (KEGEL_BALLS_BACK), and the pins stand up again.
+- One player at a time: the lane is busy while a ball rolls and the pins are cleared; a player who
+  bowls after someone else starts with all nine pins standing.
+- A ball on the lane bowls over enemies in its way (KEGEL_ENEMY_DAMAGE, thrown aside): enemies
+  climb in at the corridor's windows, so in a wave the lane is a weapon too.
+- How pins fall is worked out, not simulated: the ball rolls straight, a pin it touches falls along
+  the ball's way (to the side it was struck on) and the ball is turned a little off it; a falling pin
+  knocks over the standing pins it falls onto, and they fall on in turn. Same throw, same result:
+  co-op sends only the throw (who, from where, which way) and every screen plays it.
+- Co-op: a guest's throw goes to the host, who says yes (lane free, balls left) and sends it to all;
+  the host's game deals the ball's damage to enemies; the reward is given in the bowler's own game.
+
+*Da Bolingboi* (the reward, a gun; name by the user). A hand with a glossy purple bowling ball. Left
+click rolls a ball from the hand along the floor, straight where the player looks, over steps and
+down slopes (the Rodelkanone's ground riding): every enemy in its way is bowled over (damage and
+thrown aside), and it explodes at the first wall (or after its range): a blast like the Böller's.
+Right click, "Hoch damit!": the ball rolling now goes off where it is, at once (no round), to blow a
+ball up in the middle of a crowd. Five balls in the hand, 25 in the reserve; the Munitionskiste
+refills it. Clearing the pins again while holding it refills it.
+
+How (planned):
+- scripts/zones/kegelbahn.gd (built in code, interactable), placed in scenes/zones/skiraum.tscn;
+  CoopWorld request_kegel / _kegel_throw.
+- data/weapons/bolingboi.tres; behaviors/bolingboi.gd and kegel_ball.gd (a Rodelkanone sled with a
+  ball's look that explodes); scripts/weapons/bolingboi_viewmodel.gd and its scene.
+- Sounds kegel_roll, kegel_pins, kegel_boom (sfx.py).
+- Tests: tests/kegelbahn (the pins, Pudel, the three balls, the reward, the balls back after five
+  waves, the ball on enemies, the Bolingboi's roll, blast and Hoch damit!), a co-op step in
+  tests/net_specials.
+
+Built (2026-10-25, branch v12-extras):
+- Kegelbahn (scripts/zones/kegelbahn.gd) at (19.65, 0, -3.1) in the Skiraum, the lane running north.
+  Kegelbahn.roll is the pure function of a throw; bowl() plays it (ball along the path, pins toppled
+  by tween, cleared after CLEAR_WAIT, the set reset after RESET_WAIT). Per-player balls (_balls,
+  _back) kept the same on every screen, since every screen plays every throw. CoopWorld
+  request_kegel / _ask_kegel / _kegel_bowled. Tuning (KEGEL_* in constants.gd): an aimed ball near
+  the pocket takes 3 to 8 pins; Alle Neune comes from about 1 in 100 throws of a fan.
+- Bolingboi: data/weapons/bolingboi.tres (5 / 25, 220 a body, 450 blast in 3.5 m, 30 m roll, no
+  Dengelstock upgrade); behaviors/bolingboi.gd; behaviors/kegel_ball.gd extends the Rodelkanone's
+  sled (no banks; its crash is the blast); BolingboiViewmodel builds its hand and ball at
+  NOTIFICATION_SCENE_INSTANTIATED, so the co-op hiker's copy of Model has them. Not in the
+  Hüttentruhe. Sounds kegel_roll, kegel_pins, kegel_click.
+- Views: tests/room_view gun=<id> (a viewmodel on the camera), tests/armed_view takes a gun list.
+- Play-test round 1 (2026-10-25):
+  - Hoch damit! was buggy: it played its animation with nothing rolling, it waited out the throw's
+    cooldown, and it was not read during the reload that follows the last ball (so it often failed).
+    Now WeaponBehavior.secondary_ready (nothing to do: the click does nothing) and secondary_instant
+    (no cooldown either way, and it goes off during a reload too, without its animation).
+  - 5 / 25 balls; the reload (2.4 s) flicks a fresh ball high up out of view, catches it and spins
+    it on a finger.
+  - Resi stalled the game for a second or two as she came: her look and the map marker's glow and
+    label compiled on the spot. ShaderWarmup now draws the events' models, every material of their
+    scenes, and a MapMarker (176 items, was 144).
+
 
 ## 13. Project structure
 

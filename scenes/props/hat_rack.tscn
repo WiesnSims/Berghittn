@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/trophies/hat_rack.gd" id="1"]
+
+[node name="HatRack" type="Node3D"]
+script = ExtResource("1")

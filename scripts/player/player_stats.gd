@@ -1,6 +1,7 @@
 class_name PlayerStats
 extends Node
-## This player's run for the death screen: kills, headshot kills, kills per weapon and Schnaps drunk.
+## This player's run for the death screen: kills, headshot kills, kills per weapon, Schnaps drunk and
+## Bsundan killed.
 ## Like PlayerPoints it only counts what its own player did, so in co-op every screen shows its own run.
 
 ## Caps for a Hüttenwertung row from another browser (sanitize_row).
@@ -12,6 +13,8 @@ var headshots: int = 0
 ## Every Schnaps that went down, bought at the shrine or tapped from the Bierfassl; a Schnaps had again
 ## after going down counts again.
 var schnaps: int = 0
+## The rare variants (Die Bsundan, 1.2) this player killed.
+var bsundan: int = 0
 # Base weapon id -> kills with it (a dengelt one counts for its base), and id -> the highest version
 # of it that made a kill (its name is the one shown).
 var _weapon_kills: Dictionary = {}
@@ -45,7 +48,7 @@ func row(player_name: String, points: int) -> Dictionary:
 	return {
 		"name": player_name, "points": points, "kills": kills, "headshots": headshots,
 		"fav": String(best.display_name) if best else "", "fav_kills": kills_with(best), "schnaps": schnaps,
-		"public": Settings.board, "clean": Board.clean,
+		"bsundan": bsundan, "public": Settings.board, "clean": Board.clean,
 	}
 
 
@@ -56,16 +59,18 @@ static func sanitize_row(data: Dictionary) -> Dictionary:
 		"name": str(data.get("name", "")).left(HikerStyle.NAME_MAX_LENGTH), "points": number.call("points"),
 		"kills": number.call("kills"), "headshots": number.call("headshots"),
 		"fav": str(data.get("fav", "")).left(ROW_TEXT_MAX), "fav_kills": number.call("fav_kills"),
-		"schnaps": number.call("schnaps"),
+		"schnaps": number.call("schnaps"), "bsundan": number.call("bsundan"),
 		"public": data.get("public", true) is bool and data.get("public", true),
 		"clean": data.get("clean", true) is bool and data.get("clean", true),
 	}
 
 
-func _on_enemy_killed(_enemy: Node3D, is_headshot: bool, is_melee: bool, source: Node3D) -> void:
+func _on_enemy_killed(enemy: Node3D, is_headshot: bool, is_melee: bool, source: Node3D) -> void:
 	if source != _player:
 		return
 	kills += 1
+	if enemy is Enemy and (enemy as Enemy).data.variant_of:
+		bsundan += 1
 	if is_headshot:
 		headshots += 1
 	# The kill goes to what was in hand: a burn, a mine or a thrown thing has no weapon of its own here.

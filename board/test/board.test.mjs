@@ -94,6 +94,16 @@ test('refused: no ticket, the wrong numbers, too fast for the wave, too many poi
 	assert.equal((await post('ticket', { mode: 'versus' })).status, 400);
 });
 
+test('the Bsundan killed (1.2): kept, 0 from older games, never more than the kills', async () => {
+	const with_ = await (await post('entry', { ticket: await ticket(), ...run({ bsundan: 2 }) })).json();
+	const without = await (await post('entry', { ticket: await ticket(), ...run() })).json();
+	const entries = await list('solo');
+	assert.equal(entries.find((e) => e.id === with_.id).bsundan, 2);
+	assert.equal(entries.find((e) => e.id === without.id).bsundan, 0);
+	assert.equal((await post('entry', { ticket: await ticket(), ...run({ bsundan: 5, kills: 4 }) })).status, 400);
+	assert.equal((await post('entry', { ticket: await ticket(), ...run({ bsundan: -1 }) })).status, 400);
+});
+
 test('co-op: one entry for the group, on its own board', async () => {
 	const t = await ticket('coop');
 	const response = await post('entry', { ticket: t, ...run({ names: ['Resi', 'Sepp', '–'], points: 2000 }) });

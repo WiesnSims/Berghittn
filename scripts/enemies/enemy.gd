@@ -278,6 +278,7 @@ func activate(enemy_data: EnemyData, for_wave: int, at: Transform3D) -> void:
 		_appear()
 	if variant:
 		variant.activated()
+	Events.enemy_appeared.emit(self)
 
 
 func is_alive() -> bool:

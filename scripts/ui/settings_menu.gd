@@ -91,6 +91,7 @@ func _build() -> void:
 			func(v: float) -> void: Settings.crosshair_size = v, _percent)
 	_add_toggle("UI_SET_DAMAGE_NUMBERS", Settings.damage_numbers, func(on: bool) -> void: Settings.damage_numbers = on)
 	_add_toggle("UI_SET_CHATTER", Settings.chatter, func(on: bool) -> void: Settings.chatter = on)
+	_add_toggle("UI_SET_ZEITLUPE", Settings.zeitlupe, func(on: bool) -> void: Settings.zeitlupe = on)
 	_add_toggle("UI_SET_BOARD", Settings.board, func(on: bool) -> void: Settings.board = on)
 	for bus: StringName in Settings.BUSES:
 		_add_slider(VOLUME_KEYS[bus], 0.0, 1.0, Settings.volume(bus),

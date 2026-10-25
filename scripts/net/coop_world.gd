@@ -117,6 +117,16 @@ func dengel_taken(stock: Dengelstock) -> void:
 	_dengel_taken.rpc(_path(stock))
 
 
+## Da Kegelbahn (1.2): a guest wants to bowl from `start` along `direction` (local to the lane).
+func request_kegel(lane: Kegelbahn, start: Vector3, direction: Vector3) -> void:
+	_ask_kegel.rpc_id(1, _path(lane), start, direction)
+
+
+## Host: a throw went down the lane (ours, or a guest's we allowed): every guest plays it too.
+func kegel_bowled(lane: Kegelbahn, peer: int, start: Vector3, direction: Vector3) -> void:
+	_kegel_bowled.rpc(_path(lane), peer, start, direction)
+
+
 @rpc("any_peer", "call_remote", "reliable")
 func _ask_unlock(zone: StringName, cost: int) -> void:
 	var sender: int = multiplayer.get_remote_sender_id()
@@ -147,6 +157,21 @@ func _ask_dengel(path: NodePath, weapon_id: String, melee: bool, cost: int) -> v
 	var stock := _node(path) as Dengelstock
 	if stock == null or not stock.start_for(Coop.node_of(sender), StringName(weapon_id), melee):
 		_refund.rpc_id(sender, cost)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _ask_kegel(path: NodePath, start: Vector3, direction: Vector3) -> void:
+	var sender: int = multiplayer.get_remote_sender_id()
+	var lane := _node(path) as Kegelbahn
+	if lane and lane.bowl(sender, start, direction):
+		kegel_bowled(lane, sender, start, direction)
+
+
+@rpc("authority", "call_remote", "reliable")
+func _kegel_bowled(path: NodePath, peer: int, start: Vector3, direction: Vector3) -> void:
+	var lane := _node(path) as Kegelbahn
+	if lane:
+		lane.bowl(peer, start, direction)
 
 
 @rpc("any_peer", "call_remote", "reliable")

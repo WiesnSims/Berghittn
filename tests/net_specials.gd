@@ -149,10 +149,14 @@ func _run() -> bool:
 		await get_tree().create_timer(0.5).timeout
 		if _player.points.total != before + Constants.POINTS_HAT:
 			return _fail("the hat was paid more than once (%d)" % (_player.points.total - before))
+		# The Huatständer (1.2 extras): the guest's own rack has it.
+		var rack := get_tree().get_first_node_in_group("hat_rack") as HatRack
+		if rack == null or not puppet.data.id in rack.hung():
+			return _fail("the hat never went up on the guest's Huatständer")
 		# Its complaint fades before the next line is looked for.
 		if not await _until(func() -> bool: return Gredn.current.shown() == 0):
 			return _fail("the hat's line never faded")
-	print("hat: the guest's shot knocked the host's hat off, paid 20 once")
+	print("hat: the guest's shot knocked the host's hat off, paid 20 once, on the guest's Huatständer")
 	if not await _sync("hat"):
 		return false
 	# --- Die Bsundan (1.2): the host's Kassier takes the guest's fee, the guest's kill gets it back;
@@ -201,6 +205,41 @@ func _run() -> bool:
 			return _fail("the variants' lines never faded")
 	print("variants: the Kassier's fee taken from the guest and paid back with his kill; the rope on the guest")
 	if not await _sync("variants"):
+		return false
+	# --- "Bsundane Woch!" (1.2 extras): the host's event, its banner on the guest ---
+	if host:
+		director.bsundane_woch()
+		if waves.variant_chance != Constants.BSUNDAN_WEEK_CHANCE:
+			return _fail("Bsundane Woch did not raise the host's chance")
+	elif not await _until(func() -> bool: return _banners.has(tr("EVENT_BSUNDAN_WEEK"))):
+		return _fail("no Bsundane Woch banner on the guest")
+	print("bsundane woch: the host's event, its banner on the guest")
+	if not await _sync("woch"):
+		return false
+	# --- da Kegelbahn (1.2): the guest bowls through the host; both lanes end the same ---
+	var lane := get_tree().get_first_node_in_group("kegelbahnen") as Kegelbahn
+	if not host:
+		var throw_from := Vector3(0.1, 0.0, Kegelbahn.LINE_Z)
+		var throw_way := Vector3.FORWARD.rotated(Vector3.UP, -deg_to_rad(1.0))
+		Coop.world.request_kegel(lane, throw_from, throw_way)
+		if not await _until(func() -> bool: return not lane.is_free()):
+			return _fail("the host never let the guest's ball go")
+		if not await _until(func() -> bool: return not lane._rolling and lane._clear_left < 0.0):
+			return _fail("the guest's ball never finished")
+		_note.rpc("kegel_left", lane.standing_count())
+		if lane.balls_of(Net.my_id()) != Constants.KEGEL_BALLS - 1:
+			return _fail("the guest's ball was not counted (%d left)" % lane.balls_of(Net.my_id()))
+	else:
+		if not await _until(func() -> bool: return _marks.has("kegel_left")):
+			return _fail("the guest never bowled")
+		if not await _until(func() -> bool: return not lane._rolling and lane._clear_left < 0.0):
+			return _fail("the host's lane never finished the guest's ball")
+		if lane.standing_count() != int(_marks["kegel_left"]) or lane.bowler != multiplayer.get_peers()[0]:
+			return _fail("the lanes differ: host %d standing, guest %d" % [lane.standing_count(), int(_marks["kegel_left"])])
+		if lane.balls_of(1) != Constants.KEGEL_BALLS:
+			return _fail("the guest's ball was taken from the host's")
+	print("kegelbahn: the guest's ball went down both lanes alike")
+	if not await _sync("kegel"):
 		return false
 	# --- a line (Gredn): picked by the host, its index sent, heard and shown on the guest ---
 	var gredn: Gredn = Gredn.current

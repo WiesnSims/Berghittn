@@ -6,7 +6,8 @@ extends Control
 signal closed
 
 const HEADER_KEYS: Array[String] = [
-	"UI_BOARD_PLACE", "UI_WERTUNG_NAME", "UI_BOARD_WAVE", "UI_WERTUNG_POINTS", "UI_DEATH_KILLS", "UI_DEATH_FAVOURITE",
+	"UI_BOARD_PLACE", "UI_WERTUNG_NAME", "UI_BOARD_WAVE", "UI_WERTUNG_POINTS", "UI_DEATH_KILLS", "UI_DEATH_BSUNDAN",
+	"UI_DEATH_FAVOURITE",
 ]
 const HEADER_COLOR := Color(0.75, 0.7, 0.62)
 const CELL_COLOR := Color(0.95, 0.92, 0.85)
@@ -130,7 +131,7 @@ func _on_listed(mode: String, period: String, entries: Array, ok: bool) -> void:
 		var fav: String = str(entry.get("fav", ""))
 		for text: String in [
 			str(i + 1), ", ".join(names), str(int(entry.get("wave", 0))), str(int(entry.get("points", 0))),
-			str(int(entry.get("kills", 0))), tr(fav) if fav != "" else tr("UI_DEATH_NONE"),
+			str(int(entry.get("kills", 0))), str(int(entry.get("bsundan", 0))), tr(fav) if fav != "" else tr("UI_DEATH_NONE"),
 		]:
 			_grid.add_child(_cell(text, color))
 	_scroll.scroll_vertical = 0
