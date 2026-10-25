@@ -21,6 +21,16 @@ func add(amount: int) -> void:
 	changed.emit(total, amount)
 
 
+## Points taken away (the Kassier's fee): as many as there are, up to `amount`. Returns how many.
+func lose(amount: int) -> int:
+	var taken: int = mini(amount, total)
+	if taken <= 0:
+		return 0
+	total -= taken
+	changed.emit(total, -taken)
+	return taken
+
+
 func can_afford(cost: int) -> bool:
 	return total >= cost
 
@@ -50,12 +60,17 @@ func _on_enemy_killed(enemy: Node3D, is_headshot: bool, is_melee: bool, source: 
 	if body and body.data.treasure:
 		add(Constants.MANDL_KILL_POINTS + Constants.MANDL_KILL_PER_WAVE * body.wave)
 		return
+	var kill: int = Constants.POINTS_KILL_BODY
 	if is_melee:
-		add(Constants.POINTS_KILL_MELEE)
+		kill = Constants.POINTS_KILL_MELEE
 	elif is_headshot:
-		add(Constants.POINTS_KILL_HEADSHOT)
-	else:
-		add(Constants.POINTS_KILL_BODY)
+		kill = Constants.POINTS_KILL_HEADSHOT
+	# A rare variant (Die Bsundan) pays more, and maybe a bonus (the Kassier's Kassa).
+	if body:
+		kill = roundi(kill * body.data.points_multiplier)
+		if body.variant:
+			kill += body.variant.kill_bonus()
+	add(kill)
 
 
 func _on_board_repaired(_barricade: Node3D, source: Node3D) -> void:

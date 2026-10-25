@@ -1201,6 +1201,111 @@ Built (2026-10-24, branch huat-obschiassn, version 1.1.3):
   (CoopEnemies._hat_lost), whose own game pays the shooter.
 - Test: tests/huat.
 
+### Die Bsundan: rare enemy variants (user request 2026-10-24, version 1.2)
+
+Now and then a special one of a known enemy turns up: the same body in its own colours, its own
+hat, its own lines and one trick of its own. Six of them, two per base enemy for the Wanderer and
+the Tourist, one each for the Knappe and the Perchte.
+
+Shared rules:
+- From wave 5, each normal spawn has a VARIANT_CHANCE (3 %) to be a variant instead (never on a
+  boss wave, never the Sitzfleisch company or a flock). Picked evenly among the variants allowed
+  in that wave (each has its own first wave), never the same one twice in a row, and at most one
+  variant alive at a time. It counts in the wave like anyone.
+- It arrives with a banner on every screen (its name and a line, in dialect in both languages).
+- Its kill pays 3x the usual kill points (EnemyData.points_multiplier); hits pay as usual.
+- It wears a hat of its own that can be shot off (+20, with its own line), and it talks with its
+  base enemy's voice: lines of its own, and its base enemy's for the moments it has none for.
+- Co-op: the host runs it as any enemy; what a guest must see (a lit fuse, the stream, a
+  blessing, the rope) goes out as a cue (Enemy.cued, CoopEnemies._cued).
+
+**Da Vereinskassier** (Wanderer, from wave 5). The Alpenverein's treasurer: a white shirt under a
+dark green Loden waistcoat, glasses, a black Tirolerhut with a gold band and a gold Edelweiss, the
+red Kassa under his arm. He walks like a Wanderer and his blow is weak (10), but every blow
+collects the Mitgliedsbeitrag: KASSIER_FEE 150 points off the player he hits (never below 0,
+shown as a -150), "Mitgliedsbeitrag!". His kill bursts the Kassa in a fountain of coins and pays
+the killer KASSIER_KILL 500 plus every fee he took this life, on top of the 3x kill.
+"Ihr Beitrag is fällig!", "Wer hot no ned zoit?", hat: "Mei Vereinshuat!", dying: "Die Kassa
+stimmt ned…".
+
+**Da Sprengmeister** (Knappe, from wave 8). A miner with a red helmet, a red sash, and dynamite:
+a bundle strapped to his chest and one in his hand instead of the pick. With a player within
+SPRENG_LIGHT_RANGE 6 m in sight he lights the fuse ("Obacht, gleich tuat's an Tuscher!"): a
+hiss, sparks at his hand, and he hurries on (SPRENG_FUSE_SPEED) for SPRENG_FUSE_TIME 3 s, then
+goes up. He also goes up whenever he dies, lit or not. The blast (the Böller's look, 5 m):
+players in it with nothing solid between take up to SPRENG_PLAYER_DAMAGE 70 (less at the edge),
+every enemy in it SPRENG_ENEMY_DAMAGE 400, paid to whoever killed him (a fuse that runs out pays
+nobody). So: shoot him early, or shoot him in the middle of a crowd, but never with the shovel.
+
+**Die Schönperchte** (Perchte, from wave 10). From the real custom of the beautiful Perchten
+against the ugly ones: a white and red costume, a pale smiling mask, bells round the waist and
+the Tafel, a big board on her head covered in mirrors and ribbons. She never attacks: she keeps
+SCHOEN_KEEP 8 m from the nearest player and every SCHOEN_BLESS_EVERY 4 s jumps and rings her
+bells, "Glück und Segen!": every enemy within SCHOEN_RADIUS 9 m (bosses too) gets SCHOEN_HEAL
+35 % of its health back, with a gold sparkle. Kill her first. Shoot her Tafel off ("Mei
+Tafel!") and the blessing is gone: then she fights like a plain Perchte, without the lunge.
+
+**Da Influencer** (Tourist, from wave 6). Neon pink jacket, yellow shorts, a cap on backwards, a
+selfie stick with a ring light. With a player 4 to 16 m off in sight he stops, holds the stick up
+and goes live for INFLU_LIVE_TIME 6 s ("Servus Leute, mia san live vom Berg!"), a red LIVE over
+his head: every other enemy within INFLU_RADIUS 15 m gets the Likes, INFLU_HYPE 1.3x speed while
+he streams, and every INFLU_FLASH_EVERY 2 s his ring light flashes: a player looking at him
+(within 30°, nothing between) is dazzled for a moment (a white flash on the screen). Then
+INFLU_COOLDOWN 5 s as a plain Tourist. "Lasst's a Like do!", hat: "Mei Kappl!", dying:
+"Abonniert's mi…".
+
+**Da Bergführer** (Wanderer, from wave 5). The mountain guide: an orange softshell, a white
+climbing helmet, a coil of rope over his shoulder, an ice axe. He comes with a Seilschaft:
+SEIL_FOLLOWERS 4 Wanderers of the wave (fewer if the wave has fewer left) roped on behind him in a
+line, a rope drawn between them. Each follows the one before it (SEIL_GAP 1.4 m), and fights only
+when a player is within SEIL_FREE 2.5 m of it. A rope stretched past SEIL_SNAP 7 m (a window
+climb) snaps, and those behind go free. Kill him: "Seilriss!", the rope goes slack and every
+Wanderer still on it trips over (dazed SEIL_TRIP_TIME 3 s). "Seilschaft, auf geht's!", "Bleibt's
+beinand!", hat: "Ohne Helm geh i ned weiter!".
+
+**Da Trailrunner** (Tourist, from wave 5; planned as an E-Biker, but a bike needs a riding rig of
+its own, so he runs). Lime Lycra, black tights, a running vest with bottles, a cap. From 5 to
+TRAIL_RANGE 14 m with a clear line he crouches for TRAIL_WINDUP 0.8 s ("Bahn frei!") and
+charges: TRAIL_SPEED 11 m/s straight ahead for up to TRAIL_TIME 1.4 s, unable to turn. A player
+in his way takes TRAIL_DAMAGE 25 and is thrown along his run; other enemies are shoved aside.
+Into a wall: he goes down, dazed TRAIL_CRASH_STUN 2.5 s ("Au! Mei Bestzeit!"). TRAIL_COOLDOWN 4 s
+between charges, a plain Tourist meanwhile. Dying: "Ziel… erreicht…".
+
+How (planned):
+- EnemyData: `variant_of` (the base enemy, for lines and the wave pick), `variant` (the script
+  with its trick, an EnemyVariant), `points_multiplier`. Each variant is a data file of its own in
+  data/enemies (so co-op guests find it by id) with its own model.
+- WaveTable.variants: WaveEntry per variant (enemy, first wave); WaveManager rolls and spawns
+  them, and ropes the Seilschaft on.
+- EnemyVariant (scripts/enemies/variants/): a node on the enemy with hooks the enemy calls:
+  activated, step (its trick, solo and host), struck (it hurt a player: run on the victim's own
+  machine, so the fee and the throw work for co-op guests too), died, hat_lost, cue (on puppets).
+- Models: tools/models/build_enemies.gd builds each from its base figure with its own colours,
+  gear and hat.
+- Gredn: the new moments FEE, FUSE, BLESS, LIVE, CHARGE, CRASH; a variant falls back on its base
+  enemy's lines. Voices in tools/audio/voices.py, new sounds (fuse hiss, Kassa ching, bells) in
+  sfx.py.
+- Test: tests/variants (each trick, the spawn rules, the pay), and a co-op step in
+  tests/net_specials.
+
+Built (2026-10-25, branch worktree-enemy-variants, version 1.2):
+- Data: data/enemies/<variant>.tres (variant_of, variant, points_multiplier 3); WaveTable.variants
+  with each first wave (Kassier, Bergführer, Trailrunner 5, Influencer 6, Sprengmeister 8,
+  Schönperchte 10). WaveManager._roll_variant, send_variant (also for tests), variant_about.
+- Tricks: scripts/enemies/variants/ (EnemyVariant and one script each). Enemy got the hooks and
+  what they use: cued / send_cue / puppet_cue, pace (speed_scale, the Likes: hype), roped_to and
+  _follow_rope, _strike (every blow), leaping / crash, heal / sparkle / spill, kill_self.
+  Player.take_damage hands a variant's blow to EnemyVariant.struck in the victim's own game;
+  PlayerPoints pays 3x and kill_bonus, and lose() takes the fee.
+- Co-op: CoopEnemies._cued (an Enemy in the cue goes as its net id); any enemy may get "healed".
+- Models: build_enemies.gd's _wanderer, _tourist, _knappe and _perchte take a `look` (colours, gear,
+  face, hat, stance); the base figures came out byte for byte the same. tests/model_view takes a
+  list of ids.
+- Gredn: FEE, FUSE, BLESS, LIVE, CRASH; Gredn.now, Gredn.lines_for (the base enemy's lines as a
+  fallback). Voices in voices.py; kassa_ching, fuse_hiss, perchten_schellen in sfx.py.
+- ShaderWarmup draws the variants' models and hats (from data/enemies) and variant_looks.gd (fuse
+  sparks, LIVE, rope).
+
 
 ## 13. Project structure
 

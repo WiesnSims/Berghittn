@@ -110,6 +110,10 @@ func take_damage(amount: int, attacker: Node3D = null) -> void:
 	if weapons.block(attacker):
 		amount = roundi(amount * weapons.melee_weapon.block_share)
 	health.take_damage(amount, attacker)
+	# A variant's blow does more in the victim's own game (the Kassier's fee, the Trailrunner's throw).
+	var enemy := attacker as Enemy
+	if enemy and enemy.variant:
+		enemy.variant.struck(self)
 
 
 func is_crouching() -> bool:

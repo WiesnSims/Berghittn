@@ -39,6 +39,12 @@ func _init() -> void:
 	_wilderer()
 	_dohle()
 	_guest()
+	_kassier()
+	_bergfuehrer()
+	_influencer()
+	_trailrunner()
+	_sprengmeister()
+	_schoenperchte()
 	print("enemy models built")
 	quit()
 
@@ -127,91 +133,123 @@ func _face(b: Builder, skin: Color, eye: Color = EYE, centre: Vector3 = Vector3(
 	b.head(false)
 
 
-func _wanderer() -> void:
+## The Wanderer; a variant of him (Die Bsundan) is built from the same figure with its own `look`:
+## colours (jacket, sleeves, breeches, socks, boots), no rucksack (rucksack false), its own gear
+## (Callable taking the builder, on the body), face extras (on the head) and hat (on the hat part),
+## and its own stance.
+func _wanderer(id: String = "wanderer", look: Dictionary = {}) -> void:
 	var b := Builder.new(_scale("wanderer"))
 	_standard(b)
-	var jacket := Color(0.72, 0.14, 0.1)
-	var breeches := Color(0.36, 0.24, 0.13)
-	var socks := Color(0.85, 0.8, 0.7)
+	var jacket: Color = look.get("jacket", Color(0.72, 0.14, 0.1))
+	var breeches: Color = look.get("breeches", Color(0.36, 0.24, 0.13))
+	var socks: Color = look.get("socks", Color(0.85, 0.8, 0.7))
 	var felt := Color(0.17, 0.3, 0.17)
 	_torso(b, [[0.86, 0.17, 0.12], [1.0, 0.16, 0.11], [WAIST.y, 0.165, 0.115], [1.25, 0.2, 0.13], [1.4, 0.23, 0.13], [1.47, 0.17, 0.1], [1.5, 0.07, 0.06]], &"wool", jacket)
 	# Knickerbockers over knee socks, mountain boots.
 	_torso(b, [[0.8, 0.175, 0.125], [0.9, 0.18, 0.13]], &"leather", breeches)
 	_legs(b, Vector2(0.085, 0.09), Vector2(0.05, 0.055), &"leather", breeches, &"wool", socks)
-	_boots(b, Color(0.22, 0.15, 0.1))
-	_arms(b, Vector2(0.065, 0.065), Vector2(0.048, 0.048), &"wool", jacket)
+	_boots(b, look.get("boots", Color(0.22, 0.15, 0.1)))
+	_arms(b, Vector2(0.065, 0.065), Vector2(0.048, 0.048), &"wool", look.get("sleeves", jacket))
 	_hands(b, ZOMBIE_SKIN)
-	# Rucksack with a bedroll strapped on top.
-	b.box(Vector3(0.0, 1.17, 0.2), Vector3(0.34, 0.42, 0.17), &"wool", Color(0.3, 0.33, 0.2), &"chest", Basis.IDENTITY, Vector2(0.9, 0.85))
-	b.box(Vector3(0.0, 1.06, 0.29), Vector3(0.26, 0.14, 0.05), &"wool", Color(0.26, 0.28, 0.17), &"chest")
-	b.tube([Vector3(-0.2, 1.43, 0.2), Vector3(0.2, 1.43, 0.2)], [Vector2(0.06, 0.06), Vector2(0.06, 0.06)], &"linen", Color(0.75, 0.7, 0.62), &"chest", 7, true, Vector3.UP)
-	_both(func(m: Vector3, _s: String) -> void:
-		b.box(Vector3(-0.12, 1.25, -0.125) * m, Vector3(0.05, 0.42, 0.02), &"leather", Color(0.2, 0.14, 0.09), &"chest"))
+	if look.get("rucksack", true):
+		# Rucksack with a bedroll strapped on top.
+		b.box(Vector3(0.0, 1.17, 0.2), Vector3(0.34, 0.42, 0.17), &"wool", look.get("pack", Color(0.3, 0.33, 0.2)), &"chest", Basis.IDENTITY, Vector2(0.9, 0.85))
+		b.box(Vector3(0.0, 1.06, 0.29), Vector3(0.26, 0.14, 0.05), &"wool", Color(0.26, 0.28, 0.17), &"chest")
+		if look.get("bedroll", true):
+			b.tube([Vector3(-0.2, 1.43, 0.2), Vector3(0.2, 1.43, 0.2)], [Vector2(0.06, 0.06), Vector2(0.06, 0.06)], &"linen", Color(0.75, 0.7, 0.62), &"chest", 7, true, Vector3.UP)
+		_both(func(m: Vector3, _s: String) -> void:
+			b.box(Vector3(-0.12, 1.25, -0.125) * m, Vector3(0.05, 0.42, 0.02), &"leather", Color(0.2, 0.14, 0.09), &"chest"))
+	if look.has("gear"):
+		(look.gear as Callable).call(b)
 	_face(b, ZOMBIE_SKIN)
+	if look.has("face"):
+		b.head(true)
+		(look.face as Callable).call(b)
+		b.head(false)
 	# Tyrolean felt hat with a band and a feather, a part of its own so it can be shot off.
 	b.part(&"hat")
-	b.tube([Vector3(0.0, 1.735, -0.02), Vector3(0.0, 1.75, -0.02)], [Vector2(0.21, 0.21), Vector2(0.2, 0.2)], &"wool", felt, &"head", 10)
-	b.tube([Vector3(0.0, 1.74, -0.02), Vector3(0.0, 1.8, -0.02), Vector3(0.0, 1.88, -0.025)], [Vector2(0.125, 0.13), Vector2(0.115, 0.12), Vector2(0.085, 0.095)], &"wool", felt, &"head", 9)
-	b.tube([Vector3(0.0, 1.75, -0.02), Vector3(0.0, 1.78, -0.02)], [Vector2(0.127, 0.132), Vector2(0.124, 0.13)], &"leather", Color(0.15, 0.1, 0.06), &"head", 9, false)
-	b.box(Vector3(0.12, 1.86, 0.03), Vector3(0.015, 0.17, 0.045), &"plain", Color(0.88, 0.86, 0.8), &"head", Basis(Vector3.RIGHT, -0.35), Vector2(0.4, 0.4))
+	if look.has("hat"):
+		(look.hat as Callable).call(b)
+	else:
+		b.tube([Vector3(0.0, 1.735, -0.02), Vector3(0.0, 1.75, -0.02)], [Vector2(0.21, 0.21), Vector2(0.2, 0.2)], &"wool", felt, &"head", 10)
+		b.tube([Vector3(0.0, 1.74, -0.02), Vector3(0.0, 1.8, -0.02), Vector3(0.0, 1.88, -0.025)], [Vector2(0.125, 0.13), Vector2(0.115, 0.12), Vector2(0.085, 0.095)], &"wool", felt, &"head", 9)
+		b.tube([Vector3(0.0, 1.75, -0.02), Vector3(0.0, 1.78, -0.02)], [Vector2(0.127, 0.132), Vector2(0.124, 0.13)], &"leather", Color(0.15, 0.1, 0.06), &"head", 9, false)
+		b.box(Vector3(0.12, 1.86, 0.03), Vector3(0.015, 0.17, 0.045), &"plain", Color(0.88, 0.86, 0.8), &"head", Basis(Vector3.RIGHT, -0.35), Vector2(0.4, 0.4))
 	b.head(false)
 	b.ragdoll({&"arm_l": 0.065, &"forearm_l": 0.05, &"arm_r": 0.065, &"forearm_r": 0.05,
 			&"thigh_l": 0.085, &"shin_l": 0.06, &"thigh_r": 0.085, &"shin_r": 0.06},
 			Vector3(0.32, 0.22, 0.24), Vector3(0.4, 0.38, 0.26), 0.13)
-	b.save(OUT + "/wanderer.tscn", "WandererModel", RIG, {
-		"build_scale": b.scale,
-		"stance": {&"arm_l": Vector3(80, 0, -4), &"arm_r": Vector3(70, 0, 6), &"forearm_l": Vector3(12, 0, 0),
-				&"forearm_r": Vector3(18, 0, 0), &"chest": Vector3(-8, 0, 0), &"head": Vector3(8, 0, 6)},
+	b.save(OUT + "/%s.tscn" % id, look.get("root", "WandererModel"), RIG, {
+		"build_scale": b.scale, "one_handed": look.get("one_handed", false),
+		"stance": look.get("stance", {&"arm_l": Vector3(80, 0, -4), &"arm_r": Vector3(70, 0, 6), &"forearm_l": Vector3(12, 0, 0),
+				&"forearm_r": Vector3(18, 0, 0), &"chest": Vector3(-8, 0, 0), &"head": Vector3(8, 0, 6)}),
 		"stride": 26.0, "arm_swing": 6.0, "cadence": 1.5})
 
 
-func _tourist() -> void:
+## The Tourist; a variant (Die Bsundan) is built from the same figure with its own `look`: colours
+## (jacket, shorts, legs: the bare skin of the legs, or tights; socks, sandals), no bum bag and camera
+## (camera false), its own gear, face extras, hat and stance, as for _wanderer.
+func _tourist(id: String = "tourist", look: Dictionary = {}) -> void:
 	var b := Builder.new(_scale("tourist"))
 	_standard(b)
-	var jacket := Color(0.1, 0.72, 0.78)
+	var jacket: Color = look.get("jacket", Color(0.1, 0.72, 0.78))
+	var shorts: Color = look.get("shorts", Color(0.95, 0.88, 0.7))
+	var legs: Color = look.get("legs", ZOMBIE_SKIN)
+	var socks: Color = look.get("socks", Color(0.95, 0.95, 0.92))
+	var sandals: Color = look.get("sandals", Color(0.3, 0.2, 0.12))
 	_torso(b, [[0.86, 0.17, 0.13], [1.0, 0.185, 0.17, -0.03], [WAIST.y, 0.19, 0.17, -0.04], [1.25, 0.2, 0.15, -0.02], [1.4, 0.22, 0.13], [1.47, 0.16, 0.1], [1.5, 0.07, 0.06]], &"plain", jacket)
 	# Khaki shorts, bare knees, white socks in sandals.
-	_torso(b, [[0.74, 0.18, 0.13], [0.9, 0.18, 0.135]], &"linen", Color(0.95, 0.88, 0.7))
+	_torso(b, [[0.74, 0.18, 0.13], [0.9, 0.18, 0.135]], &"linen", shorts)
 	_both(func(m: Vector3, s: String) -> void:
 		var own := StringName("thigh" + s)
-		b.tube([(HIP + Vector3(0, 0.05, 0)) * m, Vector3(-0.115, 0.66, 0.0) * m], [Vector2(0.095, 0.1), Vector2(0.09, 0.095)], &"linen", Color(0.95, 0.88, 0.7), [[&"hips", own, 0.5], own], 7)
-		b.tube([Vector3(-0.112, 0.68, 0.0) * m, KNEE * m], [Vector2(0.06, 0.065), Vector2(0.055, 0.058)], &"skin", ZOMBIE_SKIN, own, 6, false)
+		b.tube([(HIP + Vector3(0, 0.05, 0)) * m, Vector3(-0.115, 0.66, 0.0) * m], [Vector2(0.095, 0.1), Vector2(0.09, 0.095)], &"linen", shorts, [[&"hips", own, 0.5], own], 7)
+		b.tube([Vector3(-0.112, 0.68, 0.0) * m, KNEE * m], [Vector2(0.06, 0.065), Vector2(0.055, 0.058)], &"skin", legs, own, 6, false)
 		var shin := StringName("shin" + s)
-		b.tube([(KNEE + Vector3(0, 0.02, 0)) * m, Vector3(-0.11, 0.3, 0.0) * m], [Vector2(0.055, 0.058), Vector2(0.05, 0.052)], &"skin", ZOMBIE_SKIN, [[own, shin, 0.5], shin], 6, false)
-		b.tube([Vector3(-0.11, 0.32, 0.0) * m, (ANKLE + Vector3(0, -0.02, 0)) * m], [Vector2(0.056, 0.058), Vector2(0.05, 0.052)], &"wool", Color(0.95, 0.95, 0.92), shin, 6)
+		b.tube([(KNEE + Vector3(0, 0.02, 0)) * m, Vector3(-0.11, 0.3, 0.0) * m], [Vector2(0.055, 0.058), Vector2(0.05, 0.052)], &"skin", legs, [[own, shin, 0.5], shin], 6, false)
+		b.tube([Vector3(-0.11, 0.32, 0.0) * m, (ANKLE + Vector3(0, -0.02, 0)) * m], [Vector2(0.056, 0.058), Vector2(0.05, 0.052)], &"wool", socks, shin, 6)
 		var foot := StringName("foot" + s)
-		b.box(Vector3(-0.11, 0.06, -0.06) * m, Vector3(0.1, 0.07, 0.22), &"wool", Color(0.95, 0.95, 0.92), foot, Basis.IDENTITY, Vector2(0.8, 0.8))
-		b.box(Vector3(-0.11, 0.015, -0.06) * m, Vector3(0.12, 0.03, 0.27), &"leather", Color(0.3, 0.2, 0.12), foot)
-		b.box(Vector3(-0.11, 0.07, -0.1) * m, Vector3(0.125, 0.02, 0.04), &"leather", Color(0.3, 0.2, 0.12), foot))
-	_arms(b, Vector2(0.07, 0.07), Vector2(0.05, 0.05), &"plain", jacket)
+		b.box(Vector3(-0.11, 0.06, -0.06) * m, Vector3(0.1, 0.07, 0.22), &"wool", socks, foot, Basis.IDENTITY, Vector2(0.8, 0.8))
+		b.box(Vector3(-0.11, 0.015, -0.06) * m, Vector3(0.12, 0.03, 0.27), &"leather", sandals, foot)
+		b.box(Vector3(-0.11, 0.07, -0.1) * m, Vector3(0.125, 0.02, 0.04), &"leather", sandals, foot))
+	_arms(b, Vector2(0.07, 0.07), Vector2(0.05, 0.05), &"plain", look.get("sleeves", jacket))
 	_hands(b, ZOMBIE_SKIN)
-	# Bum bag and the camera on its strap.
-	b.box(Vector3(0.0, 0.97, -0.2), Vector3(0.2, 0.09, 0.07), &"plain", Color(0.45, 0.08, 0.12), &"hips", Basis.IDENTITY, Vector2(0.9, 0.7))
-	b.box(Vector3(0.0, 1.02, -0.06), Vector3(0.4, 0.03, 0.3), &"plain", Color(0.1, 0.1, 0.1), &"hips")
-	b.box(Vector3(0.0, 1.27, -0.175), Vector3(0.13, 0.08, 0.06), &"plain", Color(0.15, 0.15, 0.16), &"chest")
-	b.tube([Vector3(0.03, 1.26, -0.2), Vector3(0.03, 1.26, -0.25)], [Vector2(0.028, 0.028), Vector2(0.025, 0.025)], &"plain", Color(0.06, 0.06, 0.07), &"chest", 8)
-	b.box(Vector3(0.03, 1.26, -0.252), Vector3(0.035, 0.035, 0.005), &"glow", Color(0.35, 0.45, 0.6), &"chest")
-	b.tube([Vector3(-0.07, 1.3, -0.18), Vector3(-0.12, 1.45, -0.08), Vector3(0.0, 1.5, 0.06), Vector3(0.12, 1.45, -0.08), Vector3(0.07, 1.3, -0.18)],
-			[Vector2(0.008, 0.01), Vector2(0.008, 0.01), Vector2(0.008, 0.01), Vector2(0.008, 0.01), Vector2(0.008, 0.01)], &"plain", Color(0.08, 0.08, 0.08), &"chest", 4, false)
+	if look.get("camera", true):
+		# Bum bag and the camera on its strap.
+		b.box(Vector3(0.0, 0.97, -0.2), Vector3(0.2, 0.09, 0.07), &"plain", Color(0.45, 0.08, 0.12), &"hips", Basis.IDENTITY, Vector2(0.9, 0.7))
+		b.box(Vector3(0.0, 1.02, -0.06), Vector3(0.4, 0.03, 0.3), &"plain", Color(0.1, 0.1, 0.1), &"hips")
+		b.box(Vector3(0.0, 1.27, -0.175), Vector3(0.13, 0.08, 0.06), &"plain", Color(0.15, 0.15, 0.16), &"chest")
+		b.tube([Vector3(0.03, 1.26, -0.2), Vector3(0.03, 1.26, -0.25)], [Vector2(0.028, 0.028), Vector2(0.025, 0.025)], &"plain", Color(0.06, 0.06, 0.07), &"chest", 8)
+		b.box(Vector3(0.03, 1.26, -0.252), Vector3(0.035, 0.035, 0.005), &"glow", Color(0.35, 0.45, 0.6), &"chest")
+		b.tube([Vector3(-0.07, 1.3, -0.18), Vector3(-0.12, 1.45, -0.08), Vector3(0.0, 1.5, 0.06), Vector3(0.12, 1.45, -0.08), Vector3(0.07, 1.3, -0.18)],
+				[Vector2(0.008, 0.01), Vector2(0.008, 0.01), Vector2(0.008, 0.01), Vector2(0.008, 0.01), Vector2(0.008, 0.01)], &"plain", Color(0.08, 0.08, 0.08), &"chest", 4, false)
+	if look.has("gear"):
+		(look.gear as Callable).call(b)
 	_face(b, ZOMBIE_SKIN)
 	b.head(true)
 	# Sunglasses over the glowing eyes, and a bucket hat.
-	b.box(Vector3(0.0, 1.652, -0.152), Vector3(0.2, 0.045, 0.012), &"plain", Color(0.03, 0.03, 0.04), &"head")
+	b.box(Vector3(0.0, 1.652, -0.152), Vector3(0.2, 0.045, 0.012), &"plain", look.get("glasses", Color(0.03, 0.03, 0.04)), &"head")
+	if look.has("face"):
+		(look.face as Callable).call(b)
 	b.part(&"hat")
-	b.tube([Vector3(0.0, 1.72, -0.02), Vector3(0.0, 1.74, -0.02)], [Vector2(0.18, 0.18), Vector2(0.15, 0.15)], &"linen", Color(0.95, 0.9, 0.75), &"head", 10)
-	b.tube([Vector3(0.0, 1.73, -0.02), Vector3(0.0, 1.81, -0.02)], [Vector2(0.13, 0.135), Vector2(0.11, 0.115)], &"linen", Color(0.95, 0.9, 0.75), &"head", 10)
+	if look.has("hat"):
+		(look.hat as Callable).call(b)
+	else:
+		b.tube([Vector3(0.0, 1.72, -0.02), Vector3(0.0, 1.74, -0.02)], [Vector2(0.18, 0.18), Vector2(0.15, 0.15)], &"linen", Color(0.95, 0.9, 0.75), &"head", 10)
+		b.tube([Vector3(0.0, 1.73, -0.02), Vector3(0.0, 1.81, -0.02)], [Vector2(0.13, 0.135), Vector2(0.11, 0.115)], &"linen", Color(0.95, 0.9, 0.75), &"head", 10)
 	b.head(false)
 	b.ragdoll({&"arm_l": 0.07, &"forearm_l": 0.05, &"arm_r": 0.07, &"forearm_r": 0.05,
 			&"thigh_l": 0.09, &"shin_l": 0.055, &"thigh_r": 0.09, &"shin_r": 0.055},
 			Vector3(0.34, 0.22, 0.28), Vector3(0.4, 0.38, 0.32), 0.13)
-	b.save(OUT + "/tourist.tscn", "TouristModel", RIG, {
-		"build_scale": b.scale,
-		"stance": {&"arm_l": Vector3(75, 0, -6), &"arm_r": Vector3(35, 0, 10), &"forearm_r": Vector3(70, 0, 0),
-				&"forearm_l": Vector3(10, 0, 0), &"chest": Vector3(4, 0, 0), &"head": Vector3(-4, 0, -6)},
-		"stride": 24.0, "arm_swing": 8.0, "cadence": 1.8})
+	b.save(OUT + "/%s.tscn" % id, look.get("root", "TouristModel"), RIG, {
+		"build_scale": b.scale, "one_handed": look.get("one_handed", false),
+		"stance": look.get("stance", {&"arm_l": Vector3(75, 0, -6), &"arm_r": Vector3(35, 0, 10), &"forearm_r": Vector3(70, 0, 0),
+				&"forearm_l": Vector3(10, 0, 0), &"chest": Vector3(4, 0, 0), &"head": Vector3(-4, 0, -6)}),
+		"stride": look.get("stride", 24.0), "arm_swing": 8.0, "cadence": 1.8})
 
 
-func _knappe() -> void:
+## The Bergknappe; a variant (Die Bsundan) is built from the same figure with its own `look`: no pick
+## (pick false), its own gear, helmet colour (helmet) and stance, as for _wanderer.
+func _knappe(id: String = "knappe", look: Dictionary = {}) -> void:
 	var b := Builder.new(_scale("knappe"))
 	_standard(b)
 	var coat := Color(0.1, 0.1, 0.11)
@@ -232,29 +270,41 @@ func _knappe() -> void:
 	_both(func(m: Vector3, s: String) -> void:
 		b.ball((SHOULDER + Vector3(0.0, 0.04, 0.0)) * m, Vector3(0.1, 0.05, 0.1), &"wool", coat, StringName("arm" + s), 7, 4))
 	_hands(b, ZOMBIE_SKIN, &"skin", Vector3(0.055, 0.06, 0.05))
-	# A pick in the right hand: shaft forward, head up.
 	var hand_r := Vector3(-WRIST.x, WRIST.y - 0.07, 0.0)
-	b.tube([hand_r + Vector3(0, 0, 0.18), hand_r + Vector3(0, 0, -0.55)], [Vector2(0.022, 0.022), Vector2(0.025, 0.025)], &"wood", Color(0.55, 0.38, 0.22), &"hand_r", 6)
-	b.tube([hand_r + Vector3(0, 0.26, -0.53), hand_r + Vector3(0, 0.02, -0.56), hand_r + Vector3(0, -0.17, -0.5)], [Vector2(0.008, 0.008), Vector2(0.03, 0.04), Vector2(0.008, 0.008)], &"metal", Color(0.5, 0.52, 0.55), &"hand_r", 5)
+	if look.get("pick", true):
+		# A pick in the right hand: shaft forward, head up.
+		b.tube([hand_r + Vector3(0, 0, 0.18), hand_r + Vector3(0, 0, -0.55)], [Vector2(0.022, 0.022), Vector2(0.025, 0.025)], &"wood", Color(0.55, 0.38, 0.22), &"hand_r", 6)
+		b.tube([hand_r + Vector3(0, 0.26, -0.53), hand_r + Vector3(0, 0.02, -0.56), hand_r + Vector3(0, -0.17, -0.5)], [Vector2(0.008, 0.008), Vector2(0.03, 0.04), Vector2(0.008, 0.008)], &"metal", Color(0.5, 0.52, 0.55), &"hand_r", 5)
+	if look.has("gear"):
+		(look.gear as Callable).call(b)
 	_face(b, ZOMBIE_SKIN, EYE, Vector3(0.0, 1.63, -0.02), Vector3(0.125, 0.14, 0.13))
 	b.head(true)
 	# Grey beard, the helmet and its lamp.
 	b.ball(Vector3(0.0, 1.55, -0.1), Vector3(0.11, 0.1, 0.07), &"fur", Color(0.42, 0.4, 0.38), &"head", 8, 5)
 	b.spike([Vector3(0.0, 1.55, -0.13), Vector3(0.0, 1.45, -0.14), Vector3(0.0, 1.39, -0.12)], 0.06, &"fur", Color(0.42, 0.4, 0.38), &"head", 6)
 	b.part(&"hat")
-	b.ball(Vector3(0.0, 1.71, -0.02), Vector3(0.145, 0.11, 0.155), &"metal", Color(0.16, 0.16, 0.17), &"head", 10, 5)
-	b.tube([Vector3(0.0, 1.69, -0.02), Vector3(0.0, 1.705, -0.02)], [Vector2(0.17, 0.18), Vector2(0.165, 0.175)], &"metal", Color(0.16, 0.16, 0.17), &"head", 10)
+	var helmet: Color = look.get("helmet", Color(0.16, 0.16, 0.17))
+	b.ball(Vector3(0.0, 1.71, -0.02), Vector3(0.145, 0.11, 0.155), &"metal", helmet, &"head", 10, 5)
+	b.tube([Vector3(0.0, 1.69, -0.02), Vector3(0.0, 1.705, -0.02)], [Vector2(0.17, 0.18), Vector2(0.165, 0.175)], &"metal", helmet, &"head", 10)
 	b.tube([Vector3(0.0, 1.74, -0.15), Vector3(0.0, 1.74, -0.2)], [Vector2(0.035, 0.035), Vector2(0.04, 0.04)], &"metal", brass, &"head", 8)
 	b.box(Vector3(0.0, 1.74, -0.202), Vector3(0.055, 0.055, 0.005), &"glow", Color(1.0, 0.95, 0.75), &"head")
 	b.head(false)
 	b.ragdoll({&"arm_l": 0.085, &"forearm_l": 0.065, &"arm_r": 0.085, &"forearm_r": 0.065,
 			&"thigh_l": 0.1, &"shin_l": 0.07, &"thigh_r": 0.1, &"shin_r": 0.07},
 			Vector3(0.4, 0.24, 0.34), Vector3(0.46, 0.4, 0.34), 0.14)
-	b.save(OUT + "/knappe.tscn", "KnappeModel", RIG, {
+	b.save(OUT + "/%s.tscn" % id, look.get("root", "KnappeModel"), RIG, {
 		"build_scale": b.scale, "one_handed": true,
-		"stance": {&"arm_r": Vector3(15, 0, 4), &"forearm_r": Vector3(25, 0, 0), &"arm_l": Vector3(40, 0, -8),
-				&"forearm_l": Vector3(25, 0, 0), &"chest": Vector3(-12, 0, 0), &"head": Vector3(10, 0, 0)},
+		"stance": look.get("stance", {&"arm_r": Vector3(15, 0, 4), &"forearm_r": Vector3(25, 0, 0), &"arm_l": Vector3(40, 0, -8),
+				&"forearm_l": Vector3(25, 0, 0), &"chest": Vector3(-12, 0, 0), &"head": Vector3(10, 0, 0)}),
 		"stride": 22.0, "arm_swing": 10.0, "cadence": 1.4})
+
+
+## Ribbons: flat strips hanging down around a ring of the body, in the `colors` in turn.
+func _ribbons(b: Builder, y: float, radius: Vector2, length: float, count: int, colors: Array, bone: StringName) -> void:
+	for i: int in count:
+		var a: float = TAU * float(i) / float(count) + 0.2
+		var at := Vector3(cos(a) * radius.x * 1.05, y - length * 0.5, sin(a) * radius.y * 1.05)
+		b.box(at, Vector3(0.05, length, 0.012), &"plain", colors[i % colors.size()], bone, Basis(Vector3.UP, -a + PI * 0.5) * Basis(Vector3.RIGHT, 0.08))
 
 
 ## Shaggy fur: tufts hanging down around a ring of the body.
@@ -266,23 +316,31 @@ func _tufts(b: Builder, y: float, radius: Vector2, length: float, count: int, co
 		b.spike([at, at + out + Vector3(0, -length * 0.6, 0), at + out * 1.5 + Vector3(0, -length, 0)], 0.055, &"fur", color.lightened(0.06 * float(i % 3)), bone, 5)
 
 
-func _perchte() -> void:
+## The Perchte; a variant (Die Bsundan) is built from the same figure with its own `look`: the
+## colour of the costume (fur), its material (cloth), the tufts' colours (ribbons: an Array, used in
+## turn), legs, and its own head (Callable on the head; then no carved mask) and hat, as for _wanderer.
+func _perchte(id: String = "perchte", look: Dictionary = {}) -> void:
 	var b := Builder.new(_scale("perchte"))
 	_standard(b)
-	var fur := Color(0.36, 0.26, 0.17)
+	var fur: Color = look.get("fur", Color(0.36, 0.26, 0.17))
+	var cloth: StringName = look.get("cloth", &"fur")
 	var mask := Color(0.55, 0.32, 0.16)
 	var bone := Color(0.9, 0.86, 0.74)
-	_torso(b, [[0.7, 0.22, 0.17], [0.86, 0.22, 0.17], [WAIST.y, 0.22, 0.17], [1.28, 0.25, 0.17], [1.42, 0.27, 0.16], [1.48, 0.2, 0.13], [1.52, 0.1, 0.09]], &"fur", fur, 9)
-	_tufts(b, 0.78, Vector2(0.21, 0.16), 0.22, 9, fur.darkened(0.1), &"hips")
-	_tufts(b, 1.2, Vector2(0.24, 0.17), 0.2, 9, fur, &"chest")
-	_tufts(b, 1.46, Vector2(0.26, 0.16), 0.18, 8, fur.lightened(0.05), &"chest")
+	_torso(b, [[0.7, 0.22, 0.17], [0.86, 0.22, 0.17], [WAIST.y, 0.22, 0.17], [1.28, 0.25, 0.17], [1.42, 0.27, 0.16], [1.48, 0.2, 0.13], [1.52, 0.1, 0.09]], cloth, fur, 9)
+	if look.has("ribbons"):
+		_ribbons(b, 0.78, Vector2(0.21, 0.16), 0.3, 12, look.ribbons, &"hips")
+		_ribbons(b, 1.46, Vector2(0.26, 0.16), 0.22, 10, look.ribbons, &"chest")
+	else:
+		_tufts(b, 0.78, Vector2(0.21, 0.16), 0.22, 9, fur.darkened(0.1), &"hips")
+		_tufts(b, 1.2, Vector2(0.24, 0.17), 0.2, 9, fur, &"chest")
+		_tufts(b, 1.46, Vector2(0.26, 0.16), 0.18, 8, fur.lightened(0.05), &"chest")
 	# A belt of cowbells.
 	b.tube([Vector3(0.0, 0.94, 0.0), Vector3(0.0, 0.99, 0.0)], [Vector2(0.235, 0.185), Vector2(0.235, 0.185)], &"leather", Color(0.15, 0.09, 0.05), &"hips", 9, false)
 	for x: float in [-0.14, 0.0, 0.14]:
 		b.tube([Vector3(x, 0.93, -0.2), Vector3(x, 0.83, -0.2)], [Vector2(0.03, 0.025), Vector2(0.05, 0.04)], &"metal", Color(0.75, 0.6, 0.3), &"hips", 6)
-	_legs(b, Vector2(0.11, 0.11), Vector2(0.075, 0.075), &"fur", fur, &"fur", fur.darkened(0.15))
+	_legs(b, Vector2(0.11, 0.11), Vector2(0.075, 0.075), cloth, fur, cloth, look.get("legs", fur.darkened(0.15)))
 	_boots(b, Color(0.08, 0.06, 0.05), Vector3(0.12, 0.12, 0.18), &"plain")
-	_arms(b, Vector2(0.09, 0.09), Vector2(0.07, 0.07), &"fur", fur)
+	_arms(b, Vector2(0.09, 0.09), Vector2(0.07, 0.07), cloth, fur)
 	_both(func(m: Vector3, s: String) -> void:
 		var hand := StringName("hand" + s)
 		var w := (WRIST + Vector3(0.0, -0.05, 0.0)) * m
@@ -290,8 +348,15 @@ func _perchte() -> void:
 		for k: int in 3:
 			var x: float = (k - 1) * 0.025 * m.x
 			b.spike([w + Vector3(x, -0.03, -0.02), w + Vector3(x, -0.1, -0.05), w + Vector3(x * 1.2, -0.14, -0.1)], 0.014, &"plain", bone, hand, 4))
-	b.tube([Vector3(0.0, 1.46, 0.0), Vector3(0.0, 1.56, -0.02)], [Vector2(0.07, 0.07), Vector2(0.06, 0.06)], &"fur", fur, [[&"chest", &"head", 0.5], &"head"], 7, false)
+	b.tube([Vector3(0.0, 1.46, 0.0), Vector3(0.0, 1.56, -0.02)], [Vector2(0.07, 0.07), Vector2(0.06, 0.06)], cloth, fur, [[&"chest", &"head", 0.5], &"head"], 7, false)
 	b.head(true)
+	if look.has("face"):
+		(look.face as Callable).call(b)
+		b.part(&"hat")
+		(look.hat as Callable).call(b)
+		b.head(false)
+		_save_perchte(b, id, look.get("root", "PerchteModel"))
+		return
 	# The carved wooden mask: a long face, a snout full of teeth, a tongue, horns and a mane.
 	b.box(Vector3(0.0, 1.64, -0.04), Vector3(0.24, 0.3, 0.24), &"wood", mask, &"head", Basis.IDENTITY, Vector2(0.85, 0.9))
 	b.box(Vector3(0.0, 1.56, -0.2), Vector3(0.17, 0.12, 0.14), &"wood", mask.darkened(0.08), &"head", Basis.IDENTITY, Vector2(0.85, 0.8))
@@ -308,10 +373,14 @@ func _perchte() -> void:
 		b.spike([Vector3(0.12 * x, 1.7, 0.05), Vector3(0.2 * x, 1.6, 0.1), Vector3(0.22 * x, 1.42, 0.12)], 0.06, &"fur", fur.lightened(0.1), &"head", 5)
 	_tufts(b, 1.78, Vector2(0.1, 0.1), 0.14, 6, fur.lightened(0.08), &"head", 0.05)
 	b.head(false)
+	_save_perchte(b, id, "PerchteModel")
+
+
+func _save_perchte(b: Builder, id: String, root: String) -> void:
 	b.ragdoll({&"arm_l": 0.09, &"forearm_l": 0.07, &"arm_r": 0.09, &"forearm_r": 0.07,
 			&"thigh_l": 0.11, &"shin_l": 0.075, &"thigh_r": 0.11, &"shin_r": 0.075},
 			Vector3(0.42, 0.24, 0.34), Vector3(0.5, 0.4, 0.34), 0.15)
-	b.save(OUT + "/perchte.tscn", "PerchteModel", RIG, {
+	b.save(OUT + "/%s.tscn" % id, root, RIG, {
 		"build_scale": b.scale,
 		"stance": {&"arm_l": Vector3(55, 0, -22), &"arm_r": Vector3(55, 0, 22), &"forearm_l": Vector3(30, 0, 0),
 				&"forearm_r": Vector3(30, 0, 0), &"chest": Vector3(-22, 0, 0), &"head": Vector3(18, 0, 0),
@@ -542,6 +611,169 @@ func _mandl() -> void:
 				&"forearm_l": Vector3(60, 0, 0), &"chest": Vector3(-26, 0, 0), &"head": Vector3(24, 0, 0),
 				&"thigh_l": Vector3(10, 0, -4), &"thigh_r": Vector3(10, 0, 4), &"shin_l": Vector3(-16, 0, 0), &"shin_r": Vector3(-16, 0, 0)},
 		"stride": 32.0, "arm_swing": 8.0, "cadence": 1.6})
+
+
+# --- Die Bsundan: the rare variants (1.2), each its base figure in its own look ------------------
+
+## Da Vereinskassier: a white shirt under a dark green Loden waistcoat with gold buttons, grey
+## breeches, green socks, glasses, the red Kassa in his left hand, a black Tirolerhut with a gold band
+## and an Edelweiss.
+func _kassier() -> void:
+	var shirt := Color(0.88, 0.87, 0.82)
+	var waistcoat := Color(0.13, 0.28, 0.16)
+	var gold := Color(0.95, 0.75, 0.25)
+	_wanderer("kassier", {"root": "KassierModel", "jacket": shirt, "breeches": Color(0.32, 0.32, 0.34),
+		"socks": Color(0.2, 0.36, 0.2), "rucksack": false,
+		"gear": func(b: Builder) -> void:
+			_torso(b, [[0.97, 0.168, 0.119], [WAIST.y, 0.172, 0.123], [1.25, 0.207, 0.137], [1.4, 0.236, 0.137], [1.46, 0.185, 0.108]], &"wool", waistcoat)
+			for i: int in 3:
+				b.box(Vector3(0.0, 1.33 - i * 0.1, -0.14), Vector3(0.022, 0.022, 0.015), &"metal", gold, &"chest" if 1.33 - i * 0.1 > WAIST.y else &"hips")
+			# The Kassa, held in the left hand.
+			var hand_l := Vector3(WRIST.x, WRIST.y - 0.07, 0.0)
+			b.box(hand_l + Vector3(0.0, -0.05, -0.03), Vector3(0.09, 0.15, 0.24), &"metal", Color(0.72, 0.1, 0.08), &"hand_l", Basis.IDENTITY, Vector2(0.95, 0.95))
+			b.box(hand_l + Vector3(0.05, -0.02, -0.03), Vector3(0.012, 0.04, 0.04), &"metal", gold, &"hand_l"),
+		"face": func(b: Builder) -> void:
+			b.box(Vector3(0.0, 1.652, -0.15), Vector3(0.18, 0.035, 0.008), &"metal", Color(0.25, 0.2, 0.12), &"head"),
+		"hat": func(b: Builder) -> void:
+			var felt := Color(0.08, 0.08, 0.09)
+			b.tube([Vector3(0.0, 1.735, -0.02), Vector3(0.0, 1.75, -0.02)], [Vector2(0.21, 0.21), Vector2(0.2, 0.2)], &"wool", felt, &"head", 10)
+			b.tube([Vector3(0.0, 1.74, -0.02), Vector3(0.0, 1.8, -0.02), Vector3(0.0, 1.88, -0.025)], [Vector2(0.125, 0.13), Vector2(0.115, 0.12), Vector2(0.085, 0.095)], &"wool", felt, &"head", 9)
+			b.tube([Vector3(0.0, 1.75, -0.02), Vector3(0.0, 1.78, -0.02)], [Vector2(0.127, 0.132), Vector2(0.124, 0.13)], &"metal", gold, &"head", 9, false)
+			# The Edelweiss on the band: white petals round a yellow middle.
+			for k: int in 6:
+				var a: float = TAU * k / 6.0
+				b.box(Vector3(cos(a) * 0.022, 1.765 + sin(a) * 0.022, -0.155), Vector3(0.018, 0.018, 0.006), &"plain", Color(0.95, 0.95, 0.92), &"head", Basis(Vector3.FORWARD, a))
+			b.box(Vector3(0.0, 1.765, -0.158), Vector3(0.016, 0.016, 0.006), &"plain", Color(0.95, 0.8, 0.2), &"head"),
+	})
+
+
+## Da Bergführer: an orange softshell, dark trousers, a blue pack with a coil of red rope on it, an
+## ice axe in his right hand, a white climbing helmet.
+func _bergfuehrer() -> void:
+	var rope := Color(0.85, 0.25, 0.1)
+	_wanderer("bergfuehrer", {"root": "BergfuehrerModel", "jacket": Color(0.95, 0.45, 0.08), "breeches": Color(0.18, 0.2, 0.24),
+		"socks": Color(0.45, 0.45, 0.48), "boots": Color(0.3, 0.12, 0.08), "pack": Color(0.15, 0.2, 0.35), "bedroll": false, "one_handed": true,
+		"gear": func(b: Builder) -> void:
+			var coil: Array = []
+			var radii: Array = []
+			for k: int in 13:
+				var a: float = TAU * k / 12.0
+				coil.append(Vector3(cos(a) * 0.15, 1.2 + sin(a) * 0.15, 0.3))
+				radii.append(Vector2(0.028, 0.028))
+			b.tube(coil, radii, &"linen", rope, &"chest", 5, false)
+			# The ice axe: shaft forward, pick and adze at the end.
+			var hand_r := Vector3(-WRIST.x, WRIST.y - 0.07, 0.0)
+			b.tube([hand_r + Vector3(0, 0, 0.1), hand_r + Vector3(0, 0, -0.5)], [Vector2(0.018, 0.018), Vector2(0.02, 0.02)], &"metal", Color(0.25, 0.3, 0.4), &"hand_r", 6)
+			b.tube([hand_r + Vector3(0, 0.14, -0.5), hand_r + Vector3(0, 0.0, -0.52), hand_r + Vector3(0, -0.18, -0.46)], [Vector2(0.025, 0.012), Vector2(0.03, 0.02), Vector2(0.006, 0.006)], &"metal", Color(0.6, 0.62, 0.65), &"hand_r", 5),
+		"hat": func(b: Builder) -> void:
+			b.ball(Vector3(0.0, 1.72, -0.02), Vector3(0.14, 0.105, 0.155), &"plain", Color(0.92, 0.92, 0.9), &"head", 10, 5)
+			b.tube([Vector3(0.0, 1.7, -0.02), Vector3(0.0, 1.715, -0.02)], [Vector2(0.145, 0.16), Vector2(0.142, 0.157)], &"plain", Color(0.85, 0.15, 0.1), &"head", 10, false),
+		"stance": {&"arm_l": Vector3(80, 0, -4), &"arm_r": Vector3(20, 0, 6), &"forearm_l": Vector3(12, 0, 0),
+				&"forearm_r": Vector3(30, 0, 0), &"chest": Vector3(-8, 0, 0), &"head": Vector3(8, 0, 6)},
+	})
+
+
+## Da Influencer: a neon pink jacket, yellow shorts, white sneakers, a cap on backwards, and the selfie
+## stick in his right hand, the phone and the ring light at its end (Constants.INFLU_LIGHT_POINT): it
+## hangs down at rest, so with his arm raised (the rig's AIM) it points ahead and the phone at him.
+func _influencer() -> void:
+	_tourist("influencer", {"root": "InfluencerModel", "jacket": Color(1.0, 0.2, 0.6), "shorts": Color(1.0, 0.88, 0.1),
+		"sandals": Color(0.95, 0.95, 0.95), "camera": false, "one_handed": true,
+		"gear": func(b: Builder) -> void:
+			var hand_r := Vector3(-WRIST.x, WRIST.y - 0.07, 0.0)
+			b.tube([hand_r + Vector3(0, 0.05, 0), hand_r + Vector3(0, -0.6, 0)], [Vector2(0.012, 0.012), Vector2(0.01, 0.01)], &"metal", Color(0.08, 0.08, 0.09), &"hand_r", 5)
+			b.box(hand_r + Vector3(0, -0.615, 0), Vector3(0.075, 0.012, 0.14), &"plain", Color(0.06, 0.06, 0.07), &"hand_r")
+			var ring: Array = []
+			var radii: Array = []
+			for k: int in 13:
+				var a: float = TAU * k / 12.0
+				ring.append(hand_r + Vector3(cos(a) * 0.1, -0.625, sin(a) * 0.1))
+				radii.append(Vector2(0.014, 0.014))
+			b.tube(ring, radii, &"glow", Color(1.0, 0.97, 0.92), &"hand_r", 4, false),
+		"hat": func(b: Builder) -> void:
+			b.ball(Vector3(0.0, 1.73, -0.02), Vector3(0.128, 0.075, 0.138), &"plain", Color(0.1, 0.1, 0.12), &"head", 10, 5)
+			b.box(Vector3(0.0, 1.725, 0.15), Vector3(0.19, 0.015, 0.12), &"plain", Color(1.0, 0.88, 0.1), &"head"),
+	})
+
+
+## Da Trailrunner: a lime top, black tights and shorts, orange shoes, a running vest with two bottles,
+## a cap; he leans into his run, arms bent.
+func _trailrunner() -> void:
+	var lime := Color(0.55, 0.95, 0.15)
+	_tourist("trailrunner", {"root": "TrailrunnerModel", "jacket": lime, "shorts": Color(0.08, 0.08, 0.09),
+		"legs": Color(0.1, 0.1, 0.11), "socks": Color(0.95, 0.95, 0.95), "sandals": Color(1.0, 0.4, 0.1), "camera": false, "stride": 34.0,
+		"gear": func(b: Builder) -> void:
+			b.box(Vector3(0.0, 1.25, 0.16), Vector3(0.3, 0.32, 0.06), &"plain", Color(0.12, 0.18, 0.4), &"chest", Basis.IDENTITY, Vector2(0.9, 0.9))
+			for x: float in [-0.08, 0.08]:
+				b.tube([Vector3(x, 1.24, -0.17), Vector3(x, 1.38, -0.17)], [Vector2(0.032, 0.032), Vector2(0.03, 0.03)], &"plain", Color(0.55, 0.75, 0.95), &"chest", 7)
+				b.box(Vector3(x, 1.39, -0.17), Vector3(0.025, 0.02, 0.025), &"plain", Color(0.1, 0.1, 0.1), &"chest"),
+		"glasses": Color(0.9, 0.35, 0.05),
+		"hat": func(b: Builder) -> void:
+			b.ball(Vector3(0.0, 1.73, -0.02), Vector3(0.128, 0.075, 0.138), &"plain", Color(0.95, 0.95, 0.95), &"head", 10, 5)
+			b.box(Vector3(0.0, 1.725, -0.19), Vector3(0.19, 0.015, 0.12), &"plain", lime, &"head"),
+		"stance": {&"arm_l": Vector3(25, 0, -8), &"arm_r": Vector3(25, 0, 8), &"forearm_l": Vector3(85, 0, 0),
+				&"forearm_r": Vector3(85, 0, 0), &"chest": Vector3(-14, 0, 0), &"head": Vector3(10, 0, 0)},
+	})
+
+
+## Da Sprengmeister: the Knappe with a red helmet, a red sash, a bundle of dynamite strapped to his
+## chest and one in his right hand instead of the pick, its fuse at Constants.SPRENG_FUSE_POINT.
+func _sprengmeister() -> void:
+	var red := Color(0.8, 0.12, 0.1)
+	_knappe("sprengmeister", {"root": "SprengmeisterModel", "pick": false, "helmet": Color(0.75, 0.1, 0.08),
+		"gear": func(b: Builder) -> void:
+			for i: int in 7:
+				var t: float = float(i) / 6.0
+				var at: Vector3 = Vector3(-0.2, 1.42, -0.15).lerp(Vector3(0.18, 0.98, -0.2), t) + Vector3(0, 0, -0.03 * sin(t * PI))
+				b.box(at, Vector3(0.08, 0.07, 0.03), &"wool", Color(0.85, 0.15, 0.12), &"chest" if at.y > WAIST.y else &"hips", Basis(Vector3.FORWARD, 0.85))
+			for x: float in [-0.05, 0.0, 0.05]:
+				b.tube([Vector3(x - 0.12, 1.18, -0.2), Vector3(x - 0.12, 1.36, -0.2)], [Vector2(0.024, 0.024), Vector2(0.024, 0.024)], &"plain", red, &"chest", 7)
+			b.box(Vector3(-0.12, 1.27, -0.2), Vector3(0.17, 0.03, 0.055), &"plain", Color(0.85, 0.82, 0.7), &"chest")
+			var hand_r := Vector3(-WRIST.x, WRIST.y - 0.07, 0.0)
+			for d: Vector2 in [Vector2(-0.025, 0.0), Vector2(0.025, 0.0), Vector2(0.0, 0.035)]:
+				b.tube([hand_r + Vector3(d.x, d.y, 0.06), hand_r + Vector3(d.x, d.y, -0.2)], [Vector2(0.022, 0.022), Vector2(0.022, 0.022)], &"plain", red, &"hand_r", 7)
+			b.box(hand_r + Vector3(0, 0.012, -0.12), Vector3(0.09, 0.08, 0.03), &"plain", Color(0.85, 0.82, 0.7), &"hand_r")
+			b.tube([hand_r + Vector3(0, 0.012, -0.2), hand_r + Vector3(0, 0.03, -0.26)], [Vector2(0.006, 0.006), Vector2(0.005, 0.005)], &"plain", Color(0.15, 0.12, 0.1), &"hand_r", 4),
+	})
+
+
+## Die Schönperchte: a white costume hung with coloured ribbons, white stockings, a pale smiling mask
+## with red cheeks, and on her head the Tafel: a big red board covered in mirrors, gold edges, flowers
+## and ribbons.
+func _schoenperchte() -> void:
+	var ribbons: Array = [Color(0.85, 0.1, 0.12), Color(0.1, 0.55, 0.2), Color(0.95, 0.8, 0.15), Color(0.15, 0.3, 0.75)]
+	var gold := Color(0.95, 0.75, 0.25)
+	_perchte("schoenperchte", {"root": "SchoenperchteModel", "fur": Color(0.93, 0.91, 0.86), "cloth": &"linen",
+		"ribbons": ribbons, "legs": Color(0.95, 0.95, 0.93),
+		"face": func(b: Builder) -> void:
+			var pale := Color(0.96, 0.88, 0.8)
+			b.ball(Vector3(0.0, 1.64, -0.03), Vector3(0.12, 0.14, 0.12), &"plain", pale, &"head", 10, 7)
+			b.box(Vector3(0.0, 1.62, -0.15), Vector3(0.03, 0.05, 0.03), &"plain", pale.darkened(0.06), &"head")
+			for x: float in [-1.0, 1.0]:
+				b.box(Vector3(0.05 * x, 1.665, -0.14), Vector3(0.045, 0.025, 0.015), &"plain", Color(0.06, 0.04, 0.04), &"head")
+				b.box(Vector3(0.05 * x, 1.665, -0.148), Vector3(0.025, 0.014, 0.008), &"glow", Color(1.0, 0.85, 0.4), &"head")
+				b.box(Vector3(0.07 * x, 1.6, -0.13), Vector3(0.04, 0.03, 0.01), &"plain", Color(0.9, 0.35, 0.35), &"head")
+				b.box(Vector3(0.035 * x, 1.565, -0.142), Vector3(0.04, 0.014, 0.012), &"plain", Color(0.75, 0.1, 0.12), &"head", Basis(Vector3.FORWARD, 0.35 * x))
+			b.box(Vector3(0.0, 1.555, -0.145), Vector3(0.04, 0.014, 0.012), &"plain", Color(0.75, 0.1, 0.12), &"head"),
+		"hat": func(b: Builder) -> void:
+			b.tube([Vector3(0.0, 1.72, -0.02), Vector3(0.0, 1.8, -0.02)], [Vector2(0.13, 0.135), Vector2(0.11, 0.115)], &"plain", Color(0.15, 0.12, 0.1), &"head", 9)
+			b.box(Vector3(0.0, 2.15, 0.0), Vector3(0.62, 0.7, 0.05), &"wood", Color(0.6, 0.12, 0.1), &"head", Basis.IDENTITY, Vector2(0.95, 0.95))
+			for y: float in [1.8, 2.5]:
+				b.box(Vector3(0.0, y, -0.03), Vector3(0.64, 0.035, 0.03), &"metal", gold, &"head")
+			for x: float in [-0.31, 0.31]:
+				b.box(Vector3(x, 2.15, -0.03), Vector3(0.035, 0.72, 0.03), &"metal", gold, &"head")
+			# The mirrors.
+			for row: int in 3:
+				for col: int in 3:
+					b.box(Vector3(-0.18 + col * 0.18, 1.94 + row * 0.2, -0.032), Vector3(0.11, 0.11, 0.01), &"glow", Color(0.85, 0.92, 1.0), &"head")
+			# Flowers on top, ribbons down the sides.
+			for k: int in 5:
+				var x: float = -0.26 + k * 0.13
+				b.ball(Vector3(x, 2.54, 0.0), Vector3(0.045, 0.045, 0.045), &"plain", ribbons[k % ribbons.size()].lightened(0.2), &"head", 6, 4)
+			for x: float in [-0.32, 0.32]:
+				for k: int in 3:
+					b.box(Vector3(x + 0.025 * (k - 1), 2.25 - 0.25, 0.02), Vector3(0.035, 0.5, 0.01), &"plain", ribbons[k], &"head"),
+	})
 
 
 ## The Deitscha Tourist (section 8a), alive (M6 part 4c): sunburnt, a striped shirt over his belly, a

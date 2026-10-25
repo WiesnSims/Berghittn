@@ -1,9 +1,10 @@
 extends Node3D
 ## Frames of the enemy models (M6 part 4) in a plain studio: the line-up from the front and the
 ## back, the faces, every action pose (the Venedigermandl's dig, the Wilderer's aim and shot, the Bergdohle's wings too), and a ragdoll fall. Windowed:
-##     godot res://tests/model_view.tscn -- <out dir>
+##     godot res://tests/model_view.tscn -- <out dir> [<id>,<id>,...]
+## (the ids default to the base enemies; the rare variants, Die Bsundan: kassier,bergfuehrer,...)
 
-const IDS: Array[String] = ["wanderer", "tourist", "knappe", "perchte", "krampus", "venedigermandl", "wilderer", "bergdohle"]
+var IDS: Array[String] = ["wanderer", "tourist", "knappe", "perchte", "krampus", "venedigermandl", "wilderer", "bergdohle"]
 
 var _out: String
 var _camera: Camera3D
@@ -13,6 +14,8 @@ var _rigs: Array[EnemyRig] = []
 func _ready() -> void:
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	_out = args[0] if args.size() > 0 else "user://model_view"
+	if args.size() > 1:
+		IDS.assign(args[1].split(","))
 	DirAccess.make_dir_recursive_absolute(_out)
 	_studio()
 	var x: float = -10.5

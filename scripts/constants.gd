@@ -811,3 +811,69 @@ const WILDERER_MUZZLE: Vector3 = Vector3(0.26, 0.13, -0.075)
 const WILDERER_SCOPE: Vector3 = Vector3(0.26, 0.56, -0.125)
 ## His old rifle: the Stutzen's shot, lower.
 const WILDERER_SHOT_PITCH: float = 0.78
+
+# --- Die Bsundan: rare enemy variants (1.2, GAME_DESIGN section 12; the rest is in their data files) -
+## From this wave, each normal spawn is a variant with this chance (never on a boss wave); at most
+## one alive at a time, never the same one twice in a row.
+const VARIANT_FIRST_WAVE: int = 5
+const VARIANT_CHANCE: float = 0.03
+## Da Vereinskassier: each blow takes this many points off the player hit (never below 0); his kill
+## pays KASSIER_KILL plus every fee he took this life.
+const KASSIER_FEE: int = 150
+const KASSIER_KILL: int = 500
+## Da Sprengmeister: lights the fuse with a player this near (m) in sight, then hurries on at this
+## speed (m/s) and goes up this long (s) after. The blast: this wide (m); a player in it takes up to
+## SPRENG_PLAYER_DAMAGE (SPRENG_EDGE of it at the edge), every enemy SPRENG_ENEMY_DAMAGE.
+const SPRENG_LIGHT_RANGE: float = 6.0
+const SPRENG_FUSE_SPEED: float = 3.2
+const SPRENG_FUSE_TIME: float = 3.0
+const SPRENG_RADIUS: float = 5.0
+const SPRENG_PLAYER_DAMAGE: int = 70
+const SPRENG_EDGE: float = 0.3
+const SPRENG_ENEMY_DAMAGE: int = 400
+## The end of the bundle in his hand, where the fuse sparks (built rest space, on the right hand bone).
+const SPRENG_FUSE_POINT: Vector3 = Vector3(0.26, 0.86, -0.26)
+## Die Schönperchte: keeps this far (m) from the nearest player; every SCHOEN_BLESS_EVERY s she
+## blesses every enemy within SCHOEN_RADIUS m: SCHOEN_HEAL of its health back. Her jump lasts
+## SCHOEN_JUMP_TIME s.
+const SCHOEN_KEEP: float = 8.0
+const SCHOEN_BLESS_EVERY: float = 4.0
+const SCHOEN_RADIUS: float = 9.0
+const SCHOEN_HEAL: float = 0.35
+const SCHOEN_JUMP_TIME: float = 1.2
+## Da Influencer: goes live with a player INFLU_RANGE_MIN..MAX m off in sight, for INFLU_LIVE_TIME s;
+## every other enemy within INFLU_RADIUS m is INFLU_HYPE x as fast meanwhile. His ring light flashes
+## every INFLU_FLASH_EVERY s: a player looking within INFLU_FLASH_ANGLE degrees of him, no farther
+## than INFLU_RANGE_MAX, sees white (INFLU_FLASH_ALPHA) fading over INFLU_FLASH_TIME s. Then
+## INFLU_COOLDOWN s off.
+const INFLU_RANGE_MIN: float = 4.0
+const INFLU_RANGE_MAX: float = 16.0
+const INFLU_LIVE_TIME: float = 6.0
+const INFLU_RADIUS: float = 15.0
+const INFLU_HYPE: float = 1.3
+const INFLU_FLASH_EVERY: float = 2.0
+const INFLU_FLASH_ANGLE: float = 30.0
+const INFLU_FLASH_TIME: float = 0.6
+const INFLU_FLASH_ALPHA: float = 0.75
+const INFLU_COOLDOWN: float = 5.0
+## The ring light at the end of his selfie stick (built rest space, on the right hand bone).
+const INFLU_LIGHT_POINT: Vector3 = Vector3(0.26, 0.205, 0.0)
+## Da Bergführer: up to SEIL_FOLLOWERS Wanderers roped on behind him, each SEIL_GAP m behind the one
+## before; one fights only with a player within SEIL_FREE m. A rope longer than SEIL_SNAP m snaps.
+## His death trips everyone still roped on for SEIL_TRIP_TIME s.
+const SEIL_FOLLOWERS: int = 4
+const SEIL_GAP: float = 1.4
+const SEIL_FREE: float = 2.5
+const SEIL_SNAP: float = 7.0
+const SEIL_TRIP_TIME: float = 3.0
+## The rope: how far it sags (m) between two of them, at what height (m) it is tied on.
+const SEIL_SAG: float = 0.35
+const SEIL_HEIGHT: float = 1.0
+## Da Trailrunner: charges from TRAIL_RANGE_MIN m (up to his data file's lunge_range); a player in his
+## way is thrown TRAIL_THROW m/s along his run (and TRAIL_THROW_UP up); other enemies are shoved aside
+## at TRAIL_SHOVE m/s. Into a wall: dazed TRAIL_CRASH_STUN s.
+const TRAIL_RANGE_MIN: float = 5.0
+const TRAIL_THROW: float = 9.0
+const TRAIL_THROW_UP: float = 3.0
+const TRAIL_SHOVE: float = 5.0
+const TRAIL_CRASH_STUN: float = 2.5

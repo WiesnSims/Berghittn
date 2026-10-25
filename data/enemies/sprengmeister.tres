@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/sprengmeister.tscn" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/knappe.tres" id="3"]
+[ext_resource type="Script" path="res://scripts/enemies/variants/sprengmeister.gd" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"sprengmeister"
+display_name = "ENEMY_SPRENGMEISTER"
+base_health = 300
+health_per_wave = 40
+speed = 2.0
+damage = 35
+attack_range = 1.6
+attack_windup = 0.7
+attack_cooldown = 1.5
+climb_time = 3.0
+board_break_time = 0.3
+head_pop_damage = 120
+model = ExtResource("2")
+model_scale = 1.12
+flinch_multiplier = 0.3
+lunge_range = 0.0
+variant_of = ExtResource("3")
+variant = ExtResource("4")
+points_multiplier = 3.0
+is_boss = false
+groan_sounds = Array[StringName]([&"groan_knappe"])
+voice_pitch = 0.95

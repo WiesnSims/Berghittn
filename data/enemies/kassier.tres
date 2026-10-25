@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/kassier.tscn" id="2"]
+[ext_resource type="Resource" path="res://data/enemies/wanderer.tres" id="3"]
+[ext_resource type="Script" path="res://scripts/enemies/variants/kassier.gd" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"kassier"
+display_name = "ENEMY_KASSIER"
+base_health = 150
+health_per_wave = 20
+speed = 2.7
+damage = 10
+attack_range = 1.4
+attack_windup = 0.45
+attack_cooldown = 1.1
+climb_time = 2.2
+board_break_time = 0.5
+head_pop_damage = 60
+model = ExtResource("2")
+model_scale = 1.0
+flinch_multiplier = 1.0
+lunge_range = 0.0
+variant_of = ExtResource("3")
+variant = ExtResource("4")
+points_multiplier = 3.0
+is_boss = false
+groan_sounds = Array[StringName]([&"groan_wanderer"])
+voice_pitch = 1.05

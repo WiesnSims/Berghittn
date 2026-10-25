@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="WaveTable" load_steps=17 format=3]
+[gd_resource type="Resource" script_class="WaveTable" load_steps=29 format=3]
 
 [ext_resource type="Script" path="res://scripts/waves/wave_table.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/waves/wave_entry.gd" id="2"]
@@ -10,6 +10,12 @@
 [ext_resource type="Resource" path="res://data/enemies/venedigermandl.tres" id="8"]
 [ext_resource type="Resource" path="res://data/enemies/wilderer.tres" id="9"]
 [ext_resource type="Resource" path="res://data/enemies/bergdohle.tres" id="10"]
+[ext_resource type="Resource" path="res://data/enemies/kassier.tres" id="11"]
+[ext_resource type="Resource" path="res://data/enemies/bergfuehrer.tres" id="12"]
+[ext_resource type="Resource" path="res://data/enemies/trailrunner.tres" id="13"]
+[ext_resource type="Resource" path="res://data/enemies/influencer.tres" id="14"]
+[ext_resource type="Resource" path="res://data/enemies/sprengmeister.tres" id="15"]
+[ext_resource type="Resource" path="res://data/enemies/schoenperchte.tres" id="16"]
 
 [sub_resource type="Resource" id="Wanderer"]
 script = ExtResource("2")
@@ -53,6 +59,48 @@ first_wave = 6
 weight = 0.5
 last_wave = 0
 
+[sub_resource type="Resource" id="KassierVariant"]
+script = ExtResource("2")
+enemy = ExtResource("11")
+first_wave = 5
+weight = 1.0
+last_wave = 0
+
+[sub_resource type="Resource" id="BergfuehrerVariant"]
+script = ExtResource("2")
+enemy = ExtResource("12")
+first_wave = 5
+weight = 1.0
+last_wave = 0
+
+[sub_resource type="Resource" id="TrailrunnerVariant"]
+script = ExtResource("2")
+enemy = ExtResource("13")
+first_wave = 5
+weight = 1.0
+last_wave = 0
+
+[sub_resource type="Resource" id="InfluencerVariant"]
+script = ExtResource("2")
+enemy = ExtResource("14")
+first_wave = 6
+weight = 1.0
+last_wave = 0
+
+[sub_resource type="Resource" id="SprengmeisterVariant"]
+script = ExtResource("2")
+enemy = ExtResource("15")
+first_wave = 8
+weight = 1.0
+last_wave = 0
+
+[sub_resource type="Resource" id="SchoenperchteVariant"]
+script = ExtResource("2")
+enemy = ExtResource("16")
+first_wave = 10
+weight = 1.0
+last_wave = 0
+
 [resource]
 script = ExtResource("1")
 base_enemies = 6
@@ -69,3 +117,4 @@ boss_escort_count = 6
 boss_first_wave = 5
 boss_every = 5
 treasure = ExtResource("8")
+variants = Array[ExtResource("2")]([SubResource("KassierVariant"), SubResource("BergfuehrerVariant"), SubResource("TrailrunnerVariant"), SubResource("InfluencerVariant"), SubResource("SprengmeisterVariant"), SubResource("SchoenperchteVariant")])
