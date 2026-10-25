@@ -20,6 +20,7 @@ const ENTRIES: Array[Dictionary] = [
 			"\"Bsundane Woch!\": a new event that brings the Bsundan far more often for a wave. The other enemies greet them, too.",
 			"The last kill of a wave plays in slow motion (it can be switched off in Settings).",
 			"The end screen and the Gipfelbuch count the Bsundan you killed.",
+			"Da Kegelbahn in the Skiraum: three balls to clear all nine pins. Clear them and da Bolingboi is yours: a bowling ball that rolls straight, bowls enemies over and blows up at the wall.",
 		],
 		"de": [
 			"Die Bsundan: sechs seltene Spezialgegner mit eigenem Aussehen, Hut und Trick, für die dreifachen Punkte.",
@@ -33,6 +34,7 @@ const ENTRIES: Array[Dictionary] = [
 			"\"Bsundane Woch!\": ein neues Ereignis, bei dem eine Welle lang viel öfter Bsundane kommen. Die anderen Gegner begrüßen sie auch.",
 			"Der letzte Kill einer Welle läuft in Zeitlupe (in den Einstellungen abschaltbar).",
 			"Der Endbildschirm und das Gipfelbuch zählen die Bsundan, die du erlegt hast.",
+			"Da Kegelbahn im Skiraum: drei Kugeln, um alle neun Kegel abzuräumen. Schaffst du's, gehört da Bolingboi dir: eine Kugel, die geradeaus rollt, Gegner umkegelt und an der Wand explodiert.",
 		],
 	},
 	{

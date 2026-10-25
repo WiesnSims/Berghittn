@@ -2,7 +2,8 @@ extends Node
 ## Pictures of the real map from given spots, for checking where props sit. Windowed:
 ##     godot res://tests/room_view.tscn -- <out dir> <x,y,z:tx,ty,tz> [...]
 ## Each shot is saved as <out dir>/view_<n>.jpg. A shot ending in "!" first hangs every hat on the
-## Huatständer (1.2), to see it full.
+## Huatständer (1.2), to see it full. "gun=<id>" (before the shots) holds that gun's viewmodel in front
+## of the camera, as the player sees it in hand.
 
 var _main: Node
 
@@ -26,6 +27,11 @@ func _ready() -> void:
 	add_child(camera)
 	for i: int in range(1, args.size()):
 		var spec: String = args[i]
+		if spec.begins_with("gun="):
+			var gun := load("res://data/weapons/%s.tres" % spec.trim_prefix("gun=")) as WeaponData
+			camera.fov = 75.0
+			camera.add_child(gun.viewmodel.instantiate())
+			continue
 		if spec.ends_with("!"):
 			spec = spec.trim_suffix("!")
 			var rack := get_tree().get_first_node_in_group("hat_rack")

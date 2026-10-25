@@ -411,5 +411,15 @@ messages = {
 [&"", &"UI_NADL_GOAL_HUAT_FULL"]: [&"Fill the Huatständer in one match"],
 [&"", &"UI_NADL_GOAL_SCHARF"]: [&"%d headshot kills"],
 [&"", &"UI_NADL_GOAL_KRAMPUS"]: [&"Defeat the Krampus %d×"],
-[&"", &"UI_NADL_GOAL_SEILSCHAFT"]: [&"Reach wave %d in co-op"]
+[&"", &"UI_NADL_GOAL_SEILSCHAFT"]: [&"Reach wave %d in co-op"],
+[&"", &"WEAPON_BOLINGBOI"]: [&"Bolingboi"],
+[&"", &"UI_KEGEL_BOWL"]: [&"Press {interact} to bowl (ball %d of %d)"],
+[&"", &"UI_KEGEL_BUSY"]: [&"The pins are being set up"],
+[&"", &"UI_KEGEL_BACK"]: [&"Your balls are back in wave %d"],
+[&"", &"UI_KEGEL_BOARD"]: [&"Kugeln: %d   ·   Kegel: %d"],
+[&"", &"UI_KEGEL_BOARD_BACK"]: [&"Kugeln wieder ab Welle %d"],
+[&"", &"EVENT_KEGEL_NEUNE"]: [&"Alle Neune!"],
+[&"", &"EVENT_KEGEL_CLEARED"]: [&"Abgräumt!"],
+[&"", &"EVENT_KEGEL_PRIZE"]: [&"Da Bolingboi g'hört dir!"],
+[&"", &"EVENT_KEGEL_OVER"]: [&"De Kugeln san weg, %d Kegel stehn no."]
 }

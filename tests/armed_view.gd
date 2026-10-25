@@ -1,16 +1,18 @@
 extends Node3D
 ## Visual check of other players' hikers in a co-op match (M7 part 3): each holds a different gun the
 ## way the others see it, from the side and at three quarters, one aiming up. Needs a real window:
-##   godot res://tests/armed_view.tscn -- <out_dir>
+##   godot res://tests/armed_view.tscn -- <out_dir> [<gun>,<gun>,...]
 
 const HIKER := preload("res://scenes/net/hiker.tscn")
-const GUNS: Array[String] = ["pistole", "jagdflinte", "repetierer", "alphorn", "knoedelwerfer", "rodelkanone", "brennkessel", "handboeller"]
+var GUNS: Array[String] = ["pistole", "jagdflinte", "repetierer", "alphorn", "knoedelwerfer", "rodelkanone", "brennkessel", "handboeller"]
 const SPACING: float = 1.1
 
 
 func _ready() -> void:
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	var out_dir: String = args[0] if args.size() > 0 else "user://armed_view"
+	if args.size() > 1:
+		GUNS.assign(args[1].split(","))
 	DirAccess.make_dir_recursive_absolute(out_dir)
 	get_window().size = Vector2i(1600, 640)
 	var env := WorldEnvironment.new()

@@ -9,6 +9,7 @@
 [ext_resource type="Material" path="res://assets/materials/board.tres" id="7"]
 [ext_resource type="Material" path="res://assets/materials/metal.tres" id="9"]
 [ext_resource type="PackedScene" path="res://scenes/zones/wallbuy_stutzen.tscn" id="10"]
+[ext_resource type="Script" path="res://scripts/zones/kegelbahn.gd" id="v12_kegel"]
 [ext_resource type="Material" path="res://assets/materials/lamp.tres" id="11"]
 [ext_resource type="Material" path="res://assets/materials/snow.tres" id="12"]
 [ext_resource type="Script" path="res://scripts/zones/wall_buy.gd" id="12_s40dl"]
@@ -489,3 +490,7 @@ zone = &"skiraum"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, -0.3, -20.5)
 script = ExtResource("13")
 zone = &"skiraum"
+
+[node name="Kegelbahn" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.65, 0, -3.1)
+script = ExtResource("v12_kegel")

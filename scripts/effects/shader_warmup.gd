@@ -24,6 +24,7 @@ const EFFECTS: Array[Script] = [
 	preload("res://scripts/weapons/behaviors/knoedel.gd"),
 	preload("res://scripts/weapons/behaviors/knoedel_pile.gd"),
 	preload("res://scripts/weapons/behaviors/rodel_sled.gd"),
+	preload("res://scripts/weapons/behaviors/kegel_ball.gd"),
 	preload("res://scripts/weapons/behaviors/handboeller_shell.gd"),
 	preload("res://scripts/weapons/behaviors/alphorn_wave.gd"),
 	preload("res://scripts/weapons/behaviors/harmonika_notes.gd"),

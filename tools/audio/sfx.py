@@ -821,6 +821,36 @@ def nadl(v):
     return d.normalize(d.fade(x), 0.75)
 
 
+def kegel_roll(v):
+    """Da Kegelbahn (1.2): a wooden ball let go on the lane, rumbling away down the boards."""
+    t = 1.8
+    rumble = d.bandpass(d.noise(t), 50, 380) * (0.65 + 0.35 * d.smooth_noise(t, 14))
+    boards = np.zeros(d.n_of(t))
+    for i in range(14):
+        k = thud(110 + d.rng.uniform(-15, 15), 0.02, 0.3)
+        at = d.n_of(0.08 + i * 0.12)
+        boards[at:at + len(k)] += k[: len(boards) - at]
+    env = d.env_points(t, [(0, 0), (0.05, 1), (1.2, 0.7), (t, 0)])
+    return d.normalize(d.mix(thud(90, 0.05, 0.9), (0.0, (rumble + boards * 0.5) * env)), 0.8)
+
+
+def kegel_pins(v):
+    """Pins going down: hollow wooden clacks tumbling over each other, a rattle as they settle."""
+    x = np.zeros(d.n_of(0.9))
+    for _ in range(5 + v):
+        f = d.rng.uniform(700, 1500)
+        k = bell(0.25, f, [1, 2.4, 4.1], [0.05, 0.03, 0.02], [1, 0.45, 0.25])
+        at = d.n_of(d.rng.uniform(0.0, 0.45))
+        x[at:at + len(k)] += k[: len(x) - at] * d.rng.uniform(0.5, 1.0)
+    return d.normalize(d.fade(x), 0.8)
+
+
+def kegel_click(v):
+    """Da Bolingboi's Hoch damit!: a snap of the fingers, a bright little ping."""
+    ping = bell(0.3, 2600, [1, 2.7], [0.06, 0.03], [1, 0.3])
+    return d.normalize(d.mix(click(3200, 0.004, 1.0), (0.01, ping * 0.6)), 0.75)
+
+
 def perchten_schellen(v):
     """The Schönperchte jumps: a shake of bright little bells, twice."""
     x = np.zeros(d.n_of(1.6))
@@ -869,7 +899,7 @@ SOUNDS = {
     "murmeltier_scream": (murmeltier_scream, 2), "murmeltier_pop": (murmeltier_pop, 1),
     "murmeltier_hit": (murmeltier_hit, 1), "camera": (camera, 1),
     "wind_loop": (wind_loop, 1), "fire_crackle": (fire_crackle, 1),
-    "kassa_ching": (kassa_ching, 1), "fuse_hiss": (fuse_hiss, 1), "perchten_schellen": (perchten_schellen, 2), "nadl": (nadl, 1),
+    "kassa_ching": (kassa_ching, 1), "fuse_hiss": (fuse_hiss, 1), "perchten_schellen": (perchten_schellen, 2), "nadl": (nadl, 1), "kegel_roll": (kegel_roll, 1), "kegel_pins": (kegel_pins, 3), "kegel_click": (kegel_click, 1),
 }
 
 LOOPS = {"flame_loop", "kuhglocke_ring", "resi_bell", "eisstock_slide", "fassl_roll", "wind_loop", "fire_crackle"}

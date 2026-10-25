@@ -1310,7 +1310,7 @@ Built (2026-10-25, branch worktree-enemy-variants, version 1.2):
 
 Smaller things around the Bsundan, so they are seen and remembered, plus a few good moments. The
 user picked seven of eight; the Wurlitzer (a song buff from a jukebox) was dropped: the Skiraum's
-small side room should get something else later (open; to be decided before 1.2 ships).
+small side room got the Kegelbahn instead (below, user pick 2026-10-25).
 
 **Da Huatständer.** A hat rack on the Stube's east wall, under the Trophäenwand: a dark board with
 eleven pegs and a brass plate with a name under each. Top row the five hats of the plain enemies
@@ -1393,6 +1393,64 @@ Built (2026-10-25, branch v12-extras, on top of the Bsundan, version 1.2):
 - Views for checking: tests/room_view (the map from given spots), tests/ui_view (the menus).
 - Tests: tests/v12_extras (47 checks); tests/net_specials (the guest's Huatständer, Bsundane Woch on
   the guest); board/test/board.test.mjs (bsundan kept, 0 from older games, refused above the kills).
+
+### Da Kegelbahn and da Bolingboi (user request 2026-10-25, version 1.2)
+
+The Skiraum's boot corridor behind the partition (4 x 15 m) becomes a Kegelbahn, a skittle alley
+like those in the cellars of Austrian inns: a wooden lane down the middle with a gutter on each side,
+nine pins in a diamond at the north end (the middle one, the König, with a red crown), a ball return
+with three balls at the south end, a sign and a board over the pins.
+
+*Kegeln*
+- At the ball return, E bowls a ball from where the player stands at the line, straight along where
+  they look (flat). It rolls down the lane (KEGEL_SPEED); a ball that leaves the lane is a "Pudel"
+  (the gutter) and hits nothing.
+- Every player has three balls. Pins knocked down are cleared after each ball (Abräumen), so the
+  three balls are three tries to clear all nine. All nine with the first ball: "Alle Neune!".
+- Cleared: the reward, da Bolingboi. Three balls gone without clearing: no reward. Either way the
+  player's balls come back five waves later (KEGEL_BALLS_BACK), and the pins stand up again.
+- One player at a time: the lane is busy while a ball rolls and the pins are cleared; a player who
+  bowls after someone else starts with all nine pins standing.
+- A ball on the lane bowls over enemies in its way (KEGEL_ENEMY_DAMAGE, thrown aside): enemies
+  climb in at the corridor's windows, so in a wave the lane is a weapon too.
+- How pins fall is worked out, not simulated: the ball rolls straight, a pin it touches falls along
+  the ball's way (to the side it was struck on) and the ball is turned a little off it; a falling pin
+  knocks over the standing pins it falls onto, and they fall on in turn. Same throw, same result:
+  co-op sends only the throw (who, from where, which way) and every screen plays it.
+- Co-op: a guest's throw goes to the host, who says yes (lane free, balls left) and sends it to all;
+  the host's game deals the ball's damage to enemies; the reward is given in the bowler's own game.
+
+*Da Bolingboi* (the reward, a gun; name by the user). A hand with a glossy purple bowling ball. Left
+click rolls a ball from the hand along the floor, straight where the player looks, over steps and
+down slopes (the Rodelkanone's ground riding): every enemy in its way is bowled over (damage and
+thrown aside), and it explodes at the first wall (or after its range): a blast like the Böller's.
+Right click, "Hoch damit!": the ball rolling now goes off where it is, at once (no round), to blow a
+ball up in the middle of a crowd. Four balls in the hand, more in the reserve; the Munitionskiste
+refills it. Clearing the pins again while holding it refills it.
+
+How (planned):
+- scripts/zones/kegelbahn.gd (built in code, interactable), placed in scenes/zones/skiraum.tscn;
+  CoopWorld request_kegel / _kegel_throw.
+- data/weapons/bolingboi.tres; behaviors/bolingboi.gd and kegel_ball.gd (a Rodelkanone sled with a
+  ball's look that explodes); scripts/weapons/bolingboi_viewmodel.gd and its scene.
+- Sounds kegel_roll, kegel_pins, kegel_boom (sfx.py).
+- Tests: tests/kegelbahn (the pins, Pudel, the three balls, the reward, the balls back after five
+  waves, the ball on enemies, the Bolingboi's roll, blast and Hoch damit!), a co-op step in
+  tests/net_specials.
+
+Built (2026-10-25, branch v12-extras):
+- Kegelbahn (scripts/zones/kegelbahn.gd) at (19.65, 0, -3.1) in the Skiraum, the lane running north.
+  Kegelbahn.roll is the pure function of a throw; bowl() plays it (ball along the path, pins toppled
+  by tween, cleared after CLEAR_WAIT, the set reset after RESET_WAIT). Per-player balls (_balls,
+  _back) kept the same on every screen, since every screen plays every throw. CoopWorld
+  request_kegel / _ask_kegel / _kegel_bowled. Tuning (KEGEL_* in constants.gd): an aimed ball near
+  the pocket takes 3 to 8 pins; Alle Neune comes from about 1 in 100 throws of a fan.
+- Bolingboi: data/weapons/bolingboi.tres (4 / 16, 220 a body, 450 blast in 3.5 m, 30 m roll, no
+  Dengelstock upgrade); behaviors/bolingboi.gd; behaviors/kegel_ball.gd extends the Rodelkanone's
+  sled (no banks; its crash is the blast); BolingboiViewmodel builds its hand and ball at
+  NOTIFICATION_SCENE_INSTANTIATED, so the co-op hiker's copy of Model has them. Not in the
+  Hüttentruhe. Sounds kegel_roll, kegel_pins, kegel_click.
+- Views: tests/room_view gun=<id> (a viewmodel on the camera), tests/armed_view takes a gun list.
 
 
 ## 13. Project structure
