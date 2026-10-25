@@ -1425,7 +1425,7 @@ click rolls a ball from the hand along the floor, straight where the player look
 down slopes (the Rodelkanone's ground riding): every enemy in its way is bowled over (damage and
 thrown aside), and it explodes at the first wall (or after its range): a blast like the Böller's.
 Right click, "Hoch damit!": the ball rolling now goes off where it is, at once (no round), to blow a
-ball up in the middle of a crowd. Four balls in the hand, more in the reserve; the Munitionskiste
+ball up in the middle of a crowd. Five balls in the hand, 25 in the reserve; the Munitionskiste
 refills it. Clearing the pins again while holding it refills it.
 
 How (planned):
@@ -1445,12 +1445,22 @@ Built (2026-10-25, branch v12-extras):
   _back) kept the same on every screen, since every screen plays every throw. CoopWorld
   request_kegel / _ask_kegel / _kegel_bowled. Tuning (KEGEL_* in constants.gd): an aimed ball near
   the pocket takes 3 to 8 pins; Alle Neune comes from about 1 in 100 throws of a fan.
-- Bolingboi: data/weapons/bolingboi.tres (4 / 16, 220 a body, 450 blast in 3.5 m, 30 m roll, no
+- Bolingboi: data/weapons/bolingboi.tres (5 / 25, 220 a body, 450 blast in 3.5 m, 30 m roll, no
   Dengelstock upgrade); behaviors/bolingboi.gd; behaviors/kegel_ball.gd extends the Rodelkanone's
   sled (no banks; its crash is the blast); BolingboiViewmodel builds its hand and ball at
   NOTIFICATION_SCENE_INSTANTIATED, so the co-op hiker's copy of Model has them. Not in the
   Hüttentruhe. Sounds kegel_roll, kegel_pins, kegel_click.
 - Views: tests/room_view gun=<id> (a viewmodel on the camera), tests/armed_view takes a gun list.
+- Play-test round 1 (2026-10-25):
+  - Hoch damit! was buggy: it played its animation with nothing rolling, it waited out the throw's
+    cooldown, and it was not read during the reload that follows the last ball (so it often failed).
+    Now WeaponBehavior.secondary_ready (nothing to do: the click does nothing) and secondary_instant
+    (no cooldown either way, and it goes off during a reload too, without its animation).
+  - 5 / 25 balls; the reload (2.4 s) flicks a fresh ball high up out of view, catches it and spins
+    it on a finger.
+  - Resi stalled the game for a second or two as she came: her look and the map marker's glow and
+    label compiled on the spot. ShaderWarmup now draws the events' models, every material of their
+    scenes, and a MapMarker (176 items, was 144).
 
 
 ## 13. Project structure

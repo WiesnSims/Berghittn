@@ -3,7 +3,8 @@ extends Node
 ##     godot res://tests/room_view.tscn -- <out dir> <x,y,z:tx,ty,tz> [...]
 ## Each shot is saved as <out dir>/view_<n>.jpg. A shot ending in "!" first hangs every hat on the
 ## Huatständer (1.2), to see it full. "gun=<id>" (before the shots) holds that gun's viewmodel in front
-## of the camera, as the player sees it in hand.
+## of the camera, as the player sees it in hand; "reload=<s>" before a shot plays its reload (2.4 s)
+## and takes the shot <s> seconds into it.
 
 var _main: Node
 
@@ -22,6 +23,8 @@ func _ready() -> void:
 	var player := _main.get_node("Player") as Player
 	player.weapons.visible = false
 	get_tree().paused = false
+	var held: Viewmodel
+	var reload_at: float = -1.0
 	var camera := Camera3D.new()
 	camera.fov = 62.0
 	add_child(camera)
@@ -30,7 +33,11 @@ func _ready() -> void:
 		if spec.begins_with("gun="):
 			var gun := load("res://data/weapons/%s.tres" % spec.trim_prefix("gun=")) as WeaponData
 			camera.fov = 75.0
-			camera.add_child(gun.viewmodel.instantiate())
+			held = gun.viewmodel.instantiate() as Viewmodel
+			camera.add_child(held)
+			continue
+		if spec.begins_with("reload="):
+			reload_at = float(spec.trim_prefix("reload="))
 			continue
 		if spec.ends_with("!"):
 			spec = spec.trim_suffix("!")
@@ -44,6 +51,10 @@ func _ready() -> void:
 		camera.current = true
 		for f: int in 40:
 			await get_tree().process_frame
+		if reload_at >= 0.0 and held:
+			held.play_reload(2.4)
+			await get_tree().create_timer(reload_at).timeout
+			reload_at = -1.0
 		for f: int in 3:
 			await RenderingServer.frame_post_draw
 		var path: String = "%s/view_%d.jpg" % [out, i]

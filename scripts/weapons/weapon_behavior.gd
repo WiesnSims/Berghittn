@@ -35,6 +35,18 @@ func fire_secondary() -> void:
 	pass
 
 
+## Whether a BEHAVIOR secondary has something to do now; false and the click does nothing (no round,
+## no animation, no reload). The Bolingboi's Hoch damit! needs a ball rolling.
+func secondary_ready() -> bool:
+	return true
+
+
+## A BEHAVIOR secondary that goes off between shots: it does not wait for the shot's cooldown, and
+## leaves none after it (Hoch damit! right after the ball is let go).
+func secondary_instant() -> bool:
+	return false
+
+
 ## Every frame right click is held on a PLAY secondary (its rounds are paid by the WeaponHolder).
 func play_secondary(_delta: float) -> void:
 	pass

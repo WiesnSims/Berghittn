@@ -242,6 +242,13 @@ func _enemy(offset: Vector3) -> Enemy:
 	return enemy
 
 
+func _right_click() -> void:
+	Input.action_press("secondary")
+	await _frames(2)
+	Input.action_release("secondary")
+	await _frames(1)
+
+
 func _bolingboi() -> void:
 	var holder: WeaponHolder = player.weapons
 	player.global_position = _ground(Vector3.ZERO)
@@ -273,20 +280,34 @@ func _bolingboi() -> void:
 	_check(10000 - near_wall.health >= BOLINGBOI.secondary_damage / 2, "and explodes there: the one by the wall takes %d" % (10000 - near_wall.health))
 	_check(beside.health == 10000, "not one 3 m beside its way and far from the blast")
 	wall.queue_free()
-	# Hoch damit!: the next ball goes off early, among enemies standing ahead.
+	# Hoch damit! (play-test 1.2: right click had to wait out the throw, did nothing during the reload
+	# that follows the last ball, and played an animation with nothing rolling). Clicked for real.
+	holder.force_aim = true
 	var crowd: Array[Enemy] = [_enemy(Vector3(4.5, 0, 1.0)), _enemy(Vector3(4.5, 0, -1.0))]
 	var far: Enemy = _enemy(Vector3(16, 0, 0))
 	await _seconds(1.2)
-	holder._fire()
-	await _frames(22)
 	var mag: int = holder.mag
-	holder.fire_secondary()
-	await _frames(2)
-	_check(behavior.call("rolling") == 0 and holder.mag == mag, "Hoch damit!: it goes off at once, for no ball")
+	await _right_click()
+	_check(holder.mag == mag and holder._cooldown <= 0.0, "with nothing rolling a right click does nothing")
+	holder._fire()
+	await _frames(20)
+	_check(holder._cooldown > 0.0, "the throw's cooldown is still running")
+	mag = holder.mag
+	await _right_click()
+	_check(behavior.call("rolling") == 0 and holder.mag == mag, "Hoch damit! right after the throw: it goes off at once, for no ball")
 	_check(crowd.all(func(e: Enemy) -> bool: return e.health < 10000), "the enemies beside it are caught in the blast")
 	_check(far.health == 10000, "the one further on is not")
-	holder.fire_secondary()
-	_check(holder.mag == mag, "with nothing rolling it does nothing")
+	# The last ball in the hand: the reload starts by itself while it still rolls.
+	await _seconds(1.2)
+	holder.mag = 1
+	holder._fire()
+	await _seconds(1.1)
+	_check(holder.is_reloading() and behavior.call("rolling") == 1, "after the last ball the reload starts while it rolls")
+	await _right_click()
+	_check(behavior.call("rolling") == 0 and holder.is_reloading(), "Hoch damit! still sets it off, and the reload goes on")
+	await _seconds(BOLINGBOI.reload_time)
+	_check(holder.mag == BOLINGBOI.mag_size, "reloaded: %d balls" % holder.mag)
+	holder.force_aim = false
 	for e: Enemy in [in_way, beside, near_wall, far] + crowd:
 		e.set_physics_process(true)
 		if e.is_alive():

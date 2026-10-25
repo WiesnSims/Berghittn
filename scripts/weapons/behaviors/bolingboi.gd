@@ -37,6 +37,15 @@ func fire(_rounds: int) -> void:
 	_rolled.append(ball)
 
 
+## Hoch damit! has a ball to set off only while one rolls, and goes off at once, between throws.
+func secondary_ready() -> bool:
+	return rolling() > 0
+
+
+func secondary_instant() -> bool:
+	return true
+
+
 func fire_secondary() -> void:
 	for i: int in range(_rolled.size() - 1, -1, -1):
 		var ball: Node3D = _rolled[i]

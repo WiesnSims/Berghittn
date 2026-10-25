@@ -2,12 +2,18 @@ class_name BolingboiViewmodel
 extends Viewmodel
 ## Da Bolingboi (1.2): a hand in a loden sleeve, palm up under a glossy purple bowling ball. A shot
 ## swings the arm down and forward (the ball is let go), and the next ball is back in the hand as
-## the arm comes up (fire_animation_time). Right click, Hoch damit!: a fist pump. The reload brings
-## the arm down out of view and back with a ball. Built in code under Model as soon as the scene is
+## the arm comes up (fire_animation_time). Right click, Hoch damit!: a fist pump. The reload (play-test
+## 1.2) flicks a fresh ball high up out of view, catches it and spins it on a finger. Built in code under Model as soon as the scene is
 ## made, so a copy of Model alone (WeaponPickup.model_of: a co-op hiker's hand, a drop) has it too.
 
 ## Seconds from a shot until the next ball is in the hand (= 1 / fire_rate).
 @export var ready_time: float = 1.0
+
+## Where the ball sits in the palm; how high it is tossed in the reload (model space, out of view),
+## and how far up the fingertip lifts it for the spin.
+const BALL_REST := Vector3(0.0, 0.085, -0.03)
+const TOSS_HEIGHT: float = 1.5
+const SPIN_LIFT: float = 0.07
 
 var _ball: Node3D
 var _arm: Node3D
@@ -40,12 +46,41 @@ func play_secondary(_rounds: int) -> void:
 
 
 func play_reload(duration: float, _chamber_time: float = 0.0) -> void:
+	# A fresh ball flicked high up out of view, caught with a dip, then spun on a finger before it
+	# settles back in the palm.
 	_restart_tween()
-	var lowered: Transform3D = _rest.translated(Vector3(0.0, -lower_drop, 0.05)).rotated_local(Vector3.RIGHT, deg_to_rad(-20.0))
-	_tween.tween_property(_model, "transform", lowered, duration * 0.35).set_trans(Tween.TRANS_QUAD)
-	_tween.tween_callback(func() -> void: _ball.visible = true)
-	_tween.tween_interval(duration * 0.2)
-	_tween.tween_property(_model, "transform", _rest, duration * 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	var d: float = duration
+	_ball.visible = true
+	var dipped: Transform3D = _rest.translated(Vector3(0.0, -0.06, 0.02)).rotated_local(Vector3.RIGHT, deg_to_rad(-12.0))
+	var flicked: Transform3D = _rest.translated(Vector3(0.0, 0.05, -0.02)).rotated_local(Vector3.RIGHT, deg_to_rad(18.0))
+	var high: Vector3 = BALL_REST + Vector3(0.0, TOSS_HEIGHT, 0.0)
+	_tween.tween_property(_model, "transform", dipped, d * 0.1).set_trans(Tween.TRANS_QUAD)
+	_tween.tween_property(_model, "transform", flicked, d * 0.06).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	# Up it goes, spinning, and slows at the top ...
+	_tween.tween_property(_ball, "position", high, d * 0.24).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_tween.parallel().tween_property(_ball, "rotation", Vector3(TAU, 0.0, TAU * 0.25), d * 0.24)
+	_tween.parallel().tween_property(_model, "transform", _rest, d * 0.2)
+	# ... and down again, into the hand.
+	_tween.tween_property(_ball, "position", BALL_REST, d * 0.24).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_tween.parallel().tween_property(_ball, "rotation", Vector3(TAU * 2.0, 0.0, TAU * 0.5), d * 0.24)
+	_tween.tween_property(_model, "transform", dipped, d * 0.05).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_tween.tween_property(_model, "transform", _rest, d * 0.06).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	# Up onto the fingertip and spun round twice, wobbling, then back down.
+	_tween.tween_property(_ball, "position", BALL_REST + Vector3(0.0, SPIN_LIFT, 0.0), d * 0.04)
+	_tween.tween_method(_spin, 0.0, 1.0, d * 0.16)
+	_tween.tween_property(_ball, "position", BALL_REST, d * 0.05).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+# The fingertip spin: `t` 0..1, three turns, the ball wobbling on its point.
+func _spin(t: float) -> void:
+	_ball.rotation = Vector3(sin(t * TAU * 2.0) * 0.18, t * TAU * 3.0, cos(t * TAU * 2.0) * 0.18)
+
+
+func _reset_parts() -> void:
+	super()
+	if _ball:
+		_ball.position = BALL_REST
+		_ball.rotation = Vector3.ZERO
 
 
 func _build() -> void:
@@ -71,7 +106,7 @@ func _build() -> void:
 		_part(BoxMesh.new(), Vector3(0.018, 0.06, 0.022), Vector3(-0.036 + i * 0.024, -0.005, -0.075), SharedLook.adopt(skin), _arm)
 	_part(BoxMesh.new(), Vector3(0.02, 0.05, 0.05), Vector3(0.058, 0.0, -0.01), SharedLook.adopt(skin), _arm)
 	_ball = Node3D.new()
-	_ball.position = Vector3(0.0, 0.085, -0.03)
+	_ball.position = BALL_REST
 	model.add_child(_ball)
 	var sphere := SphereMesh.new()
 	sphere.radius = 0.11
